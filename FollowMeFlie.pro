@@ -31,7 +31,9 @@ SOURCES +=  src/gui/main.cpp \
     src/communication/CCrazyflie.cpp \
     src/communication/CCrazyRadio.cpp \
     src/communication/CCRTPPacket.cpp \
-    src/communication/CTOC.cpp
+    src/communication/CTOC.cpp \
+    test/simpletest.cpp
+
 
 HEADERS  += src/gui/mainwindow.h \
     build/debug/moc_predefs.h \
@@ -40,18 +42,27 @@ HEADERS  += src/gui/mainwindow.h \
     src/communication/CCrazyRadio.h \
     src/communication/CCRTPPacket.h \
     src/communication/CTOC.h \
-    src/math/clock_gettime.h
+    src/math/clock_gettime.h \
+    test/simpletest.h
+
 
 FORMS    += src/gui/mainwindow.ui
 DESTDIR = bin
-INCLUDEPATH += src/gui
-INCLUDEPATH += src/communication
-INCLUDEPATH += src/math
-INCLUDEPATH += src/control
-
+INCLUDEPATH += src/gui \
+    src/communication \
+    src/math \
+    src/control \
+    test
+# Include library libusb-1.0.21
 INCLUDEPATH += $$PWD/../lib/libusb-1.0.21/include/libusb-1.0
 INCLUDEPATH += $$PWD/../lib/libusb-1.0.21/include/$$PWD/
 LIBS += -L$$PWD/"../lib/libusb-1.0.21/MinGW32/static" -llibusb-1.0
 
 DEPENDPATH += $$PWD/../lib/libusb-1.0.21/MinGW32/static
+# Include Google Test
+INCLUDEPATH += E:/Code/GTest/googletest-release-1.7.0/include \
+    E:/Code/GTest/googletest-release-1.7.0 \
+    E:/Code/GTest/gtestbuild-1.7.0
+SOURCES += E:/Code/GTest/googletest-release-1.7.0/src/gtest-all.cc
+LIBS += -lgtest -LE:/Code/GTest/gtestbuild-1.7.0
 
