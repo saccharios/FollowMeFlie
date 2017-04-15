@@ -6,8 +6,7 @@
 //#include <QtMultimediaWidgets>
 #include <QDebug>
 #include <memory>
-#include "../communication/CCrazyflie.h"
-
+#include "communication/CCrazyflie.h"
 
 bool checkCameraAvailability()
 {
@@ -16,12 +15,11 @@ bool checkCameraAvailability()
 
 int main(int argc, char *argv[])
 {
-//    QApplication app(argc, argv);
-//    MainWindow w;
-//    w.show();
+    QApplication app(argc, argv);
+    MainWindow w;
+    w.show();
 
-//    return app.exec();
-
+    return app.exec();
 
 //    CCrazyRadio *crRadio = new CCrazyRadio("radio://0/80/250K");
 //    bool startRadio = crRadio->startRadio();
