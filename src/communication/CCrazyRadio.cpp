@@ -296,46 +296,52 @@ enum Power CCrazyRadio::power() {
 	return m_enumPower;
 }
 
-void CCrazyRadio::setPower(enum Power enumPower) {
+void CCrazyRadio::setPower(enum Power enumPower)
+{
 	m_enumPower = enumPower;
 
 	this->writeControl(NULL, 0, 0x04, enumPower, 0);
 }
 
-void CCrazyRadio::setAddress(char *cAddress) {
+void CCrazyRadio::setAddress(char *cAddress)
+{
 	m_cAddress = cAddress;
 
 	this->writeControl(cAddress, 5, 0x02, 0, 0);
 }
 
-void CCrazyRadio::setContCarrier(bool bContCarrier) {
+void CCrazyRadio::setContCarrier(bool bContCarrier)
+{
 	m_bContCarrier = bContCarrier;
 
 	this->writeControl(NULL, 0, 0x20, (bContCarrier ? 1 : 0), 0);
 }
 
-bool CCrazyRadio::claimInterface(int nInterface) {
+bool CCrazyRadio::claimInterface(int nInterface)
+{
 	int errcode = libusb_claim_interface(m_hndlDevice, nInterface);
 	return errcode == 0;
 }
 
-CCRTPPacket *CCrazyRadio::sendPacket(CCRTPPacket *crtpSend, bool bDeleteAfterwards) {
+CCRTPPacket *CCrazyRadio::sendPacket(CCRTPPacket *crtpSend, bool bDeleteAfterwards)
+{
 	CCRTPPacket *crtpPacket = NULL;
 
-	char *cSendable = crtpSend->sendableData();
-	crtpPacket = this->writeData(cSendable, crtpSend->sendableDataLength());
+    char *cSendable = crtpSend->SendableData();
+    crtpPacket = this->writeData(cSendable, crtpSend->GetSendableDataLength());
 
 	delete[] cSendable;
 
-	if(crtpPacket) {
-		char *cData = crtpPacket->data();
-		int nLength = crtpPacket->dataLength();
+    if(crtpPacket)
+    {
+        char *cData = crtpPacket->Data();
+        int nLength = crtpPacket->DataLength();
 
 		if(nLength > 0) {
 			short sPort = (cData[0] & 0xf0) >> 4;
-			crtpPacket->setPort(sPort);
+            crtpPacket->setPort(sPort);
 			short sChannel = cData[0] & 0b00000011;
-			crtpPacket->setChannel(sChannel);
+            crtpPacket->SetChannel(sChannel);
 
 			switch(sPort) {
 			case 0: { // Console
@@ -347,10 +353,10 @@ CCRTPPacket *CCrazyRadio::sendPacket(CCRTPPacket *crtpSend, bool bDeleteAfterwar
 			} break;
 
 			case 5: { // Logging
-				if(crtpPacket->channel() == 2) {
-					CCRTPPacket *crtpLog = new CCRTPPacket(cData, nLength, crtpPacket->channel());
-					crtpLog->setChannel(crtpPacket->channel());
-					crtpLog->setPort(crtpPacket->port());
+                if(crtpPacket->GetChannel() == 2) {
+                    CCRTPPacket *crtpLog = new CCRTPPacket(cData, nLength, crtpPacket->GetChannel());
+                    crtpLog->SetChannel(crtpPacket->GetChannel());
+                    crtpLog->setPort(crtpPacket->GetPort());
 
 					m_lstLoggingPackets.push_back(crtpLog);
 				}
@@ -386,7 +392,7 @@ CCRTPPacket *CCrazyRadio::readACK() {
 			crtpPacket = new CCRTPPacket(0);
 
 			if(nBytesRead > 1) {
-				crtpPacket->setData(&cBuffer[1], nBytesRead);
+                crtpPacket->SetData(&cBuffer[1], nBytesRead);
 			}
 		} else {
 			m_bAckReceived = false;
@@ -410,7 +416,7 @@ CCRTPPacket *CCrazyRadio::waitForPacket() {
 	bool bGoon = true;
 	CCRTPPacket *crtpReceived = NULL;
 	CCRTPPacket *crtpDummy = new CCRTPPacket(0);
-	crtpDummy->setIsPingPacket(true);
+    crtpDummy->SetIsPingPacket(true);
 
 	while(bGoon) {
 		crtpReceived = this->sendPacket(crtpDummy);
@@ -422,7 +428,7 @@ CCRTPPacket *CCrazyRadio::waitForPacket() {
 }
 
 CCRTPPacket *CCrazyRadio::sendAndReceive(CCRTPPacket *crtpSend, bool bDeleteAfterwards) {
-	return this->sendAndReceive(crtpSend, crtpSend->port(), crtpSend->channel(), bDeleteAfterwards);
+    return this->sendAndReceive(crtpSend, crtpSend->GetPort(), crtpSend->GetChannel(), bDeleteAfterwards);
 }
 
 CCRTPPacket *CCrazyRadio::sendAndReceive(CCRTPPacket *crtpSend, int nPort, int nChannel, bool bDeleteAfterwards, int nRetries, int nMicrosecondsWait) {
@@ -440,8 +446,8 @@ CCRTPPacket *CCrazyRadio::sendAndReceive(CCRTPPacket *crtpSend, int nPort, int n
 		}
 
 		if(crtpReceived) {
-			if(crtpReceived->port() == nPort &&
-					crtpReceived->channel() == nChannel) {
+            if(crtpReceived->GetPort() == nPort &&
+                    crtpReceived->GetChannel() == nChannel) {
 				crtpReturnvalue = crtpReceived;
 				bGoon = false;
 			}
@@ -476,7 +482,7 @@ std::list<CCRTPPacket*> CCrazyRadio::popLoggingPackets() {
 bool CCrazyRadio::sendDummyPacket() {
 	CCRTPPacket *crtpReceived = NULL;
 	CCRTPPacket *crtpDummy = new CCRTPPacket(0);
-	crtpDummy->setIsPingPacket(true);
+    crtpDummy->SetIsPingPacket(true);
 
 	crtpReceived = this->sendPacket(crtpDummy, true);
 	if(crtpReceived) {

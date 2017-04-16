@@ -29,135 +29,99 @@
 /* \author Jan Winkler */
 
 
-#ifndef __C_CRTP_PACKET_H__
-#define __C_CRTP_PACKET_H__
-
+#pragma once
 
 // System
 #include <cstring>
 
 
-/*! \brief Class to hold and process communication-related data for
-  the CRTProtocol */
+// Class to hold and process communication-related data for the CRTProtocol
 class CCRTPPacket {
- private:
-  // Variables
-  /*! \brief Internal storage pointer for payload data inside the
-    packet
 
-    This data is freed when either new data is set or the class
-    instance is destroyed.*/
-  char *m_cData;
-  /*! \brief The length of the data pointed to by m_cData */
-  int m_nDataLength;
-  /*! \brief The copter port the packet will be delivered to */
-  int m_nPort;
-  /*! \brief The copter channel the packet will be delivered to */
-  int m_nChannel;
-  bool m_bIsPingPacket;
+public:
+    // Constructor for the CCRTPPacket communication packet
+    // Initializes the communication packet and sets the given
+    // channel. The packet starts out without payload data.
+    // nChannel The channel the payload in this packet is
+    // designated for.
+    CCRTPPacket(int channel);
 
-  // Functions
-  /*! \brief Sets all internal variables to their default values.
+    // Convenience constructor for the CCRTPPacket communication packet class
+    // Initializes the communication packet and sets the given
+    // channel. The given data is set as the internal payload data.
+    // \param cData The data pointer to read the new payload data from
+    // \param nDataLength The length (in bytes) of data to read from cData
+    // \param nChannel The channel the payload in this packet is designated for.
+    CCRTPPacket(char* data, int dataLength, int channel);
+    CCRTPPacket(char data, int port);
 
-    The function clearData() should be called before this if it is
-    used outside of the constructor. */
-  void basicSetup();
-  /*! \brief Deletes the internally stored data and resets the data
-    length and the pointer to zero */
-  void clearData();
+    //    De-initializes the packet and deletes all available payload data stored.
+    ~CCRTPPacket();
 
- public:
-  /*! \brief Constructor for the CCRTPPacket communication packet
-    class
+    // Copies the given data of the specified length to the internal storage.
+    //    \param cData Pointer pointing to the data that should be used as payload
+    //    \param nDataLength Length (in bytes) of the data that should be read from cData for storage
+    void SetData(char* data, int dataLength);
 
-    Initializes the communication packet and sets the given
-    channel. The packet starts out without payload data.
+    // Gives out the pointer to the internally stored data
+    // Don't manipulate the data pointed to by this pointer. Usually, you
+    // won't have to call this function at all as it is used by the more
+    // interface-designated functions.
+    // \return Returns a direct pointer to the internally stored data
+    char* Data();
 
-    \param nChannel The channel the payload in this packet is
-    designated for. */
-  CCRTPPacket(int nChannel);
-  /*! \brief Convenience constructor for the CCRTPPacket communication
-    packet class
+    // Returns the length of the currently stored data (in bytes)
+    //\return Returns the number of bytes stored as payload data
+    int DataLength();
 
-    Initializes the communication packet and sets the given
-    channel. The given data is set as the internal payload data.
+    // Prepares a sendable block of data based on the CCRTPPacket details
+    // A block of data is prepared that contains the packet header
+    // (channel, port), the payload data and a finishing byte
+    // (0x27). This block is newly allocated and must be delete[]'d after usage.
+    // \return Pointer to a new char[] containing a sendable block of payload data
+    char* SendableData();
 
-    \param cData The data pointer to read the new payload data from
-    \param nDataLength The length (in bytes) of data to read from
-    cData
-    \param nChannel The channel the payload in this packet is
-    designated for. */
-  CCRTPPacket(char *cData, int nDataLength, int nChannel);
-  CCRTPPacket(char cData, int nPort);
-  /*! \brief Destructor for the packet class
+    // Returns the length of a sendable data block
+    // \return Length of the sendable data block returned by sendableData() (in bytes)
+    int GetSendableDataLength();
 
-    De-initializes the packet and deletes all available payload data
-    stored. */
-  ~CCRTPPacket();
+    // Set the copter port to send the payload data to
+    // The port identifies the purpose of the packet on the copter. This
+    // function sets the port that is later used in sendableData().
+    // \param nPort Port number to set */
+    void setPort(int port);
 
-  /*! \brief Copies the given data of the specified length to the
-    internal storage.
+    int GetPort();
 
-    \param cData Pointer pointing to the data that should be used as
-    payload
-    \param nDataLength Length (in bytes) of the data that should be
-    read from cData for storage */
-  void setData(char *cData, int nDataLength);
-  /*! \brief Gives out the pointer to the internally stored data
+    // Set the copter channel to send the payload data to
+    // The channel identifies the purpose of the packet on the
+    // copter. This function sets the channel that is later used in
+    // sendableData().
+    // \param nChannel Channel number to set */
+    void SetChannel(int channel);
 
-    Don't manipulate the data pointed to by this pointer. Usually, you
-    won't have to call this function at all as it is used by the more
-    interface-designated functions.
+    int GetChannel();
 
-    \return Returns a direct pointer to the internally stored data */
-  char *data();
-  /*! \brief Returns the length of the currently stored data (in
-      bytes)
+    void SetIsPingPacket(bool isPingPacket);
+    bool IsPingPacket();
+private:
+    // Internal storage pointer for payload data inside the  packet
+    //    This data is freed when either new data is set or the class instance is destroyed.
+    char* _data;
+    // The length of the data pointed to by m_cData
+    int _dataLength;
+    // The copter port the packet will be delivered to
+    int _port;
+    // The copter channel the packet will be delivered to
+    int _channel;
+    bool _isPingPacket;
 
-    \return Returns the number of bytes stored as payload data */
-  int dataLength();
-
-  /*! \brief Prepares a sendable block of data based on the
-      CCRTPPacket details
-
-    A block of data is prepared that contains the packet header
-    (channel, port), the payload data and a finishing byte
-    (0x27). This block is newly allocated and must be delete[]'d after
-    usage.
-
-    \return Pointer to a new char[] containing a sendable block of
-    payload data */
-  char *sendableData();
-  /*! \brief Returns the length of a sendable data block
-
-    \return Length of the sendable data block returned by
-    sendableData() (in bytes) */
-  int sendableDataLength();
-
-  /*! \brief Set the copter port to send the payload data to
-
-    The port identifies the purpose of the packet on the copter. This
-    function sets the port that is later used in sendableData().
-
-    \param nPort Port number to set */
-  void setPort(int nPort);
-  /*! \brief Returns the currently set port number */
-  int port();
-
-  /*! \brief Set the copter channel to send the payload data to
-
-    The channel identifies the purpose of the packet on the
-    copter. This function sets the channel that is later used in
-    sendableData().
-
-    \param nChannel Channel number to set */
-  void setChannel(int nChannel);
-  /*! \brief Returns the currently set channel number */
-  int channel();
-
-  void setIsPingPacket(bool bIsPingPacket);
-  bool isPingPacket();
+    // Sets all internal variables to their default values.
+    // The function clearData() should be called before this if it is
+    // used outside of the constructor.
+    void BasicSetup();
+    // Deletes the internally stored data and resets the data length and the pointer to zero
+    void ClearData();
 };
 
 
-#endif /* __C_CRTP_PACKET_H__ */

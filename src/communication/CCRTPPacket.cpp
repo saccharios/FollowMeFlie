@@ -29,108 +29,131 @@
 #include "CCRTPPacket.h"
 
 
-CCRTPPacket::CCRTPPacket(int nPort) {
-  this->basicSetup();
-  this->setPort(nPort);
+CCRTPPacket::CCRTPPacket(int port)
+{
+    this->BasicSetup();
+    this->setPort(port);
 }
 
-CCRTPPacket::CCRTPPacket(char *cData, int nDataLength, int nPort) {
-  this->basicSetup();
-  this->setPort(nPort);
+CCRTPPacket::CCRTPPacket(char* data, int dataLength, int port)
+{
+    this->BasicSetup();
+    this->setPort(port);
 
-  this->setData(cData, nDataLength);
+    this->SetData(data, dataLength);
 }
 
-CCRTPPacket::CCRTPPacket(char cData, int nPort) {
-  this->basicSetup();
-  this->setPort(nPort);
+CCRTPPacket::CCRTPPacket(char data, int port)
+{
+    this->BasicSetup();
+    this->setPort(port);
 
-  this->setData(&cData, 1);
+    this->SetData(&data, 1);
 }
 
 CCRTPPacket::~CCRTPPacket() {
-  this->clearData();
+    this->ClearData();
 }
 
-void CCRTPPacket::basicSetup() {
-  m_cData = NULL;
-  m_nDataLength = 0;
-  m_nPort = 0;
-  m_nChannel = 0;
-  m_bIsPingPacket = false;
+void CCRTPPacket::BasicSetup()
+{
+    _data = NULL;
+    _dataLength = 0;
+    _port = 0;
+    _channel = 0;
+    _isPingPacket = false;
 }
 
-void CCRTPPacket::setData(char *cData, int nDataLength) {
-  this->clearData();
+void CCRTPPacket::SetData(char* data, int dataLength)
+{
+    this->ClearData();
 
-  m_cData = new char[nDataLength]();
-  std::memcpy(m_cData, cData, nDataLength);
-  m_nDataLength = nDataLength;
+    _data = new char[dataLength]();
+    std::memcpy(_data,  data, dataLength);
+    _dataLength = dataLength;
 }
 
-char *CCRTPPacket::data() {
-  return m_cData;
+char *CCRTPPacket::Data()
+{
+    return _data;
 }
 
-int CCRTPPacket::dataLength() {
-  return m_nDataLength;
+int CCRTPPacket::DataLength()
+{
+    return _dataLength;
 }
 
-void CCRTPPacket::clearData() {
-  if(m_cData != NULL) {
-    delete[] m_cData;
-    m_cData = NULL;
-    m_nDataLength = 0;
-  }
+void CCRTPPacket::ClearData()
+{
+    if(_data != NULL)
+    {
+        delete[] _data;
+        _data = NULL;
+        _dataLength = 0;
+    }
 }
 
-char *CCRTPPacket::sendableData() {
-  char *cSendable = new char[this->sendableDataLength()]();
+char *CCRTPPacket::SendableData()
+{
+    char* sendable = new char[this->GetSendableDataLength()]();
 
-  if(m_bIsPingPacket) {
-    cSendable[0] = 0xff;
-  } else {
-    // Header byte
-    cSendable[0] = (m_nPort << 4) | 0b00001100 | (m_nChannel & 0x03);
+    if(_isPingPacket)
+    {
+        sendable[0] = 0xff;
+    }
+    else
+    {
+        // Header byte
+        sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
 
-    // Payload
-    std::memcpy(&cSendable[1], m_cData, m_nDataLength);
+        // Payload
+        std::memcpy(&sendable[1], _data, _dataLength);
 
-    // Finishing byte
-    //cSendable[m_nDataLength + 1] = 0x27;
-  }
+        // Finishing byte
+        //cSendable[m_nDataLength + 1] = 0x27;
+    }
 
-  return cSendable;
+    return sendable;
 }
 
-int CCRTPPacket::sendableDataLength() {
-  if(m_bIsPingPacket) {
-    return 1;
-  } else {
-    return m_nDataLength + 1;//2;
-  }
+int CCRTPPacket::GetSendableDataLength()
+{
+    if(_isPingPacket)
+    {
+        return 1;
+    }
+    else
+    {
+        return _dataLength + 1;//2;
+    }
 }
 
-void CCRTPPacket::setPort(int nPort) {
-  m_nPort = nPort;
+void CCRTPPacket::setPort(int port) // Name SetPort (with capital S) is a macro
+{
+    _port = port;
 }
 
-int CCRTPPacket::port() {
-  return m_nPort;
+int CCRTPPacket::GetPort()
+{
+    return _port;
 }
 
-void CCRTPPacket::setChannel(int nChannel) {
-  m_nChannel = nChannel;
+void CCRTPPacket::SetChannel(int channel)
+{
+    _channel = channel;
 }
 
-int CCRTPPacket::channel() {
-  return m_nChannel;
+int CCRTPPacket::GetChannel()
+{
+    return _channel;
 }
 
-void CCRTPPacket::setIsPingPacket(bool bIsPingPacket) {
-  m_bIsPingPacket = bIsPingPacket;
+void CCRTPPacket::SetIsPingPacket(bool isPingPacket)
+{
+    _isPingPacket = isPingPacket;
 }
 
-bool CCRTPPacket::isPingPacket() {
-  return m_bIsPingPacket;
+bool CCRTPPacket::IsPingPacket()
+{
+    return _isPingPacket;
 }

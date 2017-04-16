@@ -15,58 +15,62 @@ bool checkCameraAvailability()
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    MainWindow w;
-    w.show();
+    //    QApplication app(argc, argv);
+    //    MainWindow w;
+    //    w.show();
 
-    return app.exec();
+    //    return app.exec();
 
-//    CCrazyRadio *crRadio = new CCrazyRadio("radio://0/80/250K");
-//    bool startRadio = crRadio->startRadio();
-//    if(startRadio) {
-//      CCrazyflie *cflieCopter = new CCrazyflie(crRadio);
-//      cflieCopter->setThrust(10001);
+    CCrazyRadio* crazyRadio = new CCrazyRadio("radio://0/80/250K");
+    bool startRadio = crazyRadio->startRadio();
+    if(startRadio)
+    {
+        CCrazyflie *crazyFlie= new CCrazyflie(crazyRadio);
+        crazyFlie->SetThrust(10001);
 
-//      // Enable sending the setpoints. This can be used to temporarily
-//      // stop updating the internal controller setpoints and instead
-//      // sending dummy packets (to keep the connection alive).
-//      cflieCopter->setSendSetpoints(true);
+        // Enable sending the setpoints. This can be used to temporarily
+        // stop updating the internal controller setpoints and instead
+        // sending dummy packets (to keep the connection alive).
+        crazyFlie->SetSendSetpoints(true);
 
-//      while(cflieCopter->cycle()) {
-//        // Main loop. Currently empty.
+        while(crazyFlie->Update())
+        {
+            // Main loop. Currently empty.
 
-//        /* Examples to set thrust and RPY:
+            /* Examples to set thrust and RPY:
 
-//       // Range: 10001 - (approx.) 60000
-//       cflieCopter->setThrust(10001);
+       // Range: 10001 - (approx.) 60000
+       cflieCopter->setThrust(10001);
 
-//       // All in degrees. R/P shouldn't be over 45 degree (it goes
-//       // sidewards really fast!). R/P/Y are all from -180.0deg to 180.0deg.
-//       cflieCopter->setRoll(20);
-//       cflieCopter->setPitch(15);
-//       cflieCopter->setYaw(140); */
+       // All in degrees. R/P shouldn't be over 45 degree (it goes
+       // sidewards really fast!). R/P/Y are all from -180.0deg to 180.0deg.
+       cflieCopter->setRoll(20);
+       cflieCopter->setPitch(15);
+       cflieCopter->setYaw(140); */
 
-//        // Important note: When quitting the program, please don't just
-//        // SIGINT (i.e. CTRL-C) it. The CCrazyflie class instance
-//        // cflieCopter must be deleted in order to call the destructor
-//        // which stops logging on the device. If you fail to do this
-//        // when quitting your program, your copter will experience some
-//        // kind of buffer overflow (because of a lot of logging messages
-//        // summing up without being collected) and you will have to
-//        // restart it manually. This is not being done in this
-//        // particular example. You have been warned.
+            // Important note: When quitting the program, please don't just
+            // SIGINT (i.e. CTRL-C) it. The CCrazyflie class instance
+            // cflieCopter must be deleted in order to call the destructor
+            // which stops logging on the device. If you fail to do this
+            // when quitting your program, your copter will experience some
+            // kind of buffer overflow (because of a lot of logging messages
+            // summing up without being collected) and you will have to
+            // restart it manually. This is not being done in this
+            // particular example. You have been warned.
 
-//        // Other than that, this example covers pretty much everything
-//        // basic you will need for controlling the copter.
-//      }
+            // Other than that, this example covers pretty much everything
+            // basic you will need for controlling the copter.
+        }
 
-//      delete cflieCopter;
-//    } else {
-//      std::cerr << "Could not connect to dongle. Did you plug it in?" << std::endl;
-//    }
+        delete crazyFlie;
+    }
+    else
+    {
+        std::cerr << "Could not connect to dongle. Did you plug it in?" << std::endl;
+    }
 
-//    delete crRadio;
-//    return 0;
+    delete crazyRadio;
+    return 0;
 
 
 }
