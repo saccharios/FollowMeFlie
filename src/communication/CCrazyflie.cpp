@@ -99,7 +99,7 @@ bool CCrazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust) 
     memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
 
     CCRTPPacket *crtpPacket = new CCRTPPacket(cBuffer, nSize, 3);
-    CCRTPPacket *crtpReceived = _crazyRadio->sendPacket(crtpPacket);
+    CCRTPPacket *crtpReceived = _crazyRadio->SendPacket(crtpPacket);
 
     delete crtpPacket;
     if(crtpReceived != NULL)
@@ -168,7 +168,7 @@ bool CCrazyflie::Update()
     
   case STATE_ZERO_MEASUREMENTS:
   {
-    _tocLogs->ProcessPackets(_crazyRadio->popLoggingPackets());
+    _tocLogs->ProcessPackets(_crazyRadio->PopLoggingPackets());
     
     // NOTE(winkler): Here, we can do measurement zero'ing. This is
     // not done at the moment, though. Reason: No readings to zero at
@@ -180,7 +180,7 @@ bool CCrazyflie::Update()
   case STATE_NORMAL_OPERATION:
   {
     // Shove over the sensor readings from the radio to the Logs TOC.
-    _tocLogs->ProcessPackets(_crazyRadio->popLoggingPackets());
+    _tocLogs->ProcessPackets(_crazyRadio->PopLoggingPackets());
     
     if(_sendsSetpoints)
     {
@@ -195,7 +195,7 @@ bool CCrazyflie::Update()
     else
     {
       // Send a dummy packet for keepalive
-      _crazyRadio->sendDummyPacket();
+      _crazyRadio->SendDummyPacket();
     }
   } break;
     
@@ -204,7 +204,7 @@ bool CCrazyflie::Update()
   } break;
   }
   
-  if(_crazyRadio->ackReceived())
+  if(_crazyRadio->AckReceived())
   {
     _ackMissCounter = 0;
   }
@@ -213,7 +213,7 @@ bool CCrazyflie::Update()
     _ackMissCounter++;
   }
   
-  return _crazyRadio->usbOK();
+  return _crazyRadio->IsUsbConnectionOk();
 }
 
 bool CCrazyflie::IsCopterConnected()

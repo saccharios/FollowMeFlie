@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     //    return app.exec();
 
     CCrazyRadio* crazyRadio = new CCrazyRadio("radio://0/80/250K");
-    bool startRadio = crazyRadio->startRadio();
+    bool startRadio = crazyRadio->StartRadio();
     if(startRadio)
     {
         CCrazyflie *crazyFlie= new CCrazyflie(crazyRadio);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         while(crazyFlie->Update())
         {
             // Main loop. Currently empty.
-
+crazyFlie->SetThrust(60001);
             /* Examples to set thrust and RPY:
 
        // Range: 10001 - (approx.) 60000

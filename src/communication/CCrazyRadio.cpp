@@ -34,105 +34,118 @@
 #include <mutex>
 #include "../../../mingw_std_threads/mingw.mutex.h"
 
-CCrazyRadio::CCrazyRadio(std::string strRadioIdentifier) {
-	m_strRadioIdentifier = strRadioIdentifier;
-	m_enumPower = P_M18DBM;
+CCrazyRadio::CCrazyRadio(std::string radioIdentifier)
+{
+    _radioIdentifier = radioIdentifier;
+    _power = P_M18DBM;
 
-	m_ctxContext = NULL;
-	m_hndlDevice = NULL;
+    _context = NULL;
+    _device = NULL;
 
-	m_bAckReceived = false;
+    _ackReceived = false;
 
-	int nReturn = libusb_init(&m_ctxContext);
+    int returnVal = libusb_init(&_context);
 	// Do error checking here.
 }
 
-CCrazyRadio::~CCrazyRadio() {
-	this->closeDevice();
+CCrazyRadio::~CCrazyRadio()
+{
+    this->CloseDevice();
 
 	// TODO(winkler): Free all remaining packets in m_lstLoggingPackets.
 
-	if(m_ctxContext) {
-		libusb_exit(m_ctxContext);
+    if(_context)
+    {
+        libusb_exit(_context);
 	}
 }
 
-void CCrazyRadio::closeDevice() {
-	if(m_hndlDevice) {
-		libusb_close(m_hndlDevice);
-		libusb_unref_device(m_devDevice);
+void CCrazyRadio::CloseDevice()
+{
+    if(_device)
+    {
+        libusb_close(_device);
+        libusb_unref_device(_devDevice);
 
-		m_hndlDevice = NULL;
-		m_devDevice = NULL;
+        _device = NULL;
+        _devDevice = NULL;
 	}
 }
 
-std::list<libusb_device*> CCrazyRadio::listDevices(int nVendorID, int nProductID) {
-	std::list<libusb_device*> lstDevices;
-	ssize_t szCount;
-	libusb_device **ptDevices;
+std::list<libusb_device*> CCrazyRadio::ListDevices(int vendorID, int productID)
+{
+    std::list<libusb_device*> devices;
+    ssize_t count;
+    libusb_device** pdevices;
 
-	szCount = libusb_get_device_list(m_ctxContext, &ptDevices);
-	for(unsigned int unI = 0; unI < szCount; unI++) {
-		libusb_device *devCurrent = ptDevices[unI];
+    count = libusb_get_device_list(_context, &pdevices);
+    for(unsigned int unI = 0; unI < count; unI++)
+    {
+        libusb_device *devCurrent = pdevices[unI];
 		libusb_device_descriptor ddDescriptor;
 
 		libusb_get_device_descriptor(devCurrent, &ddDescriptor);
 
-		if(ddDescriptor.idVendor == nVendorID && ddDescriptor.idProduct == nProductID) {
+        if(ddDescriptor.idVendor == vendorID && ddDescriptor.idProduct == productID)
+        {
 			libusb_ref_device(devCurrent);
-			lstDevices.push_back(devCurrent);
+            devices.push_back(devCurrent);
 		}
 	}
 
-	if(szCount > 0) {
-		libusb_free_device_list(ptDevices, 1);
+    if(count > 0)
+    {
+        libusb_free_device_list(pdevices, 1);
 	}
 
-	return lstDevices;
+    return devices;
 }
 
-bool CCrazyRadio::openUSBDongle() {
-	this->closeDevice();
-	std::list<libusb_device*> lstDevices = this->listDevices(0x1915, 0x7777);
+bool CCrazyRadio::OpenUSBDongle()
+{
+    this->CloseDevice();
+    std::list<libusb_device*> lstDevices = this->ListDevices(0x1915, 0x7777);
 
 	if(lstDevices.size() > 0) {
 		// For now, just take the first device. Give it a second to
 		// initialize the system permissions.
 		sleep(1.0);
 
-		libusb_device *devFirst = lstDevices.front();
-		int nError = libusb_open(devFirst, &m_hndlDevice);
+        libusb_device* devFirst = lstDevices.front();
+        int error = libusb_open(devFirst, &_device);
 
-		if(nError == 0) {
+        if(error == 0)
+        {
 			// Opening device OK. Don't free the first device just yet.
 			lstDevices.pop_front();
-			m_devDevice = devFirst;
+            _devDevice = devFirst;
 		}
 
 		for(std::list<libusb_device*>::iterator itDevice = lstDevices.begin();
 				itDevice != lstDevices.end();
-				itDevice++) {
-			libusb_device *devCurrent = *itDevice;
+                itDevice++)
+        {
+            libusb_device* devCurrent = *itDevice;
 
 			libusb_unref_device(devCurrent);
 		}
 
-		return !nError;
+        return !error;
 	}
 
 	return false;
 }
 
-bool CCrazyRadio::startRadio() {
-	if(this->openUSBDongle())
+bool CCrazyRadio::StartRadio()
+{
+    if(this->OpenUSBDongle())
 	{
 		int nDongleNBR;
 		int nRadioChannel;
 		int nDataRate;
 		char cDataRateType;
 
-		if(std::sscanf(m_strRadioIdentifier.c_str(), "radio://%d/%d/%d%c",
+        if(std::sscanf(_radioIdentifier.c_str(), "radio://%d/%d/%d%c",
 				&nDongleNBR, &nRadioChannel, &nDataRate,
 				&cDataRateType) != EOF)
 		{
@@ -145,52 +158,52 @@ bool CCrazyRadio::startRadio() {
 
 			// Read device version
 			libusb_device_descriptor ddDescriptor;
-			libusb_get_device_descriptor(m_devDevice, &ddDescriptor);
+            libusb_get_device_descriptor(_devDevice, &ddDescriptor);
 			sts.clear();
 			sts.str(std::string());
 			sts << (ddDescriptor.bcdDevice >> 8);
 			sts << ".";
 			sts << (ddDescriptor.bcdDevice & 0x0ff);
-			std::sscanf(sts.str().c_str(), "%f", &m_fDeviceVersion);
+            std::sscanf(sts.str().c_str(), "%f", &_deviceVersion);
 
-			std::cout << "Got device version " << m_fDeviceVersion << std::endl;
-			if(m_fDeviceVersion < 0.3)
+            std::cout << "Got device version " << _deviceVersion << std::endl;
+            if(_deviceVersion < 0.3)
 			{
 				return false;
 			}
 
 			// Set active configuration to 1
-			libusb_set_configuration(m_hndlDevice, 1);
+            libusb_set_configuration(_device, 1);
 			// Claim interface
-			bool claimIntf = this->claimInterface(0);
+            bool claimIntf = this->ClaimInterface(0);
 			if(claimIntf)
 			{
 				// Set power-up settings for dongle (>= v0.4)
-				this->setDataRate("2M");
+                this->SetDataRate("2M");
 				this->setChannel(2);
 
-				if(m_fDeviceVersion >= 0.4)
+                if(_deviceVersion >= 0.4)
 				{
-					this->setContCarrier(false);
+                    this->SetContCarrier(false);
 					char cAddress[5];
 					cAddress[0] = 0xe7;
 					cAddress[1] = 0xe7;
 					cAddress[2] = 0xe7;
 					cAddress[3] = 0xe7;
 					cAddress[4] = 0xe7;
-					this->setAddress(cAddress);
-					this->setPower(P_0DBM);
-					this->setARC(3);
-					this->setARDBytes(32);
+                    this->SetAddress(cAddress);
+                    this->SetPower(P_0DBM);
+                    this->SetARC(3);
+                    this->SetARDBytes(32);
 				}
 
 				// Initialize device
-				if(m_fDeviceVersion >= 0.4) {
-					this->setARC(10);
+                if(_deviceVersion >= 0.4) {
+                    this->SetARC(10);
 				}
 
 				this->setChannel(nRadioChannel);
-				this->setDataRate(strDataRate);
+                this->SetDataRate(strDataRate);
 
 				return true;
 			}
@@ -200,29 +213,36 @@ bool CCrazyRadio::startRadio() {
 	return false;
 }
 
-CCRTPPacket *CCrazyRadio::writeData(void *vdData, int nLength) {
-	CCRTPPacket *crtpPacket = NULL;
+CCRTPPacket *CCrazyRadio::WriteData(void* data, int length)
+{
+    CCRTPPacket* packet = NULL;
 
 	int nActuallyWritten;
-	int nReturn = libusb_bulk_transfer(m_hndlDevice, (0x01 | LIBUSB_ENDPOINT_OUT), (unsigned char*)vdData, nLength, &nActuallyWritten, 1000);
+    int nReturn = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), (unsigned char*)data, length, &nActuallyWritten, 1000);
 
-	if(nReturn == 0 && nActuallyWritten == nLength) {
-		crtpPacket = this->readACK();
+    if(nReturn == 0 && nActuallyWritten == length)
+    {
+        packet = this->ReadAck();
 	}
 
-	return crtpPacket;
+    return packet;
 }
 
-bool CCrazyRadio::readData(void *vdData, int &nMaxLength) {
+bool CCrazyRadio::ReadData(void* data, int & maxLength)
+{
 	int nActuallyRead;
-	int nReturn = libusb_bulk_transfer(m_hndlDevice, (0x81 | LIBUSB_ENDPOINT_IN), (unsigned char*)vdData, nMaxLength, &nActuallyRead, 50);
+    int nReturn = libusb_bulk_transfer(_device, (0x81 | LIBUSB_ENDPOINT_IN), (unsigned char*)data,  maxLength, &nActuallyRead, 50);
 
-	if(nReturn == 0) {
-		nMaxLength = nActuallyRead;
+    if(nReturn == 0)
+    {
+         maxLength = nActuallyRead;
 
 		return true;
-	} else {
-		switch(nReturn) {
+    }
+    else
+    {
+        switch(nReturn)
+        {
 		case LIBUSB_ERROR_TIMEOUT:
 			std::cout << "USB timeout" << std::endl;
 			break;
@@ -235,10 +255,11 @@ bool CCrazyRadio::readData(void *vdData, int &nMaxLength) {
 	return false;
 }
 
-bool CCrazyRadio::writeControl(void *vdData, int nLength, uint8_t u8Request, uint16_t u16Value, uint16_t u16Index) {
+bool CCrazyRadio::WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index)
+{
 	int nTimeout = 1000;
 
-	/*int nReturn = */libusb_control_transfer(m_hndlDevice, LIBUSB_REQUEST_TYPE_VENDOR, u8Request, u16Value, u16Index, (unsigned char*)vdData, nLength, nTimeout);
+    /*int nReturn = */libusb_control_transfer(_device, LIBUSB_REQUEST_TYPE_VENDOR, request, value, index, (unsigned char*)data, length, nTimeout);
 
 	// if(nReturn == 0) {
 	//   return true;
@@ -248,141 +269,157 @@ bool CCrazyRadio::writeControl(void *vdData, int nLength, uint8_t u8Request, uin
 	return true;
 }
 
-void CCrazyRadio::setARC(int nARC) {
-	m_nARC = nARC;
-	this->writeControl(NULL, 0, 0x06, nARC, 0);
+void CCrazyRadio::SetARC(int ARC)
+{
+    _arc = ARC;
+    this->WriteControl(NULL, 0, 0x06, ARC, 0);
 }
 
-void CCrazyRadio::setChannel(int nChannel) {
-	m_nChannel = nChannel;
-	this->writeControl(NULL, 0, 0x01, nChannel, 0);
+void CCrazyRadio::setChannel(int channel)
+{
+    _channel = channel;
+    this->WriteControl(NULL, 0, 0x01, channel, 0);
 }
 
-void CCrazyRadio::setDataRate(std::string strDataRate) {
-	m_strDataRate = strDataRate;
-	int nDataRate = -1;
+void CCrazyRadio::SetDataRate(std::string dataRate)
+{
+    _dataRate = dataRate;
+    int dataRateCoded = -1;
 
-	if(m_strDataRate == "250K") {
-		nDataRate = 0;
-	} else if(m_strDataRate == "1M") {
-		nDataRate = 1;
-	} else if(m_strDataRate == "2M") {
-		nDataRate = 2;
+    if(_dataRate == "250K") {
+        dataRateCoded = 0;
+    } else if(_dataRate == "1M") {
+        dataRateCoded = 1;
+    } else if(_dataRate == "2M") {
+        dataRateCoded = 2;
 	}
 
-	this->writeControl(NULL, 0, 0x03, nDataRate, 0);
+    this->WriteControl(NULL, 0, 0x03, dataRateCoded, 0);
 }
 
-void CCrazyRadio::setARDTime(int nARDTime) { // in uSec
-	m_nARDTime = nARDTime;
+void CCrazyRadio::SetARDTime(int ARDTime)
+{ // in uSec
+    _ardTime = ARDTime;
 
-	int nT = int((nARDTime / 250) - 1);
-	if(nT < 0) {
-		nT = 0;
-	} else if(nT > 0xf) {
-		nT = 0xf;
+    int T = int((ARDTime / 250) - 1);
+    if(T < 0)
+    {
+        T = 0;
+    }
+    else if(T > 0xf)
+    {
+        T = 0xf;
 	}
 
-	this->writeControl(NULL, 0, 0x05, nT, 0);
+    this->WriteControl(NULL, 0, 0x05, T, 0);
 }
 
-void CCrazyRadio::setARDBytes(int nARDBytes) {
-	m_nARDBytes = nARDBytes;
-
-	this->writeControl(NULL, 0, 0x05, 0x80 | nARDBytes, 0);
-}
-
-enum Power CCrazyRadio::power() {
-	return m_enumPower;
-}
-
-void CCrazyRadio::setPower(enum Power enumPower)
+void CCrazyRadio::SetARDBytes(int ARDBytes)
 {
-	m_enumPower = enumPower;
+    _ardBytes = ARDBytes;
 
-	this->writeControl(NULL, 0, 0x04, enumPower, 0);
+    this->WriteControl(NULL, 0, 0x05, 0x80 | ARDBytes, 0);
 }
 
-void CCrazyRadio::setAddress(char *cAddress)
+enum Power CCrazyRadio::Power()
 {
-	m_cAddress = cAddress;
-
-	this->writeControl(cAddress, 5, 0x02, 0, 0);
+    return _power;
 }
 
-void CCrazyRadio::setContCarrier(bool bContCarrier)
+void CCrazyRadio::SetPower(enum Power power)
 {
-	m_bContCarrier = bContCarrier;
+    _power = power;
 
-	this->writeControl(NULL, 0, 0x20, (bContCarrier ? 1 : 0), 0);
+    this->WriteControl(NULL, 0, 0x04, power, 0);
 }
 
-bool CCrazyRadio::claimInterface(int nInterface)
+void CCrazyRadio::SetAddress(char*  address)
 {
-	int errcode = libusb_claim_interface(m_hndlDevice, nInterface);
+    _address = address;
+
+    this->WriteControl(address, 5, 0x02, 0, 0);
+}
+
+void CCrazyRadio::SetContCarrier(bool contCarrier)
+{
+    _contCarrier = contCarrier;
+
+    this->WriteControl(NULL, 0, 0x20, (contCarrier ? 1 : 0), 0);
+}
+
+bool CCrazyRadio::ClaimInterface(int interface)
+{
+    int errcode = libusb_claim_interface(_device, interface);
 	return errcode == 0;
 }
 
-CCRTPPacket *CCrazyRadio::sendPacket(CCRTPPacket *crtpSend, bool bDeleteAfterwards)
+CCRTPPacket* CCrazyRadio::SendPacket(CCRTPPacket* send, bool deleteAfterwards)
 {
-	CCRTPPacket *crtpPacket = NULL;
+    CCRTPPacket* crtpPacket = NULL;
 
-    char *cSendable = crtpSend->SendableData();
-    crtpPacket = this->writeData(cSendable, crtpSend->GetSendableDataLength());
+    char* sendable = send->SendableData();
+    crtpPacket = this->WriteData(sendable, send->GetSendableDataLength());
 
-	delete[] cSendable;
+    delete[] sendable;
 
     if(crtpPacket)
     {
-        char *cData = crtpPacket->Data();
-        int nLength = crtpPacket->DataLength();
+        char* data = crtpPacket->Data();
+        int length = crtpPacket->DataLength();
 
-		if(nLength > 0) {
-			short sPort = (cData[0] & 0xf0) >> 4;
-            crtpPacket->setPort(sPort);
-			short sChannel = cData[0] & 0b00000011;
+        if(length > 0) {
+            short port = (data[0] & 0xf0) >> 4;
+            crtpPacket->setPort(port);
+            short sChannel = data[0] & 0b00000011;
             crtpPacket->SetChannel(sChannel);
 
-			switch(sPort) {
-			case 0: { // Console
-				char cText[nLength];
-				std::memcpy(cText, &cData[1], nLength - 1);
-				cText[nLength - 1] = '\0';
+            switch(port)
+            {
+            case 0:
+            { // Console
+                char cText[length];
+                std::memcpy(cText, &data[1], length - 1);
+                cText[length - 1] = '\0';
 
 				std::cout << "Console text: " << cText << std::endl;
 			} break;
 
-			case 5: { // Logging
-                if(crtpPacket->GetChannel() == 2) {
-                    CCRTPPacket *crtpLog = new CCRTPPacket(cData, nLength, crtpPacket->GetChannel());
-                    crtpLog->SetChannel(crtpPacket->GetChannel());
-                    crtpLog->setPort(crtpPacket->GetPort());
+            case 5:
+            { // Logging
+                if(crtpPacket->GetChannel() == 2)
+                {
+                    CCRTPPacket* log = new CCRTPPacket(data, length, crtpPacket->GetChannel());
+                    log->SetChannel(crtpPacket->GetChannel());
+                    log->setPort(crtpPacket->GetPort());
 
-					m_lstLoggingPackets.push_back(crtpLog);
+                    _loggingPackets.push_back(log);
 				}
 			} break;
 			}
 		}
 	}
 
-	if(bDeleteAfterwards) {
-		delete crtpSend;
+    if(deleteAfterwards)
+    {
+        delete send;
 	}
 
 	return crtpPacket;
 }
 
-CCRTPPacket *CCrazyRadio::readACK() {
+CCRTPPacket* CCrazyRadio::ReadAck() {
 	CCRTPPacket *crtpPacket = NULL;
 
-	int nBufferSize = 64;
-	char cBuffer[nBufferSize];
-	int nBytesRead = nBufferSize;
+    int bufferSize = 64;
+    char buffer[bufferSize];
+    int bytesRead = bufferSize;
 
-	if(this->readData(cBuffer, nBytesRead)) {
-		if(nBytesRead > 0) {
+    if(this->ReadData(buffer, bytesRead))
+    {
+        if(bytesRead > 0)
+        {
 			// Analyse status byte
-			m_bAckReceived = true;//cBuffer[0] & 0x1;
+            _ackReceived = true;//cBuffer[0] & 0x1;
 			//bool bPowerDetector = cBuffer[0] & 0x2;
 			//int nRetransmissions = cBuffer[0] & 0xf0;
 
@@ -391,102 +428,120 @@ CCRTPPacket *CCrazyRadio::readACK() {
 
 			crtpPacket = new CCRTPPacket(0);
 
-			if(nBytesRead > 1) {
-                crtpPacket->SetData(&cBuffer[1], nBytesRead);
+            if(bytesRead > 1)
+            {
+                crtpPacket->SetData(&buffer[1], bytesRead);
 			}
-		} else {
-			m_bAckReceived = false;
+        }
+        else
+        {
+            _ackReceived = false;
 		}
 	}
 
 	return crtpPacket;
 }
 
-bool CCrazyRadio::ackReceived() {
-	return m_bAckReceived;
+bool CCrazyRadio::AckReceived()
+{
+    return _ackReceived;
 }
 
-bool CCrazyRadio::usbOK() {
-	libusb_device_descriptor ddDescriptor;
-	return (libusb_get_device_descriptor(m_devDevice,
-			&ddDescriptor) == 0);
+bool CCrazyRadio::IsUsbConnectionOk()
+{
+    libusb_device_descriptor descriptor;
+    return (libusb_get_device_descriptor(_devDevice,	&descriptor) == 0);
 }
 
-CCRTPPacket *CCrazyRadio::waitForPacket() {
-	bool bGoon = true;
-	CCRTPPacket *crtpReceived = NULL;
-	CCRTPPacket *crtpDummy = new CCRTPPacket(0);
-    crtpDummy->SetIsPingPacket(true);
+CCRTPPacket *CCrazyRadio::WaitForPacket()
+{
+    bool goon = true;
+    CCRTPPacket* received = NULL;
+    CCRTPPacket* dummy = new CCRTPPacket(0);
+    dummy->SetIsPingPacket(true);
 
-	while(bGoon) {
-		crtpReceived = this->sendPacket(crtpDummy);
-		bGoon = (crtpReceived == NULL);
+    while(goon)
+    {
+        received = this->SendPacket(dummy);
+        goon = (received == NULL);
 	}
 
-	delete crtpDummy;
-	return crtpReceived;
+    delete dummy;
+    return received;
 }
 
-CCRTPPacket *CCrazyRadio::sendAndReceive(CCRTPPacket *crtpSend, bool bDeleteAfterwards) {
-    return this->sendAndReceive(crtpSend, crtpSend->GetPort(), crtpSend->GetChannel(), bDeleteAfterwards);
+CCRTPPacket *CCrazyRadio::SendAndReceive(CCRTPPacket* send, bool deleteAfterwards)
+{
+    return this->SendAndReceive(send, send->GetPort(), send->GetChannel(), deleteAfterwards);
 }
 
-CCRTPPacket *CCrazyRadio::sendAndReceive(CCRTPPacket *crtpSend, int nPort, int nChannel, bool bDeleteAfterwards, int nRetries, int nMicrosecondsWait) {
-	bool bGoon = true;
-	int nResendCounter = 0;
-	CCRTPPacket *crtpReturnvalue = NULL;
-	CCRTPPacket *crtpReceived = NULL;
+CCRTPPacket *CCrazyRadio::SendAndReceive(CCRTPPacket* send, int port, int channel, bool deleteAfterwards, int retries, int microsecondsWait) {
+    bool goon = true;
+    int resendCounter = 0;
+    CCRTPPacket* returnVal = NULL;
+    CCRTPPacket* received = NULL;
 
-	while(bGoon) {
-		if(nResendCounter == 0) {
-			crtpReceived = this->sendPacket(crtpSend);
-			nResendCounter = nRetries;
-		} else {
-			nResendCounter--;
+    while(goon)
+    {
+        if(resendCounter == 0)
+        {
+            received = this->SendPacket(send);
+            resendCounter = retries;
+        }
+        else
+        {
+            resendCounter--;
 		}
 
-		if(crtpReceived) {
-            if(crtpReceived->GetPort() == nPort &&
-                    crtpReceived->GetChannel() == nChannel) {
-				crtpReturnvalue = crtpReceived;
-				bGoon = false;
+        if(received)
+        {
+            if(received->GetPort() == port && received->GetChannel() == channel)
+            {
+                returnVal = received;
+                goon = false;
 			}
 		}
 
-		if(bGoon) {
-			if(crtpReceived) {
-				delete crtpReceived;
+        if(goon)
+        {
+            if(received)
+            {
+                delete received;
 			}
 
 			//      usleep(nMicrosecondsWait);
 			//      std::this_thread::sleep_for(std::chrono::microseconds(123));
-			std::this_thread::sleep_for(std::chrono::microseconds(nMicrosecondsWait));
-			crtpReceived = this->waitForPacket();
+            std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
+            received = this->WaitForPacket();
 		}
 	}
 
-	if(bDeleteAfterwards) {
-		delete crtpSend;
+    if(deleteAfterwards)
+    {
+        delete send;
 	}
 
-	return crtpReturnvalue;
+    return returnVal;
 }
 
-std::list<CCRTPPacket*> CCrazyRadio::popLoggingPackets() {
-	std::list<CCRTPPacket*> lstPackets = m_lstLoggingPackets;
-	m_lstLoggingPackets.clear();
+std::list<CCRTPPacket*> CCrazyRadio::PopLoggingPackets()
+{
+    std::list<CCRTPPacket*> packets = _loggingPackets;
+    _loggingPackets.clear();
 
-	return lstPackets;
+    return packets;
 }
 
-bool CCrazyRadio::sendDummyPacket() {
-	CCRTPPacket *crtpReceived = NULL;
-	CCRTPPacket *crtpDummy = new CCRTPPacket(0);
-    crtpDummy->SetIsPingPacket(true);
+bool CCrazyRadio::SendDummyPacket()
+{
+    CCRTPPacket* received = NULL;
+    CCRTPPacket* dummy = new CCRTPPacket(0);
+    dummy->SetIsPingPacket(true);
 
-	crtpReceived = this->sendPacket(crtpDummy, true);
-	if(crtpReceived) {
-		delete crtpReceived;
+    received = this->SendPacket(dummy, true);
+    if(received)
+    {
+        delete received;
 		return true;
 	}
 
