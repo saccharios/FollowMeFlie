@@ -64,9 +64,9 @@ CCrazyflie::~CCrazyflie()
 
 bool CCrazyflie::ReadTOCParameters()
 {
-    if(_tocParameters->requestMetaData() )
+    if(_tocParameters->RequestMetaData() )
     {
-        if(_tocParameters->requestItems())
+        if(_tocParameters->RequestItems())
         {
             return true;
         }
@@ -77,9 +77,9 @@ bool CCrazyflie::ReadTOCParameters()
 
 bool CCrazyflie::ReadTOCLogs()
 {
-    if(_tocLogs->requestMetaData())
+    if(_tocLogs->RequestMetaData())
     {
-        if(_tocLogs->requestItems())
+        if(_tocLogs->RequestItems())
         {
             return true;
         }
@@ -168,7 +168,7 @@ bool CCrazyflie::Update()
     
   case STATE_ZERO_MEASUREMENTS:
   {
-    _tocLogs->processPackets(_crazyRadio->popLoggingPackets());
+    _tocLogs->ProcessPackets(_crazyRadio->popLoggingPackets());
     
     // NOTE(winkler): Here, we can do measurement zero'ing. This is
     // not done at the moment, though. Reason: No readings to zero at
@@ -180,7 +180,7 @@ bool CCrazyflie::Update()
   case STATE_NORMAL_OPERATION:
   {
     // Shove over the sensor readings from the radio to the Logs TOC.
-    _tocLogs->processPackets(_crazyRadio->popLoggingPackets());
+    _tocLogs->ProcessPackets(_crazyRadio->popLoggingPackets());
     
     if(_sendsSetpoints)
     {
@@ -315,31 +315,31 @@ bool CCrazyflie::IsSendingSetpoints()
 
 double CCrazyflie::GetSensorValue(std::string strName)
 {
-  return _tocLogs->doubleValue(strName);
+  return _tocLogs->DoubleValue(strName);
 }
 
 void CCrazyflie::DisableLogging()
 {
-  _tocLogs->unregisterLoggingBlock("high-speed");
-  _tocLogs->unregisterLoggingBlock("low-speed");
+  _tocLogs->UnregisterLoggingBlock("high-speed");
+  _tocLogs->UnregisterLoggingBlock("low-speed");
 }
 
 void CCrazyflie::EnableStabilizerLogging()
 {
-  _tocLogs->registerLoggingBlock("stabilizer", 1000);
+  _tocLogs->RegisterLoggingBlock("stabilizer", 1000);
   
-  _tocLogs->startLogging("stabilizer.roll", "stabilizer");
-  _tocLogs->startLogging("stabilizer.pitch", "stabilizer");
-  _tocLogs->startLogging("stabilizer.yaw", "stabilizer");
+  _tocLogs->StartLogging("stabilizer.roll", "stabilizer");
+  _tocLogs->StartLogging("stabilizer.pitch", "stabilizer");
+  _tocLogs->StartLogging("stabilizer.yaw", "stabilizer");
 }
 
 void CCrazyflie::EnableGyroscopeLogging()
 {
-  _tocLogs->registerLoggingBlock("gyroscope", 1000);
+  _tocLogs->RegisterLoggingBlock("gyroscope", 1000);
 
-  _tocLogs->startLogging("gyro.x", "gyroscope");
-  _tocLogs->startLogging("gyro.y", "gyroscope");
-  _tocLogs->startLogging("gyro.z", "gyroscope");
+  _tocLogs->StartLogging("gyro.x", "gyroscope");
+  _tocLogs->StartLogging("gyro.y", "gyroscope");
+  _tocLogs->StartLogging("gyro.z", "gyroscope");
 }
 
 float CCrazyflie::GyroX()
@@ -357,12 +357,12 @@ float CCrazyflie::GyroZ() {
 
 void CCrazyflie::EnableAccelerometerLogging()
 {
-  _tocLogs->registerLoggingBlock("accelerometer", 1000);
+  _tocLogs->RegisterLoggingBlock("accelerometer", 1000);
 
-  _tocLogs->startLogging("acc.x", "accelerometer");
-  _tocLogs->startLogging("acc.y", "accelerometer");
-  _tocLogs->startLogging("acc.z", "accelerometer");
-  _tocLogs->startLogging("acc.zw", "accelerometer");
+  _tocLogs->StartLogging("acc.x", "accelerometer");
+  _tocLogs->StartLogging("acc.y", "accelerometer");
+  _tocLogs->StartLogging("acc.z", "accelerometer");
+  _tocLogs->StartLogging("acc.zw", "accelerometer");
 }
 
 float CCrazyflie::AccX()
@@ -387,25 +387,25 @@ float CCrazyflie::AccZW()
 
 void CCrazyflie::DisableStabilizerLogging()
 {
-  _tocLogs->unregisterLoggingBlock("stabilizer");
+  _tocLogs->UnregisterLoggingBlock("stabilizer");
 }
 
 void CCrazyflie::DisableGyroscopeLogging()
 {
-  _tocLogs->unregisterLoggingBlock("gyroscope");
+  _tocLogs->UnregisterLoggingBlock("gyroscope");
 }
 
 void CCrazyflie::DisableAccelerometerLogging()
 {
-  _tocLogs->unregisterLoggingBlock("accelerometer");
+  _tocLogs->UnregisterLoggingBlock("accelerometer");
 }
 
 void CCrazyflie::EnableBatteryLogging()
 {
-  _tocLogs->registerLoggingBlock("battery", 1000);
+  _tocLogs->RegisterLoggingBlock("battery", 1000);
 
-  _tocLogs->startLogging("pm.vbat", "battery");
-  _tocLogs->startLogging("pm.state", "battery");
+  _tocLogs->StartLogging("pm.vbat", "battery");
+  _tocLogs->StartLogging("pm.state", "battery");
 }
 
 double CCrazyflie::GetBatteryLevel()
@@ -420,16 +420,16 @@ float CCrazyflie::GetBatteryState()
 
 void CCrazyflie::DisableBatteryLogging()
 {
-  _tocLogs->unregisterLoggingBlock("battery");
+  _tocLogs->UnregisterLoggingBlock("battery");
 }
 
 void CCrazyflie::EnableMagnetometerLogging()
 {
-  _tocLogs->registerLoggingBlock("magnetometer", 1000);
+  _tocLogs->RegisterLoggingBlock("magnetometer", 1000);
 
-  _tocLogs->startLogging("mag.x", "magnetometer");
-  _tocLogs->startLogging("mag.y", "magnetometer");
-  _tocLogs->startLogging("mag.z", "magnetometer");
+  _tocLogs->StartLogging("mag.x", "magnetometer");
+  _tocLogs->StartLogging("mag.y", "magnetometer");
+  _tocLogs->StartLogging("mag.z", "magnetometer");
 }
 float CCrazyflie::MagX()
 {
@@ -445,16 +445,16 @@ float CCrazyflie::MagZ()
 }
 void CCrazyflie::DisableMagnetometerLogging()
 {
-  _tocLogs->unregisterLoggingBlock("magnetometer");
+  _tocLogs->UnregisterLoggingBlock("magnetometer");
 }
 
 void CCrazyflie::EnableAltimeterLogging()
 {
-  _tocLogs->registerLoggingBlock("altimeter", 1000);
-  _tocLogs->startLogging("alti.asl", "altimeter");
-  _tocLogs->startLogging("alti.aslLong", "altimeter");
-  _tocLogs->startLogging("alti.pressure", "altimeter");
-  _tocLogs->startLogging("alti.temperature", "altimeter");
+  _tocLogs->RegisterLoggingBlock("altimeter", 1000);
+  _tocLogs->StartLogging("alti.asl", "altimeter");
+  _tocLogs->StartLogging("alti.aslLong", "altimeter");
+  _tocLogs->StartLogging("alti.pressure", "altimeter");
+  _tocLogs->StartLogging("alti.temperature", "altimeter");
 }
 
 float CCrazyflie::Asl()
@@ -476,5 +476,5 @@ float CCrazyflie::Temperature()
 
 void CCrazyflie::DisableAltimeterLogging()
 {
-  _tocLogs->unregisterLoggingBlock("altimeter");
+  _tocLogs->UnregisterLoggingBlock("altimeter");
 }

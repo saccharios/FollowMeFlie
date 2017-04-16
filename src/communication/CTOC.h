@@ -29,94 +29,86 @@
 /* \author Jan Winkler */
 
 
-#ifndef __C_TOC_H__
-#define __C_TOC_H__
+#pragma once
 
-
-// System
 #include <list>
 #include <string>
 #include <cstdlib>
 #include <iostream>
-
-// Private
 #include "CCrazyRadio.h"
 #include "CCRTPPacket.h"
 
 
-/*! \brief Storage element for logged variable identities */
+// Storage element for logged variable identities
 struct TOCElement {
-  /*! \brief The numerical ID of the log element on the copter's
-      internal table */
-  int nID;
-  /*! \brief The (ref) type of the log element */
-  int nType;
-  /*! \brief The string group name of the log element */
-  std::string strGroup;
-  /*! \brief The string identifier of the log element */
-  std::string strIdentifier;
-  bool bIsLogging;
-  double dValue;
+    //The numerical ID of the log element on the copters internal table
+    int id;
+    //The (ref) type of the log element
+    int type;
+    //The string group name of the log element
+    std::string group;
+    //The string identifier of the log element
+    std::string identifier;
+    bool isLogging;
+    double value;
 };
 
 
 struct LoggingBlock {
-  std::string strName;
-  int nID;
-  double dFrequency;
-  std::list<int> lstElementIDs;
+    std::string name;
+    int id;
+    double frequency;
+    std::list<int> elementIDs;
 };
 
 
 class CTOC {
- private:
-  int m_nPort;
-  CCrazyRadio *m_crRadio;
-  int m_nItemCount;
-  std::list<struct TOCElement> m_lstTOCElements;
-  std::list<struct LoggingBlock> m_lstLoggingBlocks;
 
-  bool requestInitialItem();
-  bool requestItem(int nID, bool bInitial);
-  bool requestItem(int nID);
-  bool processItem(CCRTPPacket* crtpItem);
+public:
+    CTOC(CCrazyRadio* crazyRadio, int port);
+    ~CTOC();
 
-  CCRTPPacket* sendAndReceive(CCRTPPacket* crtpSend, int nChannel);
+    bool SendTOCPointerReset();
+    bool RequestMetaData();
+    bool RequestItems();
 
- public:
-  CTOC(CCrazyRadio* crRadio, int nPort);
-  ~CTOC();
+    struct TOCElement ElementForName(std::string name, bool& found);
+    struct TOCElement ElementForID(int id, bool& found);
+    int IdForName(std::string name);
+    int TypeForName(std::string name);
 
-  bool sendTOCPointerReset();
-  bool requestMetaData();
-  bool requestItems();
+    // For loggable variables only
+    bool RegisterLoggingBlock(std::string name, double frequency);
+    bool UnregisterLoggingBlock(std::string name);
+    struct LoggingBlock LoggingBlockForName(std::string name, bool& found);
+    struct LoggingBlock LoggingBlockForID(int id, bool& found);
 
-  struct TOCElement elementForName(std::string strName, bool& bFound);
-  struct TOCElement elementForID(int nID, bool &bFound);
-  int idForName(std::string strName);
-  int typeForName(std::string strName);
+    bool StartLogging(std::string name, std::string blockName);
+    bool StopLogging(std::string name);
+    bool IsLogging(std::string name);
 
-  // For loggable variables only
-  bool registerLoggingBlock(std::string strName, double dFrequency);
-  bool unregisterLoggingBlock(std::string strName);
-  struct LoggingBlock loggingBlockForName(std::string strName, bool& bFound);
-  struct LoggingBlock loggingBlockForID(int nID, bool& bFound);
+    double DoubleValue(std::string name);
 
-  bool startLogging(std::string strName, std::string strBlockName);
-  bool stopLogging(std::string strName);
-  bool isLogging(std::string strName);
+    bool EnableLogging(std::string blockName);
 
-  double doubleValue(std::string strName);
+    void ProcessPackets(std::list<CCRTPPacket*> packets);
 
-  bool enableLogging(std::string strBlockName);
+    int ElementIDinBlock(int blockID, int elementIndex);
+    bool SetFloatValueForElementID(int elementID, float value);
+    bool AddElementToBlock(int blockID, int elementID);
+    bool UnregisterLoggingBlockID(int id);
+private:
+    int _port;
+    CCrazyRadio* _crazyRadio;
+    int _itemCount;
+    std::list<struct TOCElement> _TOCElements;
+    std::list<struct LoggingBlock> _loggingBlocks;
 
-  void processPackets(std::list<CCRTPPacket*> lstPackets);
+    bool RequestInitialItem();
+    bool RequestItem(int id, bool initial);
+    bool RequestItem(int id);
+    bool ProcessItem(CCRTPPacket* packet);
 
-  int elementIDinBlock(int nBlockID, int nElementIndex);
-  bool setFloatValueForElementID(int nElementID, float fValue);
-  bool addElementToBlock(int nBlockID, int nElementID);
-  bool unregisterLoggingBlockID(int nID);
 };
 
 
-#endif /* __C_TOC_H__ */
