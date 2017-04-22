@@ -8,7 +8,7 @@ include(../defaults.pri)
 CONFIG += c++14
 TEMPLATE = app
 
-CONFIG += console
+CONFIG += console # Print console output in external console
 
 SOURCES +=  main.cpp \
     mainwindow.cpp

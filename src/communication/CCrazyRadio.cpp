@@ -213,7 +213,7 @@ bool CCrazyRadio::StartRadio()
 	return false;
 }
 
-CCRTPPacket *CCrazyRadio::WriteData(void* data, int length)
+CCRTPPacket * CCrazyRadio::WriteData(void* data, int length)
 {
     CCRTPPacket* packet = NULL;
 
@@ -359,7 +359,6 @@ CCRTPPacket* CCrazyRadio::SendPacket(CCRTPPacket* send, bool deleteAfterwards)
 
     char* sendable = send->SendableData();
     crtpPacket = this->WriteData(sendable, send->GetSendableDataLength());
-
     delete[] sendable;
 
     if(crtpPacket)
@@ -367,15 +366,15 @@ CCRTPPacket* CCrazyRadio::SendPacket(CCRTPPacket* send, bool deleteAfterwards)
         char* data = crtpPacket->Data();
         int length = crtpPacket->DataLength();
 
-        if(length > 0) {
+        if(length > 0)
+        {
             short port = (data[0] & 0xf0) >> 4;
             crtpPacket->setPort(port);
             short sChannel = data[0] & 0b00000011;
             crtpPacket->SetChannel(sChannel);
-
             switch(port)
             {
-            case 0:
+            case 0: // TODO Make enum class for ports
             { // Console
                 char cText[length];
                 std::memcpy(cText, &data[1], length - 1);
@@ -512,6 +511,7 @@ CCRTPPacket *CCrazyRadio::SendAndReceive(CCRTPPacket* send, int port, int channe
 			//      usleep(nMicrosecondsWait);
 			//      std::this_thread::sleep_for(std::chrono::microseconds(123));
             std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
+            std::cout << "sleeping\n";
             received = this->WaitForPacket();
 		}
 	}

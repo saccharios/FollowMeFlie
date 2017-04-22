@@ -110,7 +110,7 @@ char *CCRTPPacket::SendableData()
         std::memcpy(&sendable[1], _data, _dataLength);
 
         // Finishing byte
-        //cSendable[m_nDataLength + 1] = 0x27;
+        //sendable[_dataLength + 1] = 0x27;
     }
 
     return sendable;

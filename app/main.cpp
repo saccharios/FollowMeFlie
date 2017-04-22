@@ -35,18 +35,19 @@ int main(int argc, char *argv[])
 
         while(crazyFlie->Update())
         {
-            // Main loop. Currently empty.
-crazyFlie->SetThrust(60001);
-            /* Examples to set thrust and RPY:
-
        // Range: 10001 - (approx.) 60000
-       cflieCopter->setThrust(10001);
+            crazyFlie->SetSendSetpoints(true);
+            crazyFlie->SetThrust(40001);
+
+            // Main loop. Currently empty.
+//            Examples to set thrust and RPY:
+
 
        // All in degrees. R/P shouldn't be over 45 degree (it goes
        // sidewards really fast!). R/P/Y are all from -180.0deg to 180.0deg.
-       cflieCopter->setRoll(20);
-       cflieCopter->setPitch(15);
-       cflieCopter->setYaw(140); */
+//       cflieCopter->setRoll(20);
+//       cflieCopter->setPitch(15);
+//       cflieCopter->setYaw(140);
 
             // Important note: When quitting the program, please don't just
             // SIGINT (i.e. CTRL-C) it. The CCrazyflie class instance
