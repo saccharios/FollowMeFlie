@@ -29,22 +29,14 @@
 #include "CTOC.h"
 
 
-CTOC::CTOC(CCrazyRadio* crazyRadio, int port)
-{
-    _crazyRadio = crazyRadio;
-    _port = port;
-    _itemCount = 0;
-}
-
-CTOC::~CTOC()
-{
-}
+CTOC::CTOC(CCrazyRadio & crazyRadio, int port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
+{}
 
 bool CTOC::SendTOCPointerReset()
 {
     CCRTPPacket* packet = new CCRTPPacket(0x00, 0);
     packet->setPort(_port);
-    CCRTPPacket* received = _crazyRadio->SendPacket(packet, true);
+    CCRTPPacket* received = _crazyRadio.SendPacket(packet, true);
 
     if(received)
     {
@@ -61,7 +53,7 @@ bool CTOC::RequestMetaData()
 
     CCRTPPacket* packet = new CCRTPPacket(0x01, 0);
     packet->setPort(_port);
-    CCRTPPacket* received = _crazyRadio->SendAndReceive(packet);
+    CCRTPPacket* received = _crazyRadio.SendAndReceive(packet);
 
     if(received->Data()[1] == 0x01)
     {
@@ -93,7 +85,7 @@ bool CTOC::RequestItem(int id, bool initial)
 
     CCRTPPacket* crtpPacket = new CCRTPPacket(cRequest,  (initial ? 1 : 2),  0);
     crtpPacket->setPort(_port);
-    CCRTPPacket* crtpReceived = _crazyRadio->SendAndReceive(crtpPacket);
+    CCRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(crtpPacket);
 
     retVal = this->ProcessItem(crtpReceived);
 
@@ -118,7 +110,6 @@ bool CTOC::ProcessItem(CCRTPPacket* packet)
         if(packet->GetChannel() == 0)
         {
             char* data = packet->Data();
-            int length = packet->DataLength();
 
             if(data[1] == 0x0)
             { // Command identification ok?
@@ -245,7 +236,7 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
             CCRTPPacket* crtpLogVariable = new CCRTPPacket(cPayload, 4, 1);
             crtpLogVariable->setPort(_port);
             crtpLogVariable->SetChannel(1);
-            CCRTPPacket* crtpReceived = _crazyRadio->SendAndReceive(crtpLogVariable, true);
+            CCRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(crtpLogVariable, true);
 
             char* cData = crtpReceived->Data();
             bool created = false;
@@ -335,22 +326,22 @@ struct LoggingBlock CTOC::LoggingBlockForName(std::string name, bool& found)
     return lbEmpty;
 }
 
-struct LoggingBlock CTOC::LoggingBlockForID(int nID, bool& bFound)
+struct LoggingBlock CTOC::LoggingBlockForID(int id, bool& found)
 {
-    for(std::list<struct LoggingBlock>::iterator itBlock = _loggingBlocks.begin();
-        itBlock != _loggingBlocks.end();
-        itBlock++)
+    for(std::list<struct LoggingBlock>::iterator block = _loggingBlocks.begin();
+        block != _loggingBlocks.end();
+        block++)
     {
-        struct LoggingBlock lbCurrent = *itBlock;
+        struct LoggingBlock lbCurrent = *block;
 
-        if(nID == lbCurrent.id)
+        if(id == lbCurrent.id)
         {
-            bFound = true;
+            found = true;
             return lbCurrent;
         }
     }
 
-    bFound = false;
+    found = false;
     struct LoggingBlock lbEmpty;
 
     return lbEmpty;
@@ -388,7 +379,7 @@ bool CTOC::RegisterLoggingBlock(std::string name, double frequency)
         crtpRegisterBlock->setPort(_port);
         crtpRegisterBlock->SetChannel(1);
 
-        CCRTPPacket* crtpReceived = _crazyRadio->SendAndReceive(crtpRegisterBlock, true);
+        CCRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(crtpRegisterBlock, true);
 
         char* cData = crtpReceived->Data();
         bool bCreateOK = false;
@@ -435,7 +426,7 @@ bool CTOC::EnableLogging(std::string lockName)
         crtpEnable->setPort(_port);
         crtpEnable->SetChannel(1);
 
-        CCRTPPacket* crtpReceived = _crazyRadio->SendAndReceive(crtpEnable);
+        CCRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(crtpEnable);
         delete crtpReceived;
 
         return true;
@@ -465,7 +456,7 @@ bool CTOC::UnregisterLoggingBlockID(int id)
     crtpUnregisterBlock->setPort(_port);
     crtpUnregisterBlock->SetChannel(1);
 
-    CCRTPPacket* crtpReceived = _crazyRadio->SendAndReceive(crtpUnregisterBlock, true);
+    CCRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(crtpUnregisterBlock, true);
 
     if(crtpReceived)
     {

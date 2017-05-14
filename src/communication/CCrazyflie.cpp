@@ -30,10 +30,8 @@
 #include <chrono>
 #include "math/clock_gettime.h"
 
-CCrazyflie::CCrazyflie(CCrazyRadio* crazyRadio)
+CCrazyflie::CCrazyflie(CCrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
 {
-    _crazyRadio = crazyRadio;
-
     // Review these values
     _maxAbsRoll = 45.0f;
     _maxAbsPitch = _maxAbsRoll;
@@ -100,7 +98,7 @@ bool CCrazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
     memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
 
     CCRTPPacket *crtpPacket = new CCRTPPacket(cBuffer, nSize, 3);
-    CCRTPPacket *crtpReceived = _crazyRadio->SendPacket(crtpPacket);
+    CCRTPPacket *crtpReceived = _crazyRadio.SendPacket(crtpPacket);
 
     delete crtpPacket;
     if(crtpReceived != NULL)
@@ -137,74 +135,73 @@ bool CCrazyflie::Update()
     double currentTime = this->GetCurrentTime();
     switch(_state)
     {
-    case STATE_ZERO:
-    {
-        _state = STATE_READ_PARAMETERS_TOC;
-    } break;
-
-    case STATE_READ_PARAMETERS_TOC:
-    {
-        if(this->ReadTOCParameters())
+        case STATE_ZERO:
         {
-            _state = STATE_READ_LOGS_TOC;
+            _state = STATE_READ_PARAMETERS_TOC;
+            break;
         }
-    } break;
-
-    case STATE_READ_LOGS_TOC:
-    {
-        if(this->ReadTOCLogs())
+        case STATE_READ_PARAMETERS_TOC:
         {
-            _state = STATE_START_LOGGING;
-        }
-    } break;
-
-    case STATE_START_LOGGING:
-    {
-        if(this->StartLogging())
-        {
-            _state = STATE_ZERO_MEASUREMENTS;
-        }
-    } break;
-
-    case STATE_ZERO_MEASUREMENTS:
-    {
-        _tocLogs->ProcessPackets(_crazyRadio->PopLoggingPackets());
-
-        // NOTE(winkler): Here, we can do measurement zero'ing. This is
-        // not done at the moment, though. Reason: No readings to zero at
-        // the moment. This might change when altitude becomes available.
-
-        _state = STATE_NORMAL_OPERATION;
-    } break;
-
-    case STATE_NORMAL_OPERATION:
-    {
-        // Shove over the sensor readings from the radio to the Logs TOC.
-        _tocLogs->ProcessPackets(_crazyRadio->PopLoggingPackets());
-
-        if(_sendsSetpoints)
-        {
-            // Check if it's time to send the setpoint
-            if(currentTime - _setpointLastSent > _sendSetpointPeriod)
+            if(this->ReadTOCParameters())
             {
-                // Send the current set point based on the previous calculations
-                this->SendSetpoint(_roll, _pitch, _yaw, _thrust);
-                _setpointLastSent = currentTime;
+                _state = STATE_READ_LOGS_TOC;
             }
+            break;
         }
-        else
+        case STATE_READ_LOGS_TOC:
         {
-            // Send a dummy packet for keepalive
-            _crazyRadio->SendDummyPacket();
+            if(this->ReadTOCLogs())
+            {
+                _state = STATE_START_LOGGING;
+            }
+            break;
         }
-    } break;
+        case STATE_START_LOGGING:
+        {
+            if(this->StartLogging())
+            {
+                _state = STATE_ZERO_MEASUREMENTS;
+            }
+            break;
+        }
+        case STATE_ZERO_MEASUREMENTS:
+        {
+            _tocLogs->ProcessPackets(_crazyRadio.PopLoggingPackets());
 
-    default:
-    {
-    } break;
-    }
+            // NOTE(winkler): Here, we can do measurement zero'ing. This is
+            // not done at the moment, though. Reason: No readings to zero at
+            // the moment. This might change when altitude becomes available.
 
-    if(_crazyRadio->AckReceived())
+            _state = STATE_NORMAL_OPERATION;
+            break;
+        }
+        case STATE_NORMAL_OPERATION:
+        {
+            // Shove over the sensor readings from the radio to the Logs TOC.
+            _tocLogs->ProcessPackets(_crazyRadio.PopLoggingPackets());
+
+            if(_sendsSetpoints)
+            {
+                // Check if it's time to send the setpoint
+                if(currentTime - _setpointLastSent > _sendSetpointPeriod)
+                {
+                    // Send the current set point based on the previous calculations
+                    this->SendSetpoint(_roll, _pitch, _yaw, _thrust);
+                    _setpointLastSent = currentTime;
+                }
+            }
+            else
+            {
+                // Send a dummy packet for keepalive
+                _crazyRadio.SendDummyPacket();
+            }
+            break;
+        }
+        default:
+            break;
+    } // end switch
+
+    if(_crazyRadio.AckReceived())
     {
         _ackMissCounter = 0;
     }
@@ -213,7 +210,7 @@ bool CCrazyflie::Update()
         _ackMissCounter++;
     }
 
-    return _crazyRadio->IsUsbConnectionOk();
+    return _crazyRadio.IsUsbConnectionOk();
 }
 
 bool CCrazyflie::IsCopterConnected()

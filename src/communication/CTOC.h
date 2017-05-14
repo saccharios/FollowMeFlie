@@ -65,8 +65,7 @@ struct LoggingBlock {
 class CTOC {
 
 public:
-    CTOC(CCrazyRadio* crazyRadio, int port);
-    ~CTOC();
+    CTOC(CCrazyRadio & crazyRadio, int port);
 
     bool SendTOCPointerReset();
     bool RequestMetaData();
@@ -98,8 +97,8 @@ public:
     bool AddElementToBlock(int blockID, int elementID);
     bool UnregisterLoggingBlockID(int id);
 private:
+    CCrazyRadio & _crazyRadio;
     int _port;
-    CCrazyRadio* _crazyRadio;
     int _itemCount;
     std::list<struct TOCElement> _TOCElements;
     std::list<struct LoggingBlock> _loggingBlocks;

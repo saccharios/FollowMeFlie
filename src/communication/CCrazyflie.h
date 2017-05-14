@@ -49,7 +49,7 @@ enum State {
 //  The class containing the mechanisms for starting sensor readings,
 //  ordering set point setting, selecting and running controllers and
 //  calculating information based on the current sensor readings.
-class CCrazyflie {
+class Crazyflie {
 
 public:
     //Constructor for the copter convenience class
@@ -58,12 +58,12 @@ public:
     //    crRadio: Initialized (and started) instance of the
     //    CCrazyRadio class, denoting the USB dongle to communicate
     //    with.
-    CCrazyflie(CCrazyRadio* crazyRadio);
+    Crazyflie(CCrazyRadio & crazyRadio);
     //Destructor for the copter convenience class
 
     //    Destructor, deleting all internal variables (except for the
     //    CCrazyRadio radio instance given in the constructor).
-    ~CCrazyflie();
+    ~Crazyflie();
 
     //Set the thrust control set point
 
@@ -192,7 +192,7 @@ private:
     int _ackMissTolerance;
     int _ackMissCounter;
     //Internal pointer to the initialized CCrazyRadio radio interface instance.
-    CCrazyRadio* _crazyRadio;
+    CCrazyRadio & _crazyRadio;
     //The current thrust to send as a set point to the copter.
     int _thrust;
     //The current roll to send as a set point to the copter.
