@@ -83,6 +83,11 @@
       <string>0/80/250K</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>testdummy</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -108,6 +113,19 @@
     </property>
     <property name="text">
      <string>Connection Status: </string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>120</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SimpleTestButton</string>
     </property>
    </widget>
   </widget>

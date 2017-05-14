@@ -54,7 +54,10 @@ enum Power {
     // Power at 0dbm */
     P_0DBM = 3
 };
-
+enum class RadioSettings{
+    _080250K = 0,
+    _testdummy = 1
+};
 
 // Communication class to connect to and communicate via the CrazyRadio USB dongle.
 
@@ -69,7 +72,8 @@ public:
 
     // \param strRadioIdentifier URI for the radio to be opened,
     //  e.g. "radio://<dongle-no>/<channel-no>/<datarate>". */
-    CrazyRadio(std::string radioIdentifier);
+
+    CrazyRadio();
     ~CrazyRadio();
 
     // Function to start the radio communication
@@ -78,7 +82,9 @@ public:
     // communicate with a Crazyflie Nano quadcopter in range.
     // \return Returns 'true' if the connection could successfully be
     // made and 'false' if no dongle could be found (or any other USB-related error came up - this is not handled here).
-    bool StartRadio();
+    void StartRadio();
+
+    void StopRadio();
 
     // Returns the current setting for power usage by the USB dongle
     // \return Value denoting the current power settings reserved for communication
@@ -146,9 +152,14 @@ public:
     std::list<CRTPPacket*> PopLoggingPackets();
 
     bool ReadRadioSettings();
+    void SetRadioSettings(int index);
+
+    bool RadioIsConnected() const;
+
+
 private:
     // The radio URI as supplied when initializing the class instance
-    std::string _radioIdentifier;
+    RadioSettings _radioSettings;
     // The current USB context as supplied by libusb
     libusb_context* _context;
     libusb_device* _devDevice;
@@ -164,6 +175,7 @@ private:
     float _deviceVersion;
     bool _ackReceived;
     std::list<CRTPPacket*> _loggingPackets;
+    bool _radioIsConnected;
 
     std::list<libusb_device*> ListDevices(int vendorID, int productID);
     bool OpenUSBDongle();
@@ -179,7 +191,9 @@ private:
     void SetARC(int ARC);
     void setChannel(int channel);
     void WriteChannel(int channel);
+    int GetChannel() const;
     void SetDataRate(std::string dataRate);
+    std::string GetDataRate() const;
     void WriteDataRate(std::string dataRate);
     void SetARDBytes(int ARDBytes);
     void SetARDTime(int ARDTime);

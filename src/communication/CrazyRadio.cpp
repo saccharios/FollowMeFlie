@@ -34,20 +34,27 @@
 #include <mutex>
 #include "../../../mingw_std_threads/mingw.mutex.h"
 
-CrazyRadio::CrazyRadio(std::string radioIdentifier)
+CrazyRadio::CrazyRadio() :
+    _radioSettings(RadioSettings::_080250K),
+    _context(nullptr),
+    _devDevice(nullptr),
+    _device(nullptr),
+    _arc(0),
+    _channel(0),
+    _dataRate(""),
+    _ardTime(0),
+    _ardBytes(0),
+    _power(P_M18DBM),
+    _address(nullptr),
+    _contCarrier(0),
+    _deviceVersion(0.0f),
+    _ackReceived(false),
+    _loggingPackets(),
+    _radioIsConnected(false)
 {
-    _radioIdentifier = radioIdentifier;
-    _power = P_M18DBM;
-
-    _context = NULL;
-    _device = NULL;
-
-    _ackReceived = false;
-
     int returnVal = libusb_init(&_context);
-	// Do error checking here.
+    // Do error checking here.
 }
-
 CrazyRadio::~CrazyRadio()
 {
     this->CloseDevice();
@@ -135,32 +142,32 @@ bool CrazyRadio::OpenUSBDongle()
 
 	return false;
 }
+void CrazyRadio::SetRadioSettings(int index)
+{
+    _radioSettings = static_cast<RadioSettings>(index);
+    std::cout << "radioSettings = " << index << std::endl;
+}
 
 bool CrazyRadio::ReadRadioSettings()
 {
-    int nDongleNBR;
-        int nRadioChannel;
-        int nDataRate;
-        char cDataRateType;
-    bool success = std::sscanf(_radioIdentifier.c_str(), "radio://%d/%d/%d%c",
-                               &nDongleNBR, &nRadioChannel, &nDataRate,
-                               &cDataRateType) != EOF;
-    if(success)
+    int dongleNBR = 0;
+    switch(_radioSettings)
     {
-        std::cout << "Opening radio " << nDongleNBR << "/" << nRadioChannel << "/" << nDataRate << cDataRateType << std::endl;
-
-        std::stringstream sts;
-        sts << nDataRate;
-        sts << cDataRateType;
-        std::string strDataRate = sts.str();
-        SetDataRate(strDataRate);
-        setChannel(nRadioChannel);
+        default:
+    case RadioSettings::_080250K:
+        {
+            setChannel(80);
+            SetDataRate("250K");
+            break;
+        }
     }
-    return success;
+    std::cout << "Opening radio " << dongleNBR << "/" << GetChannel() << "/" << GetDataRate() << std::endl;
+    return true;
 }
 
-bool CrazyRadio::StartRadio()
+void CrazyRadio::StartRadio()
 {
+    _radioIsConnected = false;
     if(this->OpenUSBDongle())
 	{
         if (ReadRadioSettings())
@@ -178,7 +185,7 @@ bool CrazyRadio::StartRadio()
             std::cout << "Got device version " << _deviceVersion << std::endl;
             if(_deviceVersion < 0.3)
 			{
-				return false;
+                return;
 			}
 
 			// Set active configuration to 1
@@ -214,12 +221,16 @@ bool CrazyRadio::StartRadio()
                 WriteDataRate(_dataRate);
                 WriteChannel(_channel);
 
-				return true;
+                _radioIsConnected = true;
 			}
 		}
 	}
+}
 
-	return false;
+
+void CrazyRadio::StopRadio()
+{
+
 }
 
 CRTPPacket * CrazyRadio::WriteData(void* data, int length)
@@ -288,6 +299,10 @@ void CrazyRadio::setChannel(int channel)
 {
     _channel = channel;
 }
+int CrazyRadio::GetChannel() const
+{
+    return _channel;
+}
 void CrazyRadio::WriteChannel(int channel)
 {
     this->WriteControl(NULL, 0, 0x01, channel, 0);
@@ -296,6 +311,10 @@ void CrazyRadio::WriteChannel(int channel)
 void CrazyRadio::SetDataRate(std::string dataRate)
 {
     _dataRate = dataRate;
+}
+std::string CrazyRadio::GetDataRate() const
+{
+    return _dataRate;
 }
 void CrazyRadio::WriteDataRate(std::string dataRate)
 {
@@ -563,3 +582,9 @@ bool CrazyRadio::SendDummyPacket()
 
 	return false;
 }
+
+ bool CrazyRadio::RadioIsConnected() const
+ {
+     return _radioIsConnected;
+ }
+

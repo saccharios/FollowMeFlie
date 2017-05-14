@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "communication/CrazyRadio.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,8 +29,11 @@ private slots:
 
     void on_radioSettingsOptions_activated(const QString &arg1);
 
+    void on_pushButton_clicked(bool checked);
+
 private:
     Ui::MainWindow *ui;
+    CrazyRadio _crazyRadio;
 };
 
 #endif // MAINWINDOW_H
