@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "CTOC.h"
+#include "TOC.h"
 
 
 CTOC::CTOC(CrazyRadio & crazyRadio, int port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)

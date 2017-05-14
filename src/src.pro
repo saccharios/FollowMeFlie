@@ -16,18 +16,17 @@ INCLUDEPATH += communication \
     math \
     control
 
-SOURCES += communication/CCrazyflie.cpp \
-    communication/CCrazyRadio.cpp \
-    communication/CCRTPPacket.cpp \
-    communication/CTOC.cpp
+SOURCES += communication/Crazyflie.cpp \
+    communication/CrazyRadio.cpp \
+    communication/CRTPPacket.cpp \
+    communication/TOC.cpp
 
 
-HEADERS  += communication/CCrazyflie.h \
-    communication/CCrazyRadio.h \
-    communication/CCRTPPacket.h \
-    communication/CTOC.h \
+HEADERS  += communication/Crazyflie.h \
+    communication/CrazyRadio.h \
+    communication/CRTPPacket.h \
+    communication/TOC.h \
     math/clock_gettime.h
-
 
 # Include library libusb-1.0.21
 libubs_path = "E:\Code\lib\libusb-1.0.21"

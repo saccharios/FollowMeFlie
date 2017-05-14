@@ -6,7 +6,7 @@
 //#include <QtMultimediaWidgets>
 #include <QDebug>
 #include <memory>
-#include "communication/CCrazyflie.h"
+#include "communication/Crazyflie.h"
 
 bool checkCameraAvailability()
 {

@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "CCRTPPacket.h"
+#include "CRTPPacket.h"
 
 
 CRTPPacket::CRTPPacket(int port)

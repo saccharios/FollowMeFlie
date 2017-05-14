@@ -40,7 +40,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "CCRTPPacket.h"
+#include "CRTPPacket.h"
 
 
 // Power levels to configure the radio dongle with */

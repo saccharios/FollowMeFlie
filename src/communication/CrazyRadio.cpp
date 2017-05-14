@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "CCrazyRadio.h"
+#include "CrazyRadio.h"
 #include <chrono>
 //#include <thread>
 #undef _GLIBCXX_HAS_GTHREADS

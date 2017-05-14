@@ -32,8 +32,8 @@
 
 
 #include <cmath>
-#include "CCrazyRadio.h"
-#include "CTOC.h"
+#include "CrazyRadio.h"
+#include "TOC.h"
 
 constexpr unsigned long NSEC_PER_SEC = 1000000000;
 

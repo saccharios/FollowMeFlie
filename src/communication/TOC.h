@@ -35,8 +35,8 @@
 #include <string>
 #include <cstdlib>
 #include <iostream>
-#include "CCrazyRadio.h"
-#include "CCRTPPacket.h"
+#include "CrazyRadio.h"
+#include "CRTPPacket.h"
 
 
 // Storage element for logged variable identities

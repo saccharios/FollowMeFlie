@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "CCrazyflie.h"
+#include "Crazyflie.h"
 #include <chrono>
 #include "math/clock_gettime.h"
 
