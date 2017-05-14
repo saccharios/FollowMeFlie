@@ -21,7 +21,7 @@ int main()
 
     //    return app.exec();
 
-    CCrazyRadio crazyRadio("radio://0/80/250K");
+    CrazyRadio crazyRadio("radio://0/80/250K");
     bool startRadio = crazyRadio.StartRadio();
     if(startRadio)
     {
@@ -51,7 +51,7 @@ int main()
             //       cflieCopter->setYaw(140);
 
             // Important note: When quitting the program, please don't just
-            // SIGINT (i.e. CTRL-C) it. The CCrazyflie class instance
+            // SIGINT (i.e. CTRL-C) it. The Crazyflye class instance
             // cflieCopter must be deleted in order to call the destructor
             // which stops logging on the device. If you fail to do this
             // when quitting your program, your copter will experience some

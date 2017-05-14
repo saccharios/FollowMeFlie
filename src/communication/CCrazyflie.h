@@ -53,12 +53,12 @@ class Crazyflie {
 
 public:
     //Constructor for the copter convenience class
-    //    Constructor for the CCrazyflie class, taking a CCrazyRadio radio
+    //    Constructor for the Crazyflye class, taking a CCrazyRadio radio
     //    interface instance as a parameter.
     //    crRadio: Initialized (and started) instance of the
     //    CCrazyRadio class, denoting the USB dongle to communicate
     //    with.
-    Crazyflie(CCrazyRadio & crazyRadio);
+    Crazyflie(CrazyRadio & crazyRadio);
     //Destructor for the copter convenience class
 
     //    Destructor, deleting all internal variables (except for the
@@ -192,7 +192,7 @@ private:
     int _ackMissTolerance;
     int _ackMissCounter;
     //Internal pointer to the initialized CCrazyRadio radio interface instance.
-    CCrazyRadio & _crazyRadio;
+    CrazyRadio & _crazyRadio;
     //The current thrust to send as a set point to the copter.
     int _thrust;
     //The current roll to send as a set point to the copter.

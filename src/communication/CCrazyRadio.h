@@ -62,15 +62,15 @@ enum Power {
 // host computer, open and maintain a connection, and send/receive
 // data when communicating with the Crazyflie Nano copter using the
 // Crazy Radio Transfer Protocol as defined by Bitcraze.
-class CCrazyRadio {
+class CrazyRadio {
 
 public:
     // Constructor for the radio communication class
 
     // \param strRadioIdentifier URI for the radio to be opened,
     //  e.g. "radio://<dongle-no>/<channel-no>/<datarate>". */
-    CCrazyRadio(std::string radioIdentifier);
-    ~CCrazyRadio();
+    CrazyRadio(std::string radioIdentifier);
+    ~CrazyRadio();
 
     // Function to start the radio communication
     // The first available USB dongle will be opened and claimed for
@@ -92,7 +92,7 @@ public:
     // Sends the given packet's payload to the copter
     // \param crtpSend The packet which supplied header and payload
     //  information to send to the copter */
-    CCRTPPacket* SendPacket(CCRTPPacket* send, bool deleteAfterwards = false);
+    CRTPPacket* SendPacket(CRTPPacket* send, bool deleteAfterwards = false);
 
     // Sends the given packet and waits for a reply.
     // Internally, this function calls the more elaborate
@@ -102,7 +102,7 @@ public:
     // \param bDeleteAfterwards Whether or not the packet to send is
     // deleted internally after sending it
     // \return Packet containing the reply or NULL if no reply was received (after retrying).
-    CCRTPPacket* SendAndReceive(CCRTPPacket* send, bool deleteAfterwards = false);
+    CRTPPacket* SendAndReceive(CRTPPacket* send, bool deleteAfterwards = false);
 
     // Sends the given packet and waits for a reply.
     // Sends out the CCRTPPacket instance denoted by crtpSend on the
@@ -116,7 +116,7 @@ public:
     // \param nRetries Number of retries (re-sending) before giving up on an answer
     // \param nMicrosecondsWait Microseconds to wait between two re-sends
     // \return Packet containing the reply or NULL if no reply was received (after retrying).
-    CCRTPPacket *SendAndReceive(CCRTPPacket* send, int port, int channel, bool deleteAfterwards = true, int retries = 10, int microsecondsWait = 100);
+    CRTPPacket *SendAndReceive(CRTPPacket* send, int port, int channel, bool deleteAfterwards = true, int retries = 10, int microsecondsWait = 100);
 
     // Sends out an empty dummy packet
     //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.
@@ -126,7 +126,7 @@ public:
     // Waits for the next non-empty packet.
     // Sends out dummy packets until a reply is non-empty and then returns this reply.
     // \return Packet contaning a non-empty reply.
-    CCRTPPacket* WaitForPacket();
+    CRTPPacket* WaitForPacket();
 
     // Whether or not the copter is answering sent packets.
     // Returns whether the copter is actually answering sent packets with
@@ -140,10 +140,10 @@ public:
     bool IsUsbConnectionOk();
 
     // Extracting all logging related packets
-    // Returns a list of all collected logging related (i.e. originating from port 5) packets. This is called by the CCrazyflie class
+    // Returns a list of all collected logging related (i.e. originating from port 5) packets. This is called by the Crazyflie class
     //  automatically when performing cycle().
     // \return List of CCRTPPacket instances collected from port 5 (logging).
-    std::list<CCRTPPacket*> PopLoggingPackets();
+    std::list<CRTPPacket*> PopLoggingPackets();
 private:
     // The radio URI as supplied when initializing the class instance
     std::string _radioIdentifier;
@@ -161,16 +161,16 @@ private:
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
-    std::list<CCRTPPacket*> _loggingPackets;
+    std::list<CRTPPacket*> _loggingPackets;
 
     std::list<libusb_device*> ListDevices(int vendorID, int productID);
     bool OpenUSBDongle();
     bool ClaimInterface(int nInterface);
     void CloseDevice();
 
-    CCRTPPacket* ReadAck();
+    CRTPPacket* ReadAck();
 
-    CCRTPPacket* WriteData(void* data, int length);
+    CRTPPacket* WriteData(void* data, int length);
     bool WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index);
     bool ReadData(void* data, int & maxLength);
 

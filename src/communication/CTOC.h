@@ -65,7 +65,7 @@ struct LoggingBlock {
 class CTOC {
 
 public:
-    CTOC(CCrazyRadio & crazyRadio, int port);
+    CTOC(CrazyRadio & crazyRadio, int port);
 
     bool SendTOCPointerReset();
     bool RequestMetaData();
@@ -90,14 +90,14 @@ public:
 
     bool EnableLogging(std::string blockName);
 
-    void ProcessPackets(std::list<CCRTPPacket*> packets);
+    void ProcessPackets(std::list<CRTPPacket*> packets);
 
     int ElementIDinBlock(int blockID, int elementIndex);
     bool SetFloatValueForElementID(int elementID, float value);
     bool AddElementToBlock(int blockID, int elementID);
     bool UnregisterLoggingBlockID(int id);
 private:
-    CCrazyRadio & _crazyRadio;
+    CrazyRadio & _crazyRadio;
     int _port;
     int _itemCount;
     std::list<struct TOCElement> _TOCElements;
@@ -106,7 +106,7 @@ private:
     bool RequestInitialItem();
     bool RequestItem(int id, bool initial);
     bool RequestItem(int id);
-    bool ProcessItem(CCRTPPacket* packet);
+    bool ProcessItem(CRTPPacket* packet);
 
 };
 

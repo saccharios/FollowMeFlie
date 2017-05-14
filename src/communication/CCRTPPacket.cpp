@@ -29,13 +29,13 @@
 #include "CCRTPPacket.h"
 
 
-CCRTPPacket::CCRTPPacket(int port)
+CRTPPacket::CRTPPacket(int port)
 {
     this->BasicSetup();
     this->setPort(port);
 }
 
-CCRTPPacket::CCRTPPacket(char* data, int dataLength, int port)
+CRTPPacket::CRTPPacket(char* data, int dataLength, int port)
 {
     this->BasicSetup();
     this->setPort(port);
@@ -43,7 +43,7 @@ CCRTPPacket::CCRTPPacket(char* data, int dataLength, int port)
     this->SetData(data, dataLength);
 }
 
-CCRTPPacket::CCRTPPacket(char data, int port)
+CRTPPacket::CRTPPacket(char data, int port)
 {
     this->BasicSetup();
     this->setPort(port);
@@ -51,11 +51,11 @@ CCRTPPacket::CCRTPPacket(char data, int port)
     this->SetData(&data, 1);
 }
 
-CCRTPPacket::~CCRTPPacket() {
+CRTPPacket::~CRTPPacket() {
     this->ClearData();
 }
 
-void CCRTPPacket::BasicSetup()
+void CRTPPacket::BasicSetup()
 {
     _data = NULL;
     _dataLength = 0;
@@ -64,7 +64,7 @@ void CCRTPPacket::BasicSetup()
     _isPingPacket = false;
 }
 
-void CCRTPPacket::SetData(char* data, int dataLength)
+void CRTPPacket::SetData(char* data, int dataLength)
 {
     this->ClearData();
 
@@ -73,17 +73,17 @@ void CCRTPPacket::SetData(char* data, int dataLength)
     _dataLength = dataLength;
 }
 
-char *CCRTPPacket::Data()
+char *CRTPPacket::Data()
 {
     return _data;
 }
 
-int CCRTPPacket::DataLength()
+int CRTPPacket::DataLength()
 {
     return _dataLength;
 }
 
-void CCRTPPacket::ClearData()
+void CRTPPacket::ClearData()
 {
     if(_data != NULL)
     {
@@ -93,7 +93,7 @@ void CCRTPPacket::ClearData()
     }
 }
 
-char *CCRTPPacket::SendableData()
+char *CRTPPacket::SendableData()
 {
     char* sendable = new char[this->GetSendableDataLength()]();
 
@@ -116,7 +116,7 @@ char *CCRTPPacket::SendableData()
     return sendable;
 }
 
-int CCRTPPacket::GetSendableDataLength()
+int CRTPPacket::GetSendableDataLength()
 {
     if(_isPingPacket)
     {
@@ -128,32 +128,32 @@ int CCRTPPacket::GetSendableDataLength()
     }
 }
 
-void CCRTPPacket::setPort(int port) // Name SetPort (with capital S) is a macro
+void CRTPPacket::setPort(int port) // Name SetPort (with capital S) is a macro
 {
     _port = port;
 }
 
-int CCRTPPacket::GetPort()
+int CRTPPacket::GetPort()
 {
     return _port;
 }
 
-void CCRTPPacket::SetChannel(int channel)
+void CRTPPacket::SetChannel(int channel)
 {
     _channel = channel;
 }
 
-int CCRTPPacket::GetChannel()
+int CRTPPacket::GetChannel()
 {
     return _channel;
 }
 
-void CCRTPPacket::SetIsPingPacket(bool isPingPacket)
+void CRTPPacket::SetIsPingPacket(bool isPingPacket)
 {
     _isPingPacket = isPingPacket;
 }
 
-bool CCRTPPacket::IsPingPacket()
+bool CRTPPacket::IsPingPacket()
 {
     return _isPingPacket;
 }
