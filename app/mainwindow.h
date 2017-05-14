@@ -16,9 +16,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_exitButton_clicked();
-
     void on_activateCamera_clicked(bool checked);
+
+    void on_disconnect_clicked(bool checked);
+
+    void on_connect_clicked(bool checked);
+
+    void on_radioSettingsOptions_currentIndexChanged(int index);
+
+    void on_exitApp_clicked();
+
+    void on_radioSettingsOptions_activated(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;

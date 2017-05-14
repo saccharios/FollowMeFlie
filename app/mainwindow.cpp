@@ -20,10 +20,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_exitButton_clicked()
-{
-    QCoreApplication::quit();
-}
 void MainWindow::on_activateCamera_clicked(bool checked)
 {
     std::unique_ptr<QCamera> camera = nullptr;
@@ -44,3 +40,24 @@ void MainWindow::on_activateCamera_clicked(bool checked)
         qDebug() << "camera here!";
     }
 }
+
+void MainWindow::on_disconnect_clicked(bool checked)
+{
+
+}
+
+void MainWindow::on_connect_clicked(bool checked)
+{
+
+}
+
+void MainWindow::on_radioSettingsOptions_currentIndexChanged(int index)
+{
+
+}
+
+void MainWindow::on_exitApp_clicked()
+{
+    QCoreApplication::quit();
+}
+
