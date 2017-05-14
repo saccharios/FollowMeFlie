@@ -136,30 +136,39 @@ bool CrazyRadio::OpenUSBDongle()
 	return false;
 }
 
+bool CrazyRadio::ReadRadioSettings()
+{
+    int nDongleNBR;
+        int nRadioChannel;
+        int nDataRate;
+        char cDataRateType;
+    bool success = std::sscanf(_radioIdentifier.c_str(), "radio://%d/%d/%d%c",
+                               &nDongleNBR, &nRadioChannel, &nDataRate,
+                               &cDataRateType) != EOF;
+    if(success)
+    {
+        std::cout << "Opening radio " << nDongleNBR << "/" << nRadioChannel << "/" << nDataRate << cDataRateType << std::endl;
+
+        std::stringstream sts;
+        sts << nDataRate;
+        sts << cDataRateType;
+        std::string strDataRate = sts.str();
+        SetDataRate(strDataRate);
+        setChannel(nRadioChannel);
+    }
+    return success;
+}
+
 bool CrazyRadio::StartRadio()
 {
     if(this->OpenUSBDongle())
 	{
-		int nDongleNBR;
-		int nRadioChannel;
-		int nDataRate;
-		char cDataRateType;
-
-        if(std::sscanf(_radioIdentifier.c_str(), "radio://%d/%d/%d%c",
-				&nDongleNBR, &nRadioChannel, &nDataRate,
-				&cDataRateType) != EOF)
+        if (ReadRadioSettings())
 		{
-			std::cout << "Opening radio " << nDongleNBR << "/" << nRadioChannel << "/" << nDataRate << cDataRateType << std::endl;
-
-			std::stringstream sts;
-			sts << nDataRate;
-			sts << cDataRateType;
-			std::string strDataRate = sts.str();
-
 			// Read device version
 			libusb_device_descriptor ddDescriptor;
             libusb_get_device_descriptor(_devDevice, &ddDescriptor);
-			sts.clear();
+            std::stringstream sts;
 			sts.str(std::string());
 			sts << (ddDescriptor.bcdDevice >> 8);
 			sts << ".";
@@ -179,8 +188,8 @@ bool CrazyRadio::StartRadio()
 			if(claimIntf)
 			{
 				// Set power-up settings for dongle (>= v0.4)
-                this->SetDataRate("2M");
-				this->setChannel(2);
+                WriteDataRate("2M");
+                WriteChannel(2);
 
                 if(_deviceVersion >= 0.4)
 				{
@@ -202,8 +211,8 @@ bool CrazyRadio::StartRadio()
                     this->SetARC(10);
 				}
 
-				this->setChannel(nRadioChannel);
-                this->SetDataRate(strDataRate);
+                WriteDataRate(_dataRate);
+                WriteChannel(_channel);
 
 				return true;
 			}
@@ -278,24 +287,32 @@ void CrazyRadio::SetARC(int ARC)
 void CrazyRadio::setChannel(int channel)
 {
     _channel = channel;
+}
+void CrazyRadio::WriteChannel(int channel)
+{
     this->WriteControl(NULL, 0, 0x01, channel, 0);
 }
 
 void CrazyRadio::SetDataRate(std::string dataRate)
 {
     _dataRate = dataRate;
+}
+void CrazyRadio::WriteDataRate(std::string dataRate)
+{
     int dataRateCoded = -1;
 
-    if(_dataRate == "250K") {
+    if(dataRate == "250K") {
         dataRateCoded = 0;
-    } else if(_dataRate == "1M") {
+    } else if(dataRate == "1M") {
         dataRateCoded = 1;
-    } else if(_dataRate == "2M") {
+    } else if(dataRate == "2M") {
         dataRateCoded = 2;
-	}
+    }
 
     this->WriteControl(NULL, 0, 0x03, dataRateCoded, 0);
 }
+
+
 
 void CrazyRadio::SetARDTime(int ARDTime)
 { // in uSec
@@ -511,7 +528,6 @@ CRTPPacket *CrazyRadio::SendAndReceive(CRTPPacket* send, int port, int channel, 
 			//      usleep(nMicrosecondsWait);
 			//      std::this_thread::sleep_for(std::chrono::microseconds(123));
             std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
-            std::cout << "sleeping\n";
             received = this->WaitForPacket();
 		}
 	}

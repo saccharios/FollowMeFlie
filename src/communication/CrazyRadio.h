@@ -144,6 +144,8 @@ public:
     //  automatically when performing cycle().
     // \return List of CCRTPPacket instances collected from port 5 (logging).
     std::list<CRTPPacket*> PopLoggingPackets();
+
+    bool ReadRadioSettings();
 private:
     // The radio URI as supplied when initializing the class instance
     std::string _radioIdentifier;
@@ -176,7 +178,9 @@ private:
 
     void SetARC(int ARC);
     void setChannel(int channel);
+    void WriteChannel(int channel);
     void SetDataRate(std::string dataRate);
+    void WriteDataRate(std::string dataRate);
     void SetARDBytes(int ARDBytes);
     void SetARDTime(int ARDTime);
     void SetAddress(char* address);
