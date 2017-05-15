@@ -11,7 +11,9 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _crazyRadio()
+    _crazyRadio(),
+    _crazyFlie(_crazyRadio),
+    crazyFlieCaller(_crazyFlie, parent)
 {
     ui->setupUi(this);
 }
@@ -45,11 +47,21 @@ void MainWindow::on_activateCamera_clicked(bool checked)
 void MainWindow::on_disconnect_clicked(bool checked)
 {
     _crazyRadio.StopRadio();
+    _crazyFlie.EnableStateMachine(false);
 }
 
 void MainWindow::on_connect_clicked(bool checked)
 {
     _crazyRadio.StartRadio();
+    if(_crazyRadio.RadioIsConnected())
+    {
+        _crazyFlie.EnableStateMachine(true);
+    }
+    else
+    {
+        _crazyFlie.EnableStateMachine(false);
+        std::cerr << "Not connected!" << std::endl;
+    }
 }
 
 void MainWindow::on_radioSettingsOptions_currentIndexChanged(int index)
@@ -65,50 +77,41 @@ void MainWindow::on_exitApp_clicked()
 
 void MainWindow::on_pushButton_clicked(bool checked)
 {
-    if(_crazyRadio.RadioIsConnected())
-        // Connection is supervised by main thread. For the crazyflie there must be a sparate thread.
-       {
-           Crazyflie crazyFlie(_crazyRadio);
-           // With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
-           // However, the following command does not do the trick.
-           // I disabled the locking-functionality in the firmware.
-           crazyFlie.SetThrust(0);
+    // With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
+    // However, the following command does not do the trick.
+    // I disabled the locking-functionality in the firmware.
+//        _crazyFlie.SetThrust(0);
 
-           // Enable sending the setpoints. This can be used to temporarily
-           // stop updating the internal controller setpoints and instead
-           // sending dummy packets (to keep the connection alive).
-           crazyFlie.SetSendSetpoints(true);
-           while(crazyFlie.Update())
-           {
-               // Range: 10001 - (approx.) 60000
-               crazyFlie.SetSendSetpoints(true);
-               crazyFlie.SetThrust(10001);
-               // Main loop. Currently empty.
-               //            Examples to set thrust and RPY:
+//        // Enable sending the setpoints. This can be used to temporarily
+//        // stop updating the internal controller setpoints and instead
+//        // sending dummy packets (to keep the connection alive).
+//        _crazyFlie.SetSendSetpoints(true);
+//        while(_crazyFlie.Update())
+//        {
+//            // Range: 10001 - (approx.) 60000
+            _crazyFlie.SetSendSetpoints(true);
+            _crazyFlie.SetThrust(40001);
+//            // Main loop. Currently empty.
+//            //            Examples to set thrust and RPY:
 
 
-               // All in degrees. R/P shouldn't be over 45 degree (it goes
-               // sidewards really fast!). R/P/Y are all from -180.0deg to 180.0deg.
-               //       cflieCopter->setRoll(20);
-               //       cflieCopter->setPitch(15);
-               //       cflieCopter->setYaw(140);
+//            // All in degrees. R/P shouldn't be over 45 degree (it goes
+//            // sidewards really fast!). R/P/Y are all from -180.0deg to 180.0deg.
+//            //       cflieCopter->setRoll(20);
+//            //       cflieCopter->setPitch(15);
+//            //       cflieCopter->setYaw(140);
 
-               // Important note: When quitting the program, please don't just
-               // SIGINT (i.e. CTRL-C) it. The Crazyflye class instance
-               // cflieCopter must be deleted in order to call the destructor
-               // which stops logging on the device. If you fail to do this
-               // when quitting your program, your copter will experience some
-               // kind of buffer overflow (because of a lot of logging messages
-               // summing up without being collected) and you will have to
-               // restart it manually. This is not being done in this
-               // particular example. You have been warned.
+//            // Important note: When quitting the program, please don't just
+//            // SIGINT (i.e. CTRL-C) it. The Crazyflye class instance
+//            // cflieCopter must be deleted in order to call the destructor
+//            // which stops logging on the device. If you fail to do this
+//            // when quitting your program, your copter will experience some
+//            // kind of buffer overflow (because of a lot of logging messages
+//            // summing up without being collected) and you will have to
+//            // restart it manually. This is not being done in this
+//            // particular example. You have been warned.
 
-               // Other than that, this example covers pretty much everything
-               // basic you will need for controlling the copter.
-           }
-       }
-       else
-       {
-           std::cerr << "Not connected!" << std::endl;
-       }
+//            // Other than that, this example covers pretty much everything
+//            // basic you will need for controlling the copter.
+//        }
 }

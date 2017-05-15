@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 #include "communication/CrazyRadio.h"
-
+#include "communication/CrazyFlie.h"
+#include "crazyfliecaller.h"
 namespace Ui {
 class MainWindow;
 }
@@ -34,6 +35,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     CrazyRadio _crazyRadio;
+    Crazyflie _crazyFlie;
+    CrazyFlieCaller crazyFlieCaller;
 };
 
 #endif // MAINWINDOW_H

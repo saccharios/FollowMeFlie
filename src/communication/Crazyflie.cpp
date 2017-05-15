@@ -53,6 +53,8 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
 
     _sendSetpointPeriod = 0.01; // Seconds
     _setpointLastSent = 0;
+
+    _stateMachineIsEnabled = false;
 }
 
 Crazyflie::~Crazyflie()
@@ -130,8 +132,18 @@ int Crazyflie::GetThrust()
     return this->GetSensorValue("stabilizer.thrust");
 }
 
+void Crazyflie::EnableStateMachine(bool enable)
+{
+    _stateMachineIsEnabled = enable;
+}
+
 bool Crazyflie::Update()
 {
+    if(!_stateMachineIsEnabled)
+    {
+        return false;
+    }
+
     double currentTime = this->GetCurrentTime();
     switch(_state)
     {

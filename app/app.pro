@@ -11,10 +11,12 @@ TEMPLATE = app
 CONFIG += console # Print console output in external console
 
 SOURCES +=  main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    crazyfliecaller.cpp
 
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    crazyfliecaller.h
 
 
 FORMS    += mainwindow.ui

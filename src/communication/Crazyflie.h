@@ -121,6 +121,8 @@ public:
     //    radio dongle. If it returns 'false', the dongle was most likely
     //    removed or somehow else disconnected from the host machine. If it
     //    returns 'true', the dongle connection works fine.
+
+    void EnableStateMachine(bool enable);
     bool Update();
 
     //    Returns whether the radio connection to the copter is currently
@@ -263,5 +265,7 @@ private:
     void DisableAltimeterLogging();
 
     double GetCurrentTime();
+
+    bool _stateMachineIsEnabled;
 };
 
