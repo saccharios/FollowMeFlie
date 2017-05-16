@@ -40,7 +40,7 @@
      <string>Activate Camera</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="connect">
+   <widget class="QPushButton" name="connectRadio">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -53,7 +53,7 @@
      <string>Connect</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="disconnect">
+   <widget class="QPushButton" name="disconnectRadio">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -89,7 +89,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="radioSettings">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -102,7 +102,7 @@
      <string>Radio Settings:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="connectionStatus">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -126,6 +126,16 @@
     </property>
     <property name="text">
      <string>SimpleTestButton</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="actRoll">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>80</y>
+      <width>104</width>
+      <height>70</height>
+     </rect>
     </property>
    </widget>
   </widget>

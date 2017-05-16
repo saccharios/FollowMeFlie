@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <memory>
 #include <QCameraInfo>
-
+#include <iostream>
 //#include <QtMultimedia>
 //#include <QtMultimediaWidgets>
 #include <QDebug>
@@ -16,7 +16,15 @@ MainWindow::MainWindow(QWidget *parent) :
     crazyFlieCaller(_crazyFlie, parent)
 {
     ui->setupUi(this);
+
+//    connect(&crazyFlieCaller, SIGNAL(CounterSignal()), this, SLOT(displayCounter()));
+    connect(&crazyFlieCaller, SIGNAL(RollChanged()), this, SLOT(displayCounter()));
 }
+void MainWindow::displayCounter()
+ {
+//     ui->actRoll->setPlainText( QString::number(crazyFlieCaller.Counter()));
+     ui->actRoll->setPlainText( QString::number(crazyFlieCaller.GetRoll()));
+ }
 
 MainWindow::~MainWindow()
 {
@@ -44,13 +52,13 @@ void MainWindow::on_activateCamera_clicked(bool checked)
     }
 }
 
-void MainWindow::on_disconnect_clicked(bool checked)
+void MainWindow::on_disconnectRadio_clicked()
 {
     _crazyRadio.StopRadio();
     _crazyFlie.EnableStateMachine(false);
 }
 
-void MainWindow::on_connect_clicked(bool checked)
+void MainWindow::on_connectRadio_clicked()
 {
     _crazyRadio.StartRadio();
     if(_crazyRadio.RadioIsConnected())
@@ -81,7 +89,6 @@ void MainWindow::on_pushButton_clicked(bool checked)
     // However, the following command does not do the trick.
     // I disabled the locking-functionality in the firmware.
 //        _crazyFlie.SetThrust(0);
-
 //        // Enable sending the setpoints. This can be used to temporarily
 //        // stop updating the internal controller setpoints and instead
 //        // sending dummy packets (to keep the connection alive).
@@ -89,9 +96,13 @@ void MainWindow::on_pushButton_clicked(bool checked)
 //        while(_crazyFlie.Update())
 //        {
 //            // Range: 10001 - (approx.) 60000
+
+    if(_crazyFlie.IsInitialized())
+    {
             _crazyFlie.SetSendSetpoints(true);
-            _crazyFlie.SetThrust(40001);
-//            // Main loop. Currently empty.
+            _crazyFlie.SetThrust(10001);
+    }
+            //            // Main loop. Currently empty.
 //            //            Examples to set thrust and RPY:
 
 
@@ -115,3 +126,5 @@ void MainWindow::on_pushButton_clicked(bool checked)
 //            // basic you will need for controlling the copter.
 //        }
 }
+
+
