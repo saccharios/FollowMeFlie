@@ -99,9 +99,9 @@ public:
 private:
     CrazyRadio & _crazyRadio;
     int _port;
-    int _itemCount;
-    std::list<struct TOCElement> _TOCElements;
-    std::list<struct LoggingBlock> _loggingBlocks;
+    uint8_t _itemCount;
+    std::list<TOCElement> _TOCElements; // TODO Can be a map with string "name" as key.
+    std::list<LoggingBlock> _loggingBlocks;
 
     bool RequestInitialItem();
     bool RequestItem(int id, bool initial);

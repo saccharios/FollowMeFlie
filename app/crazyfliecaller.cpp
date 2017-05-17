@@ -6,7 +6,7 @@ CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) : _craz
     QObject::connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
     QObject::connect(&_timer, SIGNAL(timeout()), this, SLOT(CheckRollChanged()));
     QObject::connect(&_timer, SIGNAL(timeout()), this, SLOT(CounterUpdate()));
-    _timer.start(200); // time in ms // TODO What does the intervall need to be??
+    _timer.start(10); // time in ms // TODO What does the intervall need to be??
 }
 
 
@@ -28,8 +28,6 @@ int CrazyFlieCaller::Counter() const
 
 void CrazyFlieCaller::CheckRollChanged()
 {
-    // TODO Not getting the actual roll with _crazyFlie.GetRoll()
-    std::cout << "_crazyFlie.GetRoll() = " << _crazyFlie.GetRoll() << std::endl;
     if(_crazyFlie.GetRoll() != _roll)
     {
         _roll = _crazyFlie.GetRoll();

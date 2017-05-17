@@ -290,12 +290,12 @@ bool Crazyflie::IsInitialized()
 bool Crazyflie::StartLogging()
 {
     // Register the desired sensor readings
-    this->EnableStabilizerLogging();
-    this->EnableGyroscopeLogging();
-    this->EnableAccelerometerLogging();
-    this->EnableBatteryLogging();
-    this->EnableMagnetometerLogging();
-    this->EnableAltimeterLogging();
+    EnableStabilizerLogging();
+    EnableGyroscopeLogging();
+    EnableAccelerometerLogging();
+    EnableBatteryLogging();
+    EnableMagnetometerLogging();
+    EnableAltimeterLogging();
 
     return true;
 }

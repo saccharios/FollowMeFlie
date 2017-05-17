@@ -57,7 +57,7 @@ bool CTOC::RequestMetaData()
 
     if(received->Data()[1] == 0x01)
     {
-        _itemCount = received->Data()[2];
+        _itemCount = received->Data()[2]; // is usually 0x81 == 129 decimal
         retVal = true;
     }
 
@@ -137,11 +137,7 @@ bool CTOC::ProcessItem(CRTPPacket* packet)
                 teNew.type = nType;
                 teNew.isLogging = false;
                 teNew.value = 0;
-
                 _TOCElements.push_back(teNew);
-
-                // NOTE(winkler): For debug purposes only.
-                //std::cout << strGroup << "." << strIdentifier << std::endl;
 
                 return true;
             }
@@ -153,11 +149,12 @@ bool CTOC::ProcessItem(CRTPPacket* packet)
 
 struct TOCElement CTOC::ElementForName(std::string name, bool& found)
 {
-    for(std::list<struct TOCElement>::iterator itElement = _TOCElements.begin();
+
+    for(std::list<TOCElement>::iterator itElement = _TOCElements.begin();
         itElement != _TOCElements.end();
         itElement++)
     {
-        struct TOCElement teCurrent = *itElement;
+        TOCElement teCurrent = *itElement;
 
         std::string tempFullName = teCurrent.group + "." + teCurrent.identifier;
         if(name == tempFullName)
@@ -226,7 +223,6 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
 {
     bool found;
     struct LoggingBlock currentLogBlock = this->LoggingBlockForName(blockName, found);
-
     if(found)
     {
         struct TOCElement teCurrent = this->ElementForName(name, found);
@@ -254,7 +250,6 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
             {
                 delete crtpReceived;
             }
-
             if(created)
             {
                 this->AddElementToBlock(currentLogBlock.id, teCurrent.id);
@@ -297,11 +292,10 @@ bool CTOC::IsLogging(std::string name) {
 double CTOC::DoubleValue(std::string name) {
     bool found;
 
-    struct TOCElement teResult = this->ElementForName(name, found);
-
+    TOCElement result = this->ElementForName(name, found);
     if(found)
     {
-        return teResult.value;
+        return result.value;
     }
 
     return 0;
@@ -402,7 +396,7 @@ bool CTOC::RegisterLoggingBlock(std::string name, double frequency)
             lbNew.name = name;
             lbNew.id = id;
             lbNew.frequency = frequency;
-
+            // lbNew.ElementIDs will be populated later
             _loggingBlocks.push_back(lbNew);
 
             return this->EnableLogging(name);
@@ -486,17 +480,16 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
             int index = 0;
             int nAvailableLogBytes = crtpPacket->DataLength() - 5;
 
-            int lockID = data[1];
+            int blockID = data[1];
             bool found;
-            struct LoggingBlock currentLogBlock = this->LoggingBlockForID(lockID, found);
-
+            LoggingBlock currentLogBlock = this->LoggingBlockForID(blockID, found);
             if(found)
             {
                 while(index < currentLogBlock.elementIDs.size())
                 {
-                    int elementID = this->ElementIDinBlock(lockID, index);
+                    int elementID = this->ElementIDinBlock(blockID, index);
                     bool found2;
-                    struct TOCElement teCurrent = this->ElementForID(elementID, found2);
+                    TOCElement teCurrent = this->ElementForID(elementID, found2);
 
                     if(found2)
                     {
@@ -507,7 +500,6 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
                         // the value to fValue. This way, we let the compiler to
                         // the magic of conversion.
                         float value = 0;
-
                         switch(teCurrent.type)
                         {
                         case 1:
@@ -593,7 +585,7 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
                     else
                     {
                         std::cerr << "Didn't find element ID " << elementID
-                                  << " in block ID " << lockID
+                                  << " in block ID " << blockID
                                   << " while parsing incoming logging data." << std::endl;
                         std::cerr << "This REALLY shouldn't be happening!" << std::endl;
                         std::exit(-1);
@@ -636,7 +628,6 @@ bool CTOC::SetFloatValueForElementID(int elementID, float value)
         {
             teCurrent.value = value; // We store floats as doubles
             (*itElement) = teCurrent;
-            // std::cout << fValue << std::endl;
             return true;
         }
     }
