@@ -127,7 +127,7 @@ public:
     // Sends out an empty dummy packet
     //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.
     // \return Boolean value denoting whether sending the dummy packet worked or not.
-    bool SendDummyPacket();
+    bool SendPingPacket();
 
     // Waits for the next non-empty packet.
     // Sends out dummy packets until a reply is non-empty and then returns this reply.

@@ -490,18 +490,14 @@ bool CrazyRadio::IsUsbConnectionOk()
 
 CRTPPacket *CrazyRadio::WaitForPacket()
 {
-    bool goon = true;
-    CRTPPacket* received = NULL;
-    CRTPPacket* dummy = new CRTPPacket(0);
-    dummy->SetIsPingPacket(true);
-
-    while(goon)
+    CRTPPacket* received = nullptr;
+    CRTPPingPacket* pingPacket = new CRTPPingPacket(0);
+    while(received == nullptr)
     {
-        received = this->SendPacket(dummy);
-        goon = (received == NULL);
+        received = SendPacket(pingPacket);
 	}
 
-    delete dummy;
+    delete pingPacket;
     return received;
 }
 
@@ -567,13 +563,11 @@ std::list<CRTPPacket*> CrazyRadio::PopLoggingPackets()
     return packets;
 }
 
-bool CrazyRadio::SendDummyPacket()
+bool CrazyRadio::SendPingPacket()
 {
-    CRTPPacket* received = NULL;
-    CRTPPacket* dummy = new CRTPPacket(0);
-    dummy->SetIsPingPacket(true);
-
-    received = this->SendPacket(dummy, true);
+    CRTPPacket* received = nullptr;
+    CRTPPingPacket* pingPacket = new CRTPPingPacket(0);
+    received = this->SendPacket(pingPacket, true);
     if(received)
     {
         delete received;

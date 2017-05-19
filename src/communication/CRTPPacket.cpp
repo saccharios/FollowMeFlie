@@ -27,7 +27,7 @@
 
 
 #include "CRTPPacket.h"
-
+#include "assert.h"
 
 CRTPPacket::CRTPPacket(int port)
 {
@@ -61,7 +61,6 @@ void CRTPPacket::BasicSetup()
     _dataLength = 0;
     _port = 0;
     _channel = 0;
-    _isPingPacket = false;
 }
 
 void CRTPPacket::SetData(char* data, int dataLength)
@@ -78,7 +77,7 @@ char *CRTPPacket::Data()
     return _data;
 }
 
-int CRTPPacket::DataLength()
+int CRTPPacket::DataLength() const
 {
     return _dataLength;
 }
@@ -95,37 +94,23 @@ void CRTPPacket::ClearData()
 
 char *CRTPPacket::SendableData()
 {
-    char* sendable = new char[this->GetSendableDataLength()]();
+    char* sendable = new char[GetSendableDataLength()]();
 
-    if(_isPingPacket)
-    {
-        sendable[0] = 0xff;
-    }
-    else
-    {
-        // Header byte
-        sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
+    // Header byte
+    sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
 
-        // Payload
-        std::memcpy(&sendable[1], _data, _dataLength);
+    // Payload
+    std::memcpy(&sendable[1], _data, _dataLength);
 
-        // Finishing byte
-        //sendable[_dataLength + 1] = 0x27;
-    }
+    // Finishing byte
+    //sendable[_dataLength + 1] = 0x27;
 
     return sendable;
 }
 
 int CRTPPacket::GetSendableDataLength()
 {
-    if(_isPingPacket)
-    {
-        return 1;
-    }
-    else
-    {
-        return _dataLength + 1;//2;
-    }
+    return _dataLength + 1;//2;
 }
 
 void CRTPPacket::setPort(int port) // Name SetPort (with capital S) is a macro
@@ -133,7 +118,7 @@ void CRTPPacket::setPort(int port) // Name SetPort (with capital S) is a macro
     _port = port;
 }
 
-int CRTPPacket::GetPort()
+int CRTPPacket::GetPort() const
 {
     return _port;
 }
@@ -143,17 +128,19 @@ void CRTPPacket::SetChannel(int channel)
     _channel = channel;
 }
 
-int CRTPPacket::GetChannel()
+int CRTPPacket::GetChannel() const
 {
     return _channel;
 }
 
-void CRTPPacket::SetIsPingPacket(bool isPingPacket)
+
+char * CRTPPingPacket::SendableData()
 {
-    _isPingPacket = isPingPacket;
+    char* sendable = new char(0xff);
+    return sendable;
 }
 
-bool CRTPPacket::IsPingPacket()
-{
-    return _isPingPacket;
-}
+
+
+
+

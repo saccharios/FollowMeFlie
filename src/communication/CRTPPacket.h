@@ -72,14 +72,14 @@ public:
 
     // Returns the length of the currently stored data (in bytes)
     //\return Returns the number of bytes stored as payload data
-    int DataLength();
+    int DataLength() const;
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
     // (channel, port), the payload data and a finishing byte
     // (0x27). This block is newly allocated and must be delete[]'d after usage.
     // \return Pointer to a new char[] containing a sendable block of payload data
-    char* SendableData();
+    virtual char* SendableData();
 
     // Returns the length of a sendable data block
     // \return Length of the sendable data block returned by sendableData() (in bytes)
@@ -91,7 +91,7 @@ public:
     // \param nPort Port number to set */
     void setPort(int port);
 
-    int GetPort();
+    int GetPort() const;
 
     // Set the copter channel to send the payload data to
     // The channel identifies the purpose of the packet on the
@@ -100,10 +100,8 @@ public:
     // \param nChannel Channel number to set */
     void SetChannel(int channel);
 
-    int GetChannel();
+    int GetChannel() const;
 
-    void SetIsPingPacket(bool isPingPacket);
-    bool IsPingPacket();
 private:
     // Internal storage pointer for payload data inside the  packet
     //    This data is freed when either new data is set or the class instance is destroyed.
@@ -114,7 +112,6 @@ private:
     int _port;
     // The copter channel the packet will be delivered to
     int _channel;
-    bool _isPingPacket;
 
     // Sets all internal variables to their default values.
     // The function clearData() should be called before this if it is
@@ -123,5 +120,10 @@ private:
     // Deletes the internally stored data and resets the data length and the pointer to zero
     void ClearData();
 };
-
+class CRTPPingPacket : public CRTPPacket {
+public:
+    CRTPPingPacket(int channel) : CRTPPacket(channel)
+    {}
+    char * SendableData() override ;
+};
 

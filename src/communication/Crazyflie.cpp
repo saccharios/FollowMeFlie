@@ -205,7 +205,7 @@ bool Crazyflie::Update()
             else
             {
                 // Send a dummy packet for keepalive
-                _crazyRadio.SendDummyPacket();
+                _crazyRadio.SendPingPacket();
             }
             break;
         }
