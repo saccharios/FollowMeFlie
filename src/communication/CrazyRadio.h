@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 #include "CRTPPacket.h"
 
@@ -98,7 +99,7 @@ public:
     // Sends the given packet's payload to the copter
     // \param crtpSend The packet which supplied header and payload
     //  information to send to the copter */
-    CRTPPacket* SendPacket(CRTPPacket* send, bool deleteAfterwards = false);
+    CRTPPacket* SendPacket(CRTPPacket & send, bool deleteAfterwards = false);
 
     // Sends the given packet and waits for a reply.
     // Internally, this function calls the more elaborate
@@ -108,21 +109,7 @@ public:
     // \param bDeleteAfterwards Whether or not the packet to send is
     // deleted internally after sending it
     // \return Packet containing the reply or NULL if no reply was received (after retrying).
-    CRTPPacket* SendAndReceive(CRTPPacket* send, bool deleteAfterwards = false);
-
-    // Sends the given packet and waits for a reply.
-    // Sends out the CCRTPPacket instance denoted by crtpSend on the
-    // given port and channel. Retries a number of times and waits
-    // between each retry whether or not an answer was received (in this
-    // case, dummy packets are sent in order to receive replies).
-    // \param crtpSend Packet to send
-    // \param nPort Port number on which to send this packet (and where to wait for the reply)
-    // \param nChannel Channel number on which to send this packet (and where to wait for the reply)
-    // \param bDeletAfterwards Whether or not the packet to send is deleted internally after sending it
-    // \param nRetries Number of retries (re-sending) before giving up on an answer
-    // \param nMicrosecondsWait Microseconds to wait between two re-sends
-    // \return Packet containing the reply or NULL if no reply was received (after retrying).
-    CRTPPacket *SendAndReceive(CRTPPacket* send, int port, int channel, bool deleteAfterwards = true, int retries = 10, int microsecondsWait = 100);
+    CRTPPacket* SendAndReceive(CRTPPacket & send, bool deleteAfterwards = false);
 
     // Sends out an empty dummy packet
     //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.

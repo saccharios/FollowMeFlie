@@ -29,43 +29,30 @@
 #include "CRTPPacket.h"
 #include "assert.h"
 
-CRTPPacket::CRTPPacket(int port)
+CRTPPacket::CRTPPacket(int port) :
+    _data (nullptr),
+    _dataLength(0),
+    _port (port),
+    _channel(0)
+{}
+
+CRTPPacket::CRTPPacket(char* data, int dataLength, int port) :
+   CRTPPacket(port)
 {
-    this->BasicSetup();
-    this->setPort(port);
+    SetData(data, dataLength);
 }
 
-CRTPPacket::CRTPPacket(char* data, int dataLength, int port)
-{
-    this->BasicSetup();
-    this->setPort(port);
-
-    this->SetData(data, dataLength);
-}
-
-CRTPPacket::CRTPPacket(char data, int port)
-{
-    this->BasicSetup();
-    this->setPort(port);
-
-    this->SetData(&data, 1);
-}
+CRTPPacket::CRTPPacket(char data, int port) :
+CRTPPacket(&data, 1, port)
+{}
 
 CRTPPacket::~CRTPPacket() {
-    this->ClearData();
-}
-
-void CRTPPacket::BasicSetup()
-{
-    _data = NULL;
-    _dataLength = 0;
-    _port = 0;
-    _channel = 0;
+    ClearData();
 }
 
 void CRTPPacket::SetData(char* data, int dataLength)
 {
-    this->ClearData();
+    ClearData();
 
     _data = new char[dataLength]();
     std::memcpy(_data,  data, dataLength);
@@ -84,15 +71,15 @@ int CRTPPacket::DataLength() const
 
 void CRTPPacket::ClearData()
 {
-    if(_data != NULL)
+    if(_data != nullptr)
     {
         delete[] _data;
-        _data = NULL;
+        _data = nullptr;
         _dataLength = 0;
     }
 }
 
-char *CRTPPacket::SendableData()
+char* CRTPPacket::SendableData()
 {
     char* sendable = new char[GetSendableDataLength()]();
 
@@ -134,7 +121,7 @@ int CRTPPacket::GetChannel() const
 }
 
 
-char * CRTPPingPacket::SendableData()
+char* CRTPPingPacket::SendableData()
 {
     char* sendable = new char(0xff);
     return sendable;

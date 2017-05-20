@@ -17,12 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    connect(&crazyFlieCaller, SIGNAL(CounterSignal()), this, SLOT(displayCounter()));
     connect(&crazyFlieCaller, SIGNAL(RollChanged()), this, SLOT(displayCounter()));
 }
 void MainWindow::displayCounter()
  {
-//     ui->actRoll->setPlainText( QString::number(crazyFlieCaller.Counter()));
      ui->actRoll->setPlainText( QString::number(crazyFlieCaller.GetRoll()));
  }
 

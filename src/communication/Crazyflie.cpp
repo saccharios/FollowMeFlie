@@ -91,18 +91,18 @@ bool Crazyflie::ReadTOCLogs()
 bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 {
     pitch = -pitch;
-
-    int nSize = 3 * sizeof(float) + sizeof(short);
-    char cBuffer[nSize];
+    // TODO SF Completely chane data layout of crtppacket. Outside users need not care about its internal buffer !
+    int size = 3 * sizeof(float) + sizeof(short);
+    char cBuffer[size];
     memcpy(&cBuffer[0 * sizeof(float)], &roll, sizeof(float));
     memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
     memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
     memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
 
-    CRTPPacket *crtpPacket = new CRTPPacket(cBuffer, nSize, 3);
-    CRTPPacket *crtpReceived = _crazyRadio.SendPacket(crtpPacket);
+    CRTPPacket  packet(cBuffer, size, 3);
 
-    delete crtpPacket;
+    CRTPPacket *crtpReceived = _crazyRadio.SendPacket(packet);
+
     if(crtpReceived != NULL)
     {
         delete crtpReceived;

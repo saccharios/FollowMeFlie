@@ -113,10 +113,6 @@ private:
     // The copter channel the packet will be delivered to
     int _channel;
 
-    // Sets all internal variables to their default values.
-    // The function clearData() should be called before this if it is
-    // used outside of the constructor.
-    void BasicSetup();
     // Deletes the internally stored data and resets the data length and the pointer to zero
     void ClearData();
 };

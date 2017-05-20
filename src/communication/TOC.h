@@ -37,7 +37,7 @@
 #include <iostream>
 #include "CrazyRadio.h"
 #include "CRTPPacket.h"
-
+#include <memory>
 
 // Storage element for logged variable identities
 struct TOCElement {
@@ -106,7 +106,7 @@ private:
     bool RequestInitialItem();
     bool RequestItem(int id, bool initial);
     bool RequestItem(int id);
-    bool ProcessItem(CRTPPacket* packet);
+    bool ProcessItem(CRTPPacket & packet);
 
 };
 

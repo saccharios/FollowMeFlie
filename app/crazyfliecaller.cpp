@@ -2,10 +2,9 @@
 
 CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) : _crazyFlie(crazyFlie), QObject(parent)
 {
-    // Execute Update() every 1ms. Add it to the event loop
+    // Execute Update() every 10ms. Add it to the event loop:
     QObject::connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
     QObject::connect(&_timer, SIGNAL(timeout()), this, SLOT(CheckRollChanged()));
-    QObject::connect(&_timer, SIGNAL(timeout()), this, SLOT(CounterUpdate()));
     _timer.start(10); // time in ms // TODO What does the intervall need to be??
 }
 
@@ -14,16 +13,6 @@ CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) : _craz
 void CrazyFlieCaller::Update()
 {
     _crazyFlie.Update();
-}
-
-void CrazyFlieCaller::CounterUpdate()
-{
-    ++_counter;
-    emit CounterSignal();
-}
-int CrazyFlieCaller::Counter() const
-{
-    return _counter;
 }
 
 void CrazyFlieCaller::CheckRollChanged()

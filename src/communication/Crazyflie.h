@@ -34,7 +34,7 @@
 #include <cmath>
 #include "CrazyRadio.h"
 #include "TOC.h"
-
+#include <memory>
 constexpr unsigned long NSEC_PER_SEC = 1000000000;
 
 enum State {
