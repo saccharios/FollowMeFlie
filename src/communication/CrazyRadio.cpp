@@ -423,9 +423,7 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
             { // Logging
                 if(packet->GetChannel() == 2)
                 {
-                    CRTPPacket* log = new CRTPPacket(data, length, packet->GetChannel());
-                    log->SetChannel(packet->GetChannel());
-                    log->setPort(packet->GetPort());
+                    CRTPPacket* log = new CRTPPacket(packet->GetPort(), packet->GetChannel(), data, length);
 
                     _loggingPackets.push_back(log);
                 }
@@ -456,13 +454,16 @@ CRTPPacket* CrazyRadio::ReadAck() {
             // (store current link quality, etc.). For now, ignore it.
 
             int channel = 0;
+            int port = 0;
             if(bytesRead > 1)
             {
-                crtpPacket = new CRTPPacket(&buffer[1], bytesRead, channel);
+                crtpPacket = new CRTPPacket(port, channel, &buffer[1], bytesRead);
             }
             else
             {
-                crtpPacket = new CRTPPacket(channel);
+                char bufferEmpty;
+                int length = 0;
+                crtpPacket = new CRTPPacket(port, channel, &bufferEmpty, length);
             }
         }
         else
@@ -487,7 +488,7 @@ bool CrazyRadio::IsUsbConnectionOk()
 CRTPPacket* CrazyRadio::WaitForPacket()
 {
     CRTPPacket* received = nullptr;
-    CRTPPingPacket pingPacket(0);
+    CRTPPingPacket pingPacket;
     while(received == nullptr) // TODO SF Potential infinite loop
     {
         received = SendPacket(pingPacket);
@@ -552,7 +553,7 @@ std::list<CRTPPacket*> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    CRTPPingPacket pingPacket(0);
+    CRTPPingPacket pingPacket;
     CRTPPacket* received = this->SendPacket(pingPacket);
     if(received)
     {

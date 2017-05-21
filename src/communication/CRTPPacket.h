@@ -39,22 +39,7 @@
 class CRTPPacket {
 
 public:
-    // Constructor for the CCRTPPacket communication packet
-    // Initializes the communication packet and sets the given
-    // channel. The packet starts out without payload data.
-    // nChannel The channel the payload in this packet is
-    // designated for.
-    CRTPPacket(int channel);
-
-    // Convenience constructor for the CCRTPPacket communication packet class
-    // Initializes the communication packet and sets the given
-    // channel. The given data is set as the internal payload data.
-    // \param cData The data pointer to read the new payload data from
-    // \param nDataLength The length (in bytes) of data to read from cData
-    // \param nChannel The channel the payload in this packet is designated for.
-    CRTPPacket(char* data, int dataLength, int channel);
-    CRTPPacket(char data, int port);
-
+    CRTPPacket(int port, int channel, char* data, int dataLength);
     //    De-initializes the packet and deletes all available payload data stored.
     ~CRTPPacket();
 
@@ -118,7 +103,7 @@ private:
 };
 class CRTPPingPacket : public CRTPPacket {
 public:
-    CRTPPingPacket(int channel) : CRTPPacket(channel)
+    CRTPPingPacket() : CRTPPacket(0, 0, nullptr, 0)
     {}
     char * SendableData() override ;
 };

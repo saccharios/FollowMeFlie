@@ -29,22 +29,15 @@
 #include "CRTPPacket.h"
 #include "assert.h"
 
-CRTPPacket::CRTPPacket(int port) :
-    _data (nullptr),
-    _dataLength(0),
-    _port (port),
-    _channel(0)
-{}
-
-CRTPPacket::CRTPPacket(char* data, int dataLength, int port) :
-   CRTPPacket(port)
+CRTPPacket:: CRTPPacket(int port, int channel, char* data, int dataLength) :
+     _data (nullptr),
+     _dataLength(0),
+     _port (port),
+     _channel(channel)
 {
     SetData(data, dataLength);
 }
 
-CRTPPacket::CRTPPacket(char data, int port) :
-CRTPPacket(&data, 1, port)
-{}
 
 CRTPPacket::~CRTPPacket() {
     ClearData();

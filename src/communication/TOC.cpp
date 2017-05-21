@@ -34,8 +34,10 @@ CTOC::CTOC(CrazyRadio & crazyRadio, int port) : _crazyRadio(crazyRadio), _port(p
 
 bool CTOC::SendTOCPointerReset()
 {
-    CRTPPacket packet(0x00, 0);
-    packet.setPort(_port);
+    int channel = 0;
+    char data = 0x00;
+    int length = 1;
+    CRTPPacket packet(_port, channel, &data, length);
     CRTPPacket* received = _crazyRadio.SendPacket(packet);
 
     if(received)
@@ -51,9 +53,12 @@ bool CTOC::RequestMetaData()
 {
     bool retVal = false;
 
-    CRTPPacket packet = CRTPPacket(0x01, 0);
-
-    packet.setPort(_port);
+    int channel = 0;
+    char data = 0x01;
+    int length = 1;
+    CRTPPacket packet(_port, channel, &data, length);
+//    CRTPPacket packet(0x01, 0);
+//    packet.setPort(_port);
     CRTPPacket* received = _crazyRadio.SendAndReceive(packet);
 
     if(received->Data()[1] == 0x01)
@@ -83,9 +88,8 @@ bool CTOC::RequestItem(int id, bool initial)
     char cRequest[2];
     cRequest[0] = 0x0;
     cRequest[1] = id;
-
-    CRTPPacket  packet(cRequest,  (initial ? 1 : 2),  0);
-    packet.setPort(_port);
+    int channel = 0;
+    CRTPPacket  packet(_port, channel, cRequest,  (initial ? 1 : 2));
     CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(packet);
 
     retVal = this->ProcessItem(*crtpReceived);
@@ -230,9 +234,8 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
         if(found)
         {
             char cPayload[5] = {0x01, currentLogBlock.id, teCurrent.type, teCurrent.id};
-            CRTPPacket logPacket(cPayload, 4, 1);
-            logPacket.setPort(_port);
-            logPacket.SetChannel(1);
+            int channel = 1;
+            CRTPPacket logPacket(_port, channel, cPayload, 4);
             CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(logPacket);
 
             char* cData = crtpReceived->Data();
@@ -369,10 +372,8 @@ bool CTOC::RegisterLoggingBlock(std::string name, double frequency)
 
         double d10thOfMS = (1 / frequency) * 1000 * 10;
         char cPayload[4] = {0x00, id, d10thOfMS};
-
-        CRTPPacket registerBlock(cPayload, 3, 1);
-        registerBlock.setPort(_port);
-        registerBlock.SetChannel(1);
+        int channel = 1;
+        CRTPPacket registerBlock(_port, channel, cPayload, 3);
 
         CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(registerBlock);
 
@@ -416,10 +417,8 @@ bool CTOC::EnableLogging(std::string lockName)
     {
         double d10thOfMS = (1 / currenLogBlock.frequency) * 1000 * 10;
         char cPayload[3] = {0x03, currenLogBlock.id, d10thOfMS};
-
-        CRTPPacket enablePacket(cPayload, 3, 1);
-        enablePacket.setPort(_port);
-        enablePacket.SetChannel(1);
+        int channel = 1;
+        CRTPPacket enablePacket(_port, channel, cPayload, 3);
 
         CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(enablePacket);
         delete crtpReceived;
@@ -446,10 +445,8 @@ bool CTOC::UnregisterLoggingBlock(std::string name)
 bool CTOC::UnregisterLoggingBlockID(int id)
 {
     char cPayload[2] = {0x02, id};
-
-    CRTPPacket unregisterBlock(cPayload, 2, 1);
-    unregisterBlock.setPort(_port);
-    unregisterBlock.SetChannel(1);
+    int channel = 1;
+    CRTPPacket unregisterBlock(_port, channel, cPayload, 2);
 
     CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(unregisterBlock);
 

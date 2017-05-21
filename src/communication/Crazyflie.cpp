@@ -98,8 +98,9 @@ bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
     memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
     memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
     memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
-
-    CRTPPacket  packet(cBuffer, size, 3);
+    int port =0;
+    int channel = 3;
+    CRTPPacket  packet(channel, port, cBuffer, size);
 
     CRTPPacket *crtpReceived = _crazyRadio.SendPacket(packet);
 
