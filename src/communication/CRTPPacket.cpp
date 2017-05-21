@@ -36,17 +36,6 @@ CRTPPacket:: CRTPPacket(int port, int channel, char* data, int dataLength) :
      _port (port),
      _channel(channel)
 {
-    SetData(data, dataLength);
-}
-
-
-CRTPPacket::~CRTPPacket() {
-    ClearData();
-}
-
-void CRTPPacket::SetData(char* data, int dataLength)
-{
-    _data.clear();
     for (int i = 0; i < dataLength; ++i)
     {
         _data.push_back(data[i]);
@@ -68,11 +57,6 @@ char *CRTPPacket::Data()
 int CRTPPacket::DataLength() const
 {
     return _dataLength;
-}
-
-void CRTPPacket::ClearData()
-{   _data.clear();
-        _dataLength = 0;
 }
 
 char* CRTPPacket::SendableData()
@@ -99,19 +83,9 @@ int CRTPPacket::GetSendableDataLength()
     return _dataLength + 1;//2;
 }
 
-void CRTPPacket::setPort(int port) // Name SetPort (with capital S) is a macro
-{
-    _port = port;
-}
-
 int CRTPPacket::GetPort() const
 {
     return _port;
-}
-
-void CRTPPacket::SetChannel(int channel)
-{
-    _channel = channel;
 }
 
 int CRTPPacket::GetChannel() const

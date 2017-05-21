@@ -40,13 +40,6 @@ class CRTPPacket {
 
 public:
     CRTPPacket(int port, int channel, char* data, int dataLength);
-    //    De-initializes the packet and deletes all available payload data stored.
-    ~CRTPPacket();
-
-    // Copies the given data of the specified length to the internal storage.
-    //    \param cData Pointer pointing to the data that should be used as payload
-    //    \param nDataLength Length (in bytes) of the data that should be read from cData for storage
-    void SetData(char* data, int dataLength);
 
     // Gives out the pointer to the internally stored data
     // Don't manipulate the data pointed to by this pointer. Usually, you
@@ -70,20 +63,7 @@ public:
     // \return Length of the sendable data block returned by sendableData() (in bytes)
     int GetSendableDataLength();
 
-    // Set the copter port to send the payload data to
-    // The port identifies the purpose of the packet on the copter. This
-    // function sets the port that is later used in sendableData().
-    // \param nPort Port number to set */
-    void setPort(int port);
-
     int GetPort() const;
-
-    // Set the copter channel to send the payload data to
-    // The channel identifies the purpose of the packet on the
-    // copter. This function sets the channel that is later used in
-    // sendableData().
-    // \param nChannel Channel number to set */
-    void SetChannel(int channel);
 
     int GetChannel() const;
 
@@ -98,8 +78,6 @@ private:
     // The copter channel the packet will be delivered to
     int _channel;
 
-    // Deletes the internally stored data and resets the data length and the pointer to zero
-    void ClearData();
 };
 class CRTPPingPacket : public CRTPPacket {
 public:

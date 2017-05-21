@@ -246,7 +246,7 @@ CRTPPacket * CrazyRadio::WriteData(void* data, int length)
 
     if(nReturn == 0 && nActuallyWritten == length)
     {
-        packet = this->ReadAck();
+        packet = ReadAck();
     }
 
     return packet;
@@ -404,11 +404,7 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
 
         if(length > 0)
         {
-            short port = (data[0] & 0xf0) >> 4;
-            packet->setPort(port);
-            short sChannel = data[0] & 0b00000011;
-            packet->SetChannel(sChannel);
-            switch(port)
+            switch(packet->GetPort() )
             {
             case 0: // TODO Make enum class for ports
             { // Console
@@ -453,8 +449,9 @@ CRTPPacket* CrazyRadio::ReadAck() {
             // TODO(winkler): Do internal stuff with the data received here
             // (store current link quality, etc.). For now, ignore it.
 
-            int channel = 0;
-            int port = 0;
+            // Actual data starts at buffer[1]
+            int port = (buffer[1] & 0xf0) >> 4;
+            int channel = buffer[1] & 0b00000011;
             if(bytesRead > 1)
             {
                 crtpPacket = new CRTPPacket(port, channel, &buffer[1], bytesRead);
