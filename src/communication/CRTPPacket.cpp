@@ -28,9 +28,10 @@
 
 #include "CRTPPacket.h"
 #include "assert.h"
+#include <vector>
 
 CRTPPacket:: CRTPPacket(int port, int channel, char* data, int dataLength) :
-     _data (nullptr),
+     _data (),
      _dataLength(0),
      _port (port),
      _channel(channel)
@@ -45,16 +46,23 @@ CRTPPacket::~CRTPPacket() {
 
 void CRTPPacket::SetData(char* data, int dataLength)
 {
-    ClearData();
-
-    _data = new char[dataLength]();
-    std::memcpy(_data,  data, dataLength);
+    _data.clear();
+    for (int i = 0; i < dataLength; ++i)
+    {
+        _data.push_back(data[i]);
+    }
     _dataLength = dataLength;
 }
 
 char *CRTPPacket::Data()
 {
-    return _data;
+    char* buffer = new char[_dataLength];
+    for(int i = 0; i < _dataLength; ++i)
+    {
+        buffer[i] = _data[i];
+    }
+
+    return buffer;
 }
 
 int CRTPPacket::DataLength() const
@@ -63,13 +71,8 @@ int CRTPPacket::DataLength() const
 }
 
 void CRTPPacket::ClearData()
-{
-    if(_data != nullptr)
-    {
-        delete[] _data;
-        _data = nullptr;
+{   _data.clear();
         _dataLength = 0;
-    }
 }
 
 char* CRTPPacket::SendableData()
@@ -80,8 +83,11 @@ char* CRTPPacket::SendableData()
     sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
 
     // Payload
-    std::memcpy(&sendable[1], _data, _dataLength);
-
+//    std::memcpy(&sendable[1], _data, _dataLength);
+    for(int i = 0; i < _dataLength; ++i)
+    {
+        sendable[i+1] = _data[i];
+    }
     // Finishing byte
     //sendable[_dataLength + 1] = 0x27;
 

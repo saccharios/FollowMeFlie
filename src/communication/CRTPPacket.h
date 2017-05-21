@@ -33,7 +33,7 @@
 
 // System
 #include <cstring>
-
+#include <vector>
 
 // Class to hold and process communication-related data for the CRTProtocol
 class CRTPPacket {
@@ -90,7 +90,7 @@ public:
 private:
     // Internal storage pointer for payload data inside the  packet
     //    This data is freed when either new data is set or the class instance is destroyed.
-    char* _data;
+    std::vector<char> _data;
     // The length of the data pointed to by m_cData
     int _dataLength;
     // The copter port the packet will be delivered to
