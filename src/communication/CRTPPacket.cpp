@@ -36,14 +36,27 @@ CRTPPacket:: CRTPPacket(int port, int channel, char* data, int dataLength) :
      _port (port),
      _channel(channel)
 {
+//    assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
+//    assert( (_channel ==0 ||_channel == 1 || _channel == 2) &&"Packet channel must be either 0, 1 or 2");
+//    assert(_dataLength >= 0 && "Negative data length of packet");
+
     for (int i = 0; i < dataLength; ++i)
     {
         _data.push_back(data[i]);
     }
     _dataLength = dataLength;
 }
+CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> const & data) :
+    _data (data),
+    _dataLength(data.size()),
+    _port (port),
+    _channel(channel)
+{
+    assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
+    assert( (_channel ==0 ||_channel == 1 || _channel == 2) &&"Packet channel must be either 0, 1 or 2");
+}
 
-char *CRTPPacket::Data()
+char* CRTPPacket::Data()
 {
     char* buffer = new char[_dataLength];
     for(int i = 0; i < _dataLength; ++i)
@@ -67,7 +80,6 @@ char* CRTPPacket::SendableData()
     sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
 
     // Payload
-//    std::memcpy(&sendable[1], _data, _dataLength);
     for(int i = 0; i < _dataLength; ++i)
     {
         sendable[i+1] = _data[i];

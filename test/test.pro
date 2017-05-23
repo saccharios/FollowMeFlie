@@ -2,14 +2,17 @@ include(../defaults.pri)
 TEMPLATE = app
 # Use C++ 14
 CONFIG += c++14
-CONFIG += console
+#CONFIG += console
 CONFIG -= qt
 
 INCLUDEPATH += test/src
-SOURCES += src/test_main.cpp \
-    src/simpletest.cpp
+INCLUDEPATH += src
 
-HEADERS  += src/simpletest.h
+SOURCES += src/test_main.cpp \
+    src/crtppacket_test.cpp
+
+HEADERS  += \
+    src/crtppacket_test.h
 
 # Include Google Test
 goolgetest_path = E:/Code/GTest

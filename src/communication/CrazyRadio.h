@@ -173,7 +173,7 @@ private:
 
     CRTPPacket* WriteData(void* data, int length);
     bool WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index);
-    bool ReadData(void* data, int & maxLength);
+    bool ReadData(void* data, int maxLength, int & actualLength);
 
     void SetARC(int ARC);
     void setChannel(int channel);

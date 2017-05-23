@@ -252,14 +252,14 @@ CRTPPacket * CrazyRadio::WriteData(void* data, int length)
     return packet;
 }
 
-bool CrazyRadio::ReadData(void* data, int & maxLength)
+bool CrazyRadio::ReadData(void* data, int maxLength, int & actualLength)
 {
     int nActuallyRead;
     int nReturn = libusb_bulk_transfer(_device, (0x81 | LIBUSB_ENDPOINT_IN), (unsigned char*)data,  maxLength, &nActuallyRead, 50);
 
     if(nReturn == 0)
     {
-        maxLength = nActuallyRead;
+        actualLength = nActuallyRead;
 
         return true;
     }
@@ -274,6 +274,7 @@ bool CrazyRadio::ReadData(void* data, int & maxLength)
         default:
             break;
         }
+        actualLength = maxLength;
     }
 
     return false;
@@ -419,7 +420,7 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
             { // Logging
                 if(packet->GetChannel() == 2)
                 {
-                    CRTPPacket* log = new CRTPPacket(packet->GetPort(), packet->GetChannel(), data, length);
+                    CRTPPacket* log = new CRTPPacket(*packet);
 
                     _loggingPackets.push_back(log);
                 }
@@ -437,7 +438,7 @@ CRTPPacket* CrazyRadio::ReadAck() {
     char buffer[bufferSize];
     int bytesRead = bufferSize;
 
-    if( ReadData(buffer, bytesRead) )
+    if( ReadData(buffer, bufferSize, bytesRead) )
     {
         if(bytesRead > 0)
         {

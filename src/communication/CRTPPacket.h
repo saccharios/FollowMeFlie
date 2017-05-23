@@ -40,7 +40,7 @@ class CRTPPacket {
 
 public:
     CRTPPacket(int port, int channel, char* data, int dataLength);
-
+    CRTPPacket(int port, int channel, std::vector<char> const & data) ;
     // Gives out the pointer to the internally stored data
     // Don't manipulate the data pointed to by this pointer. Usually, you
     // won't have to call this function at all as it is used by the more
