@@ -53,7 +53,7 @@ std::vector<char> ConvertToCharVect(T element)
 class CRTPPacket {
 
 public:
-    CRTPPacket(int port, int channel, char* data, int dataLength);
+    CRTPPacket(int port, int channel, char* data, int dataLength) = delete;
     CRTPPacket(int port, int channel, std::vector<char> const & data) ;
     // Gives out the pointer to the internally stored data
     // Don't manipulate the data pointed to by this pointer. Usually, you
@@ -95,7 +95,7 @@ private:
 };
 class CRTPPingPacket : public CRTPPacket {
 public:
-    CRTPPingPacket() : CRTPPacket(0, 0, nullptr, 0)
+    CRTPPingPacket() : CRTPPacket(0, 0, {0})
     {}
     char * SendableData() override ;
 };

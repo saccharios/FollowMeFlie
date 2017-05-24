@@ -30,22 +30,7 @@
 #include "assert.h"
 #include <vector>
 
-CRTPPacket:: CRTPPacket(int port, int channel, char* data, int dataLength) :
-     _data (),
-     _dataLength(0),
-     _port (port),
-     _channel(channel)
-{
-//    assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
-//    assert( (_channel ==0 ||_channel == 1 || _channel == 2) &&"Packet channel must be either 0, 1 or 2");
-//    assert(_dataLength >= 0 && "Negative data length of packet");
 
-    for (int i = 0; i < dataLength; ++i)
-    {
-        _data.push_back(data[i]);
-    }
-    _dataLength = dataLength;
-}
 CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> const & data) :
     _data (data),
     _dataLength(data.size()),
