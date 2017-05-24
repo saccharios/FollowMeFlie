@@ -10,7 +10,7 @@ public:
 private:
 };
 
-TEST_F(CRTPPacketTest, ConstructionTest)
+TEST_F(CRTPPacketTest, Construction)
 {
 
     std::vector<char> data;
@@ -36,9 +36,66 @@ TEST_F(CRTPPacketTest, ConstructionTest)
         EXPECT_EQ(static_cast<int>(packet.Data()[i]), static_cast<int>(data[i]));
         EXPECT_EQ(static_cast<int>(packet.SendableData()[i+1]), static_cast<int>(data[i]));
     }
-
-
-
 }
 
+TEST_F(CRTPPacketTest, Convert_Float_To_CharVect)
+{
+    float num = 0.7;
+    char buffer[sizeof(float)];
+    memcpy(&buffer[0], &num, sizeof(float));
+    auto myVect = ConvertToCharVect(num);
+    EXPECT_EQ(myVect.size(), sizeof(float));
+    for(unsigned int i = 0; i <myVect.size(); ++i)
+    {
+        EXPECT_EQ(myVect[i], buffer[i]);
+    }
+}
+TEST_F(CRTPPacketTest, Convert_Double_To_CharVect)
+{
+    double num = 0.7;
+    char buffer[sizeof(double)];
+    memcpy(&buffer[0], &num, sizeof(double));
+    auto myVect = ConvertToCharVect(num);
+    EXPECT_EQ(myVect.size(), sizeof(double));
+    for(unsigned int i = 0; i <myVect.size(); ++i)
+    {
+        EXPECT_EQ(myVect[i], buffer[i]);
+    }
+}
+TEST_F(CRTPPacketTest, Convert_Int_To_CharVect)
+{
+    int num = 1897;
+    char buffer[sizeof(int)];
+    memcpy(&buffer[0], &num, sizeof(int));
+    auto myVect = ConvertToCharVect(num);
+    EXPECT_EQ(myVect.size(), sizeof(int));
+    for(unsigned int i = 0; i <myVect.size(); ++i)
+    {
+        EXPECT_EQ(myVect[i], buffer[i]);
+    }
+}
+TEST_F(CRTPPacketTest, Convert_Short_To_CharVect)
+{
+    short num = 79;
+    char buffer[sizeof(short)];
+    memcpy(&buffer[0], &num, sizeof(short));
+    auto myVect = ConvertToCharVect(num);
+    EXPECT_EQ(myVect.size(), sizeof(short));
+    for(unsigned int i = 0; i <myVect.size(); ++i)
+    {
+        EXPECT_EQ(myVect[i], buffer[i]);
+    }
+}
+TEST_F(CRTPPacketTest, Convert_Char_To_CharVect)
+{
+    char num = 7;
+    char buffer[sizeof(char)];
+    memcpy(&buffer[0], &num, sizeof(char));
+    auto myVect = ConvertToCharVect(num);
+    EXPECT_EQ(myVect.size(), sizeof(char));
+    for(unsigned int i = 0; i <myVect.size(); ++i)
+    {
+        EXPECT_EQ(myVect[i], buffer[i]);
+    }
+}
 #endif // SIMPLETEST_H

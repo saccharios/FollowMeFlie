@@ -34,6 +34,20 @@
 // System
 #include <cstring>
 #include <vector>
+template<typename T>
+std::vector<char> ConvertToCharVect(T element)
+{
+    // Reinterpret elemtn as array of 8-byte char
+    char* char_array = reinterpret_cast<char *>(&element);
+    // Create vector from the array
+    constexpr int size = sizeof(T) / sizeof(char);
+    std::vector<char> result;
+    for(int i = 0; i < size; ++i)
+    {
+        result.push_back(char_array[i]);
+    }
+    return result;
+}
 
 // Class to hold and process communication-related data for the CRTProtocol
 class CRTPPacket {

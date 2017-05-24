@@ -204,7 +204,7 @@ bool Crazyflie::Update()
                 if(currentTime - _setpointLastSent > _sendSetpointPeriod)
                 {
                     // Send the current set point based on the previous calculations
-                    this->SendSetpoint(_roll, _pitch, _yaw, _thrust);
+                    SendSetpoint(_roll, _pitch, _yaw, _thrust);
                     _setpointLastSent = currentTime;
                 }
             }
