@@ -104,8 +104,8 @@ private:
     std::list<LoggingBlock> _loggingBlocks;
 
     bool RequestInitialItem();
-    bool RequestItem(int id, bool initial);
-    bool RequestItem(int id);
+    bool RequestItem(std::vector<char> && data);
+    bool RequestItem(char id);
     bool ProcessItem(CRTPPacket & packet);
 
 };

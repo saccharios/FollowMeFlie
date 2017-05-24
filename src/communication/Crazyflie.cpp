@@ -90,21 +90,27 @@ bool Crazyflie::ReadTOCLogs()
 
 bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 {
-    pitch = -pitch;
     // TODO SF Completely chane data layout of crtppacket. Outside users need not care about its internal buffer !
     // Add non-member function that takes vector<floats/int/etc> and makes a vector<char>
-    int size = 3 * sizeof(float) + sizeof(short);
-    char cBuffer[size];
-    memcpy(&cBuffer[0 * sizeof(float)], &roll, sizeof(float));
-    memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
-    memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
-    memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
+//    int size = 3 * sizeof(float) + sizeof(short);
+//    char cBuffer[size];
+//    memcpy(&cBuffer[0 * sizeof(float)], &roll, sizeof(float));
+//    memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
+//    memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
+//    memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
 
+    auto data = ConvertToCharVect(roll);
+    auto pitchVect = ConvertToCharVect(-pitch); // Warning: Is negated here.
+    auto yawVect = ConvertToCharVect(yaw);
+    auto thrustVect = ConvertToCharVect(thrust);
 
+    data.insert(data.end(), pitchVect.begin(), pitchVect.end());
+    data.insert(data.end(), yawVect.begin(), yawVect.end());
+    data.insert(data.end(), thrustVect.begin(), thrustVect.end());
 
     int port = 0;
     int channel = 3;
-    CRTPPacket  packet(channel, port, cBuffer, size);
+    CRTPPacket  packet(channel, port, data);
 
     CRTPPacket *crtpReceived = _crazyRadio.SendPacket(packet);
 

@@ -73,26 +73,23 @@ bool CTOC::RequestMetaData()
 
 bool CTOC::RequestInitialItem()
 {
-    return this->RequestItem(0, true);
+    std::vector<char> data = {0};
+    return RequestItem(std::move(data));
 }
 
-bool CTOC::RequestItem(int id)
+bool CTOC::RequestItem(char id)
 {
-    return this->RequestItem(id, false);
+    std::vector<char> data = {0, id};
+    return RequestItem(std::move(data));
 }
 
-bool CTOC::RequestItem(int id, bool initial)
+bool CTOC::RequestItem(std::vector<char> && data)
 {
-    bool retVal = false;
-
-    char cRequest[2];
-    cRequest[0] = 0x0;
-    cRequest[1] = id;
     int channel = 0;
-    CRTPPacket  packet(_port, channel, cRequest,  (initial ? 1 : 2));
+    CRTPPacket  packet(_port, channel, data);
     CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(packet);
 
-    retVal = this->ProcessItem(*crtpReceived);
+    bool retVal = this->ProcessItem(*crtpReceived);
 
     delete crtpReceived;
     return retVal;
@@ -100,9 +97,9 @@ bool CTOC::RequestItem(int id, bool initial)
 
 bool CTOC::RequestItems()
 {
-    for(int nI = 0; nI < _itemCount; nI++)
+    for(int itemNr = 0; itemNr < _itemCount; itemNr++)
     {
-        this->RequestItem(nI);
+        RequestItem(itemNr);
     }
 
     return true;
