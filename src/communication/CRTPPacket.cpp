@@ -53,7 +53,7 @@ CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> const & data) :
     _channel(channel)
 {
     assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
-    assert( (_channel ==0 ||_channel == 1 || _channel == 2) &&"Packet channel must be either 0, 1 or 2");
+    assert( (_channel >= 0 && _channel < 4) &&"Packet channel must be either 0, 1 , 2, 3");
 }
 
 char* CRTPPacket::Data()

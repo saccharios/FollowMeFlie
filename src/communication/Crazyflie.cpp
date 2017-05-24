@@ -92,13 +92,17 @@ bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 {
     pitch = -pitch;
     // TODO SF Completely chane data layout of crtppacket. Outside users need not care about its internal buffer !
+    // Add non-member function that takes vector<floats/int/etc> and makes a vector<char>
     int size = 3 * sizeof(float) + sizeof(short);
     char cBuffer[size];
     memcpy(&cBuffer[0 * sizeof(float)], &roll, sizeof(float));
     memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
     memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
     memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
-    int port =0;
+
+
+
+    int port = 0;
     int channel = 3;
     CRTPPacket  packet(channel, port, cBuffer, size);
 
@@ -140,6 +144,7 @@ void Crazyflie::EnableStateMachine(bool enable)
 
 bool Crazyflie::Update()
 {
+    // TODO SF How to restart the state machine properly?
     if(!_stateMachineIsEnabled)
     {
         return false;

@@ -27,6 +27,7 @@ TEST_F(CRTPPacketTest, ConstructionTest)
     EXPECT_EQ(packet.GetPort(), port);
 //    EXPECT_DEATH(CRTPPacket(7, 0, data), "");
 //    EXPECT_DEATH(CRTPPacket(0, 7, data), "");
+    //    EXPECT_DEATH(CRTPPacket(0, -2, data), "");
     int header = (port << 4) | 0b00001100 | (channel & 0x03); // 0x03
     EXPECT_EQ(static_cast<int>(packet.SendableData()[0]), header);
 

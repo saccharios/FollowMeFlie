@@ -30,7 +30,7 @@ private slots:
 
     void on_pushButton_clicked(bool checked);
 
-    void displayCounter();
+    void display_act_values();
 
 
 private:

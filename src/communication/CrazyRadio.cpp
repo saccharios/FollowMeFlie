@@ -409,11 +409,14 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
             {
             case 0: // TODO Make enum class for ports
             { // Console
+                if(length > 1)
+                {
                 char cText[length];
                 std::memcpy(cText, &data[1], length - 1);
                 cText[length - 1] = '\0';
 
-                std::cout << "Console text: " << cText << std::endl;
+                std::cout << "Console text: " << cText  <<  std::endl;
+                }
             } break;
 
             case 5:
@@ -453,16 +456,12 @@ CRTPPacket* CrazyRadio::ReadAck() {
             // Actual data starts at buffer[1]
             int port = (buffer[1] & 0xf0) >> 4;
             int channel = buffer[1] & 0b00000011;
-            if(bytesRead > 1)
+            std::vector<char> data;
+            for(int i = 0; i < bytesRead; ++i)
             {
-                crtpPacket = new CRTPPacket(port, channel, &buffer[1], bytesRead);
+                data.push_back(buffer[1+i]);
             }
-            else
-            {
-                char bufferEmpty;
-                int length = 0;
-                crtpPacket = new CRTPPacket(port, channel, &bufferEmpty, length);
-            }
+            crtpPacket = new CRTPPacket(port, channel, data);
         }
         else
         {
