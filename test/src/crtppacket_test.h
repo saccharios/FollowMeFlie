@@ -1,8 +1,9 @@
-#ifndef SIMPLETEST_H
-#define SIMPLETEST_H
+#pragma once
 #include "gtest/gtest.h"
-#include "communication/CRTPPacket.h"
 #include <iostream>
+#include <chrono>
+#include "communication/CRTPPacket.h"
+
 
 class CRTPPacketTest : public ::testing::Test
 {
@@ -25,8 +26,8 @@ TEST_F(CRTPPacketTest, Construction)
     EXPECT_EQ(packet.DataLength(), data.size());
     EXPECT_EQ(packet.GetChannel(), channel);
     EXPECT_EQ(packet.GetPort(), port);
-//    EXPECT_DEATH(CRTPPacket(7, 0, data), "");
-//    EXPECT_DEATH(CRTPPacket(0, 7, data), "");
+    //    EXPECT_DEATH(CRTPPacket(7, 0, data), "");
+    //    EXPECT_DEATH(CRTPPacket(0, 7, data), "");
     //    EXPECT_DEATH(CRTPPacket(0, -2, data), "");
     int header = (port << 4) | 0b00001100 | (channel & 0x03); // 0x03
     EXPECT_EQ(static_cast<int>(packet.SendableData()[0]), header);
@@ -98,4 +99,52 @@ TEST_F(CRTPPacketTest, Convert_Char_To_CharVect)
         EXPECT_EQ(myVect[i], buffer[i]);
     }
 }
-#endif // SIMPLETEST_H
+//TEST_F(CRTPPacketTest, TimerCopyCtorVsMoveCtor)
+//{
+//    std::vector<char> data;
+//    data.push_back(0);
+//    data.push_back(1);
+//    data.push_back(2);
+//    data.push_back(51);
+//    int port = 5;
+//    int channel = 2;
+
+//    CRTPPacket packet_1(port, channel, data);
+//    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+//    CRTPPacket packet_2 = packet_1; // copy ctor
+//    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+//    std::cout << "Copy Ctor"
+//              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+//              << "ns.\n";
+//    start = std::chrono::steady_clock::now();
+//    CRTPPacket packet_3 = std::move(packet_1);
+//    end = std::chrono::steady_clock::now();
+//    std::cout << "Move Ctor"
+//              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+//              << "ns.\n";
+//    std::cout << "packet 3 data length" << packet_3.DataLength() << std::endl;
+//}
+TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
+{
+    std::vector<char> data;
+    data.push_back(0);
+    data.push_back(1);
+    data.push_back(2);
+    data.push_back(51);
+    int port = 5;
+    int channel = 2;
+
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    CRTPPacket packet_1(port, channel, data);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "Copy Data Ctor"
+              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+              << "ns.\n";
+    start = std::chrono::steady_clock::now();
+    CRTPPacket packet_2(port, channel, std::move(data));
+    end = std::chrono::steady_clock::now();
+    std::cout << "Move Data Ctor"
+              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+              << "ns.\n";
+}
+

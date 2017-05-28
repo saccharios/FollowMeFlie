@@ -53,8 +53,10 @@ std::vector<char> ConvertToCharVect(T element)
 class CRTPPacket {
 
 public:
-    CRTPPacket(int port, int channel, char* data, int dataLength) = delete;
+    CRTPPacket() : _data(), _dataLength(0), _port(0), _channel(0) {}
     CRTPPacket(int port, int channel, std::vector<char> const & data) ;
+    CRTPPacket(int port, int channel, std::vector<char> && data) ;
+
     // Gives out the pointer to the internally stored data
     // Don't manipulate the data pointed to by this pointer. Usually, you
     // won't have to call this function at all as it is used by the more

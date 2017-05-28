@@ -29,7 +29,7 @@
 #include "CRTPPacket.h"
 #include "assert.h"
 #include <vector>
-
+#include <iostream>
 
 CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> const & data) :
     _data (data),
@@ -39,7 +39,19 @@ CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> const & data) :
 {
     assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
     assert( (_channel >= 0 && _channel < 4) &&"Packet channel must be either 0, 1 , 2, 3");
+    std::cout << "Copy data\n";
 }
+CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> && data) :
+    _data (data),
+    _dataLength(data.size()),
+    _port (port),
+    _channel(channel)
+{
+    assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
+    assert( (_channel >= 0 && _channel < 4) &&"Packet channel must be either 0, 1 , 2, 3");
+    std::cout << "Move data\n";
+}
+
 
 char* CRTPPacket::Data()
 {
