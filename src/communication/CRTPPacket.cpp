@@ -34,7 +34,6 @@
 
 CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> && data) :
     _data (data),
-    _dataLength(data.size()),
     _port (port),
     _channel(channel)
 {
@@ -47,11 +46,6 @@ std::vector<char> const & CRTPPacket::GetData() const
     return _data;
 }
 
-int CRTPPacket::DataLength() const
-{
-    return _dataLength;
-}
-
 char* CRTPPacket::SendableData()
 {
     char* sendable = new char[GetSendableDataLength()]();
@@ -60,7 +54,7 @@ char* CRTPPacket::SendableData()
     sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
 
     // Payload
-    for(int i = 0; i < _dataLength; ++i)
+    for(std::size_t i = 0; i < _data.size(); ++i)
     {
         sendable[i+1] = _data[i];
     }
@@ -72,7 +66,7 @@ char* CRTPPacket::SendableData()
 
 int CRTPPacket::GetSendableDataLength()
 {
-    return _dataLength + 1;//2;
+    return _data.size() + 1;//2;
 }
 
 int CRTPPacket::GetPort() const

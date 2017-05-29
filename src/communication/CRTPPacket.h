@@ -53,16 +53,18 @@ std::vector<char> ConvertToCharVect(T element)
 class CRTPPacket {
 
 public:
-    CRTPPacket() : _data(), _dataLength(0), _port(0), _channel(0) {}
+    CRTPPacket() : _data(), _port(0), _channel(0) {}
     CRTPPacket(int port, int channel, std::vector<char> && data) ;
 
-
+    // Disable copy ctor + copy assignment
+    CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
+    CRTPPacket(CRTPPacket &&) = default;                    // Move constructor
+    CRTPPacket& operator=(const CRTPPacket&) & = delete;  // Copy assignment operator
+    CRTPPacket& operator=(CRTPPacket&&) & = default;       // Move assignment operator
+    //      virtual ~CRTPPacket() { }                     // Destructor
 
 
     std::vector<char> const & GetData() const;
-    // Returns the length of the currently stored data (in bytes)
-    //\return Returns the number of bytes stored as payload data
-    int DataLength() const;
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
@@ -83,8 +85,6 @@ private:
     // Internal storage pointer for payload data inside the  packet
     //    This data is freed when either new data is set or the class instance is destroyed.
     std::vector<char> _data;
-    // The length of the data pointed to by m_cData
-    int _dataLength;
     // The copter port the packet will be delivered to
     int _port;
     // The copter channel the packet will be delivered to

@@ -466,7 +466,6 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
             char const * logdata = &data[5];
             int offset = 0;
             int index = 0;
-            int nAvailableLogBytes = packet->DataLength() - 5;
 
             int blockID = data[1];
             bool found;

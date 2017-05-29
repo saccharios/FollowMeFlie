@@ -23,7 +23,6 @@ TEST_F(CRTPPacketTest, Construction)
     int channel = 2;
 
     CRTPPacket packet(port, channel, std::move(data));
-    EXPECT_EQ(packet.DataLength(), data.size());
     EXPECT_EQ(packet.GetChannel(), channel);
     EXPECT_EQ(packet.GetPort(), port);
     //    EXPECT_DEATH(CRTPPacket(7, 0, data), "");

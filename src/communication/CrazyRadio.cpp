@@ -422,7 +422,7 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
             { // Logging
                 if(packet->GetChannel() == 2)
                 {
-                    CRTPPacket* log = new CRTPPacket(*packet);
+                    CRTPPacket* log = new CRTPPacket(std::move(*packet)); // TODO Why is _loggingPacket storing ptrs? Can it store shared_ptrs?
 
                     _loggingPackets.push_back(log);
                 }
