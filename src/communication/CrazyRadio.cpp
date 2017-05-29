@@ -485,7 +485,7 @@ bool CrazyRadio::IsUsbConnectionOk()
 CRTPPacket* CrazyRadio::WaitForPacket()
 {
     CRTPPacket* received = nullptr;
-    CRTPPingPacket pingPacket;
+    CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
     while(received == nullptr) // TODO SF Potential infinite loop
     {
         received = SendPacket(pingPacket);
@@ -550,8 +550,8 @@ std::list<CRTPPacket*> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    CRTPPingPacket pingPacket;
-    CRTPPacket* received = this->SendPacket(pingPacket);
+    CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
+    CRTPPacket* received = SendPacket(pingPacket);
     if(received)
     {
         delete received;

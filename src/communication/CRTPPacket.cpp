@@ -93,11 +93,6 @@ int CRTPPacket::GetChannel() const
 }
 
 
-char* CRTPPingPacket::SendableData()
-{
-    char* sendable = new char(0xff);
-    return sendable;
-}
 
 
 

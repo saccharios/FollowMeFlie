@@ -72,7 +72,7 @@ public:
     // (channel, port), the payload data and a finishing byte
     // (0x27). This block is newly allocated and must be delete[]'d after usage.
     // \return Pointer to a new char[] containing a sendable block of payload data
-    virtual char* SendableData();
+    char* SendableData();
 
     // Returns the length of a sendable data block
     // \return Length of the sendable data block returned by sendableData() (in bytes)
@@ -94,10 +94,5 @@ private:
     int _channel;
 
 };
-class CRTPPingPacket : public CRTPPacket {
-public:
-    CRTPPingPacket() : CRTPPacket(0, 0, {0})
-    {}
-    char * SendableData() override ;
-};
+
 
