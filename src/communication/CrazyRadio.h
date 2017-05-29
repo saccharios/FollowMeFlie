@@ -69,6 +69,7 @@ enum class RadioSettings{
 class CrazyRadio {
 
 public:
+    using sptrPacket = std::shared_ptr<CRTPPacket>;
     // Constructor for the radio communication class
 
     // \param strRadioIdentifier URI for the radio to be opened,
@@ -96,10 +97,8 @@ public:
     //  communication. The integer value maps to one of the entries of the Power enum.
     void SetPower(enum Power power);
 
-    // Sends the given packet's payload to the copter
-    // \param crtpSend The packet which supplied header and payload
-    //  information to send to the copter */
-    CRTPPacket* SendPacket(CRTPPacket & send, bool deleteAfterwards = false);
+    bool SendPacket_2(CRTPPacket const & sendPacket);
+
 
     // Sends the given packet and waits for a reply.
     // Internally, this function calls the more elaborate
@@ -109,7 +108,7 @@ public:
     // \param bDeleteAfterwards Whether or not the packet to send is
     // deleted internally after sending it
     // \return Packet containing the reply or NULL if no reply was received (after retrying).
-    CRTPPacket* SendAndReceive(CRTPPacket & send, bool deleteAfterwards = false);
+    sptrPacket SendAndReceive(CRTPPacket & send, bool deleteAfterwards = false);
 
     // Sends out an empty dummy packet
     //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.
@@ -119,7 +118,7 @@ public:
     // Waits for the next non-empty packet.
     // Sends out dummy packets until a reply is non-empty and then returns this reply.
     // \return Packet contaning a non-empty reply.
-    CRTPPacket* WaitForPacket();
+    sptrPacket WaitForPacket();
 
     // Whether or not the copter is answering sent packets.
     // Returns whether the copter is actually answering sent packets with
@@ -136,7 +135,7 @@ public:
     // Returns a list of all collected logging related (i.e. originating from port 5) packets. This is called by the Crazyflie class
     //  automatically when performing cycle().
     // \return List of CCRTPPacket instances collected from port 5 (logging).
-    std::list<CRTPPacket*> PopLoggingPackets();
+    std::list<sptrPacket> PopLoggingPackets();
 
     bool ReadRadioSettings();
     void SetRadioSettings(int index);
@@ -161,7 +160,7 @@ private:
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
-    std::list<CRTPPacket*> _loggingPackets;
+    std::list<sptrPacket> _loggingPackets;
     bool _radioIsConnected;
 
     std::list<libusb_device*> ListDevices(int vendorID, int productID);
@@ -169,9 +168,9 @@ private:
     bool ClaimInterface(int nInterface);
     void CloseDevice();
 
-    CRTPPacket* ReadAck();
+    sptrPacket ReadAck();
 
-    CRTPPacket* WriteData(unsigned char * data, int length);
+    sptrPacket WriteData(unsigned char * data, int length);
     bool WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index);
     bool ReadData(void* data, int maxLength, int & actualLength);
 
@@ -186,5 +185,8 @@ private:
     void SetARDTime(int ARDTime);
     void SetAddress(char* address);
     void SetContCarrier(bool contCarrier);
+
+
+        sptrPacket SendPacket(CRTPPacket const & sendPacket);
 };
 

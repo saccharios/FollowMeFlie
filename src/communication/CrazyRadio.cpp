@@ -61,7 +61,7 @@ CrazyRadio::CrazyRadio() :
 }
 CrazyRadio::~CrazyRadio()
 {
-    this->CloseDevice();
+    CloseDevice();
 
     // TODO(winkler): Free all remaining packets in m_lstLoggingPackets.
 
@@ -78,8 +78,8 @@ void CrazyRadio::CloseDevice()
         libusb_close(_device);
         libusb_unref_device(_devDevice);
 
-        _device = NULL;
-        _devDevice = NULL;
+        _device = nullptr;
+        _devDevice = nullptr;
     }
 }
 
@@ -114,8 +114,8 @@ std::list<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
 
 bool CrazyRadio::OpenUSBDongle()
 {
-    this->CloseDevice();
-    std::list<libusb_device*> lstDevices = this->ListDevices(0x1915, 0x7777);
+    CloseDevice();
+    std::list<libusb_device*> lstDevices = ListDevices(0x1915, 0x7777);
 
     if(lstDevices.size() > 0) {
         // For now, just take the first device. Give it a second to
@@ -237,7 +237,7 @@ void CrazyRadio::StopRadio()
 
 }
 
-CRTPPacket * CrazyRadio::WriteData(unsigned char * data, int length)
+CrazyRadio::sptrPacket CrazyRadio::WriteData(unsigned char * data, int length)
 {
     CRTPPacket* packet = nullptr;
 
@@ -246,10 +246,13 @@ CRTPPacket * CrazyRadio::WriteData(unsigned char * data, int length)
 
     if(nReturn == 0 && nActuallyWritten == length)
     {
-        packet = ReadAck();
+        return ReadAck();
+    }
+    else
+    {
+        return nullptr;
     }
 
-    return packet;
 }
 
 bool CrazyRadio::ReadData(void* data, int maxLength, int & actualLength)
@@ -393,8 +396,12 @@ bool CrazyRadio::ClaimInterface(int interface)
     int errcode = libusb_claim_interface(_device, interface);
     return errcode == 0;
 }
+bool CrazyRadio::SendPacket_2(CRTPPacket const & sendPacket)
+{
+    return SendPacket(sendPacket) != nullptr;
+}
 
-CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwards)
+CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  const & sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
@@ -422,9 +429,9 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
             { // Logging
                 if(packet->GetChannel() == 2)
                 {
-                    CRTPPacket* log = new CRTPPacket(std::move(*packet)); // TODO Why is _loggingPacket storing ptrs? Can it store shared_ptrs?
+//                    CRTPPacket* log = new CRTPPacket(std::move(*packet)); // TODO Why is _loggingPacket storing ptrs? Can it store shared_ptrs?
 
-                    _loggingPackets.push_back(log);
+                    _loggingPackets.emplace_back(packet);
                 }
             } break;
             }
@@ -433,8 +440,8 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
     return packet;
 }
 
-CRTPPacket* CrazyRadio::ReadAck() {
-    CRTPPacket* crtpPacket = nullptr;
+CrazyRadio::sptrPacket CrazyRadio::ReadAck() {
+    sptrPacket packet = nullptr;
 
     int bufferSize = 64;
     char buffer[bufferSize];
@@ -460,14 +467,14 @@ CRTPPacket* CrazyRadio::ReadAck() {
             {
                 data.push_back(buffer[1+i]);
             }
-            crtpPacket = new CRTPPacket(port, channel, std::move(data));
+            packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
         }
         else
         {
             _ackReceived = false;
         }
     }
-    return crtpPacket;
+    return packet;
 }
 
 bool CrazyRadio::AckReceived()
@@ -481,9 +488,9 @@ bool CrazyRadio::IsUsbConnectionOk()
     return (libusb_get_device_descriptor(_devDevice,	&descriptor) == 0);
 }
 
-CRTPPacket* CrazyRadio::WaitForPacket()
+CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
 {
-    CRTPPacket* received = nullptr;
+    sptrPacket received = nullptr;
     CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
     while(received == nullptr) // TODO SF Potential infinite loop
     {
@@ -492,12 +499,12 @@ CRTPPacket* CrazyRadio::WaitForPacket()
     return received;
 }
 
-CRTPPacket* CrazyRadio::SendAndReceive(CRTPPacket & send, bool deleteAfterwards)
+CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket & send, bool deleteAfterwards) // TODO send is candidate to be moved in
 {
     bool goon = true;
     int resendCounter = 0;
-    CRTPPacket* returnVal = nullptr;
-    CRTPPacket* received = nullptr;
+    sptrPacket returnVal = nullptr;
+    sptrPacket received = nullptr;
     int retries = 10 ;
     int microsecondsWait = 100;
     while(goon)
@@ -523,11 +530,6 @@ CRTPPacket* CrazyRadio::SendAndReceive(CRTPPacket & send, bool deleteAfterwards)
 
         if(goon)
         {
-            if(received)
-            {
-                delete received;
-            }
-
             //      usleep(nMicrosecondsWait);
             //      std::this_thread::sleep_for(std::chrono::microseconds(123));
             std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
@@ -539,9 +541,9 @@ CRTPPacket* CrazyRadio::SendAndReceive(CRTPPacket & send, bool deleteAfterwards)
 
 }
 
-std::list<CRTPPacket*> CrazyRadio::PopLoggingPackets()
+std::list<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 {
-    std::list<CRTPPacket*> packets = _loggingPackets;
+    auto packets = _loggingPackets;
     _loggingPackets.clear();
 
     return packets;
@@ -550,14 +552,7 @@ std::list<CRTPPacket*> CrazyRadio::PopLoggingPackets()
 bool CrazyRadio::SendPingPacket()
 {
     CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
-    CRTPPacket* received = SendPacket(pingPacket);
-    if(received)
-    {
-        delete received;
-        return true;
-    }
-
-    return false;
+    return SendPacket_2(pingPacket);
 }
 
 bool CrazyRadio::RadioIsConnected() const

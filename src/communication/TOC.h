@@ -90,7 +90,7 @@ public:
 
     bool EnableLogging(std::string blockName);
 
-    void ProcessPackets(std::list<CRTPPacket*> packets);
+    void ProcessPackets(std::list<CrazyRadio::sptrPacket> packets);
 
     int ElementIDinBlock(int blockID, int elementIndex);
     bool SetFloatValueForElementID(int elementID, float value);
