@@ -110,9 +110,9 @@ bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 
     int port = 0;
     int channel = 3;
-    CRTPPacket  packet(channel, port, data);
+    CRTPPacket  packet(channel, port, std::move(data));
 
-    CRTPPacket *crtpReceived = _crazyRadio.SendPacket(packet);
+    CRTPPacket* crtpReceived = _crazyRadio.SendPacket(packet);
 
     if(crtpReceived != NULL)
     {

@@ -461,7 +461,7 @@ CRTPPacket* CrazyRadio::ReadAck() {
             {
                 data.push_back(buffer[1+i]);
             }
-            crtpPacket = new CRTPPacket(port, channel, data);
+            crtpPacket = new CRTPPacket(port, channel, std::move(data));
         }
         else
         {

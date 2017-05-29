@@ -22,7 +22,7 @@ TEST_F(CRTPPacketTest, Construction)
     int port = 5;
     int channel = 2;
 
-    CRTPPacket packet(port, channel, data);
+    CRTPPacket packet(port, channel, std::move(data));
     EXPECT_EQ(packet.DataLength(), data.size());
     EXPECT_EQ(packet.GetChannel(), channel);
     EXPECT_EQ(packet.GetPort(), port);
@@ -135,14 +135,8 @@ TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
     int channel = 2;
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    CRTPPacket packet_1(port, channel, data);
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::cout << "Copy Data Ctor"
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
-              << "ns.\n";
-    start = std::chrono::steady_clock::now();
     CRTPPacket packet_2(port, channel, std::move(data));
-    end = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Move Data Ctor"
               << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
               << "ns.\n";
