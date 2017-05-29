@@ -71,11 +71,11 @@ public:
     // (channel, port), the payload data and a finishing byte
     // (0x27). This block is newly allocated and must be delete[]'d after usage.
     // \return Pointer to a new char[] containing a sendable block of payload data
-    char* SendableData();
+    unsigned char * SendableData() const;
 
     // Returns the length of a sendable data block
     // \return Length of the sendable data block returned by sendableData() (in bytes)
-    int GetSendableDataLength();
+    int GetSendableDataLength() const;
 
     int GetPort() const;
 

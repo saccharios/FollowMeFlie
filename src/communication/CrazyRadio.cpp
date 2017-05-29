@@ -237,12 +237,12 @@ void CrazyRadio::StopRadio()
 
 }
 
-CRTPPacket * CrazyRadio::WriteData(void* data, int length)
+CRTPPacket * CrazyRadio::WriteData(unsigned char * data, int length)
 {
     CRTPPacket* packet = nullptr;
 
     int nActuallyWritten;
-    int nReturn = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), (unsigned char*)data, length, &nActuallyWritten, 1000);
+    int nReturn = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &nActuallyWritten, 1000);
 
     if(nReturn == 0 && nActuallyWritten == length)
     {

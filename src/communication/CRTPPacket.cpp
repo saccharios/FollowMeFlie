@@ -46,9 +46,9 @@ std::vector<char> const & CRTPPacket::GetData() const
     return _data;
 }
 
-char* CRTPPacket::SendableData()
+unsigned char * CRTPPacket::SendableData() const
 {
-    char* sendable = new char[GetSendableDataLength()]();
+    unsigned char* sendable = new unsigned char[GetSendableDataLength()]();
 
     // Header byte
     sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
@@ -64,7 +64,7 @@ char* CRTPPacket::SendableData()
     return sendable;
 }
 
-int CRTPPacket::GetSendableDataLength()
+int CRTPPacket::GetSendableDataLength() const
 {
     return _data.size() + 1;//2;
 }

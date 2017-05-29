@@ -171,7 +171,7 @@ private:
 
     CRTPPacket* ReadAck();
 
-    CRTPPacket* WriteData(void* data, int length);
+    CRTPPacket* WriteData(unsigned char * data, int length);
     bool WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index);
     bool ReadData(void* data, int maxLength, int & actualLength);
 
