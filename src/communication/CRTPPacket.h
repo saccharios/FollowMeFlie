@@ -56,13 +56,10 @@ public:
     CRTPPacket() : _data(), _dataLength(0), _port(0), _channel(0) {}
     CRTPPacket(int port, int channel, std::vector<char> && data) ;
 
-    // Gives out the pointer to the internally stored data
-    // Don't manipulate the data pointed to by this pointer. Usually, you
-    // won't have to call this function at all as it is used by the more
-    // interface-designated functions.
-    // \return Returns a direct pointer to the internally stored data
-    char* Data();
 
+
+
+    std::vector<char> const & GetData() const;
     // Returns the length of the currently stored data (in bytes)
     //\return Returns the number of bytes stored as payload data
     int DataLength() const;

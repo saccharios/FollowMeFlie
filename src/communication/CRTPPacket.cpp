@@ -42,16 +42,9 @@ CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> && data) :
     assert( (_channel >= 0 && _channel < 4) &&"Packet channel must be either 0, 1 , 2, 3");
 }
 
-
-char* CRTPPacket::Data()
+std::vector<char> const & CRTPPacket::GetData() const
 {
-    char* buffer = new char[_dataLength];
-    for(int i = 0; i < _dataLength; ++i)
-    {
-        buffer[i] = _data[i];
-    }
-
-    return buffer;
+    return _data;
 }
 
 int CRTPPacket::DataLength() const

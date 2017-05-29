@@ -400,22 +400,21 @@ CRTPPacket* CrazyRadio::SendPacket(CRTPPacket  & sendPacket, bool deleteAfterwar
 
     if(packet)
     {
-        char* data = packet->Data();
-        int length = packet->DataLength();
-
-        if(length > 0)
+        auto const & data = packet->GetData();
+        if(data.size() > 0)
         {
             switch(packet->GetPort() )
             {
             case 0: // TODO Make enum class for ports
             { // Console
-                if(length > 1)
-                {
-                char cText[length];
-                std::memcpy(cText, &data[1], length - 1);
-                cText[length - 1] = '\0';
-
-                std::cout << "Console text: " << cText  <<  std::endl;
+                if(data.size() > 1)
+                { // Implicit assumption that the data stored in data are chars
+                    std::cout << "Console text: ";
+                    for(auto const & element : data)
+                    {
+                        std::cout << element;
+                    }
+                    std::cout << std::endl;
                 }
             } break;
 

@@ -57,9 +57,9 @@ bool CTOC::RequestMetaData()
     CRTPPacket packet(_port, channel, std::move(data));
     CRTPPacket* received = _crazyRadio.SendAndReceive(packet);
 
-    if(received->Data()[1] == 0x01)
+    if(received->GetData()[1] == 0x01)
     {
-        _itemCount = received->Data()[2]; // is usually 0x81 == 129 decimal
+        _itemCount = received->GetData()[2]; // is usually 0x81 == 129 decimal
         retVal = true;
     }
 
@@ -107,35 +107,33 @@ bool CTOC::ProcessItem(CRTPPacket & packet)
     {
         if(packet.GetChannel() == 0)
         {
-            char* data = packet.Data();
+            auto const & data = packet.GetData();
 
             if(data[1] == 0x0)
             { // Command identification ok?
-                int nID = data[2];
-                int nType = data[3];
 
                 std::string strGroup;
-                int nI;
-                for(nI = 4; data[nI] != '\0'; nI++)
+                int index;
+                for(index = 4; data[index] != '\0'; index++)
                 {
-                    strGroup += data[nI];
+                    strGroup += data[index];
                 }
 
-                nI++;
+                index++;
                 std::string strIdentifier;
-                for(; data[nI] != '\0'; nI++)
+                for(; data[index] != '\0'; index++)
                 {
-                    strIdentifier += data[nI];
+                    strIdentifier += data[index];
                 }
 
                 TOCElement teNew;
                 teNew.identifier = strIdentifier;
                 teNew.group = strGroup;
-                teNew.id = nID;
-                teNew.type = nType;
+                teNew.id = data[2];
+                teNew.type = data[3];
                 teNew.isLogging = false;
                 teNew.value = 0;
-                _TOCElements.push_back(teNew);
+                _TOCElements.emplace_back(teNew);
 
                 return true;
             }
@@ -229,23 +227,23 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
             std::vector<char> data = {0x01, currentLogBlock.id, teCurrent.type, teCurrent.id};
             int channel = 1;
             CRTPPacket logPacket(_port, channel, std::move(data));
-            CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(logPacket);
+            CRTPPacket* received = _crazyRadio.SendAndReceive(logPacket);
 
-            char* cData = crtpReceived->Data();
+            auto const & dataReceived = received->GetData();
             bool created = false;
-            if(cData[1] == 0x01 &&
-                    cData[2] == currentLogBlock.id &&
-                    cData[3] == 0x00) {
+            if(dataReceived[1] == 0x01 &&
+                    dataReceived[2] == currentLogBlock.id &&
+                    dataReceived[3] == 0x00) {
                 created = true;
             }
             else
             {
-                std::cout << cData[3] << std::endl;
+                std::cout << dataReceived[3] << std::endl;
             }
 
-            if(crtpReceived)
+            if(received)
             {
-                delete crtpReceived;
+                delete received;
             }
             if(created)
             {
@@ -368,33 +366,33 @@ bool CTOC::RegisterLoggingBlock(std::string name, double frequency)
         int channel = 1;
         CRTPPacket registerBlock(_port, channel, std::move(data));
 
-        CRTPPacket* crtpReceived = _crazyRadio.SendAndReceive(registerBlock);
+        CRTPPacket* received = _crazyRadio.SendAndReceive(registerBlock);
 
-        char* cData = crtpReceived->Data();
+        auto const & dataReceived = received->GetData();
         bool bCreateOK = false;
-        if(cData[1] == 0x00 &&
-                cData[2] == id &&
-                cData[3] == 0x00)
+        if(dataReceived[1] == 0x00 &&
+                dataReceived[2] == id &&
+                dataReceived[3] == 0x00)
         {
             bCreateOK = true;
             std::cout << "Registered logging block `" << name << "'" << std::endl;
         }
 
-        if(crtpReceived)
+        if(received)
         {
-            delete crtpReceived;
+            delete received;
         }
 
         if(bCreateOK)
         {
-            struct LoggingBlock lbNew;
+            LoggingBlock lbNew;
             lbNew.name = name;
             lbNew.id = id;
             lbNew.frequency = frequency;
             // lbNew.ElementIDs will be populated later
             _loggingBlocks.push_back(lbNew);
 
-            return this->EnableLogging(name);
+            return EnableLogging(name);
         }
     }
 
@@ -461,16 +459,14 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
             itPacket != packets.end();
             itPacket++)
         {
-            CRTPPacket* crtpPacket = *itPacket;
+            CRTPPacket* packet = *itPacket;
 
-            char* data = crtpPacket->Data();
-            float value;
-            memcpy(&value, &data[5], 4);
+            auto const & data = packet->GetData();
 
-            char* logdata = &data[5];
+            char const * logdata = &data[5];
             int offset = 0;
             int index = 0;
-            int nAvailableLogBytes = crtpPacket->DataLength() - 5;
+            int nAvailableLogBytes = packet->DataLength() - 5;
 
             int blockID = data[1];
             bool found;
@@ -494,7 +490,7 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
                         float value = 0;
                         switch(teCurrent.type)
                         {
-                        case 1:
+                        case 1: // TODO SF Use enum class
                         { // UINT8
                             byteLength = 1;
                             uint8_t uint8Value;
@@ -585,7 +581,7 @@ void CTOC::ProcessPackets(std::list<CRTPPacket*> packets)
                 }
             }
 
-            delete crtpPacket;
+            delete packet;
         }
     }
 }

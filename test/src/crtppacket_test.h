@@ -34,7 +34,7 @@ TEST_F(CRTPPacketTest, Construction)
 
     for(unsigned int i = 0; i < data.size(); ++i)
     {
-        EXPECT_EQ(static_cast<int>(packet.Data()[i]), static_cast<int>(data[i]));
+        EXPECT_EQ(static_cast<int>(packet.GetData()[i]), static_cast<int>(data[i]));
         EXPECT_EQ(static_cast<int>(packet.SendableData()[i+1]), static_cast<int>(data[i]));
     }
 }
