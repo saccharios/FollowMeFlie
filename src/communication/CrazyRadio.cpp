@@ -309,11 +309,16 @@ void CrazyRadio::WriteDataRate(std::string dataRate)
 {
     int dataRateCoded = -1;
 
-    if(dataRate == "250K") {
+    if(dataRate == "250K")
+    {
         dataRateCoded = 0;
-    } else if(dataRate == "1M") {
+    }
+    else if(dataRate == "1M")
+    {
         dataRateCoded = 1;
-    } else if(dataRate == "2M") {
+    }
+    else if(dataRate == "2M")
+    {
         dataRateCoded = 2;
     }
 
@@ -336,14 +341,14 @@ void CrazyRadio::SetARDTime(int ARDTime)
         T = 0xf;
     }
 
-    this->WriteControl(NULL, 0, 0x05, T, 0);
+    WriteControl(nullptr, 0, 0x05, T, 0);
 }
 
 void CrazyRadio::SetARDBytes(int ARDBytes)
 {
     _ardBytes = ARDBytes;
 
-    this->WriteControl(NULL, 0, 0x05, 0x80 | ARDBytes, 0);
+    WriteControl(nullptr, 0, 0x05, 0x80 | ARDBytes, 0);
 }
 
 enum Power CrazyRadio::Power()
@@ -355,7 +360,7 @@ void CrazyRadio::SetPower(enum Power power)
 {
     _power = power;
 
-    this->WriteControl(NULL, 0, 0x04, power, 0);
+    this->WriteControl(nullptr, 0, 0x04, power, 0);
 }
 
 void CrazyRadio::SetAddress(unsigned char*  address)
@@ -369,20 +374,20 @@ void CrazyRadio::SetContCarrier(bool contCarrier)
 {
     _contCarrier = contCarrier;
 
-    this->WriteControl(NULL, 0, 0x20, (contCarrier ? 1 : 0), 0);
+    WriteControl(nullptr, 0, 0x20, (contCarrier ? 1 : 0), 0);
 }
 
 bool CrazyRadio::ClaimInterface(int interface)
 {
     int errcode = libusb_claim_interface(_device, interface);
-    return errcode == 0;
+    return( errcode == 0);
 }
-bool CrazyRadio::SendPacket_2(CRTPPacket const & sendPacket)
+bool CrazyRadio::SendPacket_2(CRTPPacket && sendPacket)
 {
-    return SendPacket(sendPacket) != nullptr;
+    return SendPacket(std::move(sendPacket)) != nullptr;
 }
 
-CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  const & sendPacket)
+CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
@@ -410,8 +415,6 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  const & sendPacket)
             { // Logging
                 if(packet->GetChannel() == 2)
                 {
-//                    CRTPPacket* log = new CRTPPacket(std::move(*packet)); // TODO Why is _loggingPacket storing ptrs? Can it store shared_ptrs?
-
                     _loggingPackets.emplace_back(packet);
                 }
             } break;
@@ -421,14 +424,15 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  const & sendPacket)
     return packet;
 }
 
-CrazyRadio::sptrPacket CrazyRadio::ReadAck() {
+CrazyRadio::sptrPacket CrazyRadio::ReadAck()
+{
     sptrPacket packet = nullptr;
 
     int bufferSize = 64;
     unsigned char buffer[bufferSize];
-    int bytesRead = bufferSize;
-
-    if( ReadData(buffer, bufferSize, bytesRead) )
+    int bytesRead = 0;
+    bool readDataOK = ReadData(buffer, bufferSize, bytesRead) ;
+    if( readDataOK )
     {
         if(bytesRead > 0)
         {
@@ -472,68 +476,56 @@ bool CrazyRadio::IsUsbConnectionOk()
 CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
 {
     sptrPacket received = nullptr;
-    CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
     while(received == nullptr) // TODO SF Potential infinite loop
     {
-        received = SendPacket(pingPacket);
+        CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
+        received = SendPacket(std::move(pingPacket));
     }
     return received;
 }
 
-CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket & send, bool deleteAfterwards) // TODO send is candidate to be moved in
+CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket)
 {
-    bool goon = true;
+    bool go_on = true;
     int resendCounter = 0;
-    sptrPacket returnVal = nullptr;
     sptrPacket received = nullptr;
     int retries = 10 ;
     int microsecondsWait = 100;
-    while(goon)
+    while( go_on)
     {
         if(resendCounter == 0)
         {
-            received = SendPacket(send);
+            received = SendPacket(std::move(sendPacket));
             resendCounter = retries;
         }
         else
         {
             --resendCounter;
-        }
-
-        if(received)
-        {
-            if(received->GetPort() == send.GetPort() && received->GetChannel() == send.GetChannel())
-            {
-                returnVal = received;
-                goon = false;
-            }
-        }
-
-        if(goon)
-        {
-            //      usleep(nMicrosecondsWait);
-            //      std::this_thread::sleep_for(std::chrono::microseconds(123));
-            std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
             received = WaitForPacket();
         }
+        std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
+        if(received)
+        {
+            if(received->GetPort() == sendPacket.GetPort() && received->GetChannel() == sendPacket.GetChannel())
+            {
+                go_on = false;
+            }
+        }
     }
-    return returnVal;
-
-
+    return received;
 }
 
-std::list<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
+std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 {
-    auto packets = _loggingPackets;
-    _loggingPackets.clear();
-
+    std::vector<CrazyRadio::sptrPacket> packets;
+    packets.swap(_loggingPackets);
     return packets;
 }
 
 bool CrazyRadio::SendPingPacket()
 {
     CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
-    return SendPacket_2(pingPacket);
+    return SendPacket_2(std::move(pingPacket));
 }
 
 bool CrazyRadio::RadioIsConnected() const
@@ -543,12 +535,13 @@ bool CrazyRadio::RadioIsConnected() const
 
 float CrazyRadio::ConvertToDeviceVersion(short number)
 {
-    float version = 0.0;
+    /*float version = 0.0;
     std::stringstream sts;
     sts.str(std::string());
     sts << (number >> 8);
     sts << ".";
     sts << (number & 0x0ff);
-    std::sscanf(sts.str().c_str(), "%f", &version);
+    std::sscanf(sts.str().c_str(), "%f", &version);*/
+    float version = static_cast<float>(number) / 100.0;
     return version;
 }

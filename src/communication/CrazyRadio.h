@@ -70,72 +70,46 @@ class CrazyRadio {
 
 public:
     using sptrPacket = std::shared_ptr<CRTPPacket>;
-    // Constructor for the radio communication class
-
-    // \param strRadioIdentifier URI for the radio to be opened,
-    //  e.g. "radio://<dongle-no>/<channel-no>/<datarate>". */
 
     CrazyRadio();
     ~CrazyRadio();
 
-    // Function to start the radio communication
     // The first available USB dongle will be opened and claimed for
     // communication. The connection will be maintained and used to
     // communicate with a Crazyflie Nano quadcopter in range.
-    // \return Returns 'true' if the connection could successfully be
-    // made and 'false' if no dongle could be found (or any other USB-related error came up - this is not handled here).
     void StartRadio();
 
     void StopRadio();
 
     // Returns the current setting for power usage by the USB dongle
-    // \return Value denoting the current power settings reserved for communication
     enum Power Power();
 
-    // Set the power level to be used for communication purposes
-    // \param enumPower The level of power that is being used for
-    //  communication. The integer value maps to one of the entries of the Power enum.
     void SetPower(enum Power power);
 
-    bool SendPacket_2(CRTPPacket const & sendPacket);
+    bool SendPacket_2(CRTPPacket && sendPacket);
 
-
-    // Sends the given packet and waits for a reply.
-    // Internally, this function calls the more elaborate
-    // sendAndReceive() function supplying parameters for retrying and
-    // waiting. Convenience function signature.
-    // \param crtpSend Packet to send
-    // \param bDeleteAfterwards Whether or not the packet to send is
-    // deleted internally after sending it
-    // \return Packet containing the reply or NULL if no reply was received (after retrying).
-    sptrPacket SendAndReceive(CRTPPacket & send, bool deleteAfterwards = false);
+    sptrPacket SendAndReceive(CRTPPacket && sendPacket);
 
     // Sends out an empty dummy packet
     //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.
-    // \return Boolean value denoting whether sending the dummy packet worked or not.
     bool SendPingPacket();
 
     // Waits for the next non-empty packet.
     // Sends out dummy packets until a reply is non-empty and then returns this reply.
-    // \return Packet contaning a non-empty reply.
     sptrPacket WaitForPacket();
 
     // Whether or not the copter is answering sent packets.
     // Returns whether the copter is actually answering sent packets with
     //  a set ACK flag. If this is not the case, it is either switched off or out of range.
-    // \return Returns true if the copter is returning the ACK flag properly, false otherwise.
     bool AckReceived();
 
     // Whether or not the USB connection is still operational.
     // Checks if the USB read/write calls yielded any errors.
-    // \return Returns true if the connection is working properly and false otherwise.
     bool IsUsbConnectionOk();
 
-    // Extracting all logging related packets
     // Returns a list of all collected logging related (i.e. originating from port 5) packets. This is called by the Crazyflie class
     //  automatically when performing cycle().
-    // \return List of CCRTPPacket instances collected from port 5 (logging).
-    std::list<sptrPacket> PopLoggingPackets();
+    std::vector<sptrPacket> PopLoggingPackets();
 
     void SetRadioSettings(int index);
 
@@ -159,7 +133,7 @@ private:
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
-    std::list<sptrPacket> _loggingPackets;
+    std::vector<sptrPacket> _loggingPackets;
     bool _radioIsConnected;
 
     std::vector<libusb_device*> ListDevices(int vendorID, int productID);
@@ -187,7 +161,7 @@ private:
 
     void ReadRadioSettings();
 
-    sptrPacket SendPacket(CRTPPacket const & sendPacket);
+    sptrPacket SendPacket(CRTPPacket && sendPacket);
 
     float ConvertToDeviceVersion(short number);
 };

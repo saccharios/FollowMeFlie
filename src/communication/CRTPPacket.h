@@ -49,6 +49,17 @@ std::vector<char> ConvertToCharVect(T element)
     return result;
 }
 
+
+enum class PORT{
+    Console = 0,
+    Parameters = 2,
+    Commander = 3,
+    Log = 5,
+    Debug = 14,
+    Link = 15
+};
+
+
 // Class to hold and process communication-related data for the CRTProtocol
 class CRTPPacket {
 
