@@ -44,8 +44,7 @@
 #include "CRTPPacket.h"
 
 
-// Power levels to configure the radio dongle with */
-enum Power {
+enum class PowerSettings {
     // Power at -18dbm */
     P_M18DBM = 0,
     // Power at -12dbm */
@@ -82,9 +81,9 @@ public:
     void StopRadio();
 
     // Returns the current setting for power usage by the USB dongle
-    enum Power Power();
+    PowerSettings Power();
 
-    void SetPower(enum Power power);
+    void SetPower(PowerSettings power);
 
     bool SendPacket_2(CRTPPacket && sendPacket);
 
@@ -128,7 +127,7 @@ private:
     std::string _dataRate;
     int _ardTime;
     int _ardBytes;
-    enum Power _power;
+    PowerSettings _power;
     unsigned char* _address;
     int _contCarrier;
     float _deviceVersion;

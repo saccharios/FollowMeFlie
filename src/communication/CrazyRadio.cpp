@@ -48,7 +48,7 @@ CrazyRadio::CrazyRadio() :
     _dataRate(""),
     _ardTime(0),
     _ardBytes(0),
-    _power(P_M18DBM),
+    _power(PowerSettings::P_M18DBM),
     _address(nullptr),
     _contCarrier(0),
     _deviceVersion(0.0f),
@@ -201,7 +201,7 @@ void CrazyRadio::StartRadio()
                 address[3] = 0xe7;
                 address[4] = 0xe7;
                 SetAddress(address);
-                SetPower(P_0DBM);
+                SetPower(PowerSettings::P_0DBM);
                 SetARC(10);
                 SetARDBytes(32);
             }
@@ -351,16 +351,16 @@ void CrazyRadio::SetARDBytes(int ARDBytes)
     WriteControl(nullptr, 0, 0x05, 0x80 | ARDBytes, 0);
 }
 
-enum Power CrazyRadio::Power()
+PowerSettings CrazyRadio::Power()
 {
     return _power;
 }
 
-void CrazyRadio::SetPower(enum Power power)
+void CrazyRadio::SetPower(PowerSettings power)
 {
     _power = power;
 
-    this->WriteControl(nullptr, 0, 0x04, power, 0);
+    WriteControl(nullptr, 0, 0x04, static_cast<unsigned short>(power), 0);
 }
 
 void CrazyRadio::SetAddress(unsigned char*  address)
