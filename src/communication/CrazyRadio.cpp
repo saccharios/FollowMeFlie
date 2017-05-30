@@ -83,9 +83,9 @@ void CrazyRadio::CloseDevice()
     }
 }
 
-std::list<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
+std::vector<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
 {
-    std::list<libusb_device*> devices;
+    std::vector<libusb_device*> devices;
     ssize_t count;
     libusb_device** pdevices;
 
@@ -100,7 +100,7 @@ std::list<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
         if(ddDescriptor.idVendor == vendorID && ddDescriptor.idProduct == productID)
         {
             libusb_ref_device(devCurrent);
-            devices.push_back(devCurrent);
+            devices.emplace_back(devCurrent);
         }
     }
 
@@ -115,30 +115,26 @@ std::list<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
 bool CrazyRadio::OpenUSBDongle()
 {
     CloseDevice();
-    std::list<libusb_device*> lstDevices = ListDevices(0x1915, 0x7777);
+    auto devices = ListDevices(0x1915, 0x7777);
 
-    if(lstDevices.size() > 0) {
+    if(devices.size() > 0) {
         // For now, just take the first device. Give it a second to
         // initialize the system permissions.
         sleep(1.0);
 
-        libusb_device* devFirst = lstDevices.front();
+        auto* devFirst = devices.front();
         int error = libusb_open(devFirst, &_device);
-
+        // If ok, remove the first element and save it
         if(error == 0)
         {
             // Opening device OK. Don't free the first device just yet.
-            lstDevices.pop_front();
+            devices.erase(devices.begin());
             _devDevice = devFirst;
         }
 
-        for(std::list<libusb_device*>::iterator itDevice = lstDevices.begin();
-            itDevice != lstDevices.end();
-            itDevice++)
+        for(auto & device : devices)
         {
-            libusb_device* devCurrent = *itDevice;
-
-            libusb_unref_device(devCurrent);
+            libusb_unref_device(device);
         }
 
         return !error;
@@ -149,10 +145,9 @@ bool CrazyRadio::OpenUSBDongle()
 void CrazyRadio::SetRadioSettings(int index)
 {
     _radioSettings = static_cast<RadioSettings>(index);
-    std::cout << "radioSettings = " << index << std::endl;
 }
 
-bool CrazyRadio::ReadRadioSettings()
+void CrazyRadio::ReadRadioSettings()
 {
     int dongleNBR = 0;
     switch(_radioSettings)
@@ -166,67 +161,55 @@ bool CrazyRadio::ReadRadioSettings()
     }
     }
     std::cout << "Opening radio " << dongleNBR << "/" << GetChannel() << "/" << GetDataRate() << std::endl;
-    return true;
 }
 
 void CrazyRadio::StartRadio()
 {
     _radioIsConnected = false;
-    if(this->OpenUSBDongle())
+    auto USBDongleIsOpen = OpenUSBDongle();
+    if( USBDongleIsOpen )
     {
-        if (ReadRadioSettings())
+        ReadRadioSettings();
+        // Read device version
+        libusb_device_descriptor descriptor;
+        libusb_get_device_descriptor(_devDevice, &descriptor);
+        _deviceVersion = ConvertToDeviceVersion(descriptor.bcdDevice);
+        std::cout << "Got device version " << _deviceVersion << std::endl;
+        if(_deviceVersion < 0.3)
         {
-            // Read device version
-            libusb_device_descriptor ddDescriptor;
-            libusb_get_device_descriptor(_devDevice, &ddDescriptor);
-            std::stringstream sts;
-            sts.str(std::string());
-            sts << (ddDescriptor.bcdDevice >> 8);
-            sts << ".";
-            sts << (ddDescriptor.bcdDevice & 0x0ff);
-            std::sscanf(sts.str().c_str(), "%f", &_deviceVersion);
+            std::cout << "Device version too low. Device is not supported.\n";
+            return;
+        }
 
-            std::cout << "Got device version " << _deviceVersion << std::endl;
-            if(_deviceVersion < 0.3)
+        // Set active configuration to 1
+        libusb_set_configuration(_device, 1);
+        // Claim interface
+        bool claimIntf = ClaimInterface(0);
+        if(claimIntf)
+        {
+            // Set power-up settings for dongle (>= v0.4)
+//            WriteDataRate("2M");
+//            WriteChannel(2);
+
+            if(_deviceVersion >= 0.4)
             {
-                return;
+                SetContCarrier(false);
+                unsigned char address[5];
+                address[0] = 0xe7;
+                address[1] = 0xe7;
+                address[2] = 0xe7;
+                address[3] = 0xe7;
+                address[4] = 0xe7;
+                SetAddress(address);
+                SetPower(P_0DBM);
+                SetARC(10);
+                SetARDBytes(32);
             }
 
-            // Set active configuration to 1
-            libusb_set_configuration(_device, 1);
-            // Claim interface
-            bool claimIntf = this->ClaimInterface(0);
-            if(claimIntf)
-            {
-                // Set power-up settings for dongle (>= v0.4)
-                WriteDataRate("2M");
-                WriteChannel(2);
+            WriteDataRate(_dataRate);
+            WriteChannel(_channel);
 
-                if(_deviceVersion >= 0.4)
-                {
-                    this->SetContCarrier(false);
-                    char cAddress[5];
-                    cAddress[0] = 0xe7;
-                    cAddress[1] = 0xe7;
-                    cAddress[2] = 0xe7;
-                    cAddress[3] = 0xe7;
-                    cAddress[4] = 0xe7;
-                    this->SetAddress(cAddress);
-                    this->SetPower(P_0DBM);
-                    this->SetARC(3);
-                    this->SetARDBytes(32);
-                }
-
-                // Initialize device
-                if(_deviceVersion >= 0.4) {
-                    this->SetARC(10);
-                }
-
-                WriteDataRate(_dataRate);
-                WriteChannel(_channel);
-
-                _radioIsConnected = true;
-            }
+            _radioIsConnected = true;
         }
     }
 }
@@ -239,12 +222,10 @@ void CrazyRadio::StopRadio()
 
 CrazyRadio::sptrPacket CrazyRadio::WriteData(unsigned char * data, int length)
 {
-    CRTPPacket* packet = nullptr;
+    int actWritten;
+    int retValue = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &actWritten, 1000);
 
-    int nActuallyWritten;
-    int nReturn = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &nActuallyWritten, 1000);
-
-    if(nReturn == 0 && nActuallyWritten == length)
+    if(retValue == 0 && actWritten == length)
     {
         return ReadAck();
     }
@@ -255,20 +236,20 @@ CrazyRadio::sptrPacket CrazyRadio::WriteData(unsigned char * data, int length)
 
 }
 
-bool CrazyRadio::ReadData(void* data, int maxLength, int & actualLength)
+bool CrazyRadio::ReadData(unsigned char* data, int maxLength, int & actualLength)
 {
-    int nActuallyRead;
-    int nReturn = libusb_bulk_transfer(_device, (0x81 | LIBUSB_ENDPOINT_IN), (unsigned char*)data,  maxLength, &nActuallyRead, 50);
+    int actRead;
+    int retValue = libusb_bulk_transfer(_device, (0x81 | LIBUSB_ENDPOINT_IN), data,  maxLength, &actRead, 50);
 
-    if(nReturn == 0)
+    if(retValue == 0)
     {
-        actualLength = nActuallyRead;
+        actualLength = actRead;
 
         return true;
     }
     else
     {
-        switch(nReturn)
+        switch(retValue)
         {
         case LIBUSB_ERROR_TIMEOUT:
             std::cout << "USB timeout" << std::endl;
@@ -283,11 +264,11 @@ bool CrazyRadio::ReadData(void* data, int maxLength, int & actualLength)
     return false;
 }
 
-bool CrazyRadio::WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index)
+bool CrazyRadio::WriteControl(unsigned char* data, int length, uint8_t request, uint16_t value, uint16_t index)
 {
-    int nTimeout = 1000;
+    int timeout = 1000;
 
-    /*int nReturn = */libusb_control_transfer(_device, LIBUSB_REQUEST_TYPE_VENDOR, request, value, index, (unsigned char*)data, length, nTimeout);
+    /*int nReturn = */libusb_control_transfer(_device, LIBUSB_REQUEST_TYPE_VENDOR, request, value, index, data, length, timeout);
 
     // if(nReturn == 0) {
     //   return true;
@@ -300,7 +281,7 @@ bool CrazyRadio::WriteControl(void* data, int length, uint8_t request, uint16_t 
 void CrazyRadio::SetARC(int ARC)
 {
     _arc = ARC;
-    this->WriteControl(NULL, 0, 0x06, ARC, 0);
+    WriteControl(nullptr, 0, 0x06, ARC, 0);
 }
 
 void CrazyRadio::setChannel(int channel)
@@ -313,14 +294,14 @@ int CrazyRadio::GetChannel() const
 }
 void CrazyRadio::WriteChannel(int channel)
 {
-    this->WriteControl(NULL, 0, 0x01, channel, 0);
+    WriteControl(nullptr, 0, 0x01, channel, 0);
 }
 
 void CrazyRadio::SetDataRate(std::string dataRate)
 {
     _dataRate = dataRate;
 }
-std::string CrazyRadio::GetDataRate() const
+std::string const & CrazyRadio::GetDataRate() const
 {
     return _dataRate;
 }
@@ -336,7 +317,7 @@ void CrazyRadio::WriteDataRate(std::string dataRate)
         dataRateCoded = 2;
     }
 
-    this->WriteControl(NULL, 0, 0x03, dataRateCoded, 0);
+    WriteControl(nullptr, 0, 0x03, dataRateCoded, 0);
 }
 
 
@@ -377,11 +358,11 @@ void CrazyRadio::SetPower(enum Power power)
     this->WriteControl(NULL, 0, 0x04, power, 0);
 }
 
-void CrazyRadio::SetAddress(char*  address)
+void CrazyRadio::SetAddress(unsigned char*  address)
 {
     _address = address;
 
-    this->WriteControl(address, 5, 0x02, 0, 0);
+    WriteControl(address, 5, 0x02, 0, 0);
 }
 
 void CrazyRadio::SetContCarrier(bool contCarrier)
@@ -444,7 +425,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck() {
     sptrPacket packet = nullptr;
 
     int bufferSize = 64;
-    char buffer[bufferSize];
+    unsigned char buffer[bufferSize];
     int bytesRead = bufferSize;
 
     if( ReadData(buffer, bufferSize, bytesRead) )
@@ -560,3 +541,14 @@ bool CrazyRadio::RadioIsConnected() const
     return _radioIsConnected;
 }
 
+float CrazyRadio::ConvertToDeviceVersion(short number)
+{
+    float version = 0.0;
+    std::stringstream sts;
+    sts.str(std::string());
+    sts << (number >> 8);
+    sts << ".";
+    sts << (number & 0x0ff);
+    std::sscanf(sts.str().c_str(), "%f", &version);
+    return version;
+}

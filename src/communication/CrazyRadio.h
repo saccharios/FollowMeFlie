@@ -137,7 +137,6 @@ public:
     // \return List of CCRTPPacket instances collected from port 5 (logging).
     std::list<sptrPacket> PopLoggingPackets();
 
-    bool ReadRadioSettings();
     void SetRadioSettings(int index);
 
     bool RadioIsConnected() const;
@@ -156,14 +155,14 @@ private:
     int _ardTime;
     int _ardBytes;
     enum Power _power;
-    char* _address;
+    unsigned char* _address;
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
     std::list<sptrPacket> _loggingPackets;
     bool _radioIsConnected;
 
-    std::list<libusb_device*> ListDevices(int vendorID, int productID);
+    std::vector<libusb_device*> ListDevices(int vendorID, int productID);
     bool OpenUSBDongle();
     bool ClaimInterface(int nInterface);
     void CloseDevice();
@@ -171,22 +170,25 @@ private:
     sptrPacket ReadAck();
 
     sptrPacket WriteData(unsigned char * data, int length);
-    bool WriteControl(void* data, int length, uint8_t request, uint16_t value, uint16_t index);
-    bool ReadData(void* data, int maxLength, int & actualLength);
+    bool WriteControl(unsigned char* data, int length, uint8_t request, uint16_t value, uint16_t index);
+    bool ReadData(unsigned char* data, int maxLength, int & actualLength);
 
     void SetARC(int ARC);
     void setChannel(int channel);
     void WriteChannel(int channel);
     int GetChannel() const;
     void SetDataRate(std::string dataRate);
-    std::string GetDataRate() const;
+    std::string const & GetDataRate() const;
     void WriteDataRate(std::string dataRate);
     void SetARDBytes(int ARDBytes);
     void SetARDTime(int ARDTime);
-    void SetAddress(char* address);
+    void SetAddress(unsigned char* address);
     void SetContCarrier(bool contCarrier);
 
+    void ReadRadioSettings();
 
-        sptrPacket SendPacket(CRTPPacket const & sendPacket);
+    sptrPacket SendPacket(CRTPPacket const & sendPacket);
+
+    float ConvertToDeviceVersion(short number);
 };
 
