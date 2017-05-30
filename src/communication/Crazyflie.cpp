@@ -46,8 +46,9 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
 
     _sendsSetpoints = false;
 
-    _tocParameters = new CTOC(_crazyRadio, 2);
-    _tocLogs = new CTOC(_crazyRadio, 5);
+    // TODO Why are they dynamically allocated?
+    _tocParameters = new CTOC(_crazyRadio, Port::Parameters);
+    _tocLogs = new CTOC(_crazyRadio, Port::Log);
 
     _state = STATE_ZERO;
 
@@ -108,9 +109,7 @@ bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
     data.insert(data.end(), yawVect.begin(), yawVect.end());
     data.insert(data.end(), thrustVect.begin(), thrustVect.end());
 
-    int port = 0;
-    int channel = 3;
-    CRTPPacket  packet(channel, port, std::move(data));
+    CRTPPacket  packet(Port::Commander,Channel::TOC, std::move(data));
 
     return _crazyRadio.SendPacket_2(std::move(packet));
 }

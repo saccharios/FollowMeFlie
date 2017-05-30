@@ -65,7 +65,7 @@ struct LoggingBlock {
 class CTOC {
 
 public:
-    CTOC(CrazyRadio & crazyRadio, int port);
+    CTOC(CrazyRadio & crazyRadio, Port port);
 
     bool SendTOCPointerReset();
     bool RequestMetaData();
@@ -98,7 +98,7 @@ public:
     bool UnregisterLoggingBlockID(int id);
 private:
     CrazyRadio & _crazyRadio;
-    int _port;
+    Port _port;
     uint8_t _itemCount;
     std::list<TOCElement> _TOCElements; // TODO Can be a map with string "name" as key.
     std::list<LoggingBlock> _loggingBlocks;

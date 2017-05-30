@@ -398,7 +398,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
         {
             switch(packet->GetPort() )
             {
-            case 0: // TODO Make enum class for ports
+            case Port::Console:
             { // Console
                 if(data.size() > 1)
                 { // Implicit assumption that the data stored in data are chars
@@ -411,9 +411,9 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                 }
             } break;
 
-            case 5:
+            case Port::Log:
             { // Logging
-                if(packet->GetChannel() == 2)
+                if(packet->GetChannel() == Channel::Data)
                 {
                     _loggingPackets.emplace_back(packet);
                 }
@@ -445,8 +445,8 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             // (store current link quality, etc.). For now, ignore it.
 
             // Actual data starts at buffer[1]
-            int port = (buffer[1] & 0xf0) >> 4;
-            int channel = buffer[1] & 0b00000011;
+            Port port = static_cast<Port>((buffer[1] & 0xf0) >> 4);
+            Channel channel = static_cast<Channel>(buffer[1] & 0b00000011);
             std::vector<char> data;
             for(int i = 0; i < bytesRead; ++i)
             {
@@ -478,7 +478,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
     sptrPacket received = nullptr;
     while(received == nullptr) // TODO SF Potential infinite loop
     {
-        CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
+        CRTPPacket pingPacket(Port::Console,Channel::TOC,{static_cast<char>(0xff)});
         received = SendPacket(std::move(pingPacket));
     }
     return received;
@@ -524,7 +524,7 @@ std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    CRTPPacket pingPacket(0,0,{static_cast<char>(0xff)});
+    CRTPPacket pingPacket(Port::Console,Channel::TOC,{static_cast<char>(0xff)});
     return SendPacket_2(std::move(pingPacket));
 }
 

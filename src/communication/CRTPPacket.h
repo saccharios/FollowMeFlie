@@ -50,7 +50,7 @@ std::vector<char> ConvertToCharVect(T element)
 }
 
 
-enum class PORT{
+enum class Port{
     Console = 0,
     Parameters = 2,
     Commander = 3,
@@ -58,14 +58,18 @@ enum class PORT{
     Debug = 14,
     Link = 15
 };
-
+enum class Channel{
+    TOC = 0,
+    Settings = 1,
+    Data = 2
+};
 
 // Class to hold and process communication-related data for the CRTProtocol
 class CRTPPacket {
 
 public:
-    CRTPPacket() : _data(), _port(0), _channel(0) {}
-    CRTPPacket(int port, int channel, std::vector<char> && data) ;
+    CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
+    CRTPPacket(Port port, Channel channel, std::vector<char> && data) ;
 
     // Disable copy ctor + copy assignment
     CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
@@ -88,18 +92,18 @@ public:
     // \return Length of the sendable data block returned by sendableData() (in bytes)
     int GetSendableDataLength() const;
 
-    int GetPort() const;
+    Port GetPort() const;
 
-    int GetChannel() const;
+    Channel GetChannel() const;
 
 private:
     // Internal storage pointer for payload data inside the  packet
     //    This data is freed when either new data is set or the class instance is destroyed.
     std::vector<char> _data;
     // The copter port the packet will be delivered to
-    int _port;
+    Port _port;
     // The copter channel the packet will be delivered to
-    int _channel;
+    Channel _channel;
 
 };
 

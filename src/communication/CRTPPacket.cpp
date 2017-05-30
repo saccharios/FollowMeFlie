@@ -32,14 +32,11 @@
 #include <iostream>
 
 
-CRTPPacket:: CRTPPacket(int port, int channel, std::vector<char> && data) :
+CRTPPacket:: CRTPPacket(Port port, Channel channel, std::vector<char> && data) :
     _data (data),
     _port (port),
     _channel(channel)
-{
-    assert( (_port == 0  || _port == 2 || _port == 3 || _port == 5 || _port == 14 || _port == 15) && "Packet port must be either 0, 2, 3, 5, 14 or 15");
-    assert( (_channel >= 0 && _channel < 4) &&"Packet channel must be either 0, 1 , 2, 3");
-}
+{}
 
 std::vector<char> const & CRTPPacket::GetData() const
 {
@@ -51,7 +48,7 @@ unsigned char * CRTPPacket::SendableData() const
     unsigned char* sendable = new unsigned char[GetSendableDataLength()]();
 
     // Header byte
-    sendable[0] = (_port << 4) | 0b00001100 | (_channel & 0x03);
+    sendable[0] = (static_cast<int>(_port) << 4) | 0b00001100 | (static_cast<int>(_channel) & 0x03);
 
     // Payload
     for(std::size_t i = 0; i < _data.size(); ++i)
@@ -69,12 +66,12 @@ int CRTPPacket::GetSendableDataLength() const
     return _data.size() + 1;//2;
 }
 
-int CRTPPacket::GetPort() const
+Port CRTPPacket::GetPort() const
 {
     return _port;
 }
 
-int CRTPPacket::GetChannel() const
+Channel CRTPPacket::GetChannel() const
 {
     return _channel;
 }
