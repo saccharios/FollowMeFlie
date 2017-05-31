@@ -45,10 +45,7 @@ struct TOCElement {
     int id;
     //The (ref) type of the log element
     int type;
-    //The string group name of the log element
-    std::string group;
-    //The string identifier of the log element
-    std::string identifier;
+    std::string name;
     bool isLogging;
     double value;
 };
@@ -62,10 +59,10 @@ struct LoggingBlock {
 };
 
 
-class CTOC {
+class TOC {
 
 public:
-    CTOC(CrazyRadio & crazyRadio, Port port);
+    TOC(CrazyRadio & crazyRadio, Port port);
 
     bool SendTOCPointerReset();
     bool RequestMetaData();
@@ -73,8 +70,6 @@ public:
 
     struct TOCElement ElementForName(std::string name, bool& found);
     struct TOCElement ElementForID(int id, bool& found);
-    int IdForName(std::string name);
-    int TypeForName(std::string name);
 
     // For loggable variables only
     bool RegisterLoggingBlock(std::string name, double frequency);

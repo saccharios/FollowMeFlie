@@ -219,8 +219,8 @@ private:
     double _sendSetpointPeriod;
     double _setpointLastSent;
     bool _sendsSetpoints;
-    CTOC* _tocParameters;
-    CTOC* _tocLogs;
+    TOC* _tocParameters;
+    TOC* _tocLogs;
     enum State _state;
 
     // Functions

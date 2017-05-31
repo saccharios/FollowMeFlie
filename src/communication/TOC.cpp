@@ -27,19 +27,19 @@
 
 
 #include "TOC.h"
+#include <algorithm>
 
-
-CTOC::CTOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
+TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
 
-bool CTOC::SendTOCPointerReset()
+bool TOC::SendTOCPointerReset()
 {
     std::vector<char> data = {0};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     return  _crazyRadio.SendPacket_2(std::move(packet));
 }
 
-bool CTOC::RequestMetaData()
+bool TOC::RequestMetaData()
 {
     bool retVal = false;
 
@@ -55,17 +55,17 @@ bool CTOC::RequestMetaData()
     return retVal;
 }
 
-bool CTOC::RequestInitialItem()
+bool TOC::RequestInitialItem()
 {
     return RequestItem({0});
 }
 
-bool CTOC::RequestItem(char id)
+bool TOC::RequestItem(char id)
 {
     return RequestItem({0, id});
 }
 
-bool CTOC::RequestItem(std::vector<char> && data)
+bool TOC::RequestItem(std::vector<char> && data)
 {
     CRTPPacket  packet(_port, Channel::TOC, std::move(data));
     auto crtpReceived = _crazyRadio.SendAndReceive(std::move(packet));
@@ -75,7 +75,7 @@ bool CTOC::RequestItem(std::vector<char> && data)
     return retVal;
 }
 
-bool CTOC::RequestItems()
+bool TOC::RequestItems()
 {
     for(int itemNr = 0; itemNr < _itemCount; itemNr++)
     {
@@ -85,7 +85,7 @@ bool CTOC::RequestItems()
     return true;
 }
 
-bool CTOC::ProcessItem(CRTPPacket & packet)
+bool TOC::ProcessItem(CRTPPacket & packet)
 {
     if(packet.GetPort() == _port)
     {
@@ -96,28 +96,26 @@ bool CTOC::ProcessItem(CRTPPacket & packet)
             if(data[1] == 0x0)
             { // Command identification ok?
 
-                std::string strGroup;
+                std::string name;
                 int index;
                 for(index = 4; data[index] != '\0'; index++)
                 {
-                    strGroup += data[index];
+                    name += data[index];
                 }
-
+                name += ".";
                 index++;
-                std::string strIdentifier;
                 for(; data[index] != '\0'; index++)
                 {
-                    strIdentifier += data[index];
+                    name += data[index];
                 }
 
-                TOCElement teNew;
-                teNew.identifier = strIdentifier;
-                teNew.group = strGroup;
-                teNew.id = data[2];
-                teNew.type = data[3];
-                teNew.isLogging = false;
-                teNew.value = 0;
-                _TOCElements.emplace_back(teNew);
+                TOCElement tocElement;
+                tocElement.name = name;
+                tocElement.id = data[2];
+                tocElement.type = data[3];
+                tocElement.isLogging = false;
+                tocElement.value = 0;
+                _TOCElements.emplace_back(tocElement);
 
                 return true;
             }
@@ -127,7 +125,7 @@ bool CTOC::ProcessItem(CRTPPacket & packet)
     return false;
 }
 
-struct TOCElement CTOC::ElementForName(std::string name, bool& found)
+struct TOCElement TOC::ElementForName(std::string name, bool& found)
 {
 
     for(std::list<TOCElement>::iterator itElement = _TOCElements.begin();
@@ -136,7 +134,7 @@ struct TOCElement CTOC::ElementForName(std::string name, bool& found)
     {
         TOCElement teCurrent = *itElement;
 
-        std::string tempFullName = teCurrent.group + "." + teCurrent.identifier;
+        std::string tempFullName = teCurrent.name;
         if(name == tempFullName)
         {
             found = true;
@@ -150,7 +148,7 @@ struct TOCElement CTOC::ElementForName(std::string name, bool& found)
     return teEmpty;
 }
 
-struct TOCElement CTOC::ElementForID(int id, bool& found)
+struct TOCElement TOC::ElementForID(int id, bool& found)
 {
     for(std::list<struct TOCElement>::iterator itElement = _TOCElements.begin();
         itElement != _TOCElements.end();
@@ -171,41 +169,14 @@ struct TOCElement CTOC::ElementForID(int id, bool& found)
     return teEmpty;
 }
 
-int CTOC::IdForName(std::string name)
+
+bool TOC::StartLogging(std::string name, std::string blockName)
 {
     bool found;
-
-    struct TOCElement teResult = this->ElementForName(name, found);
-
+    LoggingBlock currentLogBlock = LoggingBlockForName(blockName, found);
     if(found)
     {
-        return teResult.id;
-    }
-
-    return -1;
-}
-
-int CTOC::TypeForName(std::string name)
-{
-    bool found;
-
-    struct TOCElement teResult = this->ElementForName(name, found);
-
-    if(found)
-    {
-        return teResult.type;
-    }
-
-    return -1;
-}
-
-bool CTOC::StartLogging(std::string name, std::string blockName)
-{
-    bool found;
-    struct LoggingBlock currentLogBlock = this->LoggingBlockForName(blockName, found);
-    if(found)
-    {
-        struct TOCElement teCurrent = this->ElementForName(name, found);
+        TOCElement teCurrent = ElementForName(name, found);
         if(found)
         {
             std::vector<char> data = {0x01, currentLogBlock.id, teCurrent.type, teCurrent.id};
@@ -213,22 +184,16 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
 
             auto const & dataReceived = received->GetData();
-            bool created = false;
-            if(dataReceived[1] == 0x01 &&
+            if(     dataReceived[1] == 0x01 &&
                     dataReceived[2] == currentLogBlock.id &&
-                    dataReceived[3] == 0x00) {
-                created = true;
+                    dataReceived[3] == 0x00)
+            {
+                AddElementToBlock(currentLogBlock.id, teCurrent.id);
+                return true;
             }
             else
             {
                 std::cout << dataReceived[3] << std::endl;
-            }
-
-            if(created)
-            {
-                this->AddElementToBlock(currentLogBlock.id, teCurrent.id);
-
-                return true;
             }
         }
     }
@@ -236,7 +201,7 @@ bool CTOC::StartLogging(std::string name, std::string blockName)
     return false;
 }
 
-bool CTOC::AddElementToBlock(int blockID, int elementID)
+bool TOC::AddElementToBlock(int blockID, int elementID)
 {
     for(std::list<struct LoggingBlock>::iterator itBlock = _loggingBlocks.begin();
         itBlock != _loggingBlocks.end();
@@ -255,15 +220,15 @@ bool CTOC::AddElementToBlock(int blockID, int elementID)
     return false;
 }
 
-bool CTOC::StopLogging(std::string name) {
+bool TOC::StopLogging(std::string name) {
     // TODO: Implement me.
 }
 
-bool CTOC::IsLogging(std::string name) {
+bool TOC::IsLogging(std::string name) {
     // TODO: Implement me.
 }
 
-double CTOC::DoubleValue(std::string name) {
+double TOC::DoubleValue(std::string name) {
     bool found;
 
     TOCElement result = this->ElementForName(name, found);
@@ -275,7 +240,7 @@ double CTOC::DoubleValue(std::string name) {
     return 0;
 }
 
-struct LoggingBlock CTOC::LoggingBlockForName(std::string name, bool& found)
+struct LoggingBlock TOC::LoggingBlockForName(std::string name, bool& found)
 {
     for(std::list<struct LoggingBlock>::iterator itBlock = _loggingBlocks.begin();
         itBlock != _loggingBlocks.end();
@@ -294,7 +259,7 @@ struct LoggingBlock CTOC::LoggingBlockForName(std::string name, bool& found)
     return lbEmpty;
 }
 
-struct LoggingBlock CTOC::LoggingBlockForID(int id, bool& found)
+struct LoggingBlock TOC::LoggingBlockForID(int id, bool& found)
 {
     for(std::list<struct LoggingBlock>::iterator block = _loggingBlocks.begin();
         block != _loggingBlocks.end();
@@ -315,7 +280,7 @@ struct LoggingBlock CTOC::LoggingBlockForID(int id, bool& found)
     return lbEmpty;
 }
 
-bool CTOC::RegisterLoggingBlock(std::string name, double frequency)
+bool TOC::RegisterLoggingBlock(std::string name, double frequency)
 {
     int id = 0;
     bool found;
@@ -372,11 +337,11 @@ bool CTOC::RegisterLoggingBlock(std::string name, double frequency)
     return false;
 }
 
-bool CTOC::EnableLogging(std::string lockName)
+bool TOC::EnableLogging(std::string lockName)
 {
     bool found;
 
-    struct LoggingBlock currenLogBlock = this->LoggingBlockForName(lockName, found);
+    LoggingBlock currenLogBlock = LoggingBlockForName(lockName, found);
     if(found)
     {
         double d10thOfMS = (1 / currenLogBlock.frequency) * 1000 * 10;
@@ -384,7 +349,7 @@ bool CTOC::EnableLogging(std::string lockName)
 
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
-       auto crtpReceived = _crazyRadio.SendAndReceive(std::move(enablePacket));
+       auto crtpReceived = _crazyRadio.SendAndReceive(std::move(enablePacket)); // TODO why send and recevie when receivec packet is not used?
 
         return true;
     }
@@ -392,7 +357,7 @@ bool CTOC::EnableLogging(std::string lockName)
     return false;
 }
 
-bool CTOC::UnregisterLoggingBlock(std::string name)
+bool TOC::UnregisterLoggingBlock(std::string name)
 {
     bool found;
 
@@ -405,7 +370,7 @@ bool CTOC::UnregisterLoggingBlock(std::string name)
     return false;
 }
 
-bool CTOC::UnregisterLoggingBlockID(int id)
+bool TOC::UnregisterLoggingBlockID(int id)
 {
     std::vector<char> data = {0x02, static_cast<char>(id)};
     CRTPPacket unregisterBlock(_port, Channel::Settings, std::move(data));
@@ -415,7 +380,7 @@ bool CTOC::UnregisterLoggingBlockID(int id)
     return (received != nullptr);
 }
 
-void CTOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
+void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
 {
     if(packets.size() > 0)
     {
@@ -433,14 +398,14 @@ void CTOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
 
             int blockID = data[1];
             bool found;
-            LoggingBlock currentLogBlock = this->LoggingBlockForID(blockID, found);
+            LoggingBlock currentLogBlock = LoggingBlockForID(blockID, found);
             if(found)
             {
                 while(index < currentLogBlock.elementIDs.size())
                 {
-                    int elementID = this->ElementIDinBlock(blockID, index);
+                    int elementID = ElementIDinBlock(blockID, index);
                     bool found2;
-                    TOCElement teCurrent = this->ElementForID(elementID, found2);
+                    TOCElement teCurrent = ElementForID(elementID, found2);
 
                     if(found2)
                     {
@@ -547,7 +512,7 @@ void CTOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
     }
 }
 
-int CTOC::ElementIDinBlock(int blockID, int elementIndex)
+int TOC::ElementIDinBlock(int blockID, int elementIndex)
 {
     bool found;
 
@@ -564,7 +529,7 @@ int CTOC::ElementIDinBlock(int blockID, int elementIndex)
     return -1;
 }
 
-bool CTOC::SetFloatValueForElementID(int elementID, float value)
+bool TOC::SetFloatValueForElementID(int elementID, float value)
 {
     int nIndex = 0;
     for(std::list<struct TOCElement>::iterator itElement = _TOCElements.begin();

@@ -47,8 +47,8 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
     _sendsSetpoints = false;
 
     // TODO Why are they dynamically allocated?
-    _tocParameters = new CTOC(_crazyRadio, Port::Parameters);
-    _tocLogs = new CTOC(_crazyRadio, Port::Log);
+    _tocParameters = new TOC(_crazyRadio, Port::Parameters);
+    _tocLogs = new TOC(_crazyRadio, Port::Log);
 
     _state = STATE_ZERO;
 
