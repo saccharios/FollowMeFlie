@@ -116,7 +116,6 @@ bool TOC::ProcessItem(CRTPPacket & packet)
                 tocElement.isLogging = false;
                 tocElement.value = 0;
                 _TOCElements.emplace_back(tocElement);
-
                 return true;
             }
         }
@@ -125,27 +124,13 @@ bool TOC::ProcessItem(CRTPPacket & packet)
     return false;
 }
 
-struct TOCElement TOC::ElementForName(std::string name, bool& found)
+TOCElement & TOC::ElementForName(std::string name, bool & found)
 {
+    std::vector<TOCElement>::iterator element =  std::find_if (_TOCElements.begin(), _TOCElements.end(),
+                                                               [=](auto const & element){return element.name == name;});
+     found = (element != _TOCElements.end() );
+     return *element;
 
-    for(auto itElement = _TOCElements.begin();
-        itElement != _TOCElements.end();
-        itElement++)
-    {
-        TOCElement teCurrent = *itElement;
-
-        std::string tempFullName = teCurrent.name;
-        if(name == tempFullName)
-        {
-            found = true;
-            return teCurrent;
-        }
-    }
-
-    found = false;
-    struct TOCElement teEmpty;
-
-    return teEmpty;
 }
 
 TOCElement & TOC::ElementForID(int id, bool & found)
@@ -173,10 +158,10 @@ bool TOC::StartLogging(std::string name, std::string blockName)
     LoggingBlock currentLogBlock = LoggingBlockForName(blockName, found);
     if(found)
     {
-        TOCElement teCurrent = ElementForName(name, found);
+        auto & element = ElementForName(name, found);
         if(found)
         {
-            std::vector<char> data = {0x01, currentLogBlock.id, teCurrent.type, teCurrent.id};
+            std::vector<char> data = {0x01, currentLogBlock.id, element.type, element.id};
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
 
@@ -185,7 +170,7 @@ bool TOC::StartLogging(std::string name, std::string blockName)
                     dataReceived[2] == currentLogBlock.id &&
                     dataReceived[3] == 0x00)
             {
-                AddElementToBlock(currentLogBlock.id, teCurrent.id);
+                AddElementToBlock(currentLogBlock.id, element.id);
                 return true;
             }
             else
@@ -225,16 +210,12 @@ bool TOC::IsLogging(std::string name) {
     // TODO: Implement me.
 }
 
-double TOC::DoubleValue(std::string name) {
+double TOC::DoubleValue(std::string name)
+{
     bool found;
 
-    TOCElement result = this->ElementForName(name, found);
-    if(found)
-    {
-        return result.value;
-    }
-
-    return 0;
+    auto & result = ElementForName(name, found);
+    return (found ? result.value : 0);
 }
 
 struct LoggingBlock TOC::LoggingBlockForName(std::string name, bool& found)
