@@ -57,14 +57,12 @@ bool CTOC::RequestMetaData()
 
 bool CTOC::RequestInitialItem()
 {
-    std::vector<char> data = {0};
-    return RequestItem(std::move(data));
+    return RequestItem({0});
 }
 
 bool CTOC::RequestItem(char id)
 {
-    std::vector<char> data = {0, id};
-    return RequestItem(std::move(data));
+    return RequestItem({0, id});
 }
 
 bool CTOC::RequestItem(std::vector<char> && data)

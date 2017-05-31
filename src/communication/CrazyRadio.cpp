@@ -90,17 +90,16 @@ std::vector<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
     libusb_device** pdevices;
 
     count = libusb_get_device_list(_context, &pdevices);
-    for(unsigned int unI = 0; unI < count; unI++)
+    for(unsigned int i = 0; i < count; i++)
     {
-        libusb_device *devCurrent = pdevices[unI];
         libusb_device_descriptor ddDescriptor;
 
-        libusb_get_device_descriptor(devCurrent, &ddDescriptor);
+        libusb_get_device_descriptor(pdevices[i], &ddDescriptor);
 
         if(ddDescriptor.idVendor == vendorID && ddDescriptor.idProduct == productID)
         {
-            libusb_ref_device(devCurrent);
-            devices.emplace_back(devCurrent);
+            libusb_ref_device(pdevices[i]);
+            devices.emplace_back(pdevices[i]);
         }
     }
 
@@ -478,8 +477,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
     sptrPacket received = nullptr;
     while(received == nullptr) // TODO SF Potential infinite loop
     {
-        CRTPPacket pingPacket(Port::Console,Channel::TOC,{static_cast<char>(0xff)});
-        received = SendPacket(std::move(pingPacket));
+        received = SendPacket({Port::Console,Channel::TOC,{static_cast<char>(0xff)}});
     }
     return received;
 }
@@ -495,7 +493,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket)
     {
         if(resendCounter == 0)
         {
-            received = SendPacket(std::move(sendPacket));
+            received = SendPacket(std::move(sendPacket)); // TODO How is it possible to be moved from multiple times???
             resendCounter = retries;
         }
         else
@@ -503,13 +501,16 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket)
             --resendCounter;
             received = WaitForPacket();
         }
-        std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
         if(received)
         {
             if(received->GetPort() == sendPacket.GetPort() && received->GetChannel() == sendPacket.GetChannel())
             {
                 go_on = false;
             }
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
         }
     }
     return received;
@@ -524,8 +525,7 @@ std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    CRTPPacket pingPacket(Port::Console,Channel::TOC,{static_cast<char>(0xff)});
-    return SendPacket_2(std::move(pingPacket));
+    return SendPacket_2({Port::Console,Channel::TOC,{static_cast<char>(0xff)}});
 }
 
 bool CrazyRadio::RadioIsConnected() const
