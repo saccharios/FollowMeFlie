@@ -128,7 +128,7 @@ bool TOC::ProcessItem(CRTPPacket & packet)
 struct TOCElement TOC::ElementForName(std::string name, bool& found)
 {
 
-    for(std::list<TOCElement>::iterator itElement = _TOCElements.begin();
+    for(auto itElement = _TOCElements.begin();
         itElement != _TOCElements.end();
         itElement++)
     {
@@ -148,27 +148,24 @@ struct TOCElement TOC::ElementForName(std::string name, bool& found)
     return teEmpty;
 }
 
-struct TOCElement TOC::ElementForID(int id, bool& found)
+TOCElement & TOC::ElementForID(int id, bool & found)
 {
-    for(std::list<struct TOCElement>::iterator itElement = _TOCElements.begin();
-        itElement != _TOCElements.end();
-        itElement++)
-    {
-        struct TOCElement teCurrent = *itElement;
-
-        if(id == teCurrent.id)
-        {
-            found = true;
-            return teCurrent;
-        }
-    }
-
-    found = false;
-    struct TOCElement teEmpty;
-
-    return teEmpty;
+    std::vector<TOCElement>::iterator element =  std::find_if (_TOCElements.begin(), _TOCElements.end(),
+                                                               [=](auto const & element){return element.id == id;});
+     found = (element != _TOCElements.end() );
+     return *element;
 }
 
+
+void TOC::SetFloatValueForElementID(int elementID, float value)
+{
+    bool isContained = false;
+    auto & element = ElementForID(elementID, isContained);
+    if(isContained)
+    {
+        element.value = value;
+    }
+}
 
 bool TOC::StartLogging(std::string name, std::string blockName)
 {
@@ -494,9 +491,9 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                         } break;
                         }
 
-                        this->SetFloatValueForElementID(elementID, value);
+                        SetFloatValueForElementID(elementID, value);
                         offset += byteLength;
-                        index++;
+                        ++index;
                     }
                     else
                     {
@@ -525,26 +522,8 @@ int TOC::ElementIDinBlock(int blockID, int elementIndex)
             return *itID;
         }
     }
-
+    std::cout << "oioi\n";
     return -1;
 }
 
-bool TOC::SetFloatValueForElementID(int elementID, float value)
-{
-    int nIndex = 0;
-    for(std::list<struct TOCElement>::iterator itElement = _TOCElements.begin();
-        itElement != _TOCElements.end();
-        itElement++, nIndex++)
-    {
-        struct TOCElement teCurrent = *itElement;
 
-        if(teCurrent.id == elementID)
-        {
-            teCurrent.value = value; // We store floats as doubles
-            (*itElement) = teCurrent;
-            return true;
-        }
-    }
-
-    return false;
-}

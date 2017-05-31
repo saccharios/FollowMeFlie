@@ -68,8 +68,8 @@ public:
     bool RequestMetaData();
     bool RequestItems();
 
-    struct TOCElement ElementForName(std::string name, bool& found);
-    struct TOCElement ElementForID(int id, bool& found);
+    TOCElement ElementForName(std::string name, bool& found);
+    TOCElement & ElementForID(int id, bool& found);
 
     // For loggable variables only
     bool RegisterLoggingBlock(std::string name, double frequency);
@@ -87,15 +87,13 @@ public:
 
     void ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets);
 
-    int ElementIDinBlock(int blockID, int elementIndex);
-    bool SetFloatValueForElementID(int elementID, float value);
     bool AddElementToBlock(int blockID, int elementID);
     bool UnregisterLoggingBlockID(int id);
 private:
     CrazyRadio & _crazyRadio;
     Port _port;
     uint8_t _itemCount;
-    std::list<TOCElement> _TOCElements; // TODO Can be a map with string "name" as key.
+    std::vector<TOCElement> _TOCElements;
     std::list<LoggingBlock> _loggingBlocks;
 
     bool RequestInitialItem();
@@ -103,6 +101,8 @@ private:
     bool RequestItem(char id);
     bool ProcessItem(CRTPPacket & packet);
 
+    int ElementIDinBlock(int blockID, int elementIndex);
+    void SetFloatValueForElementID(int elementID, float value);
 };
 
 
