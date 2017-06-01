@@ -353,130 +353,123 @@ bool TOC::UnregisterLoggingBlockID(int id)
 
 void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
 {
-    if(packets.size() > 0)
+    for(auto const & packet : packets)
     {
-        for(std::vector<CrazyRadio::sptrPacket>::iterator itPacket = packets.begin();
-            itPacket != packets.end();
-            itPacket++)
+        auto const & data = packet->GetData();
+
+        char const * logdata = &data[5];
+        int offset = 0;
+        int index = 0;
+
+        int blockID = data[1];
+        bool found;
+        LoggingBlock currentLogBlock = LoggingBlockForID(blockID, found);
+        if(found)
         {
-            auto packet = *itPacket;
-
-            auto const & data = packet->GetData();
-
-            char const * logdata = &data[5];
-            int offset = 0;
-            int index = 0;
-
-            int blockID = data[1];
-            bool found;
-            LoggingBlock currentLogBlock = LoggingBlockForID(blockID, found);
-            if(found)
+            while(index < currentLogBlock.elementIDs.size())
             {
-                while(index < currentLogBlock.elementIDs.size())
+                int elementID = ElementIDinBlock(blockID, index);
+                bool found2;
+                TOCElement teCurrent = ElementForID(elementID, found2);
+
+                if(found2)
                 {
-                    int elementID = ElementIDinBlock(blockID, index);
-                    bool found2;
-                    TOCElement teCurrent = ElementForID(elementID, found2);
+                    int byteLength = 0;
 
-                    if(found2)
+                    // NOTE(winkler): We just copy over the incoming bytes in
+                    // their according data structures and afterwards assign
+                    // the value to fValue. This way, we let the compiler to
+                    // the magic of conversion.
+                    float value = 0;
+                    switch(teCurrent.type)
                     {
-                        int byteLength = 0;
+                    case 1: // TODO SF Use enum class
+                    { // UINT8
+                        byteLength = 1;
+                        uint8_t uint8Value;
+                        memcpy(&uint8Value, &logdata[offset], byteLength); // TODO Replace memcpy.....
+                        value = uint8Value;
+                    } break;
 
-                        // NOTE(winkler): We just copy over the incoming bytes in
-                        // their according data structures and afterwards assign
-                        // the value to fValue. This way, we let the compiler to
-                        // the magic of conversion.
-                        float value = 0;
-                        switch(teCurrent.type)
-                        {
-                        case 1: // TODO SF Use enum class
-                        { // UINT8
-                            byteLength = 1;
-                            uint8_t uint8Value;
-                            memcpy(&uint8Value, &logdata[offset], byteLength);
-                            value = uint8Value;
-                        } break;
+                    case 2:
+                    { // UINT16
+                        byteLength = 2;
+                        uint16_t uint16Value;
+                        memcpy(&uint16Value, &logdata[offset], byteLength);
+                        value = uint16Value;
+                    } break;
 
-                        case 2:
-                        { // UINT16
-                            byteLength = 2;
-                            uint16_t uint16Value;
-                            memcpy(&uint16Value, &logdata[offset], byteLength);
-                            value = uint16Value;
-                        } break;
+                    case 3:
+                    { // UINT32
+                        byteLength = 4;
+                        uint32_t uint32Value;
+                        memcpy(&uint32Value, &logdata[offset], byteLength);
+                        value = uint32Value;
+                    } break;
 
-                        case 3:
-                        { // UINT32
-                            byteLength = 4;
-                            uint32_t uint32Value;
-                            memcpy(&uint32Value, &logdata[offset], byteLength);
-                            value = uint32Value;
-                        } break;
+                    case 4:
+                    { // INT8
+                        byteLength = 1;
+                        int8_t int8Value;
+                        memcpy(&int8Value, &logdata[offset], byteLength);
+                        value = int8Value;
+                    } break;
 
-                        case 4:
-                        { // INT8
-                            byteLength = 1;
-                            int8_t int8Value;
-                            memcpy(&int8Value, &logdata[offset], byteLength);
-                            value = int8Value;
-                        } break;
+                    case 5:
+                    { // INT16
+                        byteLength = 2;
+                        int16_t int16Value;
+                        memcpy(&int16Value, &logdata[offset], byteLength);
+                        value = int16Value;
+                    } break;
 
-                        case 5:
-                        { // INT16
-                            byteLength = 2;
-                            int16_t int16Value;
-                            memcpy(&int16Value, &logdata[offset], byteLength);
-                            value = int16Value;
-                        } break;
+                    case 6:
+                    { // INT32
+                        byteLength = 4;
+                        int32_t int32Value;
+                        memcpy(&int32Value, &logdata[offset], byteLength);
+                        value = int32Value;
+                    } break;
 
-                        case 6:
-                        { // INT32
-                            byteLength = 4;
-                            int32_t int32Value;
-                            memcpy(&int32Value, &logdata[offset], byteLength);
-                            value = int32Value;
-                        } break;
+                    case 7:
+                    { // FLOAT
+                        byteLength = 4;
+                        memcpy(&value, &logdata[offset], byteLength);
+                    } break;
 
-                        case 7:
-                        { // FLOAT
-                            byteLength = 4;
-                            memcpy(&value, &logdata[offset], byteLength);
-                        } break;
+                    case 8:
+                    { // FP16
+                        // NOTE(winkler): This is untested code (as no FP16
+                        // variable gets advertised yet). This has to be tested
+                        // and is to be used carefully. I will do that as soon
+                        // as I find time for it.
+                        byteLength = 2;
+                        char cBuffer1[byteLength];
+                        char cBuffer2[4];
+                        memcpy(cBuffer1, &logdata[offset], byteLength);
+                        cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
+                        cBuffer2[1] = 0;
+                        cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
+                        cBuffer2[3] = cBuffer1[1];
+                        memcpy(&value, cBuffer2, 4); // Put it into the float variable
+                    } break;
 
-                        case 8:
-                        { // FP16
-                            // NOTE(winkler): This is untested code (as no FP16
-                            // variable gets advertised yet). This has to be tested
-                            // and is to be used carefully. I will do that as soon
-                            // as I find time for it.
-                            byteLength = 2;
-                            char cBuffer1[byteLength];
-                            char cBuffer2[4];
-                            memcpy(cBuffer1, &logdata[offset], byteLength);
-                            cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
-                            cBuffer2[1] = 0;
-                            cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
-                            cBuffer2[3] = cBuffer1[1];
-                            memcpy(&value, cBuffer2, 4); // Put it into the float variable
-                        } break;
-
-                        default:
-                        { // Unknown. This hopefully never happens.
-                        } break;
-                        }
-
-                        SetFloatValueForElementID(elementID, value);
-                        offset += byteLength;
-                        ++index;
+                    default:
+                    { // Unknown. This hopefully never happens.
+                    } break;
                     }
-                    else
-                    {
-                        std::cerr << "Didn't find element ID " << elementID
-                                  << " in block ID " << blockID
-                                  << " while parsing incoming logging data." << std::endl;
-                        std::cerr << "This REALLY shouldn't be happening!" << std::endl;
-                        std::exit(-1);
-                    }
+
+                    SetFloatValueForElementID(elementID, value);
+                    offset += byteLength;
+                    ++index;
+                }
+                else
+                {
+                    std::cerr << "Didn't find element ID " << elementID
+                              << " in block ID " << blockID
+                              << " while parsing incoming logging data." << std::endl;
+                    std::cerr << "This REALLY shouldn't be happening!" << std::endl;
+                    std::exit(-1);
                 }
             }
         }
