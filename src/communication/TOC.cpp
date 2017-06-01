@@ -216,7 +216,7 @@ double TOC::DoubleValue(std::string name)
     return (found ? result.value : 0);
 }
 
-struct LoggingBlock TOC::LoggingBlockForName(std::string name, bool& found)
+struct LoggingBlock TOC::LoggingBlockForName(std::string name, bool& found) // TODO Logging Block and TOC function can be generalized  one logging Block is a vector
 {
     for(std::list<struct LoggingBlock>::iterator itBlock = _loggingBlocks.begin();
         itBlock != _loggingBlocks.end();
@@ -235,7 +235,7 @@ struct LoggingBlock TOC::LoggingBlockForName(std::string name, bool& found)
     return lbEmpty;
 }
 
-struct LoggingBlock TOC::LoggingBlockForID(int id, bool& found)
+struct LoggingBlock TOC::LoggingBlockForID(int id, bool& found) // TODO Logging Block and TOC function can be generalized  one logging Block is a vector
 {
     for(std::list<struct LoggingBlock>::iterator block = _loggingBlocks.begin();
         block != _loggingBlocks.end();
@@ -263,15 +263,15 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
 
     if(frequency > 0)
     { // Only do it if a valid frequency > 0 is given
-        this->LoggingBlockForName(name, found);
+        LoggingBlockForName(name, found);
         if(found)
         {
-            this->UnregisterLoggingBlock(name);
+            UnregisterLoggingBlock(name);
         }
 
         do
         {
-            this->LoggingBlockForID(id, found);
+            LoggingBlockForID(id, found);
 
             if(found)
             {
@@ -279,7 +279,7 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
             }
         } while(found);
 
-        this->UnregisterLoggingBlockID(id);
+        UnregisterLoggingBlockID(id);
 
         double d10thOfMS = (1 / frequency) * 1000 * 10;
         std::vector<char> data =  {0x00, id, d10thOfMS};
@@ -288,17 +288,11 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
         auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
 
         auto const & dataReceived = received->GetData();
-        bool bCreateOK = false;
         if(dataReceived[1] == 0x00 &&
                 dataReceived[2] == id &&
                 dataReceived[3] == 0x00)
         {
-            bCreateOK = true;
             std::cout << "Registered logging block `" << name << "'" << std::endl;
-        }
-
-        if(bCreateOK)
-        {
             LoggingBlock lbNew;
             lbNew.name = name;
             lbNew.id = id;
@@ -325,7 +319,8 @@ bool TOC::EnableLogging(std::string lockName)
 
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
-       auto crtpReceived = _crazyRadio.SendAndReceive(std::move(enablePacket)); // TODO why send and recevie when receivec packet is not used?
+        // Use SendAndReceive to make sure the crazyflie is ready.
+       _crazyRadio.SendAndReceive(std::move(enablePacket));
 
         return true;
     }
@@ -337,10 +332,10 @@ bool TOC::UnregisterLoggingBlock(std::string name)
 {
     bool found;
 
-    struct LoggingBlock lbCurrent = this->LoggingBlockForName(name, found);
+    LoggingBlock lbCurrent = LoggingBlockForName(name, found);
     if(found)
     {
-        return this->UnregisterLoggingBlockID(lbCurrent.id);
+        return UnregisterLoggingBlockID(lbCurrent.id);
     }
 
     return false;
@@ -488,7 +483,7 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
     }
 }
 
-int TOC::ElementIDinBlock(int blockID, int elementIndex)
+int TOC::ElementIDinBlock(int blockID, int elementIndex) // TODO use a lambda ?
 {
     bool found;
 
@@ -501,7 +496,6 @@ int TOC::ElementIDinBlock(int blockID, int elementIndex)
             return *itID;
         }
     }
-    std::cout << "oioi\n";
     return -1;
 }
 
