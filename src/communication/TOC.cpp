@@ -66,9 +66,11 @@ bool TOC::RequestItems()
 {
     for(unsigned char itemNr = 0; itemNr < _itemCount; itemNr++)
     {
-        RequestItem(itemNr);
+        if( ! RequestItem(itemNr)) // If any of the requested items fail, return false
+        {
+            return false;
+        }
     }
-
     return true;
 }
 
