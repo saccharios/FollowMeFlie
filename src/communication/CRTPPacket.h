@@ -79,7 +79,7 @@ public:
     //      virtual ~CRTPPacket() { }                     // Destructor
 
 
-    std::vector<char> const & GetData() const;
+    std::vector<char> const & GetData() const; // TODO char sould be unsigned char, or uint8_t
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header

@@ -41,8 +41,6 @@ bool TOC::SendTOCPointerReset()
 
 bool TOC::RequestMetaData()
 {
-    bool retVal = false;
-
     std::vector<char> data = {1};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     auto received = _crazyRadio.SendAndReceive(std::move(packet));
@@ -50,9 +48,9 @@ bool TOC::RequestMetaData()
     if(received->GetData()[1] == 0x01)
     {
         _itemCount = received->GetData()[2]; // is usually 0x81 == 129 decimal
-        retVal = true;
+        return  true;
     }
-    return retVal;
+    return false;
 }
 
 bool TOC::RequestInitialItem()
@@ -60,24 +58,13 @@ bool TOC::RequestInitialItem()
     return RequestItem({0});
 }
 
-bool TOC::RequestItem(char id)
+bool TOC::RequestItem(unsigned char id)
 {
     return RequestItem({0, id});
 }
-
-bool TOC::RequestItem(std::vector<char> && data)
-{
-    CRTPPacket  packet(_port, Channel::TOC, std::move(data));
-    auto crtpReceived = _crazyRadio.SendAndReceive(std::move(packet));
-
-    bool retVal = this->ProcessItem(*crtpReceived);
-
-    return retVal;
-}
-
 bool TOC::RequestItems()
 {
-    for(int itemNr = 0; itemNr < _itemCount; itemNr++)
+    for(unsigned char itemNr = 0; itemNr < _itemCount; itemNr++)
     {
         RequestItem(itemNr);
     }
@@ -85,28 +72,38 @@ bool TOC::RequestItems()
     return true;
 }
 
-bool TOC::ProcessItem(CRTPPacket & packet)
+bool TOC::RequestItem(std::vector<char> && data)
 {
-    if(packet.GetPort() == _port)
+    CRTPPacket  packet(_port, Channel::TOC, std::move(data));
+    auto received = _crazyRadio.SendAndReceive(std::move(packet));
+
+    return ProcessItem(std::move(received));
+
+}
+
+
+bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
+{
+    if(packet->GetPort() == _port && packet->GetChannel() == Channel::TOC)
     {
-        if(packet.GetChannel() == Channel::TOC)
-        {
-            auto const & data = packet.GetData();
+            auto const & data = packet->GetData();
 
             if(data[1] == 0x0)
             { // Command identification ok?
 
                 std::string name;
-                int index;
-                for(index = 4; data[index] != '\0'; index++)
+                int index = 4;
+                while(data[index] != '\0')
                 {
                     name += data[index];
+                    ++index;
                 }
                 name += ".";
-                index++;
-                for(; data[index] != '\0'; index++)
+                ++index;
+                while(data[index] != '\0')
                 {
                     name += data[index];
+                    ++index;
                 }
 
                 TOCElement tocElement;
@@ -117,7 +114,6 @@ bool TOC::ProcessItem(CRTPPacket & packet)
                 tocElement.value = 0;
                 _TOCElements.emplace_back(tocElement);
                 return true;
-            }
         }
     }
 

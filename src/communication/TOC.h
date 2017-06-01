@@ -98,8 +98,8 @@ private:
 
     bool RequestInitialItem();
     bool RequestItem(std::vector<char> && data);
-    bool RequestItem(char id);
-    bool ProcessItem(CRTPPacket & packet);
+    bool RequestItem(unsigned char id);
+    bool ProcessItem(CrazyRadio::sptrPacket && packet);
 
     int ElementIDinBlock(int blockID, int elementIndex);
     void SetFloatValueForElementID(int elementID, float value);
