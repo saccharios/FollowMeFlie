@@ -9,10 +9,12 @@ INCLUDEPATH += test/src
 INCLUDEPATH += src
 
 SOURCES += src/test_main.cpp \
-    src/crtppacket_test.cpp
+    src/crtppacket_test.cpp \
+    src/stlutils_test.cpp
 
 HEADERS  += \
-    src/crtppacket_test.h
+    src/crtppacket_test.h \
+    src/stlutils_test.h
 
 # Include Google Test
 goolgetest_path = E:/Code/GTest
