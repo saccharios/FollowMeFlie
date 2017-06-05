@@ -27,8 +27,7 @@
 
 
 #include "TOC.h"
-#include <algorithm>
-
+#include<stl_utils.h>
 TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
 
@@ -122,28 +121,11 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
     return false;
 }
 
-TOCElement & TOC::ElementForName(std::string name, bool & found)
-{
-    std::vector<TOCElement>::iterator element =  std::find_if (_TOCElements.begin(), _TOCElements.end(),
-                                                               [=](auto const & element){return element.name == name;});
-     found = (element != _TOCElements.end() );
-     return *element;
-
-}
-
-TOCElement & TOC::ElementForID(int id, bool & found)
-{
-    std::vector<TOCElement>::iterator element =  std::find_if (_TOCElements.begin(), _TOCElements.end(),
-                                                               [=](auto const & element){return element.id == id;});
-     found = (element != _TOCElements.end() );
-     return *element;
-}
-
 
 void TOC::SetFloatValueForElementID(int elementID, float value)
 {
     bool isContained = false;
-    auto & element = ElementForID(elementID, isContained);
+    auto & element = STLUtils::ElementForID(_TOCElements, elementID, isContained);
     if(isContained)
     {
         element.value = value;
@@ -152,12 +134,12 @@ void TOC::SetFloatValueForElementID(int elementID, float value)
 
 bool TOC::StartLogging(std::string name, std::string blockName)
 {
-    bool found;
-    LoggingBlock currentLogBlock = LoggingBlockForName(blockName, found);
-    if(found)
+    bool isContained;
+    LoggingBlock currentLogBlock = LoggingBlockForName(blockName, isContained);
+    if(isContained)
     {
-        auto & element = ElementForName(name, found);
-        if(found)
+        auto & element = STLUtils::ElementForName(_TOCElements, name, isContained);
+        if(isContained)
         {
             std::vector<char> data = {0x01, currentLogBlock.id, element.type, element.id};
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
@@ -212,7 +194,7 @@ double TOC::DoubleValue(std::string name)
 {
     bool found;
 
-    auto & result = ElementForName(name, found);
+    auto & result = STLUtils::ElementForName(_TOCElements, name, found);
     return (found ? result.value : 0);
 }
 
@@ -370,7 +352,7 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
             {
                 int elementID = ElementIDinBlock(blockID, index);
                 bool found2;
-                TOCElement teCurrent = ElementForID(elementID, found2);
+                TOCElement teCurrent = STLUtils::ElementForID(_TOCElements, elementID, found2);
 
                 if(found2)
                 {

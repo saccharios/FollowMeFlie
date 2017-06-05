@@ -68,9 +68,6 @@ public:
     bool RequestMetaData();
     bool RequestItems();
 
-    TOCElement & ElementForName(std::string name, bool& found);
-    TOCElement & ElementForID(int id, bool& found);
-
     // For loggable variables only
     bool RegisterLoggingBlock(std::string name, double frequency);
     bool UnregisterLoggingBlock(std::string name);
