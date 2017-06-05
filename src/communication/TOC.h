@@ -55,7 +55,7 @@ struct LoggingBlock {
     std::string name;
     int id;
     double frequency;
-    std::list<int> elementIDs;
+    std::vector<int> elementIDs;
 };
 
 
@@ -96,7 +96,6 @@ private:
     bool RequestItem(unsigned char id);
     bool ProcessItem(CrazyRadio::sptrPacket && packet);
 
-    int ElementIDinBlock(int blockID, int elementIndex);
     void SetFloatValueForElementID(int elementID, float value);
 };
 

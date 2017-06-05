@@ -295,19 +295,17 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
         auto const & data = packet->GetData();
 
         char const * logdata = &data[5];
-        int offset = 0;
-        int index = 0;
 
         int blockID = data[1];
         bool found;
-        auto const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
+        LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
         if(found)
         {
-            while(index < logBlock.elementIDs.size())
+            int offset = 0;
+            for(auto const & elementID : logBlock.elementIDs )
             {
-                int elementID = ElementIDinBlock(blockID, index);
                 bool found2;
-                auto const & element = STLUtils::ElementForID(_TOCElements, elementID, found2);
+                TOCElement & element = STLUtils::ElementForID(_TOCElements, elementID , found2);
 
                 if(found2)
                 {
@@ -396,9 +394,9 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                     } break;
                     }
 
-                    SetFloatValueForElementID(elementID, value);
+//                    SetFloatValueForElementID(elementID, value);
+                    element.value = value;
                     offset += byteLength;
-                    ++index;
                 }
                 else
                 {
@@ -413,21 +411,6 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
     }
 }
 
-int TOC::ElementIDinBlock(int blockID, int elementIndex) // TODO use a lambda ?
-{
-    bool found;
 
-    auto & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
-    if(found)
-    {
-        if(elementIndex < logBlock.elementIDs.size())
-        {
-            std::list<int>::iterator itID = logBlock.elementIDs.begin();
-            advance(itID, elementIndex);
-            return *itID;
-        }
-    }
-    return -1;
-}
 
 
