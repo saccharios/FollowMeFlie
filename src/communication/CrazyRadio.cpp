@@ -193,7 +193,7 @@ void CrazyRadio::StartRadio()
             if(_deviceVersion >= 0.4)
             {
                 SetContCarrier(false);
-                unsigned char address[5];
+                uint8_t address[5];
                 address[0] = 0xe7;
                 address[1] = 0xe7;
                 address[2] = 0xe7;
@@ -219,7 +219,7 @@ void CrazyRadio::StopRadio()
 
 }
 
-CrazyRadio::sptrPacket CrazyRadio::WriteData(unsigned char * data, int length)
+CrazyRadio::sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
 {
     int actWritten;
     int retValue = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &actWritten, 1000);
@@ -235,7 +235,7 @@ CrazyRadio::sptrPacket CrazyRadio::WriteData(unsigned char * data, int length)
 
 }
 
-bool CrazyRadio::ReadData(unsigned char* data, int maxLength, int & actualLength)
+bool CrazyRadio::ReadData(uint8_t* data, int maxLength, int & actualLength)
 {
     int actRead;
     int retValue = libusb_bulk_transfer(_device, (0x81 | LIBUSB_ENDPOINT_IN), data,  maxLength, &actRead, 50);
@@ -263,7 +263,7 @@ bool CrazyRadio::ReadData(unsigned char* data, int maxLength, int & actualLength
     return false;
 }
 
-bool CrazyRadio::WriteControl(unsigned char* data, int length, uint8_t request, uint16_t value, uint16_t index)
+bool CrazyRadio::WriteControl(uint8_t* data, int length, uint8_t request, uint16_t value, uint16_t index)
 {
     int timeout = 1000;
 
@@ -362,7 +362,7 @@ void CrazyRadio::SetPower(PowerSettings power)
     WriteControl(nullptr, 0, 0x04, static_cast<unsigned short>(power), 0);
 }
 
-void CrazyRadio::SetAddress(unsigned char*  address)
+void CrazyRadio::SetAddress(uint8_t*  address)
 {
     _address = address;
 
@@ -400,7 +400,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
             case Port::Console:
             { // Console
                 if(data.size() > 1)
-                { // Implicit assumption that the data stored in data are chars
+                { // Implicit assumption that the data stored in data are uint8_ts
                     std::cout << "Console text: ";
                     for(auto const & element : data)
                     {
@@ -428,7 +428,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
     sptrPacket packet = nullptr;
 
     int bufferSize = 64;
-    unsigned char buffer[bufferSize];
+    uint8_t buffer[bufferSize];
     int bytesRead = 0;
     bool readDataOK = ReadData(buffer, bufferSize, bytesRead) ;
     if( readDataOK )
@@ -446,7 +446,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             // Actual data starts at buffer[1]
             Port port = static_cast<Port>((buffer[1] & 0xf0) >> 4);
             Channel channel = static_cast<Channel>(buffer[1] & 0b00000011);
-            std::vector<char> data;
+            std::vector<uint8_t> data;
             for(int i = 0; i < bytesRead; ++i)
             {
                 data.push_back(buffer[1+i]);
@@ -477,7 +477,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
     sptrPacket received = nullptr;
     while(received == nullptr) // TODO SF Potential infinite loop
     {
-        received = SendPacket({Port::Console,Channel::TOC,{static_cast<char>(0xff)}});
+        received = SendPacket({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
     }
     return received;
 }
@@ -525,7 +525,7 @@ std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    return SendPacket_2({Port::Console,Channel::TOC,{static_cast<char>(0xff)}});
+    return SendPacket_2({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
 }
 
 bool CrazyRadio::RadioIsConnected() const

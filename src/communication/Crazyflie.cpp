@@ -92,18 +92,18 @@ bool Crazyflie::ReadTOCLogs()
 bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 {
     // TODO SF Completely chane data layout of crtppacket. Outside users need not care about its internal buffer !
-    // Add non-member function that takes vector<floats/int/etc> and makes a vector<char>
+    // Add non-member function that takes vector<floats/int/etc> and makes a vector<uint8_t>
 //    int size = 3 * sizeof(float) + sizeof(short);
-//    char cBuffer[size];
+//    uint8_t cBuffer[size];
 //    memcpy(&cBuffer[0 * sizeof(float)], &roll, sizeof(float));
 //    memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
 //    memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
 //    memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
 
-    auto data = ConvertToCharVect(roll);
-    auto pitchVect = ConvertToCharVect(-pitch); // Warning: Is negated here.
-    auto yawVect = ConvertToCharVect(yaw);
-    auto thrustVect = ConvertToCharVect(thrust);
+    auto data = ConvertTouint8_tVect(roll);
+    auto pitchVect = ConvertTouint8_tVect(-pitch); // Warning: Is negated here.
+    auto yawVect = ConvertTouint8_tVect(yaw);
+    auto thrustVect = ConvertTouint8_tVect(thrust);
 
     data.insert(data.end(), pitchVect.begin(), pitchVect.end());
     data.insert(data.end(), yawVect.begin(), yawVect.end());

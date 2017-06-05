@@ -14,7 +14,7 @@ private:
 TEST_F(CRTPPacketTest, Construction)
 {
 
-    std::vector<char> data;
+    std::vector<uint8_t> data;
     data.push_back(0);
     data.push_back(1);
     data.push_back(2);
@@ -38,61 +38,61 @@ TEST_F(CRTPPacketTest, Construction)
     }
 }
 
-TEST_F(CRTPPacketTest, Convert_Float_To_CharVect)
+TEST_F(CRTPPacketTest, Convert_Float_To_uint8_tVect)
 {
     float num = 0.7;
-    char buffer[sizeof(float)];
+    uint8_t buffer[sizeof(float)];
     memcpy(&buffer[0], &num, sizeof(float));
-    auto myVect = ConvertToCharVect(num);
+    auto myVect = ConvertTouint8_tVect(num);
     EXPECT_EQ(myVect.size(), sizeof(float));
     for(unsigned int i = 0; i <myVect.size(); ++i)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
 }
-TEST_F(CRTPPacketTest, Convert_Double_To_CharVect)
+TEST_F(CRTPPacketTest, Convert_Double_To_uint8_tVect)
 {
     double num = 0.7;
-    char buffer[sizeof(double)];
+    uint8_t buffer[sizeof(double)];
     memcpy(&buffer[0], &num, sizeof(double));
-    auto myVect = ConvertToCharVect(num);
+    auto myVect = ConvertTouint8_tVect(num);
     EXPECT_EQ(myVect.size(), sizeof(double));
     for(unsigned int i = 0; i <myVect.size(); ++i)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
 }
-TEST_F(CRTPPacketTest, Convert_Int_To_CharVect)
+TEST_F(CRTPPacketTest, Convert_Int_To_uint8_tVect)
 {
     int num = 1897;
-    char buffer[sizeof(int)];
+    uint8_t buffer[sizeof(int)];
     memcpy(&buffer[0], &num, sizeof(int));
-    auto myVect = ConvertToCharVect(num);
+    auto myVect = ConvertTouint8_tVect(num);
     EXPECT_EQ(myVect.size(), sizeof(int));
     for(unsigned int i = 0; i <myVect.size(); ++i)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
 }
-TEST_F(CRTPPacketTest, Convert_Short_To_CharVect)
+TEST_F(CRTPPacketTest, Convert_Short_To_uint8_tVect)
 {
     short num = 79;
-    char buffer[sizeof(short)];
+    uint8_t buffer[sizeof(short)];
     memcpy(&buffer[0], &num, sizeof(short));
-    auto myVect = ConvertToCharVect(num);
+    auto myVect = ConvertTouint8_tVect(num);
     EXPECT_EQ(myVect.size(), sizeof(short));
     for(unsigned int i = 0; i <myVect.size(); ++i)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
 }
-TEST_F(CRTPPacketTest, Convert_Char_To_CharVect)
+TEST_F(CRTPPacketTest, Convert_uint8_t_To_uint8_tVect)
 {
-    char num = 7;
-    char buffer[sizeof(char)];
-    memcpy(&buffer[0], &num, sizeof(char));
-    auto myVect = ConvertToCharVect(num);
-    EXPECT_EQ(myVect.size(), sizeof(char));
+    uint8_t num = 7;
+    uint8_t buffer[sizeof(uint8_t)];
+    memcpy(&buffer[0], &num, sizeof(uint8_t));
+    auto myVect = ConvertTouint8_tVect(num);
+    EXPECT_EQ(myVect.size(), sizeof(uint8_t));
     for(unsigned int i = 0; i <myVect.size(); ++i)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
@@ -100,7 +100,7 @@ TEST_F(CRTPPacketTest, Convert_Char_To_CharVect)
 }
 //TEST_F(CRTPPacketTest, TimerCopyCtorVsMoveCtor)
 //{
-//    std::vector<char> data;
+//    std::vector<uint8_t> data;
 //    data.push_back(0);
 //    data.push_back(1);
 //    data.push_back(2);
@@ -125,7 +125,7 @@ TEST_F(CRTPPacketTest, Convert_Char_To_CharVect)
 //}
 TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
 {
-    std::vector<char> data;
+    std::vector<uint8_t> data;
     data.push_back(0);
     data.push_back(1);
     data.push_back(2);

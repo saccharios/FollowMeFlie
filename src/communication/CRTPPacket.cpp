@@ -32,20 +32,20 @@
 #include <iostream>
 
 
-CRTPPacket:: CRTPPacket(Port port, Channel channel, std::vector<char> && data) :
+CRTPPacket:: CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data) :
     _data (data),
     _port (port),
     _channel(channel)
 {}
 
-std::vector<char> const & CRTPPacket::GetData() const
+std::vector<uint8_t> const & CRTPPacket::GetData() const
 {
     return _data;
 }
 
-unsigned char * CRTPPacket::SendableData() const
+uint8_t * CRTPPacket::SendableData() const
 {
-    unsigned char* sendable = new unsigned char[GetSendableDataLength()]();
+    uint8_t* sendable = new uint8_t[GetSendableDataLength()]();
 
     // Header byte
     sendable[0] = (static_cast<int>(_port) << 4) | 0b00001100 | (static_cast<int>(_channel) & 0x03);

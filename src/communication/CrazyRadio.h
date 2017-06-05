@@ -128,7 +128,7 @@ private:
     int _ardTime;
     int _ardBytes;
     PowerSettings _power;
-    unsigned char* _address;
+    uint8_t* _address;
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
@@ -142,9 +142,9 @@ private:
 
     sptrPacket ReadAck();
 
-    sptrPacket WriteData(unsigned char * data, int length);
-    bool WriteControl(unsigned char* data, int length, uint8_t request, uint16_t value, uint16_t index);
-    bool ReadData(unsigned char* data, int maxLength, int & actualLength);
+    sptrPacket WriteData(uint8_t * data, int length);
+    bool WriteControl(uint8_t* data, int length, uint8_t request, uint16_t value, uint16_t index);
+    bool ReadData(uint8_t* data, int maxLength, int & actualLength);
 
     void SetARC(int ARC);
     void setChannel(int channel);
@@ -155,7 +155,7 @@ private:
     void WriteDataRate(std::string dataRate);
     void SetARDBytes(int ARDBytes);
     void SetARDTime(int ARDTime);
-    void SetAddress(unsigned char* address);
+    void SetAddress(uint8_t* address);
     void SetContCarrier(bool contCarrier);
 
     void ReadRadioSettings();

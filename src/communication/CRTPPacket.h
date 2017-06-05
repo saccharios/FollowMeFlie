@@ -34,17 +34,18 @@
 // System
 #include <cstring>
 #include <vector>
+#include <stdint.h>
 template<typename T>
-std::vector<char> ConvertToCharVect(T element)
+std::vector<uint8_t> ConvertTouint8_tVect(T element)
 {
-    // Reinterpret elemtn as array of 8-byte char
-    char* char_array = reinterpret_cast<char *>(&element);
+    // Reinterpret elemtn as array of 8-byte uint8_t
+    uint8_t* uint8_t_array = reinterpret_cast<uint8_t *>(&element);
     // Create vector from the array
-    constexpr int size = sizeof(T) / sizeof(char);
-    std::vector<char> result;
+    constexpr int size = sizeof(T) / sizeof(uint8_t);
+    std::vector<uint8_t> result;
     for(int i = 0; i < size; ++i)
     {
-        result.push_back(char_array[i]);
+        result.push_back(uint8_t_array[i]);
     }
     return result;
 }
@@ -69,7 +70,7 @@ class CRTPPacket {
 
 public:
     CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
-    CRTPPacket(Port port, Channel channel, std::vector<char> && data) ;
+    CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data) ;
 
     // Disable copy ctor + copy assignment
     CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
@@ -79,14 +80,14 @@ public:
     //      virtual ~CRTPPacket() { }                     // Destructor
 
 
-    std::vector<char> const & GetData() const; // TODO char sould be unsigned char, or uint8_t
+    std::vector<uint8_t> const & GetData() const; // TODO uint8_t sould be uint8_t, or uint8_t
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
     // (channel, port), the payload data and a finishing byte
     // (0x27). This block is newly allocated and must be delete[]'d after usage.
-    // \return Pointer to a new char[] containing a sendable block of payload data
-    unsigned char * SendableData() const;
+    // \return Pointer to a new uint8_t[] containing a sendable block of payload data
+    uint8_t * SendableData() const;
 
     // Returns the length of a sendable data block
     // \return Length of the sendable data block returned by sendableData() (in bytes)
@@ -99,7 +100,7 @@ public:
 private:
     // Internal storage pointer for payload data inside the  packet
     //    This data is freed when either new data is set or the class instance is destroyed.
-    std::vector<char> _data;
+    std::vector<uint8_t> _data;
     // The copter port the packet will be delivered to
     Port _port;
     // The copter channel the packet will be delivered to

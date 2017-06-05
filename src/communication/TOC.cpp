@@ -35,14 +35,14 @@ TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(po
 
 bool TOC::SendTOCPointerReset()
 {
-    std::vector<char> data = {0};
+    std::vector<uint8_t> data = {0};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     return  _crazyRadio.SendPacket_2(std::move(packet));
 }
 
 bool TOC::RequestMetaData()
 {
-    std::vector<char> data = {1};
+    std::vector<uint8_t> data = {1};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     auto received = _crazyRadio.SendAndReceive(std::move(packet));
 
@@ -59,13 +59,13 @@ bool TOC::RequestInitialItem()
     return RequestItem({0});
 }
 
-bool TOC::RequestItem(unsigned char id)
+bool TOC::RequestItem(uint8_t id)
 {
     return RequestItem({0, id});
 }
 bool TOC::RequestItems()
 {
-    for(unsigned char itemNr = 0; itemNr < _itemCount; itemNr++)
+    for(uint8_t itemNr = 0; itemNr < _itemCount; itemNr++)
     {
         if( ! RequestItem(itemNr)) // If any of the requested items fail, return false
         {
@@ -75,7 +75,7 @@ bool TOC::RequestItems()
     return true;
 }
 
-bool TOC::RequestItem(std::vector<char> && data)
+bool TOC::RequestItem(std::vector<uint8_t> && data)
 {
     CRTPPacket  packet(_port, Channel::TOC, std::move(data));
     auto received = _crazyRadio.SendAndReceive(std::move(packet));
@@ -133,7 +133,7 @@ bool TOC::StartLogging(std::string name, std::string blockName)
         auto & element = STLUtils::ElementForName(_TOCElements, name, isContained);
         if(isContained)
         {
-            std::vector<char> data = {0x01, logBlock.id, element.type, element.id};
+            std::vector<uint8_t> data = {0x01, logBlock.id, element.type, element.id};
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
 
@@ -190,7 +190,7 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     UnregisterLoggingBlockID(id);
     // Regiter new block
     double d10thOfMS = (1 / frequency) * 1000 * 10;
-    std::vector<char> data =  {0x00, id, d10thOfMS};
+    std::vector<uint8_t> data =  {0x00, id, d10thOfMS};
     CRTPPacket registerBlock(_port, Channel::Settings, std::move(data));
 
     auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
@@ -222,7 +222,7 @@ bool TOC::EnableLogging(std::string blockName)
     if(isContained)
     {
         double d10thOfMS = (1 / logBlock.frequency) * 1000 * 10;
-        std::vector<char> data =  {0x03, logBlock.id, d10thOfMS};
+        std::vector<uint8_t> data =  {0x03, logBlock.id, d10thOfMS};
 
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
@@ -250,7 +250,7 @@ bool TOC::UnregisterLoggingBlock(std::string name)
 
 bool TOC::UnregisterLoggingBlockID(int id)
 {
-    std::vector<char> data = {0x02, static_cast<char>(id)};
+    std::vector<uint8_t> data = {0x02, static_cast<uint8_t>(id)};
     CRTPPacket unregisterBlock(_port, Channel::Settings, std::move(data));
 
     auto received = _crazyRadio.SendAndReceive(std::move(unregisterBlock));
@@ -264,7 +264,7 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
     {
         auto const & data = packet->GetData();
 
-        char const * logdata = &data[5];
+        uint8_t const * logdata = &data[5];
 
         int blockID = data[1];
         bool found;
@@ -349,8 +349,8 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                         // and is to be used carefully. I will do that as soon
                         // as I find time for it.
                         byteLength = 2;
-                        char cBuffer1[byteLength];
-                        char cBuffer2[4];
+                        uint8_t cBuffer1[byteLength];
+                        uint8_t cBuffer2[4];
                         memcpy(cBuffer1, &logdata[offset], byteLength);
                         cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
                         cBuffer2[1] = 0;

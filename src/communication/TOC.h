@@ -89,8 +89,8 @@ private:
     std::vector<LoggingBlock> _loggingBlocks;
 
     bool RequestInitialItem();
-    bool RequestItem(std::vector<char> && data);
-    bool RequestItem(unsigned char id);
+    bool RequestItem(std::vector<uint8_t> && data);
+    bool RequestItem(uint8_t id);
     bool ProcessItem(CrazyRadio::sptrPacket && packet);
 
     bool EnableLogging(std::string blockName);
