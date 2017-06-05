@@ -78,12 +78,9 @@ public:
 
     double DoubleValue(std::string name);
 
-    bool EnableLogging(std::string blockName);
 
     void ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets);
 
-    bool AddElementToBlock(int blockID, int elementID);
-    bool UnregisterLoggingBlockID(int id);
 private:
     CrazyRadio & _crazyRadio;
     Port _port;
@@ -96,7 +93,8 @@ private:
     bool RequestItem(unsigned char id);
     bool ProcessItem(CrazyRadio::sptrPacket && packet);
 
-    void SetFloatValueForElementID(int elementID, float value);
+    bool EnableLogging(std::string blockName);
+    bool UnregisterLoggingBlockID(int id);
 };
 
 

@@ -27,7 +27,9 @@
 
 
 #include "TOC.h"
-#include<stl_utils.h>
+#include <stl_utils.h>
+#include <assert.h>
+
 TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
 
@@ -87,34 +89,34 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
 {
     if(packet->GetPort() == _port && packet->GetChannel() == Channel::TOC)
     {
-            auto const & data = packet->GetData();
+        auto const & data = packet->GetData();
 
-            if(data[1] == 0x0)
-            { // Command identification ok?
+        if(data[1] == 0x0)
+        { // Command identification ok?
 
-                std::string name;
-                int index = 4;
-                while(data[index] != '\0')
-                {
-                    name += data[index];
-                    ++index;
-                }
-                name += ".";
+            std::string name;
+            int index = 4;
+            while(data[index] != '\0')
+            {
+                name += data[index];
                 ++index;
-                while(data[index] != '\0')
-                {
-                    name += data[index];
-                    ++index;
-                }
+            }
+            name += ".";
+            ++index;
+            while(data[index] != '\0')
+            {
+                name += data[index];
+                ++index;
+            }
 
-                TOCElement tocElement;
-                tocElement.name = name;
-                tocElement.id = data[2];
-                tocElement.type = data[3];
-                tocElement.isLogging = false;
-                tocElement.value = 0;
-                _TOCElements.emplace_back(tocElement);
-                return true;
+            TOCElement tocElement;
+            tocElement.name = name;
+            tocElement.id = data[2];
+            tocElement.type = data[3];
+            tocElement.isLogging = false;
+            tocElement.value = 0;
+            _TOCElements.emplace_back(tocElement);
+            return true;
         }
     }
 
@@ -122,35 +124,25 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
 }
 
 
-void TOC::SetFloatValueForElementID(int elementID, float value)
-{
-    bool isContained = false;
-    auto & element = STLUtils::ElementForID(_TOCElements, elementID, isContained);
-    if(isContained)
-    {
-        element.value = value;
-    }
-}
-
 bool TOC::StartLogging(std::string name, std::string blockName)
 {
     bool isContained;
-    LoggingBlock currentLogBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
+    LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
     {
         auto & element = STLUtils::ElementForName(_TOCElements, name, isContained);
         if(isContained)
         {
-            std::vector<char> data = {0x01, currentLogBlock.id, element.type, element.id};
+            std::vector<char> data = {0x01, logBlock.id, element.type, element.id};
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
 
             auto const & dataReceived = received->GetData();
             if(     dataReceived[1] == 0x01 &&
-                    dataReceived[2] == currentLogBlock.id &&
+                    dataReceived[2] == logBlock.id &&
                     dataReceived[3] == 0x00)
             {
-                AddElementToBlock(currentLogBlock.id, element.id);
+                logBlock.elementIDs.push_back(element.id);
                 return true;
             }
             else
@@ -160,19 +152,6 @@ bool TOC::StartLogging(std::string name, std::string blockName)
         }
     }
 
-    return false;
-}
-
-bool TOC::AddElementToBlock(int blockID, int elementID)
-{
-    bool isValid = false;
-    auto & element = STLUtils::ElementForID(_loggingBlocks, blockID, isValid);
-    if(isValid)
-    {
-        element.elementIDs.push_back(elementID);
-
-       return true;
-    }
     return false;
 }
 
@@ -195,50 +174,41 @@ double TOC::DoubleValue(std::string name)
 
 bool TOC::RegisterLoggingBlock(std::string name, double frequency)
 {
+    assert(frequency > 0);
+    // Preparation
+    UnregisterLoggingBlock(name);
     int id = 0;
-    bool isContained;
-
-    if(frequency > 0)
-    { // Only do it if a valid frequency > 0 is given
-        STLUtils::ElementForName(_loggingBlocks, name, isContained);
+    bool isContained =  true;
+    while(isContained)
+    {
+        STLUtils::ElementForID(_loggingBlocks, id, isContained);
         if(isContained)
         {
-            UnregisterLoggingBlock(name);
+            id++;
         }
+    }
+    UnregisterLoggingBlockID(id);
+    // Regiter new block
+    double d10thOfMS = (1 / frequency) * 1000 * 10;
+    std::vector<char> data =  {0x00, id, d10thOfMS};
+    CRTPPacket registerBlock(_port, Channel::Settings, std::move(data));
 
-        do
-        {
-            STLUtils::ElementForID(_loggingBlocks, id, isContained);
+    auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
 
-            if(isContained)
-            {
-                id++;
-            }
-        } while(isContained);
+    auto const & dataReceived = received->GetData();
+    if(dataReceived[1] == 0x00 &&
+            dataReceived[2] == id &&
+            dataReceived[3] == 0x00)
+    {
+        LoggingBlock loggingBlock;
+        loggingBlock.name = name;
+        loggingBlock.id = id;
+        loggingBlock.frequency = frequency;
+        // lbNew.ElementIDs will be populated later
+        _loggingBlocks.push_back(loggingBlock);
+        std::cout << "Registered logging block `" << name << "'" << std::endl;
 
-        UnregisterLoggingBlockID(id);
-
-        double d10thOfMS = (1 / frequency) * 1000 * 10;
-        std::vector<char> data =  {0x00, id, d10thOfMS};
-        CRTPPacket registerBlock(_port, Channel::Settings, std::move(data));
-
-        auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
-
-        auto const & dataReceived = received->GetData();
-        if(dataReceived[1] == 0x00 &&
-                dataReceived[2] == id &&
-                dataReceived[3] == 0x00)
-        {
-            std::cout << "Registered logging block `" << name << "'" << std::endl;
-            LoggingBlock loggingBlock;
-            loggingBlock.name = name;
-            loggingBlock.id = id;
-            loggingBlock.frequency = frequency;
-            // lbNew.ElementIDs will be populated later
-            _loggingBlocks.push_back(loggingBlock);
-
-            return EnableLogging(name);
-        }
+        return EnableLogging(name);
     }
 
     return false;
@@ -257,7 +227,7 @@ bool TOC::EnableLogging(std::string blockName)
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
         // Use SendAndReceive to make sure the crazyflie is ready.
-       _crazyRadio.SendAndReceive(std::move(enablePacket));
+        _crazyRadio.SendAndReceive(std::move(enablePacket));
 
         return true;
     }
@@ -394,7 +364,6 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                     } break;
                     }
 
-//                    SetFloatValueForElementID(elementID, value);
                     element.value = value;
                     offset += byteLength;
                 }
