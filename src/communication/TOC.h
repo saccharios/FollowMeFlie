@@ -42,9 +42,9 @@
 // Storage element for logged variable identities
 struct TOCElement {
     //The numerical ID of the log element on the copters internal table
-    int id;
+    uint8_t id;
     //The (ref) type of the log element
-    int type;
+    uint8_t type;
     std::string name;
     bool isLogging;
     double value;
@@ -53,9 +53,9 @@ struct TOCElement {
 
 struct LoggingBlock {
     std::string name;
-    int id;
+    uint8_t id;
     double frequency;
-    std::vector<int> elementIDs;
+    std::vector<uint8_t> elementIDs;
 };
 
 
@@ -73,8 +73,8 @@ public:
     bool UnregisterLoggingBlock(std::string name);
 
     bool StartLogging(std::string name, std::string blockName);
-    bool StopLogging(std::string name);
-    bool IsLogging(std::string name);
+//    bool StopLogging(std::string name);
+//    bool IsLogging(std::string name);
 
     double DoubleValue(std::string name);
 

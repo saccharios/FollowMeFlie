@@ -56,8 +56,9 @@ CrazyRadio::CrazyRadio() :
     _loggingPackets(),
     _radioIsConnected(false)
 {
-    int returnVal = libusb_init(&_context);
+//    int returnVal = libusb_init(&_context);
     // Do error checking here.
+    libusb_init(&_context);
 }
 CrazyRadio::~CrazyRadio()
 {
@@ -90,7 +91,7 @@ std::vector<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
     libusb_device** pdevices;
 
     count = libusb_get_device_list(_context, &pdevices);
-    for(unsigned int i = 0; i < count; i++)
+    for(ssize_t i = 0; i < count; i++)
     {
         libusb_device_descriptor ddDescriptor;
 

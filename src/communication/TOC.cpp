@@ -130,7 +130,7 @@ bool TOC::StartLogging(std::string name, std::string blockName)
     LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
     {
-        auto & element = STLUtils::ElementForName(_TOCElements, name, isContained);
+        TOCElement & element = STLUtils::ElementForName(_TOCElements, name, isContained);
         if(isContained)
         {
             std::vector<uint8_t> data = {0x01, logBlock.id, element.type, element.id};
@@ -155,13 +155,13 @@ bool TOC::StartLogging(std::string name, std::string blockName)
     return false;
 }
 
-bool TOC::StopLogging(std::string name) {
-    // TODO: Implement me.
-}
+//bool TOC::StopLogging(std::string name) {
+//    // TODO: Implement me.
+//}
 
-bool TOC::IsLogging(std::string name) {
-    // TODO: Implement me.
-}
+//bool TOC::IsLogging(std::string name) {
+//    // TODO: Implement me.
+//}
 
 double TOC::DoubleValue(std::string name)
 {
@@ -177,7 +177,7 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     assert(frequency > 0);
     // Preparation
     UnregisterLoggingBlock(name);
-    int id = 0;
+    uint8_t id = 0;
     bool isContained =  true;
     while(isContained)
     {
@@ -189,8 +189,8 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     }
     UnregisterLoggingBlockID(id);
     // Regiter new block
-    double d10thOfMS = (1 / frequency) * 1000 * 10;
-    std::vector<uint8_t> data =  {0x00, id, d10thOfMS};
+    uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / frequency);// The sampling rate is in 100us units
+    std::vector<uint8_t> data =  {0x00, id, samplingRate};
     CRTPPacket registerBlock(_port, Channel::Settings, std::move(data));
 
     auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
@@ -221,8 +221,8 @@ bool TOC::EnableLogging(std::string blockName)
     auto const & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
     {
-        double d10thOfMS = (1 / logBlock.frequency) * 1000 * 10;
-        std::vector<uint8_t> data =  {0x03, logBlock.id, d10thOfMS};
+        uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / logBlock.frequency);// The sampling rate is in 100us units
+        std::vector<uint8_t> data =  {0x03, logBlock.id, samplingRate};
 
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
