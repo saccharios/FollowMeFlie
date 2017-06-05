@@ -1,37 +1,16 @@
 #pragma once
 #include "gtest/gtest.h"
 #include <iostream>
-#include <algorithm>
-class STLUtils : public ::testing::Test
+#include "math/stl_utils.h"
+
+
+class STLUtils_Test : public testing::Test
 {
-public:
 
-    template<typename T>
-    static bool  VectorContains(std::vector<T> const & vect, T element)
-    {
-        std::cout << "using const lvalue ref\n";
-        return std::find(vect.begin(), vect.end(), element) != vect.end();
-    }
-
-    template<typename T>
-    static bool  VectorContains(std::vector<T> && vect, T element)
-    {
-        std::cout << "using rvalue ref\n";
-        return std::find(vect.begin(), vect.end(), element) != vect.end();
-    }
-    template<typename T>
-    typename std::vector<T> ::iterator  IteratorToElement(std::vector<T> && vect, T element, bool & isValid)
-    {
-        auto it = std::find(vect.begin(), vect.end(), element);
-        isValid = it != vect.end();
-        return  it;
-    }
-
-
-private:
 };
 
-TEST_F(STLUtils, VectorContains)
+
+TEST_F(STLUtils_Test, VectorContains)
 {
 
     std::vector<int> myVect{4,798,7,4,31,6};
@@ -44,17 +23,16 @@ TEST_F(STLUtils, VectorContains)
     std::cout << "Element " << element << " in Vector: " << isContained << std::endl;
     EXPECT_TRUE(isContained);
 }
-TEST_F(STLUtils, VectorIterator)
+TEST_F(STLUtils_Test, VectorIterator)
 {
 
-    int element =9;
-    std::vector<int> myVect{4,798,7,4,31,6};
+    int element = 9;
 
     bool isValid = false;
     auto it = STLUtils::IteratorToElement({1,38,64,7}, element, isValid);
     if(isValid)
     {
-        std::cout << "Element " << element << " in Vector: " << "isContained" << *it<< std::endl;
+        std::cout << "Element " << element << " in Vector: " << "isContained" << it<< std::endl;
     }
     else
     {
@@ -62,5 +40,48 @@ TEST_F(STLUtils, VectorIterator)
         std::cout << "Element " << element << " is not in the vector\n";
 
     }
+    EXPECT_FALSE(isValid);
+
+}
+TEST_F(STLUtils_Test, VectorSearchByID)
+{
+    struct Element{
+        int id;
+        std::string name;
+        double data;
+    };
+    Element e1 = {0,"first",0.17};
+    Element e2 = {1,"second",0.897};
+    std::vector<Element> myVect = {e1,e2};
+
+    bool isValid = false;
+    int id = 0;
+    auto & element1 = STLUtils::ElementForID(myVect, id, isValid);
+    EXPECT_TRUE(isValid);
+    EXPECT_EQ(element1.id, e1.id);
+    id = 4;
+    auto & element2 = STLUtils::ElementForID(myVect, id, isValid);
+    EXPECT_FALSE(isValid);
+
+}
+TEST_F(STLUtils_Test, VectorISearchByName)
+{
+    struct Element{
+        int id;
+        std::string name;
+        double data;
+    };
+    Element e1 = {0,"first",0.17};
+    Element e2 = {1,"second",0.897};
+    std::vector<Element> myVect = {e1,e2};
+
+    bool isValid = false;
+    std::string name = "first";
+    auto & element1 = STLUtils::ElementForName(myVect, name, isValid);
+    EXPECT_TRUE(isValid);
+    EXPECT_EQ(element1.id, e1.id);
+    name = "abc";
+    auto & element2 = STLUtils::ElementForName(myVect, name, isValid);
+    EXPECT_FALSE(isValid);
 
 }
