@@ -71,8 +71,6 @@ public:
     // For loggable variables only
     bool RegisterLoggingBlock(std::string name, double frequency);
     bool UnregisterLoggingBlock(std::string name);
-    struct LoggingBlock LoggingBlockForName(std::string name, bool& found);
-    struct LoggingBlock LoggingBlockForID(int id, bool& found);
 
     bool StartLogging(std::string name, std::string blockName);
     bool StopLogging(std::string name);
@@ -91,7 +89,7 @@ private:
     Port _port;
     uint8_t _itemCount;
     std::vector<TOCElement> _TOCElements;
-    std::list<LoggingBlock> _loggingBlocks;
+    std::vector<LoggingBlock> _loggingBlocks;
 
     bool RequestInitialItem();
     bool RequestItem(std::vector<char> && data);

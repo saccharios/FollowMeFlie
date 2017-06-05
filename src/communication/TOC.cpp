@@ -135,7 +135,7 @@ void TOC::SetFloatValueForElementID(int elementID, float value)
 bool TOC::StartLogging(std::string name, std::string blockName)
 {
     bool isContained;
-    LoggingBlock currentLogBlock = LoggingBlockForName(blockName, isContained);
+    LoggingBlock currentLogBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
     {
         auto & element = STLUtils::ElementForName(_TOCElements, name, isContained);
@@ -165,20 +165,14 @@ bool TOC::StartLogging(std::string name, std::string blockName)
 
 bool TOC::AddElementToBlock(int blockID, int elementID)
 {
-    for(std::list<struct LoggingBlock>::iterator itBlock = _loggingBlocks.begin();
-        itBlock != _loggingBlocks.end();
-        itBlock++)
+    bool isValid = false;
+    auto & element = STLUtils::ElementForID(_loggingBlocks, blockID, isValid);
+    if(isValid)
     {
-        struct LoggingBlock currentLogBlock = *itBlock;
+        element.elementIDs.push_back(elementID);
 
-        if(currentLogBlock.id == blockID)
-        {
-            (*itBlock).elementIDs.push_back(elementID);
-
-            return true;
-        }
+       return true;
     }
-
     return false;
 }
 
@@ -198,68 +192,29 @@ double TOC::DoubleValue(std::string name)
     return (found ? result.value : 0);
 }
 
-struct LoggingBlock TOC::LoggingBlockForName(std::string name, bool& found) // TODO Logging Block and TOC function can be generalized  one logging Block is a vector
-{
-    for(std::list<struct LoggingBlock>::iterator itBlock = _loggingBlocks.begin();
-        itBlock != _loggingBlocks.end();
-        itBlock++) {
-        struct LoggingBlock lbCurrent = *itBlock;
-
-        if(name == lbCurrent.name) {
-            found = true;
-            return lbCurrent;
-        }
-    }
-
-    found = false;
-    struct LoggingBlock lbEmpty;
-
-    return lbEmpty;
-}
-
-struct LoggingBlock TOC::LoggingBlockForID(int id, bool& found) // TODO Logging Block and TOC function can be generalized  one logging Block is a vector
-{
-    for(std::list<struct LoggingBlock>::iterator block = _loggingBlocks.begin();
-        block != _loggingBlocks.end();
-        block++)
-    {
-        struct LoggingBlock lbCurrent = *block;
-
-        if(id == lbCurrent.id)
-        {
-            found = true;
-            return lbCurrent;
-        }
-    }
-
-    found = false;
-    struct LoggingBlock lbEmpty;
-
-    return lbEmpty;
-}
 
 bool TOC::RegisterLoggingBlock(std::string name, double frequency)
 {
     int id = 0;
-    bool found;
+    bool isContained;
 
     if(frequency > 0)
     { // Only do it if a valid frequency > 0 is given
-        LoggingBlockForName(name, found);
-        if(found)
+        STLUtils::ElementForName(_loggingBlocks, name, isContained);
+        if(isContained)
         {
             UnregisterLoggingBlock(name);
         }
 
         do
         {
-            LoggingBlockForID(id, found);
+            STLUtils::ElementForID(_loggingBlocks, id, isContained);
 
-            if(found)
+            if(isContained)
             {
                 id++;
             }
-        } while(found);
+        } while(isContained);
 
         UnregisterLoggingBlockID(id);
 
@@ -275,12 +230,12 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
                 dataReceived[3] == 0x00)
         {
             std::cout << "Registered logging block `" << name << "'" << std::endl;
-            LoggingBlock lbNew;
-            lbNew.name = name;
-            lbNew.id = id;
-            lbNew.frequency = frequency;
+            LoggingBlock loggingBlock;
+            loggingBlock.name = name;
+            loggingBlock.id = id;
+            loggingBlock.frequency = frequency;
             // lbNew.ElementIDs will be populated later
-            _loggingBlocks.push_back(lbNew);
+            _loggingBlocks.push_back(loggingBlock);
 
             return EnableLogging(name);
         }
@@ -289,15 +244,15 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     return false;
 }
 
-bool TOC::EnableLogging(std::string lockName)
+bool TOC::EnableLogging(std::string blockName)
 {
-    bool found;
+    bool isContained;
 
-    LoggingBlock currenLogBlock = LoggingBlockForName(lockName, found);
-    if(found)
+    auto const & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
+    if(isContained)
     {
-        double d10thOfMS = (1 / currenLogBlock.frequency) * 1000 * 10;
-        std::vector<char> data =  {0x03, currenLogBlock.id, d10thOfMS};
+        double d10thOfMS = (1 / logBlock.frequency) * 1000 * 10;
+        std::vector<char> data =  {0x03, logBlock.id, d10thOfMS};
 
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
@@ -312,12 +267,12 @@ bool TOC::EnableLogging(std::string lockName)
 
 bool TOC::UnregisterLoggingBlock(std::string name)
 {
-    bool found;
+    bool isContained;
 
-    LoggingBlock lbCurrent = LoggingBlockForName(name, found);
-    if(found)
+    auto const & logBlock = STLUtils::ElementForName(_loggingBlocks, name, isContained);
+    if(isContained)
     {
-        return UnregisterLoggingBlockID(lbCurrent.id);
+        return UnregisterLoggingBlockID(logBlock.id);
     }
 
     return false;
@@ -345,14 +300,14 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
 
         int blockID = data[1];
         bool found;
-        LoggingBlock currentLogBlock = LoggingBlockForID(blockID, found);
+        auto const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
         if(found)
         {
-            while(index < currentLogBlock.elementIDs.size())
+            while(index < logBlock.elementIDs.size())
             {
                 int elementID = ElementIDinBlock(blockID, index);
                 bool found2;
-                TOCElement teCurrent = STLUtils::ElementForID(_TOCElements, elementID, found2);
+                auto const & element = STLUtils::ElementForID(_TOCElements, elementID, found2);
 
                 if(found2)
                 {
@@ -363,7 +318,7 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                     // the value to fValue. This way, we let the compiler to
                     // the magic of conversion.
                     float value = 0;
-                    switch(teCurrent.type)
+                    switch(element.type)
                     {
                     case 1: // TODO SF Use enum class
                     { // UINT8
@@ -462,11 +417,12 @@ int TOC::ElementIDinBlock(int blockID, int elementIndex) // TODO use a lambda ?
 {
     bool found;
 
-    struct LoggingBlock currentLogBlock = this->LoggingBlockForID(blockID, found);
+    auto & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
     if(found)
     {
-        if(elementIndex < currentLogBlock.elementIDs.size()) {
-            std::list<int>::iterator itID = currentLogBlock.elementIDs.begin();
+        if(elementIndex < logBlock.elementIDs.size())
+        {
+            std::list<int>::iterator itID = logBlock.elementIDs.begin();
             advance(itID, elementIndex);
             return *itID;
         }

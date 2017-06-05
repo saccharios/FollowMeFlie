@@ -49,7 +49,7 @@ namespace STLUtils
         return  *it;
     }
     template<typename T>
-    T  & ElementForIName(std::vector<T> && vect, std::string name, bool & isValid)
+    T  & ElementForName(std::vector<T> && vect, std::string name, bool & isValid)
     {
         //        std::cout << "using rvalue ref\n";
         typename std::vector<T>::iterator it = std::find_if(vect.begin(), vect.end(), [=](auto const & element){return element.name == name;});
