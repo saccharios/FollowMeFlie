@@ -49,6 +49,8 @@ TEST_F(CRTPPacketTest, Convert_Float_To_uint8_tVect)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
+    float value = ExtractData<float>(myVect, 0 );
+    EXPECT_FLOAT_EQ(num, value);
 }
 TEST_F(CRTPPacketTest, Convert_Double_To_uint8_tVect)
 {
@@ -61,6 +63,9 @@ TEST_F(CRTPPacketTest, Convert_Double_To_uint8_tVect)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
+    // Not required:
+//    double value = ExtractData<double>(myVect, 0 );
+//    EXPECT_FLOAT_EQ(num, value);
 }
 TEST_F(CRTPPacketTest, Convert_Int_To_uint8_tVect)
 {
@@ -73,6 +78,8 @@ TEST_F(CRTPPacketTest, Convert_Int_To_uint8_tVect)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
+    int value = ExtractData<int>(myVect, 0 );
+    EXPECT_EQ(num, value);
 }
 TEST_F(CRTPPacketTest, Convert_Short_To_uint8_tVect)
 {
@@ -85,6 +92,8 @@ TEST_F(CRTPPacketTest, Convert_Short_To_uint8_tVect)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
+    short value = ExtractData<short>(myVect, 0 );
+    EXPECT_EQ(num, value);
 }
 TEST_F(CRTPPacketTest, Convert_uint8_t_To_uint8_tVect)
 {
@@ -97,6 +106,34 @@ TEST_F(CRTPPacketTest, Convert_uint8_t_To_uint8_tVect)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
+    uint8_t value = ExtractData<uint8_t>(myVect, 0 );
+    EXPECT_EQ(num, value);
+}
+TEST_F(CRTPPacketTest, ReconstructData)
+{
+    int num[3] = {7,676,974};
+    uint8_t buffer[3*sizeof(int)];
+    memcpy(&buffer[0], &num, 3*sizeof(int));
+    auto myVect1 = ConvertTouint8_tVect(num[0]);
+    auto myVect2 = ConvertTouint8_tVect(num[1]);
+    auto myVect3 = ConvertTouint8_tVect(num[2]);
+    std::vector<uint8_t> myVect;
+    myVect.insert(std::end(myVect), std::begin(myVect1), std::end(myVect1));
+    myVect.insert(std::end(myVect), std::begin(myVect2), std::end(myVect2));
+    myVect.insert(std::end(myVect), std::begin(myVect3), std::end(myVect3));
+    EXPECT_EQ(myVect.size(), 3*sizeof(int));
+    for(unsigned int i = 0; i <myVect.size(); ++i)
+    {
+        EXPECT_EQ(myVect[i], buffer[i]);
+    }
+    int offset = 0;
+    for(int i = 0;i < 3; ++i)
+    {
+        int value = ExtractData<int>(myVect, offset );
+        EXPECT_EQ(num[i], value);
+        offset += sizeof(int);
+    }
+
 }
 //TEST_F(CRTPPacketTest, TimerCopyCtorVsMoveCtor)
 //{

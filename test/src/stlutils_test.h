@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include "math/stl_utils.h"
-
+#include "communication/CRTPPacket.h"
 
 class STLUtils_Test : public testing::Test
 {
@@ -83,5 +83,8 @@ TEST_F(STLUtils_Test, VectorISearchByName)
     name = "abc";
     auto & element2 = STLUtils::ElementForName(myVect, name, isValid);
     EXPECT_FALSE(isValid);
-
 }
+
+
+
+

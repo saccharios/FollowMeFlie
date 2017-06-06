@@ -29,6 +29,7 @@
 #include "TOC.h"
 #include <stl_utils.h>
 #include <assert.h>
+#include "CRTPPacket.h"
 
 TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
@@ -264,9 +265,10 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
     {
         auto const & data = packet->GetData();
 
-        uint8_t const * logdata = &data[5];
+        uint8_t const * logdata = &data.at(5);
 
-        int blockID = data[1];
+        const std::vector<uint8_t> logdataVect(data.begin() + 5, data.end());
+        int blockID = data.at(1);
         bool found;
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
         if(found)
@@ -293,6 +295,8 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                         byteLength = 1;
                         uint8_t uint8Value;
                         memcpy(&uint8Value, &logdata[offset], byteLength); // TODO Replace memcpy.....
+                        std::cout << "extracted value = " << ExtractData<uint8_t>(logdataVect, offset) << std::endl;
+                        std::cout << "actual value = " << value << std::endl;
                         value = uint8Value;
                     } break;
 
@@ -339,7 +343,10 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                     case 7:
                     { // FLOAT
                         byteLength = 4;
+
                         memcpy(&value, &logdata[offset], byteLength);
+                        std::cout << "extracted value = " << ExtractData<float>(logdataVect, offset) << std::endl;
+                        std::cout << "actual value = " << value << std::endl;
                     } break;
 
                     case 8:

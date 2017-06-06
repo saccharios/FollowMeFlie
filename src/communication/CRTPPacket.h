@@ -35,6 +35,8 @@
 #include <cstring>
 #include <vector>
 #include <stdint.h>
+
+// Convert to vector<uint8_t>
 template<typename T>
 std::vector<uint8_t> ConvertTouint8_tVect(T element)
 {
@@ -49,6 +51,22 @@ std::vector<uint8_t> ConvertTouint8_tVect(T element)
     }
     return result;
 }
+
+// Convert from vector<uint8_t> to given type
+template<typename T>
+T ExtractData(std::vector<uint8_t> const & data, int offset)
+{
+    int byteLenght = sizeof(T);
+    T bits = 0;
+    for(int i = 0; i < byteLenght; ++i)
+    {
+        bits |= (data.at(offset + i) << 8*i);
+    }
+    T value = *reinterpret_cast<T *>(&bits);
+    return value;
+}
+template<>
+float ExtractData<float>(std::vector<uint8_t> const & data, int offset);
 
 
 enum class Port{
