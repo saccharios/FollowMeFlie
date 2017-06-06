@@ -113,7 +113,7 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
             TOCElement tocElement;
             tocElement.name = name;
             tocElement.id = data[2];
-            tocElement.type = data[3];
+            tocElement.type = static_cast<ElementType>(data[3]);
             tocElement.isLogging = false;
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
@@ -134,7 +134,7 @@ bool TOC::StartLogging(std::string name, std::string blockName)
         TOCElement & element = STLUtils::ElementForName(_TOCElements, name, isContained);
         if(isContained)
         {
-            std::vector<uint8_t> data = {0x01, logBlock.id, element.type, element.id};
+            std::vector<uint8_t> data = {0x01, logBlock.id, static_cast<uint8_t>(element.type), element.id};
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
 
@@ -265,8 +265,6 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
     {
         auto const & data = packet->GetData();
 
-        uint8_t const * logdata = &data.at(5);
-
         const std::vector<uint8_t> logdataVect(data.begin() + 5, data.end());
         int blockID = data.at(1);
         bool found;
@@ -276,10 +274,8 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
             int offset = 0;
             for(auto const & elementID : logBlock.elementIDs )
             {
-                bool found2;
-                TOCElement & element = STLUtils::ElementForID(_TOCElements, elementID , found2);
-
-                if(found2)
+                TOCElement & element = STLUtils::ElementForID(_TOCElements, elementID , found);
+                if(found)
                 {
                     int byteLength = 0;
 
@@ -290,68 +286,76 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                     float value = 0;
                     switch(element.type)
                     {
-                    case 1: // TODO SF Use enum class
-                    { // UINT8
+                    case ElementType::UINT8:
+                    {
                         byteLength = 1;
                         value = static_cast<float>(ExtractData<uint8_t>(logdataVect, offset));
-                    } break;
+                        break;
+                    }
 
-                    case 2:
-                    { // UINT16
+                    case ElementType::UINT16:
+                    {
                         byteLength =2;
                         value = static_cast<float>(ExtractData<uint16_t>(logdataVect, offset));
-                    } break;
+                        break;
+                    }
 
-                    case 3:
-                    { // UINT32
+                    case ElementType::UINT32:
+                    {
                         byteLength = 4;
                         value = static_cast<float>(ExtractData<uint32_t>(logdataVect, offset));
-                    } break;
+                        break;
+                    }
 
-                    case 4:
-                    { // INT8
+                    case ElementType::INT8:
+                    {
                         byteLength = 1;
                         value = static_cast<float>(ExtractData<int8_t>(logdataVect, offset));
-                    } break;
+                        break;
+                    }
 
-                    case 5:
-                    { // INT16
+                    case ElementType::INT16:
+                    {
                         byteLength = 2;
                         value = static_cast<float>(ExtractData<int16_t>(logdataVect, offset));
-                    } break;
+                        break;
+                    }
 
-                    case 6:
-                    { // INT32
+                    case ElementType::INT32:
+                    {
                         byteLength = 4;
                         value = static_cast<float>(ExtractData<int32_t>(logdataVect, offset));
-                    } break;
+                        break;
+                    }
 
-                    case 7:
-                    { // FLOAT
+                    case ElementType::FLOAT:
+                    {
                         byteLength = 4;
                         value =ExtractData<float>(logdataVect, offset);
-                    } break;
+                        break;
+                    }
 
-                    case 8:
-                    { // FP16
+//                    case 8:
+//                    { // FP16
                         // NOTE(winkler): This is untested code (as no FP16
                         // variable gets advertised yet). This has to be tested
                         // and is to be used carefully. I will do that as soon
                         // as I find time for it.
-                        byteLength = 2;
-                        uint8_t cBuffer1[byteLength];
-                        uint8_t cBuffer2[4];
-                        memcpy(cBuffer1, &logdata[offset], byteLength);
-                        cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
-                        cBuffer2[1] = 0;
-                        cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
-                        cBuffer2[3] = cBuffer1[1];
-                        memcpy(&value, cBuffer2, 4); // Put it into the float variable
-                    } break;
+//                        byteLength = 2;
+//                        uint8_t cBuffer1[byteLength];
+//                        uint8_t cBuffer2[4];
+//                        memcpy(cBuffer1, &logdata[offset], byteLength);
+//                        cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
+//                        cBuffer2[1] = 0;
+//                        cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
+//                        cBuffer2[3] = cBuffer1[1];
+//                        memcpy(&value, cBuffer2, 4); // Put it into the float variable
+//                    } break;
 
                     default:
                     { // Unknown. This hopefully never happens.
-                    } break;
+                        break;
+                    }
                     }
 
                     element.value = value;

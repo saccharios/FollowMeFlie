@@ -39,12 +39,22 @@
 #include "CRTPPacket.h"
 #include <memory>
 
+enum class ElementType : uint8_t{
+    UINT8  = 1,
+    UINT16  = 2,
+    UINT32  = 3,
+    INT8  = 4,
+    INT16  = 5,
+    INT32  = 6,
+    FLOAT = 7
+};
+
 // Storage element for logged variable identities
 struct TOCElement {
     //The numerical ID of the log element on the copters internal table
     uint8_t id;
     //The (ref) type of the log element
-    uint8_t type;
+    ElementType type;
     std::string name;
     bool isLogging;
     double value;
