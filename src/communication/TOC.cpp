@@ -293,60 +293,43 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                     case 1: // TODO SF Use enum class
                     { // UINT8
                         byteLength = 1;
-                        uint8_t uint8Value;
-                        memcpy(&uint8Value, &logdata[offset], byteLength); // TODO Replace memcpy.....
-                        std::cout << "extracted value = " << ExtractData<uint8_t>(logdataVect, offset) << std::endl;
-                        std::cout << "actual value = " << value << std::endl;
-                        value = uint8Value;
+                        value = static_cast<float>(ExtractData<uint8_t>(logdataVect, offset));
                     } break;
 
                     case 2:
                     { // UINT16
-                        byteLength = 2;
-                        uint16_t uint16Value;
-                        memcpy(&uint16Value, &logdata[offset], byteLength);
-                        value = uint16Value;
+                        byteLength =2;
+                        value = static_cast<float>(ExtractData<uint16_t>(logdataVect, offset));
                     } break;
 
                     case 3:
                     { // UINT32
                         byteLength = 4;
-                        uint32_t uint32Value;
-                        memcpy(&uint32Value, &logdata[offset], byteLength);
-                        value = uint32Value;
+                        value = static_cast<float>(ExtractData<uint32_t>(logdataVect, offset));
                     } break;
 
                     case 4:
                     { // INT8
                         byteLength = 1;
-                        int8_t int8Value;
-                        memcpy(&int8Value, &logdata[offset], byteLength);
-                        value = int8Value;
+                        value = static_cast<float>(ExtractData<int8_t>(logdataVect, offset));
                     } break;
 
                     case 5:
                     { // INT16
                         byteLength = 2;
-                        int16_t int16Value;
-                        memcpy(&int16Value, &logdata[offset], byteLength);
-                        value = int16Value;
+                        value = static_cast<float>(ExtractData<int16_t>(logdataVect, offset));
                     } break;
 
                     case 6:
                     { // INT32
                         byteLength = 4;
-                        int32_t int32Value;
-                        memcpy(&int32Value, &logdata[offset], byteLength);
-                        value = int32Value;
+                        value = static_cast<float>(ExtractData<int32_t>(logdataVect, offset));
                     } break;
 
                     case 7:
                     { // FLOAT
                         byteLength = 4;
-
-                        memcpy(&value, &logdata[offset], byteLength);
-                        std::cout << "extracted value = " << ExtractData<float>(logdataVect, offset) << std::endl;
-                        std::cout << "actual value = " << value << std::endl;
+                        value =ExtractData<float>(logdataVect, offset);
                     } break;
 
                     case 8:
