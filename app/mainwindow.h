@@ -18,7 +18,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_activateCamera_clicked(bool checked);
+    void on_activateCamera_clicked();
 
     void on_disconnectRadio_clicked();
 
@@ -28,7 +28,7 @@ private slots:
 
     void on_exitApp_clicked();
 
-    void on_pushButton_clicked(bool checked);
+    void on_pushButton_clicked();
 
     void display_act_values();
 

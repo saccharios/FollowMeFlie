@@ -32,7 +32,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_activateCamera_clicked(bool checked)
+void MainWindow::on_activateCamera_clicked()
 {
     std::unique_ptr<QCamera> camera = nullptr;
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
@@ -84,7 +84,7 @@ void MainWindow::on_exitApp_clicked()
 }
 
 
-void MainWindow::on_pushButton_clicked(bool checked)
+void MainWindow::on_pushButton_clicked()
 {
     // With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
     // However, the following command does not do the trick.
