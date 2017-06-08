@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(&crazyFlieCaller, SIGNAL(ActValueChanged()), this, SLOT(display_act_values()));
+    connect(&crazyFlieCaller, SIGNAL(UpdateActValues()), this, SLOT(display_act_values()));
 }
 void MainWindow::display_act_values()
  {

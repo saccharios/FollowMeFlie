@@ -12,22 +12,20 @@ public:
 
 public slots:
     void Update();
-    void CheckActValueChanged();
+    void UpdateActValueTime();
     float GetRoll() const;
     float GetYaw() const;
     float GetPitch() const;
     int GetThrust() const;
 
 signals:
-    void ActValueChanged();
+    void UpdateActValues();
 
 private:
-        QTimer _timer;
+        QTimer _timerUpdate;
+        QTimer _timerDisplay;
         Crazyflie & _crazyFlie;
-        float _roll = 0;
-        float _yaw = 0;
-        float _pitch = 0;
-        int _thrust = 0;
+
 };
 
 #endif // CRAZYFLIECALLER_H
