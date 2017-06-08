@@ -12,7 +12,7 @@ class TOC_Test : public testing::Test
     // TOC_Test if friend of TOC
 private:
     using sptrPacket = std::shared_ptr<CRTPPacket>;
-     std::vector<sptrPacket> _packets;
+    std::vector<sptrPacket> _packets;
      Port _port = Port::Log;
      Channel _channel = Channel::Data;
      float num1 = 1.6756;
@@ -32,7 +32,6 @@ public:
          std::vector<uint8_t> data = {0,blockID1,0,0,0};
          data.insert(std::end(data), std::begin(data1), std::end(data1));
          data.insert(std::end(data), std::begin(data2), std::end(data2));
-        std::cout << "float packet data size = " << data.size() << std::endl;
          auto packet1 = std::make_shared<CRTPPacket>(_port, _channel, std::move(data));
          _packets.emplace_back(std::move(packet1));
          std::vector<uint8_t> load =  {0,blockID2,0,0,0,int1, int2};
@@ -42,59 +41,19 @@ public:
 
 
 
-    void
-    run_test()
-    {
-        CrazyRadio crazyRadio;
-        TOC toc(crazyRadio, _port);
-        // Setup TOC
-        int element_id1 = 7;
-        int element_id2 = 42;
-        int element_id3 = 0;
-        int element_id4 = 5;
-        LoggingBlock block1;
-        block1.id = blockID1;
-        block1.elementIDs.push_back(element_id3);
-        block1.elementIDs.push_back(element_id4);
-        toc._loggingBlocks.push_back(block1);
-        LoggingBlock block2;
-        block2.id = blockID2;
-        block2.elementIDs.push_back(element_id1);
-        block2.elementIDs.push_back(element_id2);
-        toc._loggingBlocks.push_back(block2);
+    void run_test_ok();
+    void run_test_id_not_found();
 
 
-        TOCElement tocElement;
-        tocElement.id = element_id1;
-        tocElement.type = ElementType::UINT8;
-        tocElement.value = 0;
-        toc._TOCElements.push_back(tocElement);
-        tocElement.id = element_id2;
-        tocElement.value = 0;
-        tocElement.type = ElementType::UINT8;
-        toc._TOCElements.push_back(tocElement);
-        tocElement.id = element_id3;
-        tocElement.value = 0;
-        tocElement.type = ElementType::FLOAT;
-        toc._TOCElements.push_back(tocElement);
-        tocElement.id = element_id4;
-        tocElement.value = 0;
-        tocElement.type = ElementType::FLOAT;
-        toc._TOCElements.push_back(tocElement);
-
-        toc.ProcessLogPackets(_packets);
-        EXPECT_FLOAT_EQ(toc._TOCElements.at(0).value, int1);
-        EXPECT_FLOAT_EQ(toc._TOCElements.at(1).value, int2);
-        EXPECT_FLOAT_EQ(toc._TOCElements.at(2).value, num1);
-        EXPECT_FLOAT_EQ(toc._TOCElements.at(3).value, num2);
-
-
-    }
 };
 
 
 
-TEST_F(TOC_Test, ProcessLogPackets)
+TEST_F(TOC_Test, ProcessLogPacketsOK)
 {
-    run_test();
+    run_test_ok();
+}
+TEST_F(TOC_Test, ProcessLogPacketsIDWrong)
+{
+    run_test_id_not_found();
 }

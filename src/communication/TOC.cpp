@@ -30,7 +30,7 @@
 #include <stl_utils.h>
 #include <assert.h>
 #include "CRTPPacket.h"
-
+#include <iostream>
 TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
 
