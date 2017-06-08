@@ -27,15 +27,14 @@
 
 
 #include "CRTPPacket.h"
-#include "assert.h"
 #include <vector>
-#include <iostream>
+
 template<>
 float ExtractData<float>(std::vector<uint8_t> const & data, int offset)
 {
-    int byteLenght = sizeof(float);
+    constexpr int typeLength = sizeof(float);
     uint32_t bits = 0;
-    for(int i = 0; i < byteLenght; ++i)
+    for(int i = 0; i < typeLength; ++i)
     {
         bits |= (data.at(offset + i) << 8*i);
     }

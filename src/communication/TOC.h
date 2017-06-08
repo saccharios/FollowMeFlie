@@ -70,7 +70,7 @@ struct LoggingBlock {
 
 
 class TOC {
-
+friend class TOC_Test; // Is friend for white-box testing.
 public:
     TOC(CrazyRadio & crazyRadio, Port port);
 
@@ -89,7 +89,7 @@ public:
     double DoubleValue(std::string name);
 
 
-    void ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets);
+    void ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets);
 
 private:
     CrazyRadio & _crazyRadio;

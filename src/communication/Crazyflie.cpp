@@ -179,7 +179,7 @@ bool Crazyflie::Update()
         }
         case STATE_ZERO_MEASUREMENTS:
         {
-            _tocLogs->ProcessPackets(_crazyRadio.PopLoggingPackets());
+            _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
             // NOTE(winkler): Here, we can do measurement zero'ing. This is
             // not done at the moment, though. Reason: No readings to zero at
@@ -191,7 +191,7 @@ bool Crazyflie::Update()
         case STATE_NORMAL_OPERATION:
         {
             // Shove over the sensor readings from the radio to the Logs TOC.
-            _tocLogs->ProcessPackets(_crazyRadio.PopLoggingPackets());
+            _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
             if(_sendsSetpoints)
             {

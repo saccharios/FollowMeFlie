@@ -36,11 +36,12 @@
 #include <vector>
 #include <stdint.h>
 
+
 // Convert to vector<uint8_t>
 template<typename T>
 std::vector<uint8_t> ConvertTouint8_tVect(T element)
 {
-    // Reinterpret elemtn as array of 8-byte uint8_t
+    // Reinterpret element as array of 8-byte uint8_t
     uint8_t* uint8_t_array = reinterpret_cast<uint8_t *>(&element);
     // Create vector from the array
     constexpr int size = sizeof(T) / sizeof(uint8_t);
@@ -56,9 +57,9 @@ std::vector<uint8_t> ConvertTouint8_tVect(T element)
 template<typename T>
 T ExtractData(std::vector<uint8_t> const & data, int offset)
 {
-    int byteLenght = sizeof(T);
+    int typeLength = sizeof(T);
     T bits = 0;
-    for(int i = 0; i < byteLenght; ++i)
+    for(int i = 0; i < typeLength; ++i)
     {
         bits |= (data.at(offset + i) << 8*i);
     }
@@ -103,12 +104,10 @@ public:
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
     // (channel, port), the payload data and a finishing byte
-    // (0x27). This block is newly allocated and must be delete[]'d after usage.
-    // \return Pointer to a new uint8_t[] containing a sendable block of payload data
+    // (0x27).
     uint8_t * SendableData() const;
 
     // Returns the length of a sendable data block
-    // \return Length of the sendable data block returned by sendableData() (in bytes)
     int GetSendableDataLength() const;
 
     Port GetPort() const;
@@ -117,7 +116,6 @@ public:
 
 private:
     // Internal storage pointer for payload data inside the  packet
-    //    This data is freed when either new data is set or the class instance is destroyed.
     std::vector<uint8_t> _data;
     // The copter port the packet will be delivered to
     Port _port;

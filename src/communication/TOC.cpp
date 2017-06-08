@@ -47,9 +47,9 @@ bool TOC::RequestMetaData()
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     auto received = _crazyRadio.SendAndReceive(std::move(packet));
 
-    if(received->GetData()[1] == 0x01)
+    if(received->GetData().at(1) == 0x01)
     {
-        _itemCount = received->GetData()[2]; // is usually 0x81 == 129 decimal
+        _itemCount = received->GetData().at(2); // is usually 0x81 == 129 decimal
         return  true;
     }
     return false;
@@ -97,23 +97,23 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
 
             std::string name;
             int index = 4;
-            while(data[index] != '\0')
+            while(data.at(index) != '\0')
             {
-                name += data[index];
+                name += data.at(index);
                 ++index;
             }
             name += ".";
             ++index;
-            while(data[index] != '\0')
+            while(data.at(index) != '\0')
             {
-                name += data[index];
+                name += data.at(index);
                 ++index;
             }
 
             TOCElement tocElement;
             tocElement.name = name;
-            tocElement.id = data[2];
-            tocElement.type = static_cast<ElementType>(data[3]);
+            tocElement.id = data.at(2);
+            tocElement.type = static_cast<ElementType>(data.at(3));
             tocElement.isLogging = false;
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
@@ -139,16 +139,16 @@ bool TOC::StartLogging(std::string name, std::string blockName)
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
 
             auto const & dataReceived = received->GetData();
-            if(     dataReceived[1] == 0x01 &&
-                    dataReceived[2] == logBlock.id &&
-                    dataReceived[3] == 0x00)
+            if(     dataReceived.at(1) == 0x01 &&
+                    dataReceived.at(2) == logBlock.id &&
+                    dataReceived.at(3) == 0x00)
             {
                 logBlock.elementIDs.push_back(element.id);
                 return true;
             }
             else
             {
-                std::cout << dataReceived[3] << std::endl;
+                std::cout << dataReceived.at(3) << std::endl;
             }
         }
     }
@@ -197,15 +197,14 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
 
     auto const & dataReceived = received->GetData();
-    if(dataReceived[1] == 0x00 &&
-            dataReceived[2] == id &&
-            dataReceived[3] == 0x00)
+    if(dataReceived.at(1) == 0x00 &&
+            dataReceived.at(2) == id &&
+            dataReceived.at(3) == 0x00)
     {
         LoggingBlock loggingBlock;
         loggingBlock.name = name;
         loggingBlock.id = id;
         loggingBlock.frequency = frequency;
-        // lbNew.ElementIDs will be populated later
         _loggingBlocks.push_back(loggingBlock);
         std::cout << "Registered logging block `" << name << "'" << std::endl;
 
@@ -259,12 +258,16 @@ bool TOC::UnregisterLoggingBlockID(int id)
     return (received != nullptr);
 }
 
-void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
+void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
 {
     for(auto const & packet : packets)
     {
         auto const & data = packet->GetData();
-
+        if(data.size() < 5)
+        {
+            std::cout << "Data packet not large enough!\n";
+            break;
+        }
         const std::vector<uint8_t> logdataVect(data.begin() + 5, data.end());
         int blockID = data.at(1);
         bool found;
@@ -278,11 +281,6 @@ void TOC::ProcessPackets(std::vector<CrazyRadio::sptrPacket> packets)
                 if(found)
                 {
                     int byteLength = 0;
-
-                    // NOTE(winkler): We just copy over the incoming bytes in
-                    // their according data structures and afterwards assign
-                    // the value to fValue. This way, we let the compiler to
-                    // the magic of conversion.
                     float value = 0;
                     switch(element.type)
                     {
