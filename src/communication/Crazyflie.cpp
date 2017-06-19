@@ -52,9 +52,6 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
 
     _state = State::STATE_ZERO;
 
-    _sendSetpointPeriod = 0.01; // Seconds
-    _setpointLastSent = 0;
-
     _stateMachineIsEnabled = false;
 }
 
@@ -140,71 +137,65 @@ bool Crazyflie::Update()
         return false;
     }
 
-    double currentTime = GetCurrentTime();
     switch(_state)
     {
-        case State::STATE_ZERO:
+    case State::STATE_ZERO:
+    {
+        _state = State::STATE_READ_PARAMETERS_TOC;
+        break;
+    }
+    case State::STATE_READ_PARAMETERS_TOC:
+    {
+        if(ReadTOCParameters())
         {
-            _state = State::STATE_READ_PARAMETERS_TOC;
-            break;
+            _state =State:: STATE_READ_LOGS_TOC;
         }
-        case State::STATE_READ_PARAMETERS_TOC:
+        break;
+    }
+    case State::STATE_READ_LOGS_TOC:
+    {
+        if(ReadTOCLogs())
         {
-            if(ReadTOCParameters())
-            {
-                _state =State:: STATE_READ_LOGS_TOC;
-            }
-            break;
+            _state = State::STATE_START_LOGGING;
         }
-        case State::STATE_READ_LOGS_TOC:
-        {
-            if(ReadTOCLogs())
-            {
-                _state = State::STATE_START_LOGGING;
-            }
-            break;
-        }
-        case State::STATE_START_LOGGING:
-        {
-            StartLogging();
-            _state = State::STATE_ZERO_MEASUREMENTS;
-            break;
-        }
-        case State::STATE_ZERO_MEASUREMENTS:
-        {
-            _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        break;
+    }
+    case State::STATE_START_LOGGING:
+    {
+        StartLogging();
+        _state = State::STATE_ZERO_MEASUREMENTS;
+        break;
+    }
+    case State::STATE_ZERO_MEASUREMENTS:
+    {
+        _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
-            // NOTE(winkler): Here, we can do measurement zero'ing. This is
-            // not done at the moment, though. Reason: No readings to zero at
-            // the moment. This might change when altitude becomes available.
+        // NOTE(winkler): Here, we can do measurement zero'ing. This is
+        // not done at the moment, though. Reason: No readings to zero at
+        // the moment. This might change when altitude becomes available.
 
-            _state = State::STATE_NORMAL_OPERATION;
-            break;
-        }
-        case State::STATE_NORMAL_OPERATION:
+        _state = State::STATE_NORMAL_OPERATION;
+        break;
+    }
+    case State::STATE_NORMAL_OPERATION:
+    {
+        // Shove over the sensor readings from the radio to the Logs TOC.
+        _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+
+        if(_sendsSetpoints)
         {
-            // Shove over the sensor readings from the radio to the Logs TOC.
-            _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-
-            if(_sendsSetpoints)
-            {
-                // Check if it's time to send the setpoint
-                if(currentTime - _setpointLastSent > _sendSetpointPeriod)
-                {
-                    // Send the current set point based on the previous calculations
-                    SendSetpoint(_roll, _pitch, _yaw, _thrust);
-                    _setpointLastSent = currentTime;
-                }
-            }
-            else
-            {
-                // Send a dummy packet for keepalive
-                _crazyRadio.SendPingPacket();
-            }
-            break;
+            // Send the current set point based on the previous calculations
+            SendSetpoint(_roll, _pitch, _yaw, _thrust);
         }
-        default:
-            break;
+        else
+        {
+            // Send a dummy packet for keepalive
+            _crazyRadio.SendPingPacket();
+        }
+        break;
+    }
+    default:
+        break;
     } // end switch
 
     if(_crazyRadio.AckReceived())
@@ -266,14 +257,6 @@ void Crazyflie::SetYaw(float yaw)
 float Crazyflie::GetYaw()
 {
     return GetSensorValue("stabilizer.yaw");
-}
-
-double Crazyflie::GetCurrentTime()
-{
-    struct timespec tsTime;
-    clock_gettime(&tsTime);
-
-    return tsTime.tv_sec + double(tsTime.tv_nsec) / NSEC_PER_SEC;
 }
 
 bool Crazyflie::IsInitialized()
