@@ -382,6 +382,7 @@ bool CrazyRadio::ClaimInterface(int interface)
     int errcode = libusb_claim_interface(_device, interface);
     return( errcode == 0);
 }
+// TODO rename function
 bool CrazyRadio::SendPacket_2(CRTPPacket && sendPacket)
 {
     return SendPacket(std::move(sendPacket)) != nullptr;

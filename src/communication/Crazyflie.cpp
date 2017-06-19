@@ -30,30 +30,38 @@
 #include <chrono>
 #include "math/clock_gettime.h"
 
-Crazyflie::Crazyflie(CrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
-{
-    // Review these values
-    _maxAbsRoll = 45.0f;
-    _maxAbsPitch = _maxAbsRoll;
-    _maxYaw = 180.0f;
-    _maxThrust = 60000;
-    _minThrust = 0;//15000;
+//CrazyRadio & _crazyRadio;
 
-    _roll = 0;
-    _pitch = 0;
-    _yaw = 0;
-    _thrust = 0;
+//int _ackMissTolerance;
+//int _ackMissCounter;
 
-    _sendsSetpoints = false;
+//SetPoint _sendSetPoint;
+//SetPoint _maxSetPoint;
 
-    // TODO Why are they dynamically allocated?
-    _tocParameters = new TOC(_crazyRadio, Port::Parameters);
-    _tocLogs = new TOC(_crazyRadio, Port::Log);
+//int _minThrust;
 
-    _state = State::STATE_ZERO;
+//bool _isSendingSetpoints;
 
-    _stateMachineIsEnabled = false;
-}
+//bool _stateMachineIsEnabled;
+//State _state;
+
+//TOC* _tocParameters;
+//TOC* _tocLogs;
+
+
+Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
+    _crazyRadio(crazyRadio),
+    _ackMissTolerance(0),
+    _ackMissCounter(0),
+    _sendSetPoint(),
+    _maxSetPoint({45.0,45.0,180.0,60000}),
+    _minThrust(0),
+    _isSendingSetpoints(false),
+    _stateMachineIsEnabled(false),
+    _state (State::STATE_ZERO),
+    _tocParameters(_crazyRadio, Port::Parameters),
+    _tocLogs(_crazyRadio, Port::Log)
+{}
 
 Crazyflie::~Crazyflie()
 {
@@ -62,9 +70,9 @@ Crazyflie::~Crazyflie()
 
 bool Crazyflie::ReadTOCParameters()
 {
-    if(_tocParameters->RequestMetaData() )
+    if(_tocParameters.RequestMetaData() )
     {
-        if(_tocParameters->RequestItems())
+        if(_tocParameters.RequestItems())
         {
             return true;
         }
@@ -75,10 +83,10 @@ bool Crazyflie::ReadTOCParameters()
 
 bool Crazyflie::ReadTOCLogs()
 {
-    auto meta_ok = _tocLogs->RequestMetaData();
+    auto meta_ok = _tocLogs.RequestMetaData();
     if(meta_ok)
     {
-        auto req = _tocLogs->RequestItems();
+        auto req = _tocLogs.RequestItems();
         if(req)
         {
             return true;
@@ -88,12 +96,12 @@ bool Crazyflie::ReadTOCLogs()
     return false;
 }
 
-bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
+bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
-    auto data = ConvertTouint8_tVect(roll);
-    auto pitchVect = ConvertTouint8_tVect(-pitch); // Warning: Is negated here.
-    auto yawVect = ConvertTouint8_tVect(yaw);
-    auto thrustVect = ConvertTouint8_tVect(thrust);
+    auto data = ConvertTouint8_tVect(setPoint.roll);
+    auto pitchVect = ConvertTouint8_tVect( -setPoint.pitch); // Warning: Is negated here.
+    auto yawVect = ConvertTouint8_tVect(setPoint.yaw);
+    auto thrustVect = ConvertTouint8_tVect(setPoint.thrust);
 
     data.insert(data.end(), pitchVect.begin(), pitchVect.end());
     data.insert(data.end(), yawVect.begin(), yawVect.end());
@@ -106,15 +114,15 @@ bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 
 void Crazyflie::SetThrust(int thrust)
 {
-    _thrust = thrust;
+    _sendSetPoint.thrust = thrust;
 
-    if(_thrust < _minThrust)
+    if(_sendSetPoint.thrust < _minThrust)
     {
-        _thrust = _minThrust;
+        _sendSetPoint.thrust = _minThrust;
     }
-    else if(_thrust > _maxThrust)
+    else if(_sendSetPoint.thrust > _sendSetPoint.thrust)
     {
-        _thrust = _maxThrust;
+        _sendSetPoint.thrust = _sendSetPoint.thrust;
     }
 }
 
@@ -168,7 +176,7 @@ bool Crazyflie::Update()
     }
     case State::STATE_ZERO_MEASUREMENTS:
     {
-        _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
         // NOTE(winkler): Here, we can do measurement zero'ing. This is
         // not done at the moment, though. Reason: No readings to zero at
@@ -180,12 +188,12 @@ bool Crazyflie::Update()
     case State::STATE_NORMAL_OPERATION:
     {
         // Shove over the sensor readings from the radio to the Logs TOC.
-        _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
-        if(_sendsSetpoints)
+        if(_isSendingSetpoints)
         {
             // Send the current set point based on the previous calculations
-            SendSetpoint(_roll, _pitch, _yaw, _thrust);
+            SendSetpoint(_sendSetPoint);
         }
         else
         {
@@ -212,16 +220,17 @@ bool Crazyflie::Update()
 
 bool Crazyflie::IsCopterConnected()
 {
+    // TODO Is this function useful?
     return _ackMissCounter < _ackMissTolerance;
 }
 
 void Crazyflie::SetRoll(float roll)
 {
-    _roll = roll;
+    _sendSetPoint.roll = roll;
 
-    if(std::fabs(_roll) > _maxAbsRoll)
+    if(std::fabs(_sendSetPoint.roll) > _sendSetPoint.roll)
     {
-        _roll = copysign(_maxAbsRoll, _roll);
+        _sendSetPoint.roll = copysign(_sendSetPoint.roll, _sendSetPoint.roll);
     }
 }
 
@@ -232,11 +241,11 @@ float Crazyflie::GetRoll()
 
 void Crazyflie::SetPitch(float pitch)
 {
-    _pitch = pitch;
+    _sendSetPoint.pitch = pitch;
 
-    if(std::fabs(_pitch) > _maxAbsPitch)
+    if(std::fabs(_sendSetPoint.pitch) > _sendSetPoint.pitch)
     {
-        _pitch = copysign(_maxAbsPitch, _pitch);
+        _sendSetPoint.pitch = copysign(_sendSetPoint.pitch, _sendSetPoint.pitch);
     }
 }
 
@@ -247,10 +256,11 @@ float Crazyflie::GetPitch()
 
 void Crazyflie::SetYaw(float yaw)
 {
-    _yaw = yaw;
+    _sendSetPoint.yaw = yaw;
 
-    if(std::fabs(_yaw) > _maxYaw){
-        _yaw = copysign(_maxYaw, _yaw);
+    if(std::fabs(_sendSetPoint.yaw) > _sendSetPoint.yaw)
+    {
+        _sendSetPoint.yaw = copysign(_sendSetPoint.yaw, _sendSetPoint.yaw);
     }
 }
 
@@ -287,41 +297,41 @@ void Crazyflie::StopLogging()
 
 void Crazyflie::SetSendSetpoints(bool bSendSetpoints)
 {
-    _sendsSetpoints = bSendSetpoints;
+    _isSendingSetpoints = bSendSetpoints;
 }
 
 bool Crazyflie::IsSendingSetpoints()
 {
-    return _sendsSetpoints;
+    return _isSendingSetpoints;
 }
 
 double Crazyflie::GetSensorValue(std::string strName)
 {
-    return _tocLogs->DoubleValue(strName);
+    return _tocLogs.DoubleValue(strName);
 }
 
 void Crazyflie::DisableLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("high-speed");
-    _tocLogs->UnregisterLoggingBlock("low-speed");
+    _tocLogs.UnregisterLoggingBlock("high-speed");
+    _tocLogs.UnregisterLoggingBlock("low-speed");
 }
 
 void Crazyflie::EnableStabilizerLogging()
 {
-    _tocLogs->RegisterLoggingBlock("stabilizer", 1000);
+    _tocLogs.RegisterLoggingBlock("stabilizer", 1000);
 
-    _tocLogs->StartLogging("stabilizer.roll", "stabilizer");
-    _tocLogs->StartLogging("stabilizer.pitch", "stabilizer");
-    _tocLogs->StartLogging("stabilizer.yaw", "stabilizer");
+    _tocLogs.StartLogging("stabilizer.roll", "stabilizer");
+    _tocLogs.StartLogging("stabilizer.pitch", "stabilizer");
+    _tocLogs.StartLogging("stabilizer.yaw", "stabilizer");
 }
 
 void Crazyflie::EnableGyroscopeLogging()
 {
-    _tocLogs->RegisterLoggingBlock("gyroscope", 1000);
+    _tocLogs.RegisterLoggingBlock("gyroscope", 1000);
 
-    _tocLogs->StartLogging("gyro.x", "gyroscope");
-    _tocLogs->StartLogging("gyro.y", "gyroscope");
-    _tocLogs->StartLogging("gyro.z", "gyroscope");
+    _tocLogs.StartLogging("gyro.x", "gyroscope");
+    _tocLogs.StartLogging("gyro.y", "gyroscope");
+    _tocLogs.StartLogging("gyro.z", "gyroscope");
 }
 
 float Crazyflie::GyroX()
@@ -339,12 +349,12 @@ float Crazyflie::GyroZ() {
 
 void Crazyflie::EnableAccelerometerLogging()
 {
-    _tocLogs->RegisterLoggingBlock("accelerometer", 1000);
+    _tocLogs.RegisterLoggingBlock("accelerometer", 1000);
 
-    _tocLogs->StartLogging("acc.x", "accelerometer");
-    _tocLogs->StartLogging("acc.y", "accelerometer");
-    _tocLogs->StartLogging("acc.z", "accelerometer");
-    _tocLogs->StartLogging("acc.zw", "accelerometer");
+    _tocLogs.StartLogging("acc.x", "accelerometer");
+    _tocLogs.StartLogging("acc.y", "accelerometer");
+    _tocLogs.StartLogging("acc.z", "accelerometer");
+    _tocLogs.StartLogging("acc.zw", "accelerometer");
 }
 
 float Crazyflie::AccX()
@@ -369,25 +379,25 @@ float Crazyflie::AccZW()
 
 void Crazyflie::DisableStabilizerLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("stabilizer");
+    _tocLogs.UnregisterLoggingBlock("stabilizer");
 }
 
 void Crazyflie::DisableGyroscopeLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("gyroscope");
+    _tocLogs.UnregisterLoggingBlock("gyroscope");
 }
 
 void Crazyflie::DisableAccelerometerLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("accelerometer");
+    _tocLogs.UnregisterLoggingBlock("accelerometer");
 }
 
 void Crazyflie::EnableBatteryLogging()
 {
-    _tocLogs->RegisterLoggingBlock("battery", 1000);
+    _tocLogs.RegisterLoggingBlock("battery", 1000);
 
-    _tocLogs->StartLogging("pm.vbat", "battery");
-    _tocLogs->StartLogging("pm.state", "battery");
+    _tocLogs.StartLogging("pm.vbat", "battery");
+    _tocLogs.StartLogging("pm.state", "battery");
 }
 
 double Crazyflie::GetBatteryLevel()
@@ -402,16 +412,16 @@ float Crazyflie::GetBatteryState()
 
 void Crazyflie::DisableBatteryLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("battery");
+    _tocLogs.UnregisterLoggingBlock("battery");
 }
 
 void Crazyflie::EnableMagnetometerLogging()
 {
-    _tocLogs->RegisterLoggingBlock("magnetometer", 1000);
+    _tocLogs.RegisterLoggingBlock("magnetometer", 1000);
 
-    _tocLogs->StartLogging("mag.x", "magnetometer");
-    _tocLogs->StartLogging("mag.y", "magnetometer");
-    _tocLogs->StartLogging("mag.z", "magnetometer");
+    _tocLogs.StartLogging("mag.x", "magnetometer");
+    _tocLogs.StartLogging("mag.y", "magnetometer");
+    _tocLogs.StartLogging("mag.z", "magnetometer");
 }
 float Crazyflie::MagX()
 {
@@ -427,16 +437,16 @@ float Crazyflie::MagZ()
 }
 void Crazyflie::DisableMagnetometerLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("magnetometer");
+    _tocLogs.UnregisterLoggingBlock("magnetometer");
 }
 
 void Crazyflie::EnableAltimeterLogging()
 {
-    _tocLogs->RegisterLoggingBlock("altimeter", 1000);
-    _tocLogs->StartLogging("alti.asl", "altimeter");
-    _tocLogs->StartLogging("alti.aslLong", "altimeter");
-    _tocLogs->StartLogging("alti.pressure", "altimeter");
-    _tocLogs->StartLogging("alti.temperature", "altimeter");
+    _tocLogs.RegisterLoggingBlock("altimeter", 1000);
+    _tocLogs.StartLogging("alti.asl", "altimeter");
+    _tocLogs.StartLogging("alti.aslLong", "altimeter");
+    _tocLogs.StartLogging("alti.pressure", "altimeter");
+    _tocLogs.StartLogging("alti.temperature", "altimeter");
 }
 
 float Crazyflie::Asl()
@@ -458,5 +468,5 @@ float Crazyflie::Temperature()
 
 void Crazyflie::DisableAltimeterLogging()
 {
-    _tocLogs->UnregisterLoggingBlock("altimeter");
+    _tocLogs.UnregisterLoggingBlock("altimeter");
 }

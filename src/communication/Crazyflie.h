@@ -48,9 +48,16 @@ enum class State {
 class Crazyflie {
 
 public:
+    struct SetPoint
+    {
+        float roll;
+        float pitch;
+        float yaw;
+        uint16_t thrust;
+    };
+
     Crazyflie(CrazyRadio & crazyRadio);
     ~Crazyflie();
-
 
     // The thrust value to send (> 10000)
     void SetThrust(int thrust);
@@ -123,42 +130,28 @@ public:
     float MagZ();
 
 private:
-    // Variables
+    CrazyRadio & _crazyRadio;
+
     int _ackMissTolerance;
     int _ackMissCounter;
-    //Internal pointer to the initialized CCrazyRadio radio interface instance.
-    CrazyRadio & _crazyRadio;
-    //The current thrust to send as a set point to the copter.
-    int _thrust;
-    //The current roll to send as a set point to the copter.
-    float _roll;
-    //The current pitch to send as a set point to the copter.
-    float _pitch;
-    //The current yaw to send as a set point to the copter.
-    float _yaw;
-    //The current desired control set point (position/yaw to reach)
 
-    // Control related parameters
-    //Maximum absolute value for the roll that will be sent to  the copter.
-    float _maxAbsRoll;
-    //Maximum absolute value for the pitch that will be sent to the copter.
-    float _maxAbsPitch;
-    //Maximum absolute value for the yaw that will be sent to  the copter.
-    float _maxYaw;
-    //Maximum thrust that will be sent to the copter.
-    int _maxThrust;
-    //Minimum thrust that will be sent to the copter.
+    SetPoint _sendSetPoint;
+    SetPoint _maxSetPoint;
+
     int _minThrust;
-    bool _sendsSetpoints;
 
-    TOC* _tocParameters;
-    TOC* _tocLogs;
+    bool _isSendingSetpoints;
+
+    bool _stateMachineIsEnabled;
     State _state;
+
+    TOC _tocParameters;
+    TOC _tocLogs;
 
     bool ReadTOCParameters();
     bool ReadTOCLogs();
 
-    bool SendSetpoint(float foll, float pitch, float yaw, short thrust);
+    bool SendSetpoint(SetPoint setPoint);
 
     void DisableLogging();
 
@@ -182,6 +175,5 @@ private:
     void EnableAltimeterLogging();
     void DisableAltimeterLogging();
 
-    bool _stateMachineIsEnabled;
 };
 
