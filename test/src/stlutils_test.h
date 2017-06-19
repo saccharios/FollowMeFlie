@@ -60,7 +60,7 @@ TEST_F(STLUtils_Test, VectorSearchByID)
     EXPECT_TRUE(isValid);
     EXPECT_EQ(element1.id, e1.id);
     id = 4;
-    auto & element2 = STLUtils::ElementForID(myVect, id, isValid);
+    STLUtils::ElementForID(myVect, id, isValid);
     EXPECT_FALSE(isValid);
 
 }
@@ -81,7 +81,7 @@ TEST_F(STLUtils_Test, VectorISearchByName)
     EXPECT_TRUE(isValid);
     EXPECT_EQ(element1.id, e1.id);
     name = "abc";
-    auto & element2 = STLUtils::ElementForName(myVect, name, isValid);
+    STLUtils::ElementForName(myVect, name, isValid);
     EXPECT_FALSE(isValid);
 }
 

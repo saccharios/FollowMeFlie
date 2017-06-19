@@ -37,7 +37,7 @@
 #include <memory>
 constexpr unsigned long NSEC_PER_SEC = 1000000000;
 
-enum State {
+enum class State {
     STATE_ZERO = 0,
     STATE_READ_PARAMETERS_TOC = 1,
     STATE_READ_LOGS_TOC = 2,
@@ -255,8 +255,8 @@ private:
     void EnableBatteryLogging();
     void DisableBatteryLogging();
 
-    bool StartLogging();
-    bool StopLogging();
+    void StartLogging();
+    void StopLogging();
 
     void EnableMagnetometerLogging();
     void DisableMagnetometerLogging();

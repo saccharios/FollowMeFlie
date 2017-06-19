@@ -409,7 +409,8 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                     }
                     std::cout << std::endl;
                 }
-            } break;
+                break;
+            }
 
             case Port::Log:
             { // Logging
@@ -417,7 +418,14 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                 {
                     _loggingPackets.emplace_back(packet);
                 }
-            } break;
+                break;
+            }
+            case Port::Commander:
+            case Port::Debug:
+            case Port::Link:
+            case Port::Parameters:
+            default:
+                break;
             }
         }
     }

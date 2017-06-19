@@ -1,6 +1,10 @@
 #include "crazyfliecaller.h"
 
-CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) : _crazyFlie(crazyFlie), QObject(parent)
+CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) :
+    QObject(parent),
+    _timerUpdate(),
+    _timerDisplay(),
+    _crazyFlie(crazyFlie)
 {
     // Execute Update() every 10ms. Add it to the event loop:
     QObject::connect(&_timerUpdate, SIGNAL(timeout()), this, SLOT(Update()));

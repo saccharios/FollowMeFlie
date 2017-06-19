@@ -50,7 +50,7 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) : _crazyRadio(crazyRadio)
     _tocParameters = new TOC(_crazyRadio, Port::Parameters);
     _tocLogs = new TOC(_crazyRadio, Port::Log);
 
-    _state = STATE_ZERO;
+    _state = State::STATE_ZERO;
 
     _sendSetpointPeriod = 0.01; // Seconds
     _setpointLastSent = 0;
@@ -78,9 +78,11 @@ bool Crazyflie::ReadTOCParameters()
 
 bool Crazyflie::ReadTOCLogs()
 {
-    if(_tocLogs->RequestMetaData())
+    auto meta_ok = _tocLogs->RequestMetaData();
+    if(meta_ok)
     {
-        if(_tocLogs->RequestItems())
+        auto req = _tocLogs->RequestItems();
+        if(req)
         {
             return true;
         }
@@ -91,15 +93,6 @@ bool Crazyflie::ReadTOCLogs()
 
 bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
 {
-    // TODO SF Completely chane data layout of crtppacket. Outside users need not care about its internal buffer !
-    // Add non-member function that takes vector<floats/int/etc> and makes a vector<uint8_t>
-//    int size = 3 * sizeof(float) + sizeof(short);
-//    uint8_t cBuffer[size];
-//    memcpy(&cBuffer[0 * sizeof(float)], &roll, sizeof(float));
-//    memcpy(&cBuffer[1 * sizeof(float)], &pitch, sizeof(float));
-//    memcpy(&cBuffer[2 * sizeof(float)], &yaw, sizeof(float));
-//    memcpy(&cBuffer[3 * sizeof(float)], &thrust, sizeof(short));
-
     auto data = ConvertTouint8_tVect(roll);
     auto pitchVect = ConvertTouint8_tVect(-pitch); // Warning: Is negated here.
     auto yawVect = ConvertTouint8_tVect(yaw);
@@ -114,7 +107,8 @@ bool Crazyflie::SendSetpoint(float roll, float pitch, float yaw, short thrust)
     return _crazyRadio.SendPacket_2(std::move(packet));
 }
 
-void Crazyflie::SetThrust(int thrust) {
+void Crazyflie::SetThrust(int thrust)
+{
     _thrust = thrust;
 
     if(_thrust < _minThrust)
@@ -129,7 +123,7 @@ void Crazyflie::SetThrust(int thrust) {
 
 int Crazyflie::GetThrust()
 {
-    return this->GetSensorValue("stabilizer.thrust");
+    return GetSensorValue("stabilizer.thrust");
 }
 
 void Crazyflie::EnableStateMachine(bool enable)
@@ -142,42 +136,41 @@ bool Crazyflie::Update()
     // TODO SF How to restart the state machine properly?
     if(!_stateMachineIsEnabled)
     {
+        _state = State::STATE_ZERO;
         return false;
     }
 
-    double currentTime = this->GetCurrentTime();
+    double currentTime = GetCurrentTime();
     switch(_state)
     {
-        case STATE_ZERO:
+        case State::STATE_ZERO:
         {
-            _state = STATE_READ_PARAMETERS_TOC;
+            _state = State::STATE_READ_PARAMETERS_TOC;
             break;
         }
-        case STATE_READ_PARAMETERS_TOC:
+        case State::STATE_READ_PARAMETERS_TOC:
         {
-            if(this->ReadTOCParameters())
+            if(ReadTOCParameters())
             {
-                _state = STATE_READ_LOGS_TOC;
+                _state =State:: STATE_READ_LOGS_TOC;
             }
             break;
         }
-        case STATE_READ_LOGS_TOC:
+        case State::STATE_READ_LOGS_TOC:
         {
-            if(this->ReadTOCLogs())
+            if(ReadTOCLogs())
             {
-                _state = STATE_START_LOGGING;
+                _state = State::STATE_START_LOGGING;
             }
             break;
         }
-        case STATE_START_LOGGING:
+        case State::STATE_START_LOGGING:
         {
-            if(this->StartLogging())
-            {
-                _state = STATE_ZERO_MEASUREMENTS;
-            }
+            StartLogging();
+            _state = State::STATE_ZERO_MEASUREMENTS;
             break;
         }
-        case STATE_ZERO_MEASUREMENTS:
+        case State::STATE_ZERO_MEASUREMENTS:
         {
             _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
@@ -185,10 +178,10 @@ bool Crazyflie::Update()
             // not done at the moment, though. Reason: No readings to zero at
             // the moment. This might change when altitude becomes available.
 
-            _state = STATE_NORMAL_OPERATION;
+            _state = State::STATE_NORMAL_OPERATION;
             break;
         }
-        case STATE_NORMAL_OPERATION:
+        case State::STATE_NORMAL_OPERATION:
         {
             // Shove over the sensor readings from the radio to the Logs TOC.
             _tocLogs->ProcessLogPackets(_crazyRadio.PopLoggingPackets());
@@ -258,7 +251,7 @@ void Crazyflie::SetPitch(float pitch)
 
 float Crazyflie::GetPitch()
 {
-    return this->GetSensorValue("stabilizer.pitch");
+    return GetSensorValue("stabilizer.pitch");
 }
 
 void Crazyflie::SetYaw(float yaw)
@@ -272,7 +265,7 @@ void Crazyflie::SetYaw(float yaw)
 
 float Crazyflie::GetYaw()
 {
-    return this->GetSensorValue("stabilizer.yaw");
+    return GetSensorValue("stabilizer.yaw");
 }
 
 double Crazyflie::GetCurrentTime()
@@ -285,10 +278,10 @@ double Crazyflie::GetCurrentTime()
 
 bool Crazyflie::IsInitialized()
 {
-    return _state == STATE_NORMAL_OPERATION;
+    return _state == State::STATE_NORMAL_OPERATION;
 }
 
-bool Crazyflie::StartLogging()
+void Crazyflie::StartLogging()
 {
     // Register the desired sensor readings
     EnableStabilizerLogging();
@@ -297,20 +290,16 @@ bool Crazyflie::StartLogging()
     EnableBatteryLogging();
     EnableMagnetometerLogging();
     EnableAltimeterLogging();
-
-    return true;
 }
 
-bool Crazyflie::StopLogging()
+void Crazyflie::StopLogging()
 {
-    this->DisableStabilizerLogging();
-    this->DisableGyroscopeLogging();
-    this->DisableAccelerometerLogging();
-    this->DisableBatteryLogging();
-    this->DisableMagnetometerLogging();
-    this->DisableAltimeterLogging();
-
-    return true;
+    DisableStabilizerLogging();
+    DisableGyroscopeLogging();
+    DisableAccelerometerLogging();
+    DisableBatteryLogging();
+    DisableMagnetometerLogging();
+    DisableAltimeterLogging();
 }
 
 void Crazyflie::SetSendSetpoints(bool bSendSetpoints)
