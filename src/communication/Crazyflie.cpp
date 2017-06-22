@@ -30,25 +30,6 @@
 #include <chrono>
 #include "math/clock_gettime.h"
 
-//CrazyRadio & _crazyRadio;
-
-//int _ackMissTolerance;
-//int _ackMissCounter;
-
-//SetPoint _sendSetPoint;
-//SetPoint _maxSetPoint;
-
-//int _minThrust;
-
-//bool _isSendingSetpoints;
-
-//bool _stateMachineIsEnabled;
-//State _state;
-
-//TOC* _tocParameters;
-//TOC* _tocLogs;
-
-
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
     _ackMissTolerance(0),
@@ -109,7 +90,7 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
 
     CRTPPacket  packet(Port::Commander,Channel::TOC, std::move(data));
 
-    return _crazyRadio.SendPacket_2(std::move(packet));
+    return _crazyRadio.SendPacketAndCheck(std::move(packet));
 }
 
 void Crazyflie::SetThrust(int thrust)
@@ -125,7 +106,7 @@ void Crazyflie::SetThrust(int thrust)
         _sendSetPoint.thrust = _sendSetPoint.thrust;
     }
 }
-
+// TODO Thrust display not working
 int Crazyflie::GetThrust()
 {
     return GetSensorValue("stabilizer.thrust");
@@ -142,6 +123,7 @@ bool Crazyflie::Update()
     if(!_stateMachineIsEnabled)
     {
         _state = State::STATE_ZERO;
+        StopLogging();
         return false;
     }
 
@@ -236,7 +218,7 @@ void Crazyflie::SetRoll(float roll)
 
 float Crazyflie::GetRoll()
 {
-    return this->GetSensorValue("stabilizer.roll");
+    return GetSensorValue("stabilizer.roll");
 }
 
 void Crazyflie::SetPitch(float pitch)
@@ -336,15 +318,15 @@ void Crazyflie::EnableGyroscopeLogging()
 
 float Crazyflie::GyroX()
 {
-    return this->GetSensorValue("gyro.x");
+    return GetSensorValue("gyro.x");
 }
 
 float Crazyflie::GyroY() {
-    return this->GetSensorValue("gyro.y");
+    return GetSensorValue("gyro.y");
 }
 
 float Crazyflie::GyroZ() {
-    return this->GetSensorValue("gyro.z");
+    return GetSensorValue("gyro.z");
 }
 
 void Crazyflie::EnableAccelerometerLogging()
@@ -359,22 +341,22 @@ void Crazyflie::EnableAccelerometerLogging()
 
 float Crazyflie::AccX()
 {
-    return this->GetSensorValue("acc.x");
+    return GetSensorValue("acc.x");
 }
 
 float Crazyflie::AccY()
 {
-    return this->GetSensorValue("acc.y");
+    return GetSensorValue("acc.y");
 }
 
 float Crazyflie::AccZ()
 {
-    return this->GetSensorValue("acc.z");
+    return GetSensorValue("acc.z");
 }
 
 float Crazyflie::AccZW()
 {
-    return this->GetSensorValue("acc.zw");
+    return GetSensorValue("acc.zw");
 }
 
 void Crazyflie::DisableStabilizerLogging()
@@ -402,12 +384,12 @@ void Crazyflie::EnableBatteryLogging()
 
 double Crazyflie::GetBatteryLevel()
 {
-    return this->GetSensorValue("pm.vbat");
+    return GetSensorValue("pm.vbat");
 }
 
 float Crazyflie::GetBatteryState()
 {
-    return this->GetSensorValue("pm.state");
+    return GetSensorValue("pm.state");
 }
 
 void Crazyflie::DisableBatteryLogging()
@@ -425,15 +407,15 @@ void Crazyflie::EnableMagnetometerLogging()
 }
 float Crazyflie::MagX()
 {
-    return this->GetSensorValue("mag.x");
+    return GetSensorValue("mag.x");
 }
 float Crazyflie::MagY()
 {
-    return this->GetSensorValue("mag.y");
+    return GetSensorValue("mag.y");
 }
 float Crazyflie::MagZ()
 {
-    return this->GetSensorValue("mag.z");
+    return GetSensorValue("mag.z");
 }
 void Crazyflie::DisableMagnetometerLogging()
 {
@@ -451,19 +433,19 @@ void Crazyflie::EnableAltimeterLogging()
 
 float Crazyflie::Asl()
 {
-    return this->GetSensorValue("alti.asl");
+    return GetSensorValue("alti.asl");
 }
 float Crazyflie::AslLong()
 {
-    return this->GetSensorValue("alti.aslLong");
+    return GetSensorValue("alti.aslLong");
 }
 float Crazyflie::Pressure()
 {
-    return this->GetSensorValue("alti.pressure");
+    return GetSensorValue("alti.pressure");
 }
 float Crazyflie::Temperature()
 {
-    return this->GetSensorValue("alti.temperature");
+    return GetSensorValue("alti.temperature");
 }
 
 void Crazyflie::DisableAltimeterLogging()

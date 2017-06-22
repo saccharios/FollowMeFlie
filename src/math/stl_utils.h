@@ -65,6 +65,15 @@ namespace STLUtils
         return  *it;
     }
 
+    template<typename T>
+    void PrintVect(std::vector<T> const vect)
+    {
+        std::cout << "Vector contains " << vect.size() << " elements:\n";
+        for(auto const & e : vect)
+        {
+            std::cout << e << std::endl;
+        }
+    }
 
 
 }

@@ -64,8 +64,7 @@ CrazyRadio::~CrazyRadio()
 {
     CloseDevice();
 
-    // TODO(winkler): Free all remaining packets in m_lstLoggingPackets.
-
+    _loggingPackets.clear();
     if(_context)
     {
         libusb_exit(_context);
@@ -382,8 +381,7 @@ bool CrazyRadio::ClaimInterface(int interface)
     int errcode = libusb_claim_interface(_device, interface);
     return( errcode == 0);
 }
-// TODO rename function
-bool CrazyRadio::SendPacket_2(CRTPPacket && sendPacket)
+bool CrazyRadio::SendPacketAndCheck(CRTPPacket && sendPacket)
 {
     return SendPacket(std::move(sendPacket)) != nullptr;
 }
@@ -535,7 +533,7 @@ std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    return SendPacket_2({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
+    return SendPacketAndCheck({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
 }
 
 bool CrazyRadio::RadioIsConnected() const

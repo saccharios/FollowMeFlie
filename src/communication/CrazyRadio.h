@@ -85,7 +85,7 @@ public:
 
     void SetPower(PowerSettings power);
 
-    bool SendPacket_2(CRTPPacket && sendPacket);
+    bool SendPacketAndCheck(CRTPPacket && sendPacket);
 
     sptrPacket SendAndReceive(CRTPPacket && sendPacket);
 

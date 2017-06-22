@@ -38,7 +38,7 @@ bool TOC::SendTOCPointerReset()
 {
     std::vector<uint8_t> data = {0};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
-    return  _crazyRadio.SendPacket_2(std::move(packet));
+    return  _crazyRadio.SendPacketAndCheck(std::move(packet));
 }
 
 bool TOC::RequestMetaData()
@@ -167,7 +167,6 @@ bool TOC::StartLogging(std::string name, std::string blockName)
 double TOC::DoubleValue(std::string name)
 {
     bool found;
-
     auto & result = STLUtils::ElementForName(_TOCElements, name, found);
     return (found ? result.value : 0);
 }
@@ -280,6 +279,12 @@ void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
                 TOCElement & element = STLUtils::ElementForID(_TOCElements, elementID , found);
                 if(found)
                 {
+                    if(element.name == "stabilizer.thrust")
+                    {
+                            std::cout << static_cast<int>(element.type) << std::endl;
+                            STLUtils::PrintVect(logdataVect);
+                    }
+
                     int byteLength = 0;
                     float value = 0;
                     switch(element.type)

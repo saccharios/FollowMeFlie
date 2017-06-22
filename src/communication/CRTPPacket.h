@@ -91,15 +91,14 @@ public:
     CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
     CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data) ;
 
-    // Disable copy ctor + copy assignment
+    // Disable copy/move ctor + copy/move assignment
     CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
     CRTPPacket(CRTPPacket &&) = default;                    // Move constructor
     CRTPPacket& operator=(const CRTPPacket&) & = delete;  // Copy assignment operator
     CRTPPacket& operator=(CRTPPacket&&) & = default;       // Move assignment operator
-    //      virtual ~CRTPPacket() { }                     // Destructor
 
 
-    std::vector<uint8_t> const & GetData() const; // TODO uint8_t sould be uint8_t, or uint8_t
+    std::vector<uint8_t> const & GetData() const;
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
