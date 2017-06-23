@@ -30,10 +30,12 @@
 #include <chrono>
 #include "math/clock_gettime.h"
 
+
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
     _ackMissTolerance(0),
     _ackMissCounter(0),
+    _stateCounter(0),
     _sendSetPoint(),
     _maxSetPoint({45.0,45.0,180.0,60000}),
     _minThrust(0),
@@ -53,6 +55,7 @@ bool Crazyflie::ReadTOCParameters()
 {
     if(_tocParameters.RequestMetaData() )
     {
+        std::cout << "meta data req ok\n";
         if(_tocParameters.RequestItems())
         {
             return true;
@@ -117,6 +120,7 @@ void Crazyflie::EnableStateMachine(bool enable)
     _stateMachineIsEnabled = enable;
 }
 
+// Runs on 10ms.
 bool Crazyflie::Update()
 {
     // TODO SF How to restart the state machine properly?
@@ -132,6 +136,7 @@ bool Crazyflie::Update()
     case State::STATE_ZERO:
     {
         _state = State::STATE_READ_PARAMETERS_TOC;
+        _stateCounter = 0;
         break;
     }
     case State::STATE_READ_PARAMETERS_TOC:
@@ -139,7 +144,9 @@ bool Crazyflie::Update()
         if(ReadTOCParameters())
         {
             _state =State:: STATE_READ_LOGS_TOC;
+            _stateCounter = 0;
         }
+        ++_stateCounter;
         break;
     }
     case State::STATE_READ_LOGS_TOC:
@@ -147,7 +154,9 @@ bool Crazyflie::Update()
         if(ReadTOCLogs())
         {
             _state = State::STATE_START_LOGGING;
+            _stateCounter = 0;
         }
+        ++_stateCounter;
         break;
     }
     case State::STATE_START_LOGGING:
@@ -194,8 +203,10 @@ bool Crazyflie::Update()
     }
     else
     {
-        _ackMissCounter++;
+        ++_ackMissCounter;
     }
+    std::cout << "_stateCounter = " << _stateCounter << std::endl;
+    std::cout << "_state = " << static_cast<int>(_state )<< std::endl;
 
     return _crazyRadio.IsUsbConnectionOk();
 }
@@ -451,4 +462,9 @@ float Crazyflie::Temperature()
 void Crazyflie::DisableAltimeterLogging()
 {
     _tocLogs.UnregisterLoggingBlock("altimeter");
+}
+
+bool Crazyflie::IsConnectionTimeout() const
+{
+    return (_stateCounter > 200); // equals 2s
 }

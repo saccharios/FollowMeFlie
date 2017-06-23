@@ -17,13 +17,16 @@ public slots:
     float GetYaw() const;
     float GetPitch() const;
     int GetThrust() const;
+    void CheckConnectionTimeout();
 
 signals:
     void UpdateActValues();
+    void ConnectionTimeout();
 
 private:
-        QTimer _timerUpdate;
-        QTimer _timerDisplay;
+        QTimer _timer_t0;
+        QTimer _timer_t1;
+        QTimer _timer_t2;
         Crazyflie & _crazyFlie;
 
 };

@@ -224,12 +224,14 @@ CrazyRadio::sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
     int actWritten;
     int retValue = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &actWritten, 1000);
 
+    // TODO SF Bug is here, If copter turned off this does not return nullptr
     if(retValue == 0 && actWritten == length)
     {
         return ReadAck();
     }
     else
     {
+        std::cout << "writing data nullptr\n";
         return nullptr;
     }
 
@@ -390,6 +392,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
+    // TODO SF If copter turned off packet is not nullptr. What is it then? Maybe can be checked here.
     if(packet)
     {
         auto const & data = packet->GetData();
@@ -483,31 +486,38 @@ bool CrazyRadio::IsUsbConnectionOk()
 CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
 {
     sptrPacket received = nullptr;
-    while(received == nullptr) // TODO SF Potential infinite loop
+    int cntr = 0;
+    while(received == nullptr && cntr < 10) // TODO SF Potential infinite loop
     {
         received = SendPacket({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
+        ++cntr;
     }
+    std::cout << "counter has expired = " << cntr << " packet = " << (received == nullptr) << std::endl;
     return received;
 }
-
-CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket)
+CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool & valid)
 {
     bool go_on = true;
     int resendCounter = 0;
     sptrPacket received = nullptr;
-    int retries = 10 ;
+    const int retriesTotal = 10 ;
     int microsecondsWait = 100;
+    int totalCounter = 0;
+    const int totalCounterMax = 10;
     while( go_on)
     {
         if(resendCounter == 0)
         {
+            std::cout << "resending packet\n";
             received = SendPacket(std::move(sendPacket)); // TODO How is it possible to be moved from multiple times???
-            resendCounter = retries;
+            resendCounter = retriesTotal;
+            ++totalCounter;
+            go_on = (totalCounter < totalCounterMax );
         }
         else
         {
-            --resendCounter;
             received = WaitForPacket();
+            --resendCounter;
         }
         if(received)
         {
@@ -521,6 +531,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket)
             std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
         }
     }
+    valid = (received != nullptr);
     return received;
 }
 

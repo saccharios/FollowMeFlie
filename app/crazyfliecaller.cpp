@@ -2,15 +2,18 @@
 
 CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) :
     QObject(parent),
-    _timerUpdate(),
-    _timerDisplay(),
+    _timer_t0(),
+    _timer_t1(),
+    _timer_t2(),
     _crazyFlie(crazyFlie)
 {
     // Execute Update() every 10ms. Add it to the event loop:
-    QObject::connect(&_timerUpdate, SIGNAL(timeout()), this, SLOT(Update()));
-    QObject::connect(&_timerDisplay, SIGNAL(timeout()), this, SLOT(UpdateActValueTime()));
-    _timerUpdate.start(10); // time in ms
-    _timerDisplay.start(100); // time in ms
+    QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(Update()));
+    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(UpdateActValueTime()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(CheckConnectionTimeout()));
+    _timer_t0.start(10); // time in ms
+    _timer_t1.start(100); // time in ms
+    _timer_t2.start(500); // time in ms
 }
 
 
@@ -23,6 +26,13 @@ void CrazyFlieCaller::Update()
 void CrazyFlieCaller::UpdateActValueTime()
 {
     emit UpdateActValues();
+}
+void CrazyFlieCaller::CheckConnectionTimeout()
+{
+    if(_crazyFlie.IsConnectionTimeout())
+    {
+        emit ConnectionTimeout();
+    }
 }
 
 float CrazyFlieCaller::GetRoll() const

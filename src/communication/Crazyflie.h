@@ -129,11 +129,14 @@ public:
     float MagY();
     float MagZ();
 
+   bool IsConnectionTimeout() const;
+
 private:
     CrazyRadio & _crazyRadio;
 
     int _ackMissTolerance;
     int _ackMissCounter;
+    int _stateCounter;
 
     SetPoint _sendSetPoint;
     SetPoint _maxSetPoint;

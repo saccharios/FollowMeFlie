@@ -7,6 +7,8 @@
 //#include <QtMultimediaWidgets>
 #include <QDebug>
 #include "communication/Crazyflie.h"
+#include <QMessageBox>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     connect(&crazyFlieCaller, SIGNAL(UpdateActValues()), this, SLOT(display_act_values()));
+    connect(&crazyFlieCaller, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
+}
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 void MainWindow::display_act_values()
  {
@@ -26,11 +33,14 @@ void MainWindow::display_act_values()
      ui->actPitch->setPlainText( QString::number(crazyFlieCaller.GetPitch()));
      ui->actThrust->setPlainText( QString::number(crazyFlieCaller.GetThrust()));
  }
-
-MainWindow::~MainWindow()
+void MainWindow::display_connection_timeout_box()
 {
-    delete ui;
+    QMessageBox msgBox;
+    msgBox.setText("Could not connect to CrazyFlie.");
+    msgBox.setInformativeText("Have you turned it on?");
+    msgBox.exec();
 }
+
 
 void MainWindow::on_activateCamera_clicked()
 {
@@ -55,8 +65,13 @@ void MainWindow::on_activateCamera_clicked()
 
 void MainWindow::on_disconnectRadio_clicked()
 {
-    _crazyRadio.StopRadio();
-    _crazyFlie.EnableStateMachine(false);
+//    _crazyRadio.StopRadio();
+//    _crazyFlie.EnableStateMachine(false);
+
+    QMessageBox msgBox;
+    msgBox.setText("Feature not implemented yet.");
+    msgBox.exec();
+
 }
 
 void MainWindow::on_connectRadio_clicked()
@@ -69,7 +84,27 @@ void MainWindow::on_connectRadio_clicked()
     else
     {
         _crazyFlie.EnableStateMachine(false);
-        std::cerr << "Not connected!" << std::endl;
+        QMessageBox msgBox;
+        msgBox.setText("Could not open Radio Dongle.");
+        msgBox.setInformativeText("Have you plugged it in?");
+        msgBox.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        int ret = msgBox.exec();
+        switch(ret)
+        {
+        default:
+        case QMessageBox::Cancel:
+            {
+                break;
+            }
+        case QMessageBox::Retry:
+        {
+            on_connectRadio_clicked();
+            break;
+        }
+
+        }
+
     }
 }
 

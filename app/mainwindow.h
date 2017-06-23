@@ -19,19 +19,14 @@ public:
 
 private slots:
     void on_activateCamera_clicked();
-
     void on_disconnectRadio_clicked();
-
     void on_connectRadio_clicked();
-
     void on_radioSettingsOptions_currentIndexChanged(int index);
-
     void on_exitApp_clicked();
-
     void on_pushButton_clicked();
 
     void display_act_values();
-
+    void display_connection_timeout_box();
 
 private:
     Ui::MainWindow *ui;

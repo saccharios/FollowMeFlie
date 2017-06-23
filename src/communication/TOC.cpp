@@ -45,12 +45,18 @@ bool TOC::RequestMetaData()
 {
     std::vector<uint8_t> data = {1};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
-    auto received = _crazyRadio.SendAndReceive(std::move(packet));
-
-    if(received->GetData().at(1) == 0x01)
+    bool receivedPacketIsValid = false;
+    std::cout << "req met data 1\n";
+    auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
+    std::cout << "req met data 2\n";
+    if(receivedPacketIsValid)
     {
-        _itemCount = received->GetData().at(2); // is usually 0x81 == 129 decimal
-        return  true;
+        std::cout << "packet is valid\n";
+        if(received->GetData().at(1) == 0x01)
+        {
+            _itemCount = received->GetData().at(2); // is usually 0x81 == 129 decimal
+            return  true;
+        }
     }
     return false;
 }
@@ -79,10 +85,16 @@ bool TOC::RequestItems()
 bool TOC::RequestItem(std::vector<uint8_t> && data)
 {
     CRTPPacket  packet(_port, Channel::TOC, std::move(data));
-    auto received = _crazyRadio.SendAndReceive(std::move(packet));
-
-    return ProcessItem(std::move(received));
-
+    bool receivedPacketIsValid = false;
+    auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
+    if(receivedPacketIsValid)
+    {
+        return ProcessItem(std::move(received));
+    }
+    else
+    {
+        return false;
+    }
 }
 
 
@@ -136,19 +148,22 @@ bool TOC::StartLogging(std::string name, std::string blockName)
         {
             std::vector<uint8_t> data = {0x01, logBlock.id, static_cast<uint8_t>(element.type), element.id};
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
-            auto received = _crazyRadio.SendAndReceive(std::move(logPacket));
-
-            auto const & dataReceived = received->GetData();
-            if(     dataReceived.at(1) == 0x01 &&
-                    dataReceived.at(2) == logBlock.id &&
-                    dataReceived.at(3) == 0x00)
+            bool receivedPacketIsValid  = false;
+            auto received = _crazyRadio.SendAndReceive(std::move(logPacket), receivedPacketIsValid);
+            if(receivedPacketIsValid)
             {
-                logBlock.elementIDs.push_back(element.id);
-                return true;
-            }
-            else
-            {
-                std::cout << dataReceived.at(3) << std::endl;
+                auto const & dataReceived = received->GetData();
+                if(     dataReceived.at(1) == 0x01 &&
+                        dataReceived.at(2) == logBlock.id &&
+                        dataReceived.at(3) == 0x00)
+                {
+                    logBlock.elementIDs.push_back(element.id);
+                    return true;
+                }
+                else
+                {
+                    std::cout << dataReceived.at(3) << std::endl;
+                }
             }
         }
     }
@@ -193,23 +208,25 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     std::vector<uint8_t> data =  {0x00, id, samplingRate};
     CRTPPacket registerBlock(_port, Channel::Settings, std::move(data));
 
-    auto received = _crazyRadio.SendAndReceive(std::move(registerBlock));
-
-    auto const & dataReceived = received->GetData();
-    if(dataReceived.at(1) == 0x00 &&
-            dataReceived.at(2) == id &&
-            dataReceived.at(3) == 0x00)
+    bool receivedPacketIsValid = false;
+    auto received = _crazyRadio.SendAndReceive(std::move(registerBlock), receivedPacketIsValid);
+    if(receivedPacketIsValid)
     {
-        LoggingBlock loggingBlock;
-        loggingBlock.name = name;
-        loggingBlock.id = id;
-        loggingBlock.frequency = frequency;
-        _loggingBlocks.push_back(loggingBlock);
-        std::cout << "Registered logging block `" << name << "'" << std::endl;
+        auto const & dataReceived = received->GetData();
+        if(dataReceived.at(1) == 0x00 &&
+                dataReceived.at(2) == id &&
+                dataReceived.at(3) == 0x00)
+        {
+            LoggingBlock loggingBlock;
+            loggingBlock.name = name;
+            loggingBlock.id = id;
+            loggingBlock.frequency = frequency;
+            _loggingBlocks.push_back(loggingBlock);
+            std::cout << "Registered logging block `" << name << "'" << std::endl;
 
-        return EnableLogging(name);
+            return EnableLogging(name);
+        }
     }
-
     return false;
 }
 
@@ -226,9 +243,9 @@ bool TOC::EnableLogging(std::string blockName)
         CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
 
         // Use SendAndReceive to make sure the crazyflie is ready.
-        _crazyRadio.SendAndReceive(std::move(enablePacket));
-
-        return true;
+        bool receivedPacketIsValid = false;
+        _crazyRadio.SendAndReceive(std::move(enablePacket), receivedPacketIsValid);
+        return receivedPacketIsValid;
     }
 
     return false;
@@ -251,10 +268,9 @@ bool TOC::UnregisterLoggingBlockID(int id)
 {
     std::vector<uint8_t> data = {0x02, static_cast<uint8_t>(id)};
     CRTPPacket unregisterBlock(_port, Channel::Settings, std::move(data));
-
-    auto received = _crazyRadio.SendAndReceive(std::move(unregisterBlock));
-
-    return (received != nullptr);
+    bool receivedPacketIsValid = false;
+    _crazyRadio.SendAndReceive(std::move(unregisterBlock), receivedPacketIsValid);
+    return receivedPacketIsValid;
 }
 
 void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)

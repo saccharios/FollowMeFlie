@@ -87,7 +87,7 @@ public:
 
     bool SendPacketAndCheck(CRTPPacket && sendPacket);
 
-    sptrPacket SendAndReceive(CRTPPacket && sendPacket);
+    sptrPacket SendAndReceive(CRTPPacket && sendPacket, bool & valid);
 
     // Sends out an empty dummy packet
     //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.
