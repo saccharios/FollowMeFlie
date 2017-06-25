@@ -30,6 +30,8 @@ private slots:
     void display_act_values();
     void display_connection_timeout_box();
 
+    void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
+
 private:
     // GUI related
     Ui::MainWindow *ui;

@@ -1,7 +1,8 @@
 #include "cameraviewpainter.h"
 #include "qpainter.h"
+#include <iostream>
 
-void CameraViewPainter::paintEvent(QPaintEvent *event)
+void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     painter.setPen(Qt::blue);
