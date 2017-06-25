@@ -5,6 +5,8 @@
 #include "communication/CrazyRadio.h"
 #include "communication/CrazyFlie.h"
 #include "crazyfliecaller.h"
+#include "cameraviewpainter.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -29,7 +31,11 @@ private slots:
     void display_connection_timeout_box();
 
 private:
+    // GUI related
     Ui::MainWindow *ui;
+    CameraViewPainter _camerViewPainter;
+
+    // Function related
     CrazyRadio _crazyRadio;
     Crazyflie _crazyFlie;
     CrazyFlieCaller crazyFlieCaller;

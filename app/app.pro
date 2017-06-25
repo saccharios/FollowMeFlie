@@ -12,11 +12,13 @@ CONFIG += console # Print console output in external console
 
 SOURCES +=  main.cpp \
     mainwindow.cpp \
-    crazyfliecaller.cpp
+    crazyfliecaller.cpp \
+    cameraviewpainter.cpp
 
 
 HEADERS  += mainwindow.h \
-    crazyfliecaller.h
+    crazyfliecaller.h \
+    cameraviewpainter.h
 
 
 FORMS    += mainwindow.ui
