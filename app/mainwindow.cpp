@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Custom widgets
     ui->gridLayout->addWidget(&_cameraViewPainter);
+    _cameraViewPainter.setStyleSheet("background-color:black;");
 }
 MainWindow::~MainWindow()
 {
