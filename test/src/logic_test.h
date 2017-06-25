@@ -29,7 +29,4 @@ TEST_F(Logic_Test, NegativeEdgeDetectors)
     EXPECT_FALSE(neg_edge_det.Update(true));
     EXPECT_TRUE(neg_edge_det.Update(false));
     EXPECT_FALSE(neg_edge_det.Update(false));
-    EXPECT_FALSE(neg_edge_det.Update(false));
-    EXPECT_FALSE(neg_edge_det.Update(true));
-
 }

@@ -54,7 +54,8 @@ CrazyRadio::CrazyRadio() :
     _deviceVersion(0.0f),
     _ackReceived(false),
     _loggingPackets(),
-    _radioIsConnected(false)
+    _radioIsConnected(false),
+    _lastSendAndReceiveFailed(false)
 {
 //    int returnVal = libusb_init(&_context);
     // Do error checking here.
@@ -231,7 +232,6 @@ CrazyRadio::sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
     }
     else
     {
-        std::cout << "writing data nullptr\n";
         return nullptr;
     }
 
@@ -511,6 +511,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool
     int microsecondsWait = 100;
     int totalCounter = 0;
     const int totalCounterMax = 5;
+    _lastSendAndReceiveFailed = false;
     while( go_on)
     {
         if(resendCounter == 0)
@@ -537,6 +538,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool
             std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
         }
     }
+    _lastSendAndReceiveFailed = ((totalCounter == totalCounterMax) && (resendCounter == retriesTotal));
     valid = (received != nullptr);
     return received;
 }
@@ -558,7 +560,7 @@ bool CrazyRadio::RadioIsConnected() const
     return _radioIsConnected;
 }
 
-float CrazyRadio::ConvertToDeviceVersion(short number)
+float CrazyRadio::ConvertToDeviceVersion(short number) const
 {
     /*float version = 0.0;
     std::stringstream sts;
@@ -570,3 +572,10 @@ float CrazyRadio::ConvertToDeviceVersion(short number)
     float version = static_cast<float>(number) / 100.0;
     return version;
 }
+
+bool CrazyRadio::LastSendAndReceiveFailed() const
+{
+    return    _lastSendAndReceiveFailed;
+}
+
+

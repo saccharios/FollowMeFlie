@@ -113,7 +113,7 @@ public:
     void SetRadioSettings(int index);
 
     bool RadioIsConnected() const;
-
+    bool LastSendAndReceiveFailed() const;
 
 private:
     // The radio URI as supplied when initializing the class instance
@@ -134,6 +134,7 @@ private:
     bool _ackReceived;
     std::vector<sptrPacket> _loggingPackets;
     bool _radioIsConnected;
+    bool _lastSendAndReceiveFailed;
 
     std::vector<libusb_device*> ListDevices(int vendorID, int productID);
     bool OpenUSBDongle();
@@ -162,6 +163,7 @@ private:
 
     sptrPacket SendPacket(CRTPPacket && sendPacket);
 
-    float ConvertToDeviceVersion(short number);
+    float ConvertToDeviceVersion(short number) const;
+
 };
 

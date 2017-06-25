@@ -27,7 +27,7 @@ private:
 class Negative_Edge_Detector
 {
 public:
-    Negative_Edge_Detector() : _previous(true){}
+    Negative_Edge_Detector() : _previous(false){}
     bool Update(bool input)
     {
         if(!input && _previous)

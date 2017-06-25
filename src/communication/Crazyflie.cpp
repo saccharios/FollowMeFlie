@@ -42,7 +42,8 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _startConnecting(false),
     _state (State::STATE_ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
-    _tocLogs(_crazyRadio, Port::Log)
+    _tocLogs(_crazyRadio, Port::Log),
+    _leaveConnectingState()
 {}
 
 Crazyflie::~Crazyflie()
@@ -119,7 +120,7 @@ void Crazyflie::StartConnecting(bool enable)
 }
 
 // Runs on 10ms.
-bool Crazyflie::Update()
+void Crazyflie::Update()
 {
     // TODO SF How to restart the state machine properly?
 //    if(!_stateMachineIsEnabled)
@@ -141,12 +142,14 @@ bool Crazyflie::Update()
     }
     case State::STATE_READ_PARAMETERS_TOC:
     {
+        // TODO SF State machine is in busy wait in this state if the crazy flie is not turned on. This should not be.
         bool success = ReadTOCParameters();
         if(success)
         {
             _state =State:: STATE_READ_LOGS_TOC;
         }
-        else
+
+        if(_crazyRadio.LastSendAndReceiveFailed())
         {
             _state = State::STATE_ZERO;
             _startConnecting = false;
@@ -207,9 +210,11 @@ bool Crazyflie::Update()
     {
         ++_ackMissCounter;
     }
-
-//    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
-    return true;
+//    if(_state!= State::STATE_ZERO)
+//    {
+//        std::cout << "state = " <<static_cast<int>(_state )<< std::endl;
+//    }
+    //    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
 }
 
 bool Crazyflie::IsCopterConnected()
@@ -473,3 +478,8 @@ void Crazyflie::DisableAltimeterLogging()
     _tocLogs.UnregisterLoggingBlock("altimeter");
 }
 
+
+bool Crazyflie::IsConnectionTimeout()
+{
+    return _leaveConnectingState.Update(IsConnecting()) && IsDisconnected();
+}

@@ -35,6 +35,7 @@
 #include "CrazyRadio.h"
 #include "TOC.h"
 #include <memory>
+#include "math/logic.h"
 
 enum class State {
     STATE_ZERO = 0,
@@ -88,7 +89,7 @@ public:
     //    radio dongle. If it returns 'false', the dongle was most likely
     //    removed or somehow else disconnected from the host machine. If it
     //    returns 'true', the dongle connection works fine.
-    bool Update();
+    void Update();
 
     bool IsCopterConnected();
 
@@ -131,7 +132,7 @@ public:
     float MagY();
     float MagZ();
 
-   bool IsConnectionTimeout() const;
+   bool IsConnectionTimeout();
 
 private:
     CrazyRadio & _crazyRadio;
@@ -151,6 +152,9 @@ private:
 
     TOC _tocParameters;
     TOC _tocLogs;
+
+    Negative_Edge_Detector
+    _leaveConnectingState;
 
     bool ReadTOCParameters();
     bool ReadTOCLogs();

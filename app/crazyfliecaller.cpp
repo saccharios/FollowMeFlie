@@ -31,9 +31,11 @@ void CrazyFlieCaller::CheckConnectionTimeout()
 {
     if(_crazyFlie.IsConnectionTimeout())
     {
+        std::cout << "conn timeout\n";
         emit ConnectionTimeout();
     }
 }
+
 
 float CrazyFlieCaller::GetRoll() const
 {
