@@ -33,12 +33,15 @@ private slots:
 private:
     // GUI related
     Ui::MainWindow *ui;
-    CameraViewPainter _camerViewPainter;
+    CameraViewPainter _cameraViewPainter;
+//    QTimer _timer_t0;
+    QTimer _timer_t1;
+//    QTimer _timer_t2;
 
     // Function related
     CrazyRadio _crazyRadio;
     Crazyflie _crazyFlie;
-    CrazyFlieCaller crazyFlieCaller;
+    CrazyFlieCaller _crazyFlieCaller;
 };
 
 #endif // MAINWINDOW_H

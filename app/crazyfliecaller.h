@@ -12,7 +12,6 @@ public:
 
 public slots:
     void Update();
-    void UpdateActValueTime();
     float GetRoll() const;
     float GetYaw() const;
     float GetPitch() const;
@@ -20,7 +19,6 @@ public slots:
     void CheckConnectionTimeout();
 
 signals:
-    void UpdateActValues();
     void ConnectionTimeout();
 
 private:

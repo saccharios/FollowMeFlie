@@ -15,12 +15,22 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
-    crazyFlieCaller(_crazyFlie, parent)
+    _crazyFlieCaller(_crazyFlie, parent)
 {
     ui->setupUi(this);
 
-    connect(&crazyFlieCaller, SIGNAL(UpdateActValues()), this, SLOT(display_act_values()));
-    connect(&crazyFlieCaller, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
+    connect(&_crazyFlieCaller, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
+
+
+    // Event loop on main window_
+    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_act_values()));
+//    _timer_t0.start(10); // time in ms
+    _timer_t1.start(100); // time in ms
+//    _timer_t2.start(500); // time in ms
+
+
+
+
 }
 MainWindow::~MainWindow()
 {
@@ -28,10 +38,10 @@ MainWindow::~MainWindow()
 }
 void MainWindow::display_act_values()
  {
-     ui->actRoll->setPlainText( QString::number(crazyFlieCaller.GetRoll()));
-     ui->actYaw->setPlainText( QString::number(crazyFlieCaller.GetYaw()));
-     ui->actPitch->setPlainText( QString::number(crazyFlieCaller.GetPitch()));
-     ui->actThrust->setPlainText( QString::number(crazyFlieCaller.GetThrust()));
+     ui->actRoll->setPlainText( QString::number(_crazyFlieCaller.GetRoll()));
+     ui->actYaw->setPlainText( QString::number(_crazyFlieCaller.GetYaw()));
+     ui->actPitch->setPlainText( QString::number(_crazyFlieCaller.GetPitch()));
+     ui->actThrust->setPlainText( QString::number(_crazyFlieCaller.GetThrust()));
  }
 void MainWindow::display_connection_timeout_box()
 {
