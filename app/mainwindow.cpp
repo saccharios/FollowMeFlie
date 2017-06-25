@@ -79,11 +79,11 @@ void MainWindow::on_connectRadio_clicked()
     _crazyRadio.StartRadio();
     if(_crazyRadio.RadioIsConnected())
     {
-        _crazyFlie.EnableStateMachine(true);
+        _crazyFlie.StartConnecting(true);
     }
     else
     {
-        _crazyFlie.EnableStateMachine(false);
+        _crazyFlie.StartConnecting(false);
         QMessageBox msgBox;
         msgBox.setText("Could not open Radio Dongle.");
         msgBox.setInformativeText("Have you plugged it in?");
@@ -133,7 +133,7 @@ void MainWindow::on_pushButton_clicked()
 //        {
 //            // Range: 10001 - (approx.) 60000
 
-    if(_crazyFlie.IsInitialized())
+    if(_crazyFlie.IsConnected())
     {
             _crazyFlie.SetSendSetpoints(true);
             _crazyFlie.SetThrust(10001);

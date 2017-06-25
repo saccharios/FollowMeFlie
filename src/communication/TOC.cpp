@@ -46,12 +46,9 @@ bool TOC::RequestMetaData()
     std::vector<uint8_t> data = {1};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     bool receivedPacketIsValid = false;
-    std::cout << "req met data 1\n";
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-    std::cout << "req met data 2\n";
     if(receivedPacketIsValid)
     {
-        std::cout << "packet is valid\n";
         if(received->GetData().at(1) == 0x01)
         {
             _itemCount = received->GetData().at(2); // is usually 0x81 == 129 decimal

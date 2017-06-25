@@ -35,12 +35,11 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
     _ackMissTolerance(0),
     _ackMissCounter(0),
-    _stateCounter(0),
     _sendSetPoint(),
     _maxSetPoint({45.0,45.0,180.0,60000}),
     _minThrust(0),
     _isSendingSetpoints(false),
-    _stateMachineIsEnabled(false),
+    _startConnecting(false),
     _state (State::STATE_ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
     _tocLogs(_crazyRadio, Port::Log)
@@ -55,7 +54,6 @@ bool Crazyflie::ReadTOCParameters()
 {
     if(_tocParameters.RequestMetaData() )
     {
-        std::cout << "meta data req ok\n";
         if(_tocParameters.RequestItems())
         {
             return true;
@@ -115,38 +113,44 @@ int Crazyflie::GetThrust()
     return GetSensorValue("stabilizer.thrust");
 }
 
-void Crazyflie::EnableStateMachine(bool enable)
+void Crazyflie::StartConnecting(bool enable)
 {
-    _stateMachineIsEnabled = enable;
+    _startConnecting = enable;
 }
 
 // Runs on 10ms.
 bool Crazyflie::Update()
 {
     // TODO SF How to restart the state machine properly?
-    if(!_stateMachineIsEnabled)
-    {
-        _state = State::STATE_ZERO;
-        StopLogging();
-        return false;
-    }
+//    if(!_stateMachineIsEnabled)
+//    {
+//        _state = State::STATE_ZERO;
+//        StopLogging();
+//        return false;
+//    }
 
     switch(_state)
     {
     case State::STATE_ZERO:
     {
-        _state = State::STATE_READ_PARAMETERS_TOC;
-        _stateCounter = 0;
+        if(_startConnecting)
+        {
+            _state = State::STATE_READ_PARAMETERS_TOC;
+        }
         break;
     }
     case State::STATE_READ_PARAMETERS_TOC:
     {
-        if(ReadTOCParameters())
+        bool success = ReadTOCParameters();
+        if(success)
         {
             _state =State:: STATE_READ_LOGS_TOC;
-            _stateCounter = 0;
         }
-        ++_stateCounter;
+        else
+        {
+            _state = State::STATE_ZERO;
+            _startConnecting = false;
+        }
         break;
     }
     case State::STATE_READ_LOGS_TOC:
@@ -154,9 +158,7 @@ bool Crazyflie::Update()
         if(ReadTOCLogs())
         {
             _state = State::STATE_START_LOGGING;
-            _stateCounter = 0;
         }
-        ++_stateCounter;
         break;
     }
     case State::STATE_START_LOGGING:
@@ -205,10 +207,9 @@ bool Crazyflie::Update()
     {
         ++_ackMissCounter;
     }
-    std::cout << "_stateCounter = " << _stateCounter << std::endl;
-    std::cout << "_state = " << static_cast<int>(_state )<< std::endl;
 
-    return _crazyRadio.IsUsbConnectionOk();
+//    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
+    return true;
 }
 
 bool Crazyflie::IsCopterConnected()
@@ -262,7 +263,15 @@ float Crazyflie::GetYaw()
     return GetSensorValue("stabilizer.yaw");
 }
 
-bool Crazyflie::IsInitialized()
+bool Crazyflie::IsDisconnected()
+{
+    return _state == State::STATE_ZERO;
+}
+bool Crazyflie::IsConnecting()
+{
+    return !(IsDisconnected() || IsConnected());
+}
+bool Crazyflie::IsConnected()
 {
     return _state == State::STATE_NORMAL_OPERATION;
 }
@@ -464,7 +473,3 @@ void Crazyflie::DisableAltimeterLogging()
     _tocLogs.UnregisterLoggingBlock("altimeter");
 }
 
-bool Crazyflie::IsConnectionTimeout() const
-{
-    return (_stateCounter > 200); // equals 2s
-}

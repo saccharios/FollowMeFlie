@@ -77,7 +77,7 @@ public:
     float GetYaw();
 
 
-    void EnableStateMachine(bool enable);
+    void StartConnecting(bool enable);
     //    Should be called during every 'cycle' of the main program using
     //    this class. Things like sensor reading processing, integral
     //    calculation and controller signal application are performed
@@ -92,7 +92,9 @@ public:
 
     bool IsCopterConnected();
 
-    bool IsInitialized();
+    bool IsDisconnected();
+    bool IsConnecting();
+    bool IsConnected();
 
     void SetSendSetpoints(bool sendSetpoints);
 
@@ -136,7 +138,6 @@ private:
 
     int _ackMissTolerance;
     int _ackMissCounter;
-    int _stateCounter;
 
     SetPoint _sendSetPoint;
     SetPoint _maxSetPoint;
@@ -145,7 +146,7 @@ private:
 
     bool _isSendingSetpoints;
 
-    bool _stateMachineIsEnabled;
+    bool _startConnecting;
     State _state;
 
     TOC _tocParameters;

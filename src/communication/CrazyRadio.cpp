@@ -392,7 +392,6 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
-    // TODO SF If copter turned off packet is not nullptr. What is it then? Maybe can be checked here.
     if(packet)
     {
         auto const & data = packet->GetData();
@@ -410,6 +409,10 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                         std::cout << element;
                     }
                     std::cout << std::endl;
+                }
+                else // data.size() == 1
+                { // Special case where crazy flie is turned off. For error handling, set packet to nullptr.
+                    packet = nullptr;
                 }
                 break;
             }
@@ -492,23 +495,26 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
         received = SendPacket({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
         ++cntr;
     }
-    std::cout << "counter has expired = " << cntr << " packet = " << (received == nullptr) << std::endl;
     return received;
 }
+
+// TODO SF:: Sending and receiving of packets should hav totally different structure.
+// 1) They should be independant of eacher other
+// 2) They should be on a timelevel and thus periodically executed
+// 3) Packets must be stored during the timelevel and processed upon signal (timed).
 CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool & valid)
 {
     bool go_on = true;
     int resendCounter = 0;
     sptrPacket received = nullptr;
-    const int retriesTotal = 10 ;
+    const int retriesTotal = 5 ;
     int microsecondsWait = 100;
     int totalCounter = 0;
-    const int totalCounterMax = 10;
+    const int totalCounterMax = 5;
     while( go_on)
     {
         if(resendCounter == 0)
         {
-            std::cout << "resending packet\n";
             received = SendPacket(std::move(sendPacket)); // TODO How is it possible to be moved from multiple times???
             resendCounter = retriesTotal;
             ++totalCounter;
