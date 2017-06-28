@@ -29,7 +29,8 @@ HEADERS  += communication/Crazyflie.h \
     math/clock_gettime.h \
     math/stl_utils.h \
     math/logic.h \
-    math/functions.h
+    math/functions.h \
+    math/constants.h
 
 # Include library libusb-1.0.21
 libubs_path = "E:\Code\lib\libusb-1.0.21"

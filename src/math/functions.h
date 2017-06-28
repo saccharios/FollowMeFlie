@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include <cmath>
+
 template<typename T>
 T WrapAround(T value, T min, T max)
 {
