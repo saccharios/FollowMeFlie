@@ -66,8 +66,8 @@ public:
 
     void SetRoll(float roll);
     //    Roll values are in degree, ranging from -180.0deg to 180.0deg.
-    float GetRoll();
-
+//    float GetRoll();
+    float const & GetRoll() const {return _roll;}
     void SetPitch(float pitch);
     //    Pitch values are in degree, ranging from -180.0deg to 180.0deg.
     float GetPitch();
@@ -90,7 +90,7 @@ public:
     //    removed or somehow else disconnected from the host machine. If it
     //    returns 'true', the dongle connection works fine.
     void Update();
-
+    void UpateActValues();
     bool IsCopterConnected();
 
     bool IsDisconnected();
@@ -183,5 +183,7 @@ private:
     void EnableAltimeterLogging();
     void DisableAltimeterLogging();
 
+
+    float _roll;
 };
 

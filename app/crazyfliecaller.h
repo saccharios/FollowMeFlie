@@ -10,9 +10,11 @@ class CrazyFlieCaller : public QObject
 public:
     explicit CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent = 0);
 
+    float const & GetRollfct() const;
 public slots:
     void Update();
-    float GetRoll() const;
+//    float GetRoll() const;
+    float const & GetRoll() const;
     float GetYaw() const;
     float GetPitch() const;
     int GetThrust() const;

@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
-    _crazyFlieCaller(_crazyFlie, parent)
+    _crazyFlieCaller(_crazyFlie, parent),
+    _cameraViewPainter(_crazyFlieCaller.GetRollfct())
 {
     ui->setupUi(this);
 

@@ -34,10 +34,8 @@ void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
     {
         PaintVerticalLine(i, painter);
     }
-    // TODO For testing only
-    static float angle = 0.0;
-    angle += 0.025;
-    angle = WrapAround(angle, -pi, pi);
+    std::cout << "roll = " << _roll << std::endl;
+    float angle = WrapAround(_roll/180.0f*pi, -pi, pi);
     DrawGround(painter, angle);
 }
 

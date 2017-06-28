@@ -210,11 +210,17 @@ void Crazyflie::Update()
     {
         ++_ackMissCounter;
     }
+    UpateActValues();
 //    if(_state!= State::STATE_ZERO)
 //    {
 //        std::cout << "state = " <<static_cast<int>(_state )<< std::endl;
 //    }
     //    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
+}
+
+void Crazyflie::UpateActValues()
+{
+    _roll = GetSensorValue("stabilizer.roll");
 }
 
 bool Crazyflie::IsCopterConnected()
@@ -233,10 +239,10 @@ void Crazyflie::SetRoll(float roll)
     }
 }
 
-float Crazyflie::GetRoll()
-{
-    return GetSensorValue("stabilizer.roll");
-}
+//float Crazyflie::GetRoll()
+//{
+//    return GetSensorValue("stabilizer.roll");
+//}
 
 void Crazyflie::SetPitch(float pitch)
 {
