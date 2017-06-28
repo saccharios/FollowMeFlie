@@ -3,7 +3,8 @@
 #include <QPoint>
 #include <QPointF>
 #include <iostream>
-
+#include <QtCore/qmath.h>
+#include "math/functions.h"
 QPoint CameraViewPainter::World2CameraCoord(QPointF point_world)
 {
     QSize widgetSize = size();
@@ -15,7 +16,6 @@ QPoint CameraViewPainter::World2CameraCoord(QPointF point_world)
 
 void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
 {
-
     QPainter painter(this);
     painter.setPen(Qt::white);
     // Setup horizontal lines
@@ -31,6 +31,11 @@ void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
     {
         PaintVerticalLine(i, painter);
     }
+    // TODO For testing only
+    static float angle = 0.0;
+    angle += 0.1;
+    WrapAround(angle, -180.0f, 180.0f);
+    DrawGround(painter, angle);
 }
 
 
@@ -43,9 +48,14 @@ void CameraViewPainter::PaintHorizontalLine(float factor, float distance, QPaint
 }
 void CameraViewPainter::PaintVerticalLine(int factor, QPainter & painter)
 {
-    int length= 1;
-    int distance = 15;
+    float length= 1;
+    float distance = 15;
     auto point1 = World2CameraCoord({distance*factor,length});
     auto point2 = World2CameraCoord({distance*factor,-length});
     painter.drawLine(QLine(point1,point2));
+}
+
+void CameraViewPainter::DrawGround(QPainter & painter, float angle)
+{
+
 }

@@ -19,9 +19,8 @@ TEST_F(Logic_Test, PositiveEdgeDetectors)
     EXPECT_FALSE(pos_edge_det.Update(true));
     EXPECT_FALSE(pos_edge_det.Update(false));
     EXPECT_FALSE(pos_edge_det.Update(false));
-
-
 }
+
 TEST_F(Logic_Test, NegativeEdgeDetectors)
 {
     Negative_Edge_Detector neg_edge_det;

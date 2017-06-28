@@ -18,6 +18,7 @@ private:
     QPoint World2CameraCoord(QPointF point);
     void PaintHorizontalLine(float factor, float distance, QPainter & painter);
     void PaintVerticalLine(int factor, QPainter & painter);
+    void DrawGround(QPainter & painter, float angle);
 
 };
 
