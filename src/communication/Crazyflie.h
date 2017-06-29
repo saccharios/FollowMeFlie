@@ -64,18 +64,15 @@ public:
     void SetThrust(int thrust);
     int GetThrust();
 
-    void SetRoll(float roll);
     //    Roll values are in degree, ranging from -180.0deg to 180.0deg.
-//    float GetRoll();
+    void SetRoll(float roll);
     float const & GetRoll() const {return _roll;}
-    void SetPitch(float pitch);
     //    Pitch values are in degree, ranging from -180.0deg to 180.0deg.
-    float GetPitch();
-
-
-    void SetYaw(float yaw);
+    void SetPitch(float pitch);
+    float const & GetPitch() const {return _pitch;}
     //    Yaw values are in degree, ranging from -180.0deg to 180.0deg.
-    float GetYaw();
+    void SetYaw(float yaw);
+    float const & GetYaw() const {return _yaw;}
 
 
     void StartConnecting(bool enable);
@@ -90,7 +87,6 @@ public:
     //    removed or somehow else disconnected from the host machine. If it
     //    returns 'true', the dongle connection works fine.
     void Update();
-    void UpateActValues();
     bool IsCopterConnected();
 
     bool IsDisconnected();
@@ -183,7 +179,10 @@ private:
     void EnableAltimeterLogging();
     void DisableAltimeterLogging();
 
+    void UpateActValues();
 
     float _roll;
+    float _yaw;
+    float _pitch;
 };
 

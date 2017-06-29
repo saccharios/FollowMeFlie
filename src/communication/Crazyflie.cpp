@@ -43,7 +43,10 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _state (State::STATE_ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
     _tocLogs(_crazyRadio, Port::Log),
-    _leaveConnectingState()
+    _leaveConnectingState(),
+    _roll(),
+    _yaw(),
+    _pitch()
 {}
 
 Crazyflie::~Crazyflie()
@@ -221,6 +224,8 @@ void Crazyflie::Update()
 void Crazyflie::UpateActValues()
 {
     _roll = GetSensorValue("stabilizer.roll");
+    _yaw= GetSensorValue("stabilizer.yaw");
+    _pitch = GetSensorValue("stabilizer.pitch");
 }
 
 bool Crazyflie::IsCopterConnected()
@@ -239,11 +244,6 @@ void Crazyflie::SetRoll(float roll)
     }
 }
 
-//float Crazyflie::GetRoll()
-//{
-//    return GetSensorValue("stabilizer.roll");
-//}
-
 void Crazyflie::SetPitch(float pitch)
 {
     _sendSetPoint.pitch = pitch;
@@ -254,11 +254,6 @@ void Crazyflie::SetPitch(float pitch)
     }
 }
 
-float Crazyflie::GetPitch()
-{
-    return GetSensorValue("stabilizer.pitch");
-}
-
 void Crazyflie::SetYaw(float yaw)
 {
     _sendSetPoint.yaw = yaw;
@@ -267,11 +262,6 @@ void Crazyflie::SetYaw(float yaw)
     {
         _sendSetPoint.yaw = copysign(_sendSetPoint.yaw, _sendSetPoint.yaw);
     }
-}
-
-float Crazyflie::GetYaw()
-{
-    return GetSensorValue("stabilizer.yaw");
 }
 
 bool Crazyflie::IsDisconnected()

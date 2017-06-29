@@ -41,7 +41,7 @@ float const & CrazyFlieCaller::GetRoll() const
 {
     return _crazyFlie.GetRoll();
 }
-float const & CrazyFlieCaller::GetRollfct() const
+float const & CrazyFlieCaller::GetRollRef() const
 {
     return _crazyFlie.GetRoll();
 }
@@ -50,7 +50,15 @@ float CrazyFlieCaller::GetYaw() const
 {
     return _crazyFlie.GetYaw();
 }
+float const & CrazyFlieCaller::GetYawRef() const
+{
+    return _crazyFlie.GetYaw();
+}
 float CrazyFlieCaller::GetPitch() const
+{
+    return _crazyFlie.GetPitch();
+}
+float const & CrazyFlieCaller::GetPitchRef() const
 {
     return _crazyFlie.GetPitch();
 }
