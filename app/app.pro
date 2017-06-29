@@ -18,7 +18,8 @@ SOURCES +=  main.cpp \
 
 HEADERS  += mainwindow.h \
     crazyfliecaller.h \
-    cameraviewpainter.h
+    cameraviewpainter.h \
+    qt_util.h
 
 
 FORMS    += mainwindow.ui

@@ -7,6 +7,7 @@
 #include <math/constants.h>
 #include <QPolygon>
 #include <QVector>
+#include "qt_util.h"
 #include <iostream>
 QPoint CameraViewPainter::World2CameraCoord(QPointF point_world)
 {
@@ -34,7 +35,6 @@ void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
     {
         PaintVerticalLine(i, painter);
     }
-    std::cout << "roll = " << _roll << std::endl;
     float angle = WrapAround(_roll/180.0f*pi, -pi, pi);
     DrawGround(painter, angle);
 }
@@ -56,68 +56,22 @@ void CameraViewPainter::PaintVerticalLine(int factor, QPainter & painter)
     painter.drawLine(QLine(point1,point2));
 }
 
-void CameraViewPainter::DrawGround(QPainter & painter, float angle)
+
+
+void CameraViewPainter::DrawGround(QPainter & painter, float angle) // angle is in radians
 {
-    std::cout << "curernt angle = " << angle << std::endl;
     QVector<QPoint> points;
-    float edge_angle = qAtan2(size().height(), size().width());
-    float tan_angle = tan(angle);
-    if( - edge_angle < angle && angle <= edge_angle )
-    {
-        QPoint p1 = World2CameraCoord({-_x_max, -_x_max * tan_angle});
-        QPoint p2 = World2CameraCoord({-_x_max, -_y_max});
-        QPoint p3 = World2CameraCoord({_x_max, -_y_max});
-        QPoint p4 = World2CameraCoord({_x_max, _x_max * tan_angle});
-        points.append(p1);
-        points.append(p2);
-        points.append(p3);
-        points.append(p4);
-        std::cout << "case 1" << std::endl;
-    }
-    else if (edge_angle < angle && angle <= pi - edge_angle)
-    {
-        QPoint p1 = World2CameraCoord({-_y_max / tan_angle, -_y_max });
-        QPoint p2 = World2CameraCoord({_x_max, -_y_max});
-        QPoint p3 = World2CameraCoord({_x_max, _y_max});
-        QPoint p4 = World2CameraCoord({_y_max / tan_angle, _y_max});
-        points.append(p1);
-        points.append(p2);
-        points.append(p3);
-        points.append(p4);
-        std::cout << "case 2"<< std::endl;
-    }
-    else if (-pi + edge_angle > angle || angle > pi -edge_angle)
-    {
-        QPoint p1 = World2CameraCoord({_x_max , _x_max * tan_angle });
-        QPoint p2 = World2CameraCoord({_x_max, _y_max});
-        QPoint p3 = World2CameraCoord({-_x_max, _y_max});
-        QPoint p4 = World2CameraCoord({-_x_max , -_x_max * tan_angle});
-        points.append(p1);
-        points.append(p2);
-        points.append(p3);
-        points.append(p4);
-        std::cout << "case 3"<< std::endl;
-
-    }
-    else
-    {
-        QPoint p1 = World2CameraCoord({_y_max / tan_angle, _y_max });
-        QPoint p2 = World2CameraCoord({-_x_max, _y_max});
-        QPoint p3 = World2CameraCoord({-_x_max, -_y_max});
-        QPoint p4 = World2CameraCoord({-_y_max / tan_angle, -_y_max});
-        points.append(p1);
-        points.append(p2);
-        points.append(p3);
-        points.append(p4);
-        std::cout << "case 4"<< std::endl;
-    }
-
+    QPoint p1 = World2CameraCoord(rotate(QPointF{-4.0*_x_max, 0}, -angle));
+    QPoint p2 = World2CameraCoord(rotate(QPointF{-4.0*_x_max, -4.0*_y_max}, -angle));
+    QPoint p3 = World2CameraCoord(rotate(QPointF{4.0*_x_max, -4.0*_y_max}, -angle));
+    QPoint p4 = World2CameraCoord(rotate(QPointF{4.0*_x_max, 0}, -angle));
+    points.append(p1);
+    points.append(p2);
+    points.append(p3);
+    points.append(p4);
     painter.setPen(Qt::green);
     painter.setBrush(Qt::green);
     QPolygon ground(points);
     painter.drawPolygon(ground);
-
-
-
 
 }
