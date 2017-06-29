@@ -31,12 +31,6 @@ void CrazyFlieCaller::CheckConnectionTimeout()
     }
 }
 
-
-//float CrazyFlieCaller::GetRoll() const
-//{
-//    return _crazyFlie.GetRoll();
-//}
-
 float const & CrazyFlieCaller::GetRoll() const
 {
     return _crazyFlie.GetRoll();

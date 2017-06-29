@@ -22,28 +22,52 @@ void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
 
-    auto roll = WrapAround(_roll/180.0f*pi, -pi, pi);
-    DrawGround(painter, roll);
+    DrawGround(painter, _roll, _pitch);
     // Setup horizontal lines
-    std::array<float,3> scaling = {1.0, 0.8, 0.6};
-    std::array<int,3> distance = {0, 10, 20};
-    PaintHorizontalLine(scaling[0], distance[0], painter);
-    PaintHorizontalLine(scaling[1], distance[1], painter);
-    PaintHorizontalLine(scaling[1], -distance[1], painter);
-    PaintHorizontalLine(scaling[2], distance[2], painter);
-    PaintHorizontalLine(scaling[2], -distance[2], painter);
+
+    PaintHorizontalLine(painter, _pitch);
+
     // Setup vertical lines
     PaintVerticalLine(painter,  _yaw);
 }
 
 
-void CameraViewPainter::PaintHorizontalLine(float factor, float distance, QPainter & painter)
+void CameraViewPainter::PaintHorizontalLine(QPainter & painter, float _pitch)
 {
     painter.setPen(Qt::white);
-    float x_scaling = 0.9;
-    auto point1 = World2CameraCoord({-_x_max*x_scaling*factor,distance});
-    auto point2 = World2CameraCoord({_x_max*x_scaling*factor,distance});
-    painter.drawLine(QLine(point1,point2));
+    float length = _x_max * 0.75;
+    float distance_between_lines = 10;
+//    QPointF text_offset{0,2};
+    // draw above
+    float y = WrapAround(_pitch, 0.0f, distance_between_lines);
+    y = distance_between_lines - y;
+    while(y < _y_max)
+    {
+        QPoint p1 = World2CameraCoord({-length,y});
+        QPoint p2 = World2CameraCoord({ length,y});
+        painter.drawLine(QLine(p1,p2));
+//        QPoint p3 = World2CameraCoord(QPointF{x, 0} + text_offset);
+//        float num = WrapAround(x+angle,-180.0f, 180.0f);
+//        // Wrapping may not return exactly zero:
+//        if( std::abs(num) < 0.0005)
+//        {
+//            num = 0.0;
+//        }
+//        painter.drawText(p3,QString::number(num));
+        y += distance_between_lines;
+    }
+    // draw below
+    y = WrapAround(_pitch, 0.0f, distance_between_lines);
+    y =  - y;
+    while(y > -_y_max)
+    {
+        QPoint p1 = World2CameraCoord({-length,y});
+        QPoint p2 = World2CameraCoord({ length,y});
+        painter.drawLine(QLine(p1,p2));
+//        QPoint p3 = World2CameraCoord(QPointF{x, 0}+text_offset);
+//        painter.drawText(p3,QString::number(WrapAround(x+angle,-180.0f, 180.0f)));
+        y -= distance_between_lines;
+    }
 }
 void CameraViewPainter::PaintVerticalLine(QPainter & painter, float angle) // angle in degree
 {
@@ -85,18 +109,19 @@ void CameraViewPainter::PaintVerticalLine(QPainter & painter, float angle) // an
     QPoint p1 = World2CameraCoord({0.0,-2.0*length});
     QPoint p2 = World2CameraCoord({0.0, 2.0*length});
     painter.drawLine(QLine(p1,p2));
-
 }
 
 
 
-void CameraViewPainter::DrawGround(QPainter & painter, float angle) // angle is in radians
+void CameraViewPainter::DrawGround(QPainter & painter, float roll, float pitch) // roll, pitch in degree
 {
+    auto roll_r = deg2rad(roll);
     QVector<QPoint> points;
-    QPoint p1 = World2CameraCoord(rotate(QPointF{-4.0*_x_max, 0}, -angle));
-    QPoint p2 = World2CameraCoord(rotate(QPointF{-4.0*_x_max, -4.0*_y_max}, -angle));
-    QPoint p3 = World2CameraCoord(rotate(QPointF{4.0*_x_max, -4.0*_y_max}, -angle));
-    QPoint p4 = World2CameraCoord(rotate(QPointF{4.0*_x_max, 0}, -angle));
+// TODO SF What is the maximum? instead of 10?
+    QPoint p1 = World2CameraCoord(rotate(QPointF{-10.0*_x_max, -pitch}, -roll_r));
+    QPoint p2 = World2CameraCoord(rotate(QPointF{-10.0*_x_max, -4.0*_y_max-pitch}, -roll_r));
+    QPoint p3 = World2CameraCoord(rotate(QPointF{10.0*_x_max, -4.0*_y_max-pitch}, -roll_r));
+    QPoint p4 = World2CameraCoord(rotate(QPointF{10.0*_x_max, -pitch}, -roll_r));
     points.append(p1);
     points.append(p2);
     points.append(p3);

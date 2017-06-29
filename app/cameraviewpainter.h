@@ -21,9 +21,9 @@ private:
     float const & _pitch;
 
     QPoint World2CameraCoord(QPointF point);
-    void PaintHorizontalLine(float factor, float distance, QPainter & painter);
+    void PaintHorizontalLine(QPainter & painter, float _pitch);
     void PaintVerticalLine(QPainter & painter, float angle);
-    void DrawGround(QPainter & painter, float angle);
+    void DrawGround(QPainter & painter, float roll, float pitch);
 
 };
 
