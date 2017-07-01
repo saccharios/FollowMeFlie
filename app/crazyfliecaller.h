@@ -20,6 +20,7 @@ public slots:
     float GetYaw() const;
     float GetPitch() const;
     int GetThrust() const;
+    float GetAltitude() const;
     void CheckConnectionTimeout();
 
 signals:

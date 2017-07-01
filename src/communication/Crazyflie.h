@@ -97,20 +97,6 @@ public:
 
     bool IsSendingSetpoints();
 
-    //Read back a sensor value you subscribed to
-
-    //    Possible sensor values might be:
-    //    * stabilizer.yaw
-    //    * stabilizer.roll
-    //    * stabilizer.pitch
-    //    * pm.vbat
-
-    //    The possible key names strongly depend on your firmware. If you
-    //    don't know what to do with this, just use the convience functions
-    //    like getRoll(), getPitch(), getYaw(), and batteryLevel().
-
-    double GetSensorValue(std::string name);
-
     double GetBatteryLevel();
     float AccX();
     float AccY();
@@ -127,6 +113,8 @@ public:
     float MagX();
     float MagY();
     float MagZ();
+
+    float GetAltitude();
 
    bool IsConnectionTimeout();
 
@@ -151,6 +139,12 @@ private:
 
     Negative_Edge_Detector
     _leaveConnectingState;
+
+    float _roll;
+    float _yaw;
+    float _pitch;
+
+    static constexpr float _frequency = 1000.0;
 
     bool ReadTOCParameters();
     bool ReadTOCLogs();
@@ -180,9 +174,8 @@ private:
     void DisableAltimeterLogging();
 
     void UpateActValues();
+    double GetSensorValue(std::string name);
 
-    float _roll;
-    float _yaw;
-    float _pitch;
+
 };
 

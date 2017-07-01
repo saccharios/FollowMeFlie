@@ -196,7 +196,7 @@ void Crazyflie::Update()
         }
         else
         {
-            // Send a dummy packet for keepalive
+            // Send a ping packet for keepalive
             _crazyRadio.SendPingPacket();
         }
         break;
@@ -298,9 +298,9 @@ void Crazyflie::StopLogging()
     DisableAltimeterLogging();
 }
 
-void Crazyflie::SetSendSetpoints(bool bSendSetpoints)
+void Crazyflie::SetSendSetpoints(bool sendSetpoints)
 {
-    _isSendingSetpoints = bSendSetpoints;
+    _isSendingSetpoints = sendSetpoints;
 }
 
 bool Crazyflie::IsSendingSetpoints()
@@ -321,16 +321,17 @@ void Crazyflie::DisableLogging()
 
 void Crazyflie::EnableStabilizerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("stabilizer", 1000);
+    _tocLogs.RegisterLoggingBlock("stabilizer", _frequency);
 
     _tocLogs.StartLogging("stabilizer.roll", "stabilizer");
     _tocLogs.StartLogging("stabilizer.pitch", "stabilizer");
     _tocLogs.StartLogging("stabilizer.yaw", "stabilizer");
+    _tocLogs.StartLogging("stabilizer.thrust", "stabilizer");
 }
 
 void Crazyflie::EnableGyroscopeLogging()
 {
-    _tocLogs.RegisterLoggingBlock("gyroscope", 1000);
+    _tocLogs.RegisterLoggingBlock("gyroscope", _frequency);
 
     _tocLogs.StartLogging("gyro.x", "gyroscope");
     _tocLogs.StartLogging("gyro.y", "gyroscope");
@@ -352,7 +353,7 @@ float Crazyflie::GyroZ() {
 
 void Crazyflie::EnableAccelerometerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("accelerometer", 1000);
+    _tocLogs.RegisterLoggingBlock("accelerometer", _frequency);
 
     _tocLogs.StartLogging("acc.x", "accelerometer");
     _tocLogs.StartLogging("acc.y", "accelerometer");
@@ -397,7 +398,7 @@ void Crazyflie::DisableAccelerometerLogging()
 
 void Crazyflie::EnableBatteryLogging()
 {
-    _tocLogs.RegisterLoggingBlock("battery", 1000);
+    _tocLogs.RegisterLoggingBlock("battery", _frequency);
 
     _tocLogs.StartLogging("pm.vbat", "battery");
     _tocLogs.StartLogging("pm.state", "battery");
@@ -420,7 +421,7 @@ void Crazyflie::DisableBatteryLogging()
 
 void Crazyflie::EnableMagnetometerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("magnetometer", 1000);
+    _tocLogs.RegisterLoggingBlock("magnetometer", _frequency);
 
     _tocLogs.StartLogging("mag.x", "magnetometer");
     _tocLogs.StartLogging("mag.y", "magnetometer");
@@ -445,7 +446,7 @@ void Crazyflie::DisableMagnetometerLogging()
 
 void Crazyflie::EnableAltimeterLogging()
 {
-    _tocLogs.RegisterLoggingBlock("altimeter", 1000);
+    _tocLogs.RegisterLoggingBlock("altimeter", _frequency);
     _tocLogs.StartLogging("alti.asl", "altimeter");
     _tocLogs.StartLogging("alti.aslLong", "altimeter");
     _tocLogs.StartLogging("alti.pressure", "altimeter");
@@ -464,6 +465,10 @@ float Crazyflie::Pressure()
 {
     return GetSensorValue("alti.pressure");
 }
+float Crazyflie::GetAltitude()
+{
+    return GetSensorValue("alti.pressure");
+}
 float Crazyflie::Temperature()
 {
     return GetSensorValue("alti.temperature");
@@ -477,5 +482,7 @@ void Crazyflie::DisableAltimeterLogging()
 
 bool Crazyflie::IsConnectionTimeout()
 {
-    return _leaveConnectingState.Update(IsConnecting()) && IsDisconnected();
+    // TODO SF: Give too many false positives!
+    return false;
+//    return _leaveConnectingState.Update(IsConnecting()) && IsDisconnected();
 }

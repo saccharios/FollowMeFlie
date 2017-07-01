@@ -24,6 +24,7 @@ void CrazyFlieCaller::Update()
 
 void CrazyFlieCaller::CheckConnectionTimeout()
 {
+    // TODO SF: Does not work reliable.
     if(_crazyFlie.IsConnectionTimeout())
     {
         std::cout << "conn timeout\n";
@@ -59,5 +60,9 @@ float const & CrazyFlieCaller::GetPitchRef() const
 int CrazyFlieCaller::GetThrust() const
 {
     return _crazyFlie.GetThrust();
+}
+float CrazyFlieCaller::GetAltitude() const
+{
+    return _crazyFlie.GetAltitude();
 }
 

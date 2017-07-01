@@ -180,6 +180,10 @@ double TOC::DoubleValue(std::string name)
 {
     bool found;
     auto & result = STLUtils::ElementForName(_TOCElements, name, found);
+//    if(name == "alti.pressure")
+//    {
+//        std::cout << "name alti.pressure found " << found << std::endl;
+//    }
     return (found ? result.value : 0);
 }
 
@@ -292,12 +296,6 @@ void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
                 TOCElement & element = STLUtils::ElementForID(_TOCElements, elementID , found);
                 if(found)
                 {
-                    if(element.name == "stabilizer.thrust")
-                    {
-                            std::cout << static_cast<int>(element.type) << std::endl;
-                            STLUtils::PrintVect(logdataVect);
-                    }
-
                     int byteLength = 0;
                     float value = 0;
                     switch(element.type)
