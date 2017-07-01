@@ -8,7 +8,7 @@ class CameraViewPainter : public QWidget
 {
 //    Q_OBJECT
 public:
-    CameraViewPainter(float const & roll, float const & yaw, float const & pitch) : _roll(roll), _yaw(yaw), _pitch(pitch) {}
+    CameraViewPainter(float const & roll, float const & yaw, float const & pitch);
     void paintEvent(QPaintEvent* /*event*/);
 public slots:
 private slots:
@@ -21,8 +21,8 @@ private:
     float const & _pitch;
 
     QPoint World2CameraCoord(QPointF point);
-    void PaintHorizontalLine(QPainter & painter, float _pitch);
-    void PaintVerticalLine(QPainter & painter, float angle);
+    void PaintHorizontalLine(QPainter & painter, float roll,float pitch);
+    void PaintVerticalLine(QPainter & painter, float roll, float yaw);
     void DrawGround(QPainter & painter, float roll, float pitch);
 
 };
