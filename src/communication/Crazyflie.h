@@ -46,34 +46,79 @@ enum class State {
     STATE_NORMAL_OPERATION = 5
 };
 
+struct SetPoint
+{
+    float roll;
+    float pitch;
+    float yaw;
+    uint16_t thrust;
+};
+struct Barometer
+{
+    float asl;
+    float aslLong;
+    float temperature;
+    float pressure;
+};
+struct Accelerometer
+{
+    float x;
+    float y;
+    float z;
+    float zw;
+};
+
+struct Gyrometer
+{
+    float x;
+        float y;
+    float z;
+};
+struct Battery
+{
+    double level;
+    float state;
+};
+
+struct Magnetometer
+{
+    float x;
+    float y;
+    float z;
+};
+struct SensorValues
+{
+    SetPoint stabilizer;
+    Barometer barometer;
+    Accelerometer acceleration;
+    Gyrometer gyrometer;
+    Battery battery;
+    Magnetometer magnetometer;
+};
+
+
 class Crazyflie {
 
 public:
-    struct SetPoint
-    {
-        float roll;
-        float pitch;
-        float yaw;
-        uint16_t thrust;
-    };
+
 
     Crazyflie(CrazyRadio & crazyRadio);
     ~Crazyflie();
 
     // The thrust value to send (> 10000)
     void SetThrust(int thrust);
-    int GetThrust();
-
     //    Roll values are in degree, ranging from -180.0deg to 180.0deg.
     void SetRoll(float roll);
-    float const & GetRoll() const {return _roll;}
     //    Pitch values are in degree, ranging from -180.0deg to 180.0deg.
     void SetPitch(float pitch);
-    float const & GetPitch() const {return _pitch;}
     //    Yaw values are in degree, ranging from -180.0deg to 180.0deg.
     void SetYaw(float yaw);
-    float const & GetYaw() const {return _yaw;}
 
+    void SetSendSetpoints(bool sendSetpoints);
+
+    bool IsSendingSetpoints();
+
+    SensorValues const & GetSensorValues() const {return _sensorValues;}
 
     void StartConnecting(bool enable);
     //    Should be called during every 'cycle' of the main program using
@@ -93,28 +138,6 @@ public:
     bool IsConnecting();
     bool IsConnected();
 
-    void SetSendSetpoints(bool sendSetpoints);
-
-    bool IsSendingSetpoints();
-
-    double GetBatteryLevel();
-    float AccX();
-    float AccY();
-    float AccZ();
-    float AccZW();
-    float Asl();
-    float AslLong();
-    float Temperature();
-    float Pressure();
-    float GyroX();
-    float GyroY();
-    float GyroZ();
-    float GetBatteryState();
-    float MagX();
-    float MagY();
-    float MagZ();
-
-    float GetAltitude();
 
    bool IsConnectionTimeout();
 
@@ -137,12 +160,10 @@ private:
     TOC _tocParameters;
     TOC _tocLogs;
 
-    Negative_Edge_Detector
-    _leaveConnectingState;
+    Negative_Edge_Detector _leaveConnectingState;
 
-    float _roll;
-    float _yaw;
-    float _pitch;
+
+    SensorValues _sensorValues;
 
     static constexpr float _frequency = 1000.0;
 
@@ -151,6 +172,8 @@ private:
 
     bool SendSetpoint(SetPoint setPoint);
 
+    void StartLogging();
+    void StopLogging();
     void DisableLogging();
 
     void EnableStabilizerLogging();
@@ -164,16 +187,14 @@ private:
     void EnableBatteryLogging();
     void DisableBatteryLogging();
 
-    void StartLogging();
-    void StopLogging();
 
     void EnableMagnetometerLogging();
     void DisableMagnetometerLogging();
 
-    void EnableAltimeterLogging();
+    void EnableBarometerLogging();
     void DisableAltimeterLogging();
 
-    void UpateActValues();
+    void UpateSensorValues();
     double GetSensorValue(std::string name);
 
 

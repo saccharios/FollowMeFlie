@@ -44,9 +44,7 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _tocParameters(_crazyRadio, Port::Parameters),
     _tocLogs(_crazyRadio, Port::Log),
     _leaveConnectingState(),
-    _roll(),
-    _yaw(),
-    _pitch()
+    _sensorValues()
 {}
 
 Crazyflie::~Crazyflie()
@@ -96,25 +94,6 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
     CRTPPacket  packet(Port::Commander,Channel::TOC, std::move(data));
 
     return _crazyRadio.SendPacketAndCheck(std::move(packet));
-}
-
-void Crazyflie::SetThrust(int thrust)
-{
-    _sendSetPoint.thrust = thrust;
-
-    if(_sendSetPoint.thrust < _minThrust)
-    {
-        _sendSetPoint.thrust = _minThrust;
-    }
-    else if(_sendSetPoint.thrust > _sendSetPoint.thrust)
-    {
-        _sendSetPoint.thrust = _sendSetPoint.thrust;
-    }
-}
-// TODO Thrust display not working
-int Crazyflie::GetThrust()
-{
-    return GetSensorValue("stabilizer.thrust");
 }
 
 void Crazyflie::StartConnecting(bool enable)
@@ -213,7 +192,7 @@ void Crazyflie::Update()
     {
         ++_ackMissCounter;
     }
-    UpateActValues();
+    UpateSensorValues();
 //    if(_state!= State::STATE_ZERO)
 //    {
 //        std::cout << "state = " <<static_cast<int>(_state )<< std::endl;
@@ -221,11 +200,28 @@ void Crazyflie::Update()
     //    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
 }
 
-void Crazyflie::UpateActValues()
+void Crazyflie::UpateSensorValues()
 {
-    _roll = GetSensorValue("stabilizer.roll");
-    _yaw= GetSensorValue("stabilizer.yaw");
-    _pitch = GetSensorValue("stabilizer.pitch");
+    _sensorValues.stabilizer.roll = GetSensorValue("stabilizer.roll");
+    _sensorValues.stabilizer.yaw= GetSensorValue("stabilizer.yaw");
+    _sensorValues.stabilizer.pitch = GetSensorValue("stabilizer.pitch");
+    _sensorValues.stabilizer.thrust = GetSensorValue("stabilizer.thrust");
+    _sensorValues.barometer.pressure = GetSensorValue("baro.pressure");
+    _sensorValues.barometer.asl = GetSensorValue("baro.asl");
+    _sensorValues.barometer.aslLong= GetSensorValue("baro.aslLong");
+    _sensorValues.barometer.temperature = GetSensorValue("baro.temperature");
+    _sensorValues.acceleration.x = GetSensorValue("acc.x");
+    _sensorValues.acceleration.y = GetSensorValue("acc.y");
+    _sensorValues.acceleration.z = GetSensorValue("acc.z");
+    _sensorValues.acceleration.zw = GetSensorValue("acc.zw");
+    _sensorValues.battery.level = GetSensorValue("pm.vbat");
+    _sensorValues.battery.state = GetSensorValue("pm.state");
+    _sensorValues.gyrometer.x = GetSensorValue("gyro.x");
+    _sensorValues.gyrometer.y = GetSensorValue("gyro.y");
+    _sensorValues.gyrometer.z = GetSensorValue("gyro.z");
+    _sensorValues.magnetometer.x = GetSensorValue("mag.x");
+    _sensorValues.magnetometer.y = GetSensorValue("mag.y");
+    _sensorValues.magnetometer.z = GetSensorValue("mag.z");
 }
 
 bool Crazyflie::IsCopterConnected()
@@ -233,7 +229,20 @@ bool Crazyflie::IsCopterConnected()
     // TODO Is this function useful?
     return _ackMissCounter < _ackMissTolerance;
 }
+// TODO SF: Simplifly setpoint setting
+void Crazyflie::SetThrust(int thrust)
+{
+    _sendSetPoint.thrust = thrust;
 
+    if(_sendSetPoint.thrust < _minThrust)
+    {
+        _sendSetPoint.thrust = _minThrust;
+    }
+    else if(_sendSetPoint.thrust > _sendSetPoint.thrust)
+    {
+        _sendSetPoint.thrust = _sendSetPoint.thrust;
+    }
+}
 void Crazyflie::SetRoll(float roll)
 {
     _sendSetPoint.roll = roll;
@@ -285,7 +294,7 @@ void Crazyflie::StartLogging()
     EnableAccelerometerLogging();
     EnableBatteryLogging();
     EnableMagnetometerLogging();
-    EnableAltimeterLogging();
+    EnableBarometerLogging();
 }
 
 void Crazyflie::StopLogging()
@@ -296,6 +305,12 @@ void Crazyflie::StopLogging()
     DisableBatteryLogging();
     DisableMagnetometerLogging();
     DisableAltimeterLogging();
+}
+
+void Crazyflie::DisableLogging()
+{
+    _tocLogs.UnregisterLoggingBlock("high-speed");
+    _tocLogs.UnregisterLoggingBlock("low-speed");
 }
 
 void Crazyflie::SetSendSetpoints(bool sendSetpoints)
@@ -313,11 +328,6 @@ double Crazyflie::GetSensorValue(std::string strName)
     return _tocLogs.DoubleValue(strName);
 }
 
-void Crazyflie::DisableLogging()
-{
-    _tocLogs.UnregisterLoggingBlock("high-speed");
-    _tocLogs.UnregisterLoggingBlock("low-speed");
-}
 
 void Crazyflie::EnableStabilizerLogging()
 {
@@ -338,19 +348,6 @@ void Crazyflie::EnableGyroscopeLogging()
     _tocLogs.StartLogging("gyro.z", "gyroscope");
 }
 
-float Crazyflie::GyroX()
-{
-    return GetSensorValue("gyro.x");
-}
-
-float Crazyflie::GyroY() {
-    return GetSensorValue("gyro.y");
-}
-
-float Crazyflie::GyroZ() {
-    return GetSensorValue("gyro.z");
-}
-
 void Crazyflie::EnableAccelerometerLogging()
 {
     _tocLogs.RegisterLoggingBlock("accelerometer", _frequency);
@@ -361,25 +358,6 @@ void Crazyflie::EnableAccelerometerLogging()
     _tocLogs.StartLogging("acc.zw", "accelerometer");
 }
 
-float Crazyflie::AccX()
-{
-    return GetSensorValue("acc.x");
-}
-
-float Crazyflie::AccY()
-{
-    return GetSensorValue("acc.y");
-}
-
-float Crazyflie::AccZ()
-{
-    return GetSensorValue("acc.z");
-}
-
-float Crazyflie::AccZW()
-{
-    return GetSensorValue("acc.zw");
-}
 
 void Crazyflie::DisableStabilizerLogging()
 {
@@ -404,16 +382,6 @@ void Crazyflie::EnableBatteryLogging()
     _tocLogs.StartLogging("pm.state", "battery");
 }
 
-double Crazyflie::GetBatteryLevel()
-{
-    return GetSensorValue("pm.vbat");
-}
-
-float Crazyflie::GetBatteryState()
-{
-    return GetSensorValue("pm.state");
-}
-
 void Crazyflie::DisableBatteryLogging()
 {
     _tocLogs.UnregisterLoggingBlock("battery");
@@ -427,56 +395,24 @@ void Crazyflie::EnableMagnetometerLogging()
     _tocLogs.StartLogging("mag.y", "magnetometer");
     _tocLogs.StartLogging("mag.z", "magnetometer");
 }
-float Crazyflie::MagX()
-{
-    return GetSensorValue("mag.x");
-}
-float Crazyflie::MagY()
-{
-    return GetSensorValue("mag.y");
-}
-float Crazyflie::MagZ()
-{
-    return GetSensorValue("mag.z");
-}
+
 void Crazyflie::DisableMagnetometerLogging()
 {
     _tocLogs.UnregisterLoggingBlock("magnetometer");
 }
 
-void Crazyflie::EnableAltimeterLogging()
+void Crazyflie::EnableBarometerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("altimeter", _frequency);
-    _tocLogs.StartLogging("alti.asl", "altimeter");
-    _tocLogs.StartLogging("alti.aslLong", "altimeter");
-    _tocLogs.StartLogging("alti.pressure", "altimeter");
-    _tocLogs.StartLogging("alti.temperature", "altimeter");
-}
-
-float Crazyflie::Asl()
-{
-    return GetSensorValue("alti.asl");
-}
-float Crazyflie::AslLong()
-{
-    return GetSensorValue("alti.aslLong");
-}
-float Crazyflie::Pressure()
-{
-    return GetSensorValue("alti.pressure");
-}
-float Crazyflie::GetAltitude()
-{
-    return GetSensorValue("alti.pressure");
-}
-float Crazyflie::Temperature()
-{
-    return GetSensorValue("alti.temperature");
+    _tocLogs.RegisterLoggingBlock("barometer", _frequency);
+    _tocLogs.StartLogging("baro.asl", "altimeter");
+    _tocLogs.StartLogging("baro.aslLong", "altimeter");
+    _tocLogs.StartLogging("baro.pressure", "altimeter");
+    _tocLogs.StartLogging("baro.temperature", "altimeter");
 }
 
 void Crazyflie::DisableAltimeterLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("altimeter");
+    _tocLogs.UnregisterLoggingBlock("barometer");
 }
 
 

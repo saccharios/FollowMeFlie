@@ -143,7 +143,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>50</y>
+      <y>30</y>
       <width>171</width>
       <height>151</height>
      </rect>
@@ -152,13 +152,6 @@
      <property name="leftMargin">
       <number>0</number>
      </property>
-     <item row="4" column="0">
-      <widget class="QLabel" name="Display_Altitude">
-       <property name="text">
-        <string>Altitude</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="pitchDisplay">
        <property name="text">
@@ -173,14 +166,14 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="1">
+      <widget class="QPlainTextEdit" name="actYaw"/>
+     </item>
      <item row="2" column="1">
       <widget class="QPlainTextEdit" name="actPitch"/>
      </item>
      <item row="3" column="1">
       <widget class="QPlainTextEdit" name="actThrust"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPlainTextEdit" name="actYaw"/>
      </item>
      <item row="0" column="1">
       <widget class="QPlainTextEdit" name="actRoll">
@@ -191,9 +184,6 @@
         </size>
        </property>
       </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QPlainTextEdit" name="actAltitude"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="yawDisplay">
@@ -218,7 +208,7 @@
      <x>0</x>
      <y>0</y>
      <width>660</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

@@ -16,7 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
     _crazyFlieCaller(_crazyFlie, parent),
-    _cameraViewPainter(_crazyFlieCaller.GetRollRef(), _crazyFlieCaller.GetYawRef(),_crazyFlieCaller.GetPitchRef())
+    _cameraViewPainter(_crazyFlieCaller.SensorValues().stabilizer.roll,
+                       _crazyFlieCaller.SensorValues().stabilizer.yaw,
+                       _crazyFlieCaller.SensorValues().stabilizer.pitch)
 {
     ui->setupUi(this);
 
@@ -46,11 +48,10 @@ MainWindow::~MainWindow()
 }
 void MainWindow::display_act_values()
  {
-     ui->actRoll->setPlainText( QString::number(_crazyFlieCaller.GetRoll()));
-     ui->actYaw->setPlainText( QString::number(_crazyFlieCaller.GetYaw()));
-     ui->actPitch->setPlainText( QString::number(_crazyFlieCaller.GetPitch()));
-     ui->actThrust->setPlainText( QString::number(_crazyFlieCaller.GetThrust()));
-     ui->actAltitude->setPlainText( QString::number(_crazyFlieCaller.GetAltitude()));
+     ui->actRoll->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.roll));
+     ui->actYaw->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.yaw));
+     ui->actPitch->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.pitch));
+     ui->actThrust->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.thrust));
  }
 void MainWindow::display_connection_timeout_box()
 {

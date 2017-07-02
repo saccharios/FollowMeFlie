@@ -126,6 +126,7 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
             tocElement.isLogging = false;
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
+            std::cout << "process packet " << name << std::endl;
             return true;
         }
     }
@@ -180,10 +181,6 @@ double TOC::DoubleValue(std::string name)
 {
     bool found;
     auto & result = STLUtils::ElementForName(_TOCElements, name, found);
-//    if(name == "alti.pressure")
-//    {
-//        std::cout << "name alti.pressure found " << found << std::endl;
-//    }
     return (found ? result.value : 0);
 }
 

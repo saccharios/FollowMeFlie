@@ -32,37 +32,5 @@ void CrazyFlieCaller::CheckConnectionTimeout()
     }
 }
 
-float const & CrazyFlieCaller::GetRoll() const
-{
-    return _crazyFlie.GetRoll();
-}
-float const & CrazyFlieCaller::GetRollRef() const
-{
-    return _crazyFlie.GetRoll();
-}
 
-float CrazyFlieCaller::GetYaw() const
-{
-    return _crazyFlie.GetYaw();
-}
-float const & CrazyFlieCaller::GetYawRef() const
-{
-    return _crazyFlie.GetYaw();
-}
-float CrazyFlieCaller::GetPitch() const
-{
-    return _crazyFlie.GetPitch();
-}
-float const & CrazyFlieCaller::GetPitchRef() const
-{
-    return _crazyFlie.GetPitch();
-}
-int CrazyFlieCaller::GetThrust() const
-{
-    return _crazyFlie.GetThrust();
-}
-float CrazyFlieCaller::GetAltitude() const
-{
-    return _crazyFlie.GetAltitude();
-}
 

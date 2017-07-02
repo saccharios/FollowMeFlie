@@ -562,13 +562,6 @@ bool CrazyRadio::RadioIsConnected() const
 
 float CrazyRadio::ConvertToDeviceVersion(short number) const
 {
-    /*float version = 0.0;
-    std::stringstream sts;
-    sts.str(std::string());
-    sts << (number >> 8);
-    sts << ".";
-    sts << (number & 0x0ff);
-    std::sscanf(sts.str().c_str(), "%f", &version);*/
     float version = static_cast<float>(number) / 100.0;
     return version;
 }
