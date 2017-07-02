@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Actions
     connect(&_crazyFlieCaller, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
 
-
     // Event loop on main window_
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_act_values()));
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
@@ -152,3 +151,8 @@ void MainWindow::on_pushButton_clicked()
 }
 
 
+
+void MainWindow::on_actionExit_triggered()
+{
+    QCoreApplication::quit();
+}

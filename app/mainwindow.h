@@ -32,6 +32,8 @@ private slots:
 
     void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
 
+    void on_actionExit_triggered();
+
 private:
     // GUI related
     Ui::MainWindow *ui;
