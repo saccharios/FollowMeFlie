@@ -126,7 +126,7 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
             tocElement.isLogging = false;
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
-            std::cout << "process packet " << name << std::endl;
+   //         std::cout << "process packet " << name << std::endl;
             return true;
         }
     }

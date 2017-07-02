@@ -25,14 +25,14 @@ private slots:
     void on_connectRadio_clicked();
     void on_radioSettingsOptions_currentIndexChanged(int index);
     void on_exitApp_clicked();
-    void on_pushButton_clicked();
-
     void display_sensor_values();
     void display_connection_timeout_box();
 
     void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
 
     void on_actionExit_triggered();
+
+    void on_pushButton_setThrust_clicked();
 
 private:
     // GUI related
@@ -46,6 +46,8 @@ private:
     Crazyflie _crazyFlie;
     CrazyFlieCaller _crazyFlieCaller;
     CameraViewPainter _cameraViewPainter;
+
+    void DisplayConnectionStatus();
 };
 
 #endif // MAINWINDOW_H

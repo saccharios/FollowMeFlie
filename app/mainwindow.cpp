@@ -67,6 +67,9 @@ void MainWindow::display_sensor_values()
      ui->actAslLong->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.aslLong));
      ui->actTemperature->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.temperature));
      ui->actPressure->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.pressure));
+
+     // Also update connection status
+     DisplayConnectionStatus();
  }
 void MainWindow::display_connection_timeout_box()
 {
@@ -154,7 +157,7 @@ void MainWindow::on_exitApp_clicked()
 }
 
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_pushButton_setThrust_clicked()
 {
     // With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
     // Update SF: I disabled the locking-functionality in the firmware.
@@ -172,3 +175,25 @@ void MainWindow::on_actionExit_triggered()
 {
     QCoreApplication::quit();
 }
+void MainWindow::DisplayConnectionStatus()
+{
+    QString connectionStatus;
+    if( _crazyFlie.IsConnected())
+    {
+        connectionStatus = "Connected";
+    }
+    else if(_crazyFlie.IsConnecting())
+    {
+        connectionStatus = "Connecting";
+    }
+    else if(_crazyFlie.IsDisconnected())
+    {
+        connectionStatus = "Disconnected";
+    }
+    else
+    {
+        connectionStatus = "Connection Status unknown";
+    }
+    ui->display_ConnectionStatus->setPlainText(connectionStatus);
+}
+
