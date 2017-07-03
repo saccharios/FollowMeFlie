@@ -6,6 +6,7 @@
 #include "communication/CrazyFlie.h"
 #include "crazyfliecaller.h"
 #include "cameraviewpainter.h"
+#include "trackingcolor.h"
 
 namespace Ui {
 class MainWindow;
@@ -29,7 +30,7 @@ private slots:
     void display_connection_timeout_box();
 
     void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
-
+    void RePaintTrackingColor() {_trackingColor.repaint();}
     void on_actionExit_triggered();
 
     void on_pushButton_setThrust_clicked();
@@ -46,6 +47,7 @@ private:
     Crazyflie _crazyFlie;
     CrazyFlieCaller _crazyFlieCaller;
     CameraViewPainter _cameraViewPainter;
+    TrackingColor _trackingColor;
 
     void DisplayConnectionStatus();
 };

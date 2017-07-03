@@ -9,7 +9,7 @@ class CameraViewPainter : public QWidget
 //    Q_OBJECT
 public:
     CameraViewPainter(float const & roll, float const & yaw, float const & pitch);
-    void paintEvent(QPaintEvent* /*event*/);
+    void paintEvent(QPaintEvent* /*event*/) override;
 public slots:
 private slots:
 private:

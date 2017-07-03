@@ -161,7 +161,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_StabVal">
@@ -217,9 +217,6 @@
        </item>
       </layout>
      </widget>
-     <zorder>gridLayoutWidget_2</zorder>
-     <zorder>label_roll</zorder>
-     <zorder>label_yaw</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -231,7 +228,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_AccVal">
@@ -298,7 +295,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>111</height>
+        <height>224</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -355,7 +352,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>111</height>
+        <height>224</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -412,7 +409,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>71</height>
+        <height>148</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BatteryVal">
@@ -471,7 +468,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">
@@ -611,7 +608,7 @@
       <height>21</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="Layout_Color"/>
+    <layout class="QVBoxLayout" name="Layout_TrackingColor"/>
    </widget>
    <widget class="QLabel" name="setColor">
     <property name="geometry">
@@ -648,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>660</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFollowMeFle">

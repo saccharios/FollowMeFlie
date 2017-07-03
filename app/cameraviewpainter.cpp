@@ -39,7 +39,6 @@ void CameraViewPainter::paintEvent(QPaintEvent* /*event*/)
     painter.setPen(Qt::black);
     QPoint p1 = World2CameraCoord(QPointF{-_x_max, 0.0});
     QPoint p2 = World2CameraCoord(QPointF{_x_max, 0.0});
-//        QPoint p2 = World2CameraCoord({ length,y});
     painter.drawLine(QLine(p1,p2));
     // Setup horizontal lines
     PaintHorizontalLine(painter, _roll, _pitch);

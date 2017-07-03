@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Custom widgets
     ui->Layout_CameraView->addWidget(&_cameraViewPainter);
-
+    ui->Layout_TrackingColor->addWidget(&_trackingColor);
 
 
 
