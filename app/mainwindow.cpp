@@ -207,16 +207,19 @@ void MainWindow::on_verticalSlider_hue_valueChanged(int value)
 {
     _trackingColor.SetHue(value);
     _trackingColor.repaint();
+    ui->Hue_Num->setText(QString::number(value));
 }
 
 void MainWindow::on_verticalSlider_sat_valueChanged(int value)
 {
     _trackingColor.SetSaturation(value);
     _trackingColor.repaint();
+    ui->Sat_Num->setText(QString::number(value));
 }
 
 void MainWindow::on_verticalSlider_value_valueChanged(int value)
 {
     _trackingColor.SetValue(value);
     _trackingColor.repaint();
+    ui->Val_Num->setText(QString::number(value));
 }

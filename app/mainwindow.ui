@@ -149,7 +149,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -228,7 +228,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>300</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_AccVal">
@@ -295,7 +295,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>224</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -352,7 +352,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>224</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -409,7 +409,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>148</height>
+        <height>91</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BatteryVal">
@@ -570,7 +570,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>340</y>
+      <y>320</y>
       <width>81</width>
       <height>181</height>
      </rect>
@@ -613,14 +613,14 @@
    <widget class="QLabel" name="setColor">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>320</y>
-      <width>61</width>
+      <x>570</x>
+      <y>300</y>
+      <width>81</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Set Color</string>
+     <string>Set Tracking Color</string>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="display_ConnectionStatus">
@@ -637,6 +637,72 @@
       <pointsize>6</pointsize>
      </font>
     </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>230</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="LayoutColorVal">
+     <item>
+      <widget class="QLabel" name="Hue">
+       <property name="text">
+        <string>H:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="Hue_Num">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="Sat">
+       <property name="text">
+        <string>S:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="Sat_Num">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>47</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="Val">
+       <property name="text">
+        <string>V:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="Val_Num">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
