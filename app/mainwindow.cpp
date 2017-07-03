@@ -36,8 +36,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Layout_CameraView->addWidget(&_cameraViewPainter);
     ui->Layout_TrackingColor->addWidget(&_trackingColor);
 
-
-
+    // Setup color bar slider
+    ui->verticalSlider_hue->setMinimum(0);
+    ui->verticalSlider_hue->setMaximum(359);
+    ui->verticalSlider_sat->setMinimum(0);
+    ui->verticalSlider_sat->setMaximum(255);
+    ui->verticalSlider_value->setMinimum(0);
+    ui->verticalSlider_value->setMaximum(255);
 
 
 }
@@ -197,3 +202,21 @@ void MainWindow::DisplayConnectionStatus()
     ui->display_ConnectionStatus->setPlainText(connectionStatus);
 }
 
+
+void MainWindow::on_verticalSlider_hue_valueChanged(int value)
+{
+    _trackingColor.SetHue(value);
+    _trackingColor.repaint();
+}
+
+void MainWindow::on_verticalSlider_sat_valueChanged(int value)
+{
+    _trackingColor.SetSaturation(value);
+    _trackingColor.repaint();
+}
+
+void MainWindow::on_verticalSlider_value_valueChanged(int value)
+{
+    _trackingColor.SetValue(value);
+    _trackingColor.repaint();
+}

@@ -30,10 +30,15 @@ private slots:
     void display_connection_timeout_box();
 
     void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
-    void RePaintTrackingColor() {_trackingColor.repaint();}
     void on_actionExit_triggered();
 
     void on_pushButton_setThrust_clicked();
+
+    void on_verticalSlider_hue_valueChanged(int value);
+
+    void on_verticalSlider_sat_valueChanged(int value);
+
+    void on_verticalSlider_value_valueChanged(int value);
 
 private:
     // GUI related

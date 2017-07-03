@@ -7,8 +7,9 @@ public:
     TrackingColor() : _trackingColor(100,1,1) {}
      void paintEvent(QPaintEvent* /*event*/) override;
      QColor const & GetTrackingColor(){return _trackingColor;}
-public slots:
-      void SetColor(int h, int s, int v) {_trackingColor.setHsv( h,  s,  v);}
+     void SetHue(int hue);
+     void SetSaturation(int sat);
+     void SetValue(int value);
 private:
      QColor  _trackingColor;
 };

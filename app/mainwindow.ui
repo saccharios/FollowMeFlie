@@ -577,21 +577,21 @@
     </property>
     <layout class="QHBoxLayout" name="LayoutColorBars">
      <item>
-      <widget class="QScrollBar" name="verticalScrollBar_hue">
+      <widget class="QSlider" name="verticalSlider_hue">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QScrollBar" name="verticalScrollBar_sat">
+      <widget class="QSlider" name="verticalSlider_sat">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QScrollBar" name="verticalScrollBar_val">
+      <widget class="QSlider" name="verticalSlider_value">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
