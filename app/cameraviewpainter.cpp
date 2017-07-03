@@ -9,12 +9,13 @@
 #include <QVector>
 #include "qt_util.h"
 #include <iostream>
-
+#include <QColor>
 CameraViewPainter::CameraViewPainter(float const & roll, float const & yaw, float const & pitch) : _roll(roll), _yaw(yaw), _pitch(pitch)
 {
     // set blue background
     QPalette pal;
-    pal.setColor(QPalette::Background, Qt::blue);
+    QColor blue(25,25,112);
+    pal.setColor(QPalette::Background, blue);
     setAutoFillBackground(true);
     setPalette(pal);
     show();
@@ -133,8 +134,9 @@ void CameraViewPainter::DrawGround(QPainter & painter, float roll, float pitch) 
     points.append(p2);
     points.append(p3);
     points.append(p4);
-    painter.setPen(Qt::green);
-    painter.setBrush(Qt::green);
+    QColor green(0,100,0);
+    painter.setPen(green);
+    painter.setBrush(green);
     QPolygon ground(points);
     painter.drawPolygon(ground);
 
