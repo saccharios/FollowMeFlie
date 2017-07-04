@@ -2,11 +2,8 @@
 #include <QWidget>
 
 
-
-
 class CameraViewPainter : public QWidget
 {
-//    Q_OBJECT
 public:
     CameraViewPainter(float const & roll, float const & yaw, float const & pitch);
     void paintEvent(QPaintEvent* /*event*/) override;

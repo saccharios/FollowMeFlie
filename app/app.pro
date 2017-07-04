@@ -2,6 +2,7 @@
 
 QT += core gui
 QT += multimedia
+QT += multimediawidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 include(../defaults.pri)
 # Use C++ 14
@@ -15,7 +16,8 @@ SOURCES +=  main.cpp \
     crazyfliecaller.cpp \
     cameraviewpainter.cpp \
     imageprocessing.cpp \
-    trackingcolor.cpp
+    trackingcolor.cpp \
+    camera.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -23,7 +25,8 @@ HEADERS  += mainwindow.h \
     cameraviewpainter.h \
     qt_util.h \
     imageprocessing.h \
-    trackingcolor.h
+    trackingcolor.h \
+    camera.h
 
 
 FORMS    += mainwindow.ui

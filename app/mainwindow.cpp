@@ -1,10 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <memory>
-#include <QCameraInfo>
+
 #include <iostream>
-//#include <QtMultimedia>
-//#include <QtMultimediaWidgets>
 #include <QDebug>
 #include "communication/Crazyflie.h"
 #include <QMessageBox>
@@ -85,26 +83,6 @@ void MainWindow::display_connection_timeout_box()
 }
 
 
-void MainWindow::on_activateCamera_clicked()
-{
-    std::unique_ptr<QCamera> camera = nullptr;
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    qDebug()  << "available cameras: " << cameras.size();
-    QString cameraName = "@device:pnp:\\\\?\\usb#vid_041e&pid_4095&mi_00#7&26faed27&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\global";
-
-    for( auto const & cameraInfo : cameras)
-    {
-        if (cameraInfo.deviceName() == cameraName)
-        {
-            camera = std::make_unique<QCamera>(cameraInfo);
-        }
-        qDebug() << cameraInfo.deviceName();
-    }
-    if(camera != nullptr)
-    {
-        qDebug() << "camera here!";
-    }
-}
 
 void MainWindow::on_disconnectRadio_clicked()
 {
@@ -222,4 +200,14 @@ void MainWindow::on_verticalSlider_value_valueChanged(int value)
     _trackingColor.SetValue(value);
     _trackingColor.repaint();
     ui->Val_Num->setText(QString::number(value));
+}
+
+void MainWindow::on_pushButton_CameraOnlyMode_clicked()
+{
+    _camera.Activate(true);
+}
+
+void MainWindow::on_pushButton_Stop_clicked()
+{
+    _camera.Activate(false);
 }

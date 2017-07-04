@@ -7,7 +7,7 @@
 #include "crazyfliecaller.h"
 #include "cameraviewpainter.h"
 #include "trackingcolor.h"
-
+#include "camera.h"
 namespace Ui {
 class MainWindow;
 }
@@ -21,7 +21,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_activateCamera_clicked();
     void on_disconnectRadio_clicked();
     void on_connectRadio_clicked();
     void on_radioSettingsOptions_currentIndexChanged(int index);
@@ -40,6 +39,10 @@ private slots:
 
     void on_verticalSlider_value_valueChanged(int value);
 
+    void on_pushButton_CameraOnlyMode_clicked();
+
+    void on_pushButton_Stop_clicked();
+
 private:
     // GUI related
     Ui::MainWindow *ui;
@@ -53,6 +56,7 @@ private:
     CrazyFlieCaller _crazyFlieCaller;
     CameraViewPainter _cameraViewPainter;
     TrackingColor _trackingColor;
+    Camera _camera;
 
     void DisplayConnectionStatus();
 };
