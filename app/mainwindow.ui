@@ -149,7 +149,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -351,7 +351,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>224</height>
+        <height>111</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -408,7 +408,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>148</height>
+        <height>61</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BatteryVal">
@@ -467,7 +467,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>300</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">
@@ -622,21 +622,6 @@
      <string>Set Tracking Color</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="display_ConnectionStatus">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>20</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>6</pointsize>
-     </font>
-    </property>
-   </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
@@ -735,6 +720,19 @@
       <y>500</y>
       <width>21</width>
       <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="display_ConnectionStatus">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>20</y>
+      <width>71</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">

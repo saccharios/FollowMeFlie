@@ -199,7 +199,7 @@ void MainWindow::DisplayConnectionStatus()
     {
         connectionStatus = "Connection Status unknown";
     }
-    ui->display_ConnectionStatus->setPlainText(connectionStatus);
+    ui->display_ConnectionStatus->setText(connectionStatus);
 }
 
 
