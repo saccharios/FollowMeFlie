@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _cameraViewPainter(_crazyFlieCaller.SensorValues().stabilizer.roll,
                        _crazyFlieCaller.SensorValues().stabilizer.yaw,
                        _crazyFlieCaller.SensorValues().stabilizer.pitch),
-    _cameraCaller()
+    _camera()
 {
     ui->setupUi(this);
 
@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Event loop on main window_
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
+    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
 //    _timer_t0.start(10); // time in ms
     _timer_t1.start(100); // time in ms
 //    _timer_t2.start(500); // time in ms
@@ -203,12 +204,17 @@ void MainWindow::on_verticalSlider_value_valueChanged(int value)
     ui->Val_Num->setText(QString::number(value));
 }
 
+void MainWindow::UpdateCamera()
+{
+    _camera.Update();
+}
+
 void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 {
-    _cameraCaller.Activate(true);
+    _camera.Activate(true);
 }
 
 void MainWindow::on_pushButton_Stop_clicked()
 {
-    _cameraCaller.Activate(false);
+    _camera.Activate(false);
 }

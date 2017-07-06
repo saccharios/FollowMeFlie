@@ -7,7 +7,7 @@
 #include "crazyfliecaller.h"
 #include "cameraviewpainter.h"
 #include "trackingcolor.h"
-#include "camera_caller.h"
+#include "imageprocess/camera.h"
 namespace Ui {
 class MainWindow;
 }
@@ -43,6 +43,8 @@ private slots:
 
     void on_pushButton_Stop_clicked();
 
+    void UpdateCamera();
+
 private:
     // GUI related
     Ui::MainWindow *ui;
@@ -56,7 +58,7 @@ private:
     CrazyFlieCaller _crazyFlieCaller;
     CameraViewPainter _cameraViewPainter;
     TrackingColor _trackingColor;
-    CameraCaller _cameraCaller;
+    Camera _camera;
 
     void DisplayConnectionStatus();
 };

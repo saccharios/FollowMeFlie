@@ -49,26 +49,6 @@ void Camera::Update()
 void Camera::Activate(bool activate)
 {
     _activated = activate;
-
-//    cv::VideoCapture cap;
-    // open the default camera, use something different from 0 otherwise;
-    // Check VideoCapture documentation.
-//    if(!cap.open(1))
-//    {
-//        return 0;
-//    }
-//    cap.open(0);
-//    while(true)
-//    {
-//          cv::Mat frame;
-//          cap >> frame;
-//          if( frame.empty() ) break; // end of video stream
-//          cv::imshow("this is you, smile! :)", frame);
-//          if( cv::waitKey(10) == 27 ) break; // stop capturing by pressing ESC
-//    }
-
-
-
 }
 
 void Camera::FetchImage()
@@ -78,8 +58,6 @@ void Camera::FetchImage()
     (*_capture) >> frame;
     if( frame.empty() ) return; // end of video stream
     cv::imshow("this is you, smile! :)", frame);
-//    if( cv::waitKey(10) == 27 ) break; // stop capturing by pressing ESC
-
 }
 
 void Camera::ProcessImage()

@@ -15,18 +15,14 @@ SOURCES +=  main.cpp \
     mainwindow.cpp \
     crazyfliecaller.cpp \
     cameraviewpainter.cpp \
-    imageprocessing.cpp \
-    trackingcolor.cpp \
-    camera_caller.cpp
+    trackingcolor.cpp
 
 
 HEADERS  += mainwindow.h \
     crazyfliecaller.h \
     cameraviewpainter.h \
     qt_util.h \
-    imageprocessing.h \
-    trackingcolor.h \
-    camera_caller.h
+    trackingcolor.h
 
 
 FORMS    += mainwindow.ui
