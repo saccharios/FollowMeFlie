@@ -16,7 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _crazyFlieCaller(_crazyFlie, parent),
     _cameraViewPainter(_crazyFlieCaller.SensorValues().stabilizer.roll,
                        _crazyFlieCaller.SensorValues().stabilizer.yaw,
-                       _crazyFlieCaller.SensorValues().stabilizer.pitch)
+                       _crazyFlieCaller.SensorValues().stabilizer.pitch),
+    _cameraCaller()
 {
     ui->setupUi(this);
 
@@ -204,10 +205,10 @@ void MainWindow::on_verticalSlider_value_valueChanged(int value)
 
 void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 {
-    _camera.Activate(true);
+    _cameraCaller.Activate(true);
 }
 
 void MainWindow::on_pushButton_Stop_clicked()
 {
-    _camera.Activate(false);
+    _cameraCaller.Activate(false);
 }

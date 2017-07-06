@@ -7,7 +7,7 @@
 #include "crazyfliecaller.h"
 #include "cameraviewpainter.h"
 #include "trackingcolor.h"
-#include "camera.h"
+#include "camera_caller.h"
 namespace Ui {
 class MainWindow;
 }
@@ -56,7 +56,7 @@ private:
     CrazyFlieCaller _crazyFlieCaller;
     CameraViewPainter _cameraViewPainter;
     TrackingColor _trackingColor;
-    Camera _camera;
+    CameraCaller _cameraCaller;
 
     void DisplayConnectionStatus();
 };
