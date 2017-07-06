@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.2.1, 2017-07-06T21:18:25. -->
+<!-- Written by QtCreator 4.2.1, 2017-07-06T22:08:27. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -286,7 +286,7 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes">
-     <value type="QString">PATH=C:\Qt\5.8\mingw53_32\lib;E:\Code\FollowMeFlie\build\app\..\src\lib\;C:\Qt\5.8\mingw53_32\bin;C:\Qt\Tools\mingw530_32\bin;C:\ProgramData\Oracle\Java\javapath;C:\WinAVR\bin;C:\WinAVR\utils\bin;C:\Program Files\Common Files\Microsoft Shared\Windows Live;C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live;c:\Program Files (x86)\ATI Stream\bin\x86_64;c:\Program Files (x86)\ATI Stream\bin\x86;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;c:\Program Files (x86)\ATI Technologies\ATI.ACE\Core-Static;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files (x86)\Microsoft SDKs\Windows Azure\CLI\wbin;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files\TortoiseSVN\bin;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\MinGW\bin;C:\Program Files\Git\cmd;C:\Program Files\CMake\bin;C:\WINDOWS\system32\config\systemprofile\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files (x86)\Skype\Phone\;C:\Program Files\TortoiseGit\bin;C:\Python\Python36-32\Scripts\;C:\Python\Python36-32\;C:\Users\Stefan\AppData\Local\Microsoft\WindowsApps;</value>
+     <value type="QString">PATH=C:\Qt\5.8\mingw53_32\lib;E:\Code\FollowMeFlie\build\app\..\src\lib\;C:\Qt\5.8\mingw53_32\bin;C:\Qt\Tools\mingw530_32\bin;C:\ProgramData\Oracle\Java\javapath;C:\WinAVR\bin;C:\WinAVR\utils\bin;C:\Program Files\Common Files\Microsoft Shared\Windows Live;C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live;c:\Program Files (x86)\ATI Stream\bin\x86_64;c:\Program Files (x86)\ATI Stream\bin\x86;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;c:\Program Files (x86)\ATI Technologies\ATI.ACE\Core-Static;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files (x86)\Microsoft SDKs\Windows Azure\CLI\wbin;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files\TortoiseSVN\bin;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\MinGW\bin;C:\Program Files\Git\cmd;C:\Program Files\CMake\bin;C:\WINDOWS\system32\config\systemprofile\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files (x86)\Skype\Phone\;C:\Program Files\TortoiseGit\bin;C:\Python\Python36-32\Scripts\;C:\Python\Python36-32\;C:\Users\Stefan\AppData\Local\Microsoft\WindowsApps;E:\Code\lib\opencv-3.2.0-build\bin;</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">app</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>

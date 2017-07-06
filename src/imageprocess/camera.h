@@ -2,6 +2,10 @@
 
 #include<memory>
 
+namespace cv {
+class VideoCapture;
+}
+
 class Camera
 {
     enum class CameraState
@@ -19,6 +23,8 @@ public:
 private:
     CameraState _state;
     bool _activated;
+
+    cv::VideoCapture* _capture;
 
     void FetchImage();
     void ProcessImage();

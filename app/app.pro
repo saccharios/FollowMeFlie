@@ -17,7 +17,6 @@ SOURCES +=  main.cpp \
     cameraviewpainter.cpp \
     imageprocessing.cpp \
     trackingcolor.cpp \
-    cameraframegrabber.cpp \
     camera_caller.cpp
 
 
@@ -27,7 +26,6 @@ HEADERS  += mainwindow.h \
     qt_util.h \
     imageprocessing.h \
     trackingcolor.h \
-    cameraframgrabber.h \
     camera_caller.h
 
 
