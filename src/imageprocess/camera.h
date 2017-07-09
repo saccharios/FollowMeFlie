@@ -8,6 +8,7 @@ class VideoCapture;
 
 class Camera
 {
+public:
     enum class CameraState
     {
         DISABLED = 0,
@@ -15,10 +16,10 @@ class Camera
         RUNNING = 2,
     };
 
-public:
     Camera();
     void Activate(bool activate);
     void Update();
+    CameraState GetState() const {return _state; }
 
 private:
     CameraState _state;

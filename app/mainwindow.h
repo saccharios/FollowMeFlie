@@ -48,7 +48,7 @@ private slots:
 private:
     // GUI related
     Ui::MainWindow *ui;
-//    QTimer _timer_t0;
+    QTimer _timer_t0;
     QTimer _timer_t1;
 //    QTimer _timer_t2;
 

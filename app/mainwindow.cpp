@@ -11,6 +11,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    _timer_t0(),
+    _timer_t1(),
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
     _crazyFlieCaller(_crazyFlie, parent),
@@ -27,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Event loop on main window_
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
-    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
-//    _timer_t0.start(10); // time in ms
+    QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
+    _timer_t0.start(10); // time in ms
     _timer_t1.start(100); // time in ms
 //    _timer_t2.start(500); // time in ms
 
@@ -211,7 +213,7 @@ void MainWindow::UpdateCamera()
 
 void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 {
-    _camera.Activate(true);
+    _camera.Activate(_camera.GetState() == Camera::CameraState::DISABLED);
 }
 
 void MainWindow::on_pushButton_Stop_clicked()
