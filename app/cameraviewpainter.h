@@ -1,6 +1,30 @@
 #pragma once
 #include <QWidget>
 
+QPoint World2CameraCoord(QPointF point, QWidget* widget);
+class BackGroundBase
+{
+public:
+    virtual void DrawGround(QPainter & painter, float roll, float pitch, float x_max, float y_max) = 0;
+};
+
+class Horizon : public BackGroundBase
+{
+public:
+    Horizon(QWidget * widget): _widget(widget) {}
+    void DrawGround(QPainter & painter, float roll, float pitch, float x_max, float y_max) override;
+private:
+    QWidget * _widget;
+};
+
+class CameraBackGround : public BackGroundBase
+{
+public:
+    CameraBackGround(QWidget * widget): _widget(widget) {}
+    void DrawGround(QPainter & painter, float roll, float pitch, float x_max, float y_max) override;
+private:
+    QWidget * _widget;
+};
 
 class CameraViewPainter : public QWidget
 {
@@ -17,10 +41,12 @@ private:
     float const & _yaw;
     float const & _pitch;
 
-    QPoint World2CameraCoord(QPointF point);
+
     void PaintHorizontalLine(QPainter & painter, float roll,float pitch);
     void PaintVerticalLine(QPainter & painter, float roll, float yaw);
-    void DrawGround(QPainter & painter, float roll, float pitch);
+    BackGroundBase * _backGround;
+    Horizon _horizon;
+    CameraBackGround _cameraBackGround;
 
 };
 
