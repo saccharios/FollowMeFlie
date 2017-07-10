@@ -10,6 +10,8 @@
 #include "qt_util.h"
 #include <iostream>
 #include <QColor>
+#include <QRect>
+
 CameraViewPainter::CameraViewPainter(float const & roll, float const & yaw, float const & pitch) :
     _roll(roll),
     _yaw(yaw),
@@ -148,5 +150,9 @@ void Horizon::DrawGround(QPainter & painter, float roll, float pitch,float x_max
 }
 void CameraBackGround::DrawGround(QPainter & painter, float roll, float pitch,float x_max, float y_max) // roll, pitch in degree
 {
+    QSize widgetSize = _widget->size();
+    QRect rect(0,0,widgetSize.width(),widgetSize.height());
+    painter.drawImage(rect, _image);
+
 
 }

@@ -1,13 +1,14 @@
 #pragma once
-
+#include <QObject>
 #include<memory>
 
 namespace cv {
 class VideoCapture;
 }
 
-class Camera
+class Camera  : public QObject
 {
+    Q_OBJECT
 public:
     enum class CameraState
     {
@@ -20,7 +21,8 @@ public:
     void Activate(bool activate);
     void Update();
     CameraState GetState() const {return _state; }
-
+signals:
+    void ImageReady(QImage const &);
 private:
     CameraState _state;
     bool _activated;

@@ -15,14 +15,16 @@ SOURCES +=  main.cpp \
     mainwindow.cpp \
     crazyfliecaller.cpp \
     cameraviewpainter.cpp \
-    trackingcolor.cpp
+    trackingcolor.cpp \
+    imageprocess/camera.cpp
 
 
 HEADERS  += mainwindow.h \
     crazyfliecaller.h \
     cameraviewpainter.h \
     qt_util.h \
-    trackingcolor.h
+    trackingcolor.h \
+    imageprocess/camera.h
 
 
 FORMS    += mainwindow.ui
@@ -31,3 +33,23 @@ LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 
 INCLUDEPATH += $$PWD/../build/src/lib
 DEPENDPATH += $$PWD/../build/src/lib
+
+# Include opencv 3.2.0
+opencv_path =     "E:\Code\lib\opencv-3.2.0-build"
+INCLUDEPATH += $${opencv_path}/install/include
+LIBS += $${opencv_path}/bin/libopencv_calib3d320.dll
+LIBS += $${opencv_path}/bin/libopencv_core320.dll
+LIBS += $${opencv_path}/bin/libopencv_features2d320.dll
+LIBS += $${opencv_path}/bin/libopencv_flann320.dll
+LIBS += $${opencv_path}/bin/libopencv_highgui320.dll
+LIBS += $${opencv_path}/bin/libopencv_imgcodecs320.dll
+LIBS += $${opencv_path}/bin/libopencv_imgproc320.dll
+LIBS += $${opencv_path}/bin/libopencv_ml320.dll
+LIBS += $${opencv_path}/bin/libopencv_objdetect320.dll
+LIBS += $${opencv_path}/bin/libopencv_photo320.dll
+LIBS += $${opencv_path}/bin/libopencv_shape320.dll
+LIBS += $${opencv_path}/bin/libopencv_stitching320.dll
+LIBS += $${opencv_path}/bin/libopencv_superres320.dll
+LIBS += $${opencv_path}/bin/libopencv_video320.dll
+LIBS += $${opencv_path}/bin/libopencv_videoio320.dll
+LIBS += $${opencv_path}/bin/libopencv_videostab320.dll

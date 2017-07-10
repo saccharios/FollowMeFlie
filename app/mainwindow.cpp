@@ -46,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->verticalSlider_value->setMinimum(0);
     ui->verticalSlider_value->setMaximum(255);
 
+    // Connections
+    QObject::connect(&_camera, SIGNAL(ImageReady(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
+
 
 }
 MainWindow::~MainWindow()
@@ -213,7 +216,16 @@ void MainWindow::UpdateCamera()
 
 void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 {
-    _camera.Activate(_camera.GetState() == Camera::CameraState::DISABLED);
+    bool activate = (_camera.GetState() == Camera::CameraState::DISABLED);
+    if(activate)
+    {
+    _cameraViewPainter.SetCameraBackGround();
+    }
+    else
+    {
+        _cameraViewPainter.SetHorizon();
+    }
+    _camera.Activate(activate);
 }
 
 void MainWindow::on_pushButton_Stop_clicked()
