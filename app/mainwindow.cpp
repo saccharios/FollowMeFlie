@@ -6,7 +6,7 @@
 #include <QDebug>
 #include "communication/Crazyflie.h"
 #include <QMessageBox>
-
+#include "opencv2/opencv.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _cameraViewPainter(_crazyFlieCaller.SensorValues().stabilizer.roll,
                        _crazyFlieCaller.SensorValues().stabilizer.yaw,
                        _crazyFlieCaller.SensorValues().stabilizer.pitch),
-    _camera()
+    _camera(),
+    _extractColor()
 {
     ui->setupUi(this);
 
@@ -30,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
     QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
-    _timer_t0.start(10); // time in ms
+    _timer_t0.start(30); // time in ms
     _timer_t1.start(100); // time in ms
 //    _timer_t2.start(500); // time in ms
 
@@ -47,7 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->verticalSlider_value->setMaximum(255);
 
     // Connections
-    QObject::connect(&_camera, SIGNAL(ImageReady(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
+    QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
+    QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
+    QObject::connect(&_trackingColor, SIGNAL(ColorChanged(QColor const &)), &_extractColor, SLOT(SetColor(QColor const & )));
 
 
 }

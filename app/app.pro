@@ -16,7 +16,8 @@ SOURCES +=  main.cpp \
     crazyfliecaller.cpp \
     cameraviewpainter.cpp \
     trackingcolor.cpp \
-    imageprocess/camera.cpp
+    imageprocess/camera.cpp \
+    imageprocess/extractcolor.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -24,7 +25,8 @@ HEADERS  += mainwindow.h \
     cameraviewpainter.h \
     qt_util.h \
     trackingcolor.h \
-    imageprocess/camera.h
+    imageprocess/camera.h \
+    imageprocess/extractcolor.h
 
 
 FORMS    += mainwindow.ui

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QTimer>
 #include <communication/Crazyflie.h>
-
+// TODO SF Is this class really needed??
 class CrazyFlieCaller : public QObject
 {
     Q_OBJECT

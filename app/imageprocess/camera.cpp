@@ -6,7 +6,15 @@
 #include "opencv2/opencv.hpp"
 #include <QImage>
 
-
+QImage Mat2QImage(cv::Mat const& src)
+{
+     cv::Mat temp; // make the same cv::Mat
+     cvtColor(src, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
+     QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
+     dest.bits(); // enforce deep copy, see documentation
+     // of QImage::QImage ( const uchar * data, int width, int height, Format format )
+     return dest;
+}
 
 bool EnumerateCameras(std::vector<int> & camIdx)
 {
@@ -83,15 +91,7 @@ void Camera::Activate(bool activate)
     _activated = activate;
 }
 
-QImage Mat2QImage(cv::Mat const& src)
-{
-     cv::Mat temp; // make the same cv::Mat
-     cvtColor(src, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
-     QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
-     dest.bits(); // enforce deep copy, see documentation
-     // of QImage::QImage ( const uchar * data, int width, int height, Format format )
-     return dest;
-}
+
 
 
 void Camera::FetchImage()
@@ -99,14 +99,11 @@ void Camera::FetchImage()
 
     cv::Mat frame;
     (*_capture) >> frame;
-    if( frame.empty() ) return; // end of video stream
-//    cv::imshow("this is you, smile! :)", frame); // Show camera stream in separate window
+    if( (frame).empty() ) return; // end of video stream
+    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
 
     auto image = Mat2QImage(frame);
-    emit ImageReady(image);
+    emit ImgReadyForDisplay(image);
+    emit ImgReadyForProcessing(frame);
 }
 
-void Camera::ProcessImage()
-{
-
-}

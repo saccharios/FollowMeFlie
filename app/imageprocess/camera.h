@@ -1,6 +1,8 @@
 #pragma once
 #include <QObject>
 #include<memory>
+#include "opencv2/opencv.hpp"
+
 
 namespace cv {
 class VideoCapture;
@@ -22,7 +24,8 @@ public:
     void Update();
     CameraState GetState() const {return _state; }
 signals:
-    void ImageReady(QImage const &);
+    void ImgReadyForDisplay(QImage const &);
+    void ImgReadyForProcessing(cv::Mat const &);
 private:
     CameraState _state;
     bool _activated;
@@ -30,5 +33,4 @@ private:
     cv::VideoCapture* _capture;
 
     void FetchImage();
-    void ProcessImage();
 };

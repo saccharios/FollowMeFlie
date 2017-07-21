@@ -8,6 +8,9 @@
 #include "cameraviewpainter.h"
 #include "trackingcolor.h"
 #include "imageprocess/camera.h"
+#include "imageprocess/extractcolor.h"
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -59,6 +62,7 @@ private:
     CameraViewPainter _cameraViewPainter;
     TrackingColor _trackingColor;
     Camera _camera;
+    ExtractColor _extractColor;
 
     void DisplayConnectionStatus();
 };
