@@ -100,7 +100,7 @@ void Camera::FetchImage()
     cv::Mat frame;
     (*_capture) >> frame;
     if( (frame).empty() ) return; // end of video stream
-    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
+//    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
 
     auto image = Mat2QImage(frame);
     emit ImgReadyForDisplay(image);

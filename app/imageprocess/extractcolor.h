@@ -15,19 +15,18 @@ class ExtractColor :  public QObject
 {
     Q_OBJECT
 public:
-    ExtractColor() : _colorToFilter()
+    ExtractColor(QColor const & color) : _colorToFilter(color)
     {}
 
 
 public slots:
     void ProcessImage(cv::Mat const & img);
-    void SetColor(QColor const & color) {_colorToFilter = color;}
 
 signals:
     void NewDistance(Distance const &);
 
 private:
-    QColor
+    QColor const &
     _colorToFilter;
 
 };

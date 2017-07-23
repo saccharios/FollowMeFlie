@@ -28,4 +28,11 @@ void TrackingColor::SetValue(int value)
     emit ColorChanged(_trackingColor);
 }
 
-
+int TrackingColor::GetHue()
+{
+    int hue = 0;
+    int sat = 0;
+    int val = 0;
+   _trackingColor.getHsv(&hue, &sat, &val);
+   return hue;
+}

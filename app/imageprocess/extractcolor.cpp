@@ -7,7 +7,7 @@ cv::Scalar QColor2Scalar(QColor const & color)
     int s = 0;
     int v = 0;;
     color.getHsv(&h, &s, &v);
-    return cv::Scalar(h,s,v);
+    return cv::Scalar(h/2,s,v); // In opencv, hue ranges from 0 to 179
 }
 
 
@@ -18,12 +18,12 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     cv::cvtColor(img, imgHSV, cv::COLOR_BGR2HSV);
     // Create lower and upper color bounds
     cv::Scalar colorToFilter= QColor2Scalar(_colorToFilter);
-    cv::Scalar tolerance(10,10,10);
-    cv::Scalar colorLower = colorToFilter - tolerance;
-    cv::Scalar colorUppder = colorToFilter + tolerance;
+    int tolerance = 20;
+    cv::Scalar colorLower(colorToFilter[0] - tolerance, 120,120);
+    cv::Scalar colorUpper(colorToFilter[0] + tolerance, 255,255);
     // TODO SF:: Special case red!
     cv::Mat imgThreshold;
-    cv::inRange(imgHSV, colorLower, colorUppder, imgThreshold);
+    cv::inRange(imgHSV, colorLower, colorUpper, imgThreshold);
 
     cv::imshow("Thresholded Frame", imgThreshold); // Show camera stream in separate window
 

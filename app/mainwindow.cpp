@@ -19,8 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _cameraViewPainter(_crazyFlieCaller.SensorValues().stabilizer.roll,
                        _crazyFlieCaller.SensorValues().stabilizer.yaw,
                        _crazyFlieCaller.SensorValues().stabilizer.pitch),
+     _trackingColor(),
     _camera(),
-    _extractColor()
+    _extractColor(_trackingColor.GetColor())
 {
     ui->setupUi(this);
 
@@ -39,18 +40,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Layout_CameraView->addWidget(&_cameraViewPainter);
     ui->Layout_TrackingColor->addWidget(&_trackingColor);
 
-    // Setup color bar slider
+    // Setup color bar sliders
     ui->verticalSlider_hue->setMinimum(0);
     ui->verticalSlider_hue->setMaximum(359);
+    ui->verticalSlider_hue->setValue(_trackingColor.GetHue()); // Default value is the same as defined in trackingColor
     ui->verticalSlider_sat->setMinimum(0);
     ui->verticalSlider_sat->setMaximum(255);
+    ui->verticalSlider_sat->setValue(255);
     ui->verticalSlider_value->setMinimum(0);
     ui->verticalSlider_value->setMaximum(255);
+    ui->verticalSlider_value->setValue(255);
 
     // Connections
     QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
-    QObject::connect(&_trackingColor, SIGNAL(ColorChanged(QColor const &)), &_extractColor, SLOT(SetColor(QColor const & )));
 
 
 }

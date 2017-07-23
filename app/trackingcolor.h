@@ -5,10 +5,11 @@ class TrackingColor : public QWidget
 {
     Q_OBJECT
 public:
-    TrackingColor() : _trackingColor(100,1,1) {}
+    TrackingColor() : _trackingColor(QColor::fromHsv(224,255,255)) {}
      void paintEvent(QPaintEvent* /*event*/) override;
-     QColor const & GetTrackingColor(){return _trackingColor;}
+     QColor const & GetColor(){return _trackingColor;}
      void SetHue(int hue);
+     int GetHue();
      void SetSaturation(int sat);
      void SetValue(int value);
 
