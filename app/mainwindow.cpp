@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Actions
     connect(&_crazyFlieCaller, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
 
-    // Event loop on main window_
+    // Event loop on main window
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
     QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->verticalSlider_hue->setMinimum(0);
     ui->verticalSlider_hue->setMaximum(359);
     ui->verticalSlider_hue->setValue(_trackingColor.GetHue()); // Default value is the same as defined in trackingColor
+    // TODO SF Can sat and value slider be removed??
     ui->verticalSlider_sat->setMinimum(0);
     ui->verticalSlider_sat->setMaximum(255);
     ui->verticalSlider_sat->setValue(255);
