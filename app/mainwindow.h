@@ -38,10 +38,6 @@ private slots:
 
     void on_verticalSlider_hue_valueChanged(int value);
 
-    void on_verticalSlider_sat_valueChanged(int value);
-
-    void on_verticalSlider_value_valueChanged(int value);
-
     void on_pushButton_CameraOnlyMode_clicked();
 
     void on_pushButton_Stop_clicked();

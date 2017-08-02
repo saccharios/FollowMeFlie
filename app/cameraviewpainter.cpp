@@ -148,7 +148,7 @@ void Horizon::DrawGround(QPainter & painter, float roll, float pitch,float x_max
     QPolygon ground(points);
     painter.drawPolygon(ground);
 }
-void CameraBackGround::DrawGround(QPainter & painter, float roll, float pitch,float x_max, float y_max) // roll, pitch in degree
+void CameraBackGround::DrawGround(QPainter & painter, float /*roll*/, float /*pitch*/,float /*x_max*/, float /*y_max*/) // roll, pitch in degree
 {
     QSize widgetSize = _widget->size();
     QRect rect(0,0,widgetSize.width(),widgetSize.height());

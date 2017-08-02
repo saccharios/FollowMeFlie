@@ -44,13 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->verticalSlider_hue->setMinimum(0);
     ui->verticalSlider_hue->setMaximum(359);
     ui->verticalSlider_hue->setValue(_trackingColor.GetHue()); // Default value is the same as defined in trackingColor
-    // TODO SF Can sat and value slider be removed??
-    ui->verticalSlider_sat->setMinimum(0);
-    ui->verticalSlider_sat->setMaximum(255);
-    ui->verticalSlider_sat->setValue(255);
-    ui->verticalSlider_value->setMinimum(0);
-    ui->verticalSlider_value->setMaximum(255);
-    ui->verticalSlider_value->setValue(255);
 
     // Connections
     QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
@@ -202,19 +195,6 @@ void MainWindow::on_verticalSlider_hue_valueChanged(int value)
     ui->Hue_Num->setText(QString::number(value));
 }
 
-void MainWindow::on_verticalSlider_sat_valueChanged(int value)
-{
-    _trackingColor.SetSaturation(value);
-    _trackingColor.repaint();
-    ui->Sat_Num->setText(QString::number(value));
-}
-
-void MainWindow::on_verticalSlider_value_valueChanged(int value)
-{
-    _trackingColor.SetValue(value);
-    _trackingColor.repaint();
-    ui->Val_Num->setText(QString::number(value));
-}
 
 void MainWindow::UpdateCamera()
 {

@@ -148,7 +148,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>151</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_StabVal">
@@ -215,7 +215,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>151</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_AccVal">
@@ -282,7 +282,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>224</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -338,7 +338,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>111</height>
+        <height>224</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -395,7 +395,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>61</height>
+        <height>148</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BatteryVal">
@@ -454,7 +454,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">
@@ -557,7 +557,7 @@
      <rect>
       <x>570</x>
       <y>320</y>
-      <width>81</width>
+      <width>31</width>
       <height>181</height>
      </rect>
     </property>
@@ -569,29 +569,15 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QSlider" name="verticalSlider_sat">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSlider" name="verticalSlider_value">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>530</y>
-      <width>81</width>
-      <height>21</height>
+      <x>610</x>
+      <y>350</y>
+      <width>41</width>
+      <height>31</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="Layout_TrackingColor"/>
@@ -600,7 +586,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>270</y>
+      <y>300</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -609,103 +595,12 @@
      <string>Set Tracking Color</string>
     </property>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>290</y>
-      <width>81</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="LayoutColorVal">
-     <item>
-      <widget class="QLabel" name="Hue">
-       <property name="text">
-        <string>H:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="Sat">
-       <property name="text">
-        <string>S:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="Val">
-       <property name="text">
-        <string>V:</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QLabel" name="Hue_Num">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>500</y>
-      <width>21</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Sat_Num">
-    <property name="geometry">
-     <rect>
-      <x>600</x>
-      <y>500</y>
-      <width>20</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Val_Num">
-    <property name="geometry">
-     <rect>
-      <x>630</x>
-      <y>500</y>
-      <width>21</width>
+      <x>610</x>
+      <y>320</y>
+      <width>41</width>
       <height>29</height>
      </rect>
     </property>
