@@ -33,14 +33,14 @@
 
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
-    _ackMissTolerance(0),
+    _ackMissTolerance(100),
     _ackMissCounter(0),
     _sendSetPoint(),
     _maxSetPoint({45.0,45.0,180.0,60000}),
     _minThrust(0),
     _isSendingSetpoints(false),
     _startConnecting(false),
-    _state (State::STATE_ZERO),
+    _state (State::ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
     _tocLogs(_crazyRadio, Port::Log),
     _leaveConnectingState(),
@@ -114,45 +114,46 @@ void Crazyflie::Update()
 
     switch(_state)
     {
-    case State::STATE_ZERO:
+    case State::ZERO:
     {
         if(_startConnecting)
         {
-            _state = State::STATE_READ_PARAMETERS_TOC;
+             _ackMissCounter = 0;
+            _state = State::READ_PARAMETERS_TOC;
         }
         break;
     }
-    case State::STATE_READ_PARAMETERS_TOC:
+    case State::READ_PARAMETERS_TOC:
     {
         // TODO SF State machine is in busy wait in this state if the crazy flie is not turned on. This should not be.
         bool success = ReadTOCParameters();
         if(success)
         {
-            _state =State:: STATE_READ_LOGS_TOC;
+            _state =State:: READ_LOGS_TOC;
         }
 
         if(_crazyRadio.LastSendAndReceiveFailed())
         {
-            _state = State::STATE_ZERO;
+            _state = State::ZERO;
             _startConnecting = false;
         }
         break;
     }
-    case State::STATE_READ_LOGS_TOC:
+    case State::READ_LOGS_TOC:
     {
         if(ReadTOCLogs())
         {
-            _state = State::STATE_START_LOGGING;
+            _state = State::START_LOGGING;
         }
         break;
     }
-    case State::STATE_START_LOGGING:
+    case State::START_LOGGING:
     {
         StartLogging();
-        _state = State::STATE_ZERO_MEASUREMENTS;
+        _state = State::ZERO_MEASUREMENTS;
         break;
     }
-    case State::STATE_ZERO_MEASUREMENTS:
+    case State::ZERO_MEASUREMENTS:
     {
         _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
@@ -160,10 +161,10 @@ void Crazyflie::Update()
         // not done at the moment, though. Reason: No readings to zero at
         // the moment. This might change when altitude becomes available.
 
-        _state = State::STATE_NORMAL_OPERATION;
+        _state = State::NORMAL_OPERATION;
         break;
     }
-    case State::STATE_NORMAL_OPERATION:
+    case State::NORMAL_OPERATION:
     {
         // Shove over the sensor readings from the radio to the Logs TOC.
         _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
@@ -178,20 +179,40 @@ void Crazyflie::Update()
             // Send a ping packet for keepalive
             _crazyRadio.SendPingPacket();
         }
+
+        if(_crazyRadio.AckReceived())
+        {
+            _ackMissCounter = 0;
+        }
+        else if(_ackMissCounter < _ackMissTolerance)
+        {
+            ++_ackMissCounter;
+        }
+        if( _ackMissCounter == _ackMissTolerance )
+        {
+            ++_ackMissCounter;
+            _startConnecting = false;
+            _state = State::ZERO;
+        }
+
         break;
     }
     default:
         break;
     } // end switch
 
-    if(_crazyRadio.AckReceived())
-    {
-        _ackMissCounter = 0;
-    }
-    else
-    {
-        ++_ackMissCounter;
-    }
+  //  if(_state != State::STATE_ZERO)
+ /*   {
+        if(_crazyRadio.AckReceived())
+        {
+            _ackMissCounter = 0;
+        }
+        else if(_ackMissCounter < _ackMissTolerance)
+        {
+            std::cout << _ackMissCounter << std::endl;
+            ++_ackMissCounter;
+        }*/
+    //}
     UpateSensorValues();
 //    if(_state!= State::STATE_ZERO)
 //    {
@@ -224,10 +245,10 @@ void Crazyflie::UpateSensorValues()
     _sensorValues.magnetometer.z = GetSensorValue("mag.z");
 }
 
-bool Crazyflie::IsCopterConnected()
+bool Crazyflie::IsConnectionTimeout()
 {
-    // TODO Is this function useful?
-    return _ackMissCounter < _ackMissTolerance;
+    std::cout << _ackMissCounter << "  " << _ackMissTolerance <<std::endl;
+    return _ackMissCounter == _ackMissTolerance+1;
 }
 // TODO SF: Simplifly setpoint setting
 void Crazyflie::SetThrust(int thrust)
@@ -275,7 +296,7 @@ void Crazyflie::SetYaw(float yaw)
 
 bool Crazyflie::IsDisconnected()
 {
-    return _state == State::STATE_ZERO;
+    return _state == State::ZERO;
 }
 bool Crazyflie::IsConnecting()
 {
@@ -283,7 +304,7 @@ bool Crazyflie::IsConnecting()
 }
 bool Crazyflie::IsConnected()
 {
-    return _state == State::STATE_NORMAL_OPERATION;
+    return _state == State::NORMAL_OPERATION;
 }
 
 void Crazyflie::StartLogging()
@@ -416,9 +437,3 @@ void Crazyflie::DisableAltimeterLogging()
 }
 
 
-bool Crazyflie::IsConnectionTimeout()
-{
-    // TODO SF: Give too many false positives!
-    return false;
-//    return _leaveConnectingState.Update(IsConnecting()) && IsDisconnected();
-}

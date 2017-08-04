@@ -450,7 +450,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
         if(bytesRead > 0)
         {
             // Analyse status byte
-            _ackReceived = true;//cBuffer[0] & 0x1;
+            _ackReceived = buffer[0] & 0x01;
             //bool bPowerDetector = cBuffer[0] & 0x2;
             //int nRetransmissions = cBuffer[0] & 0xf0;
 

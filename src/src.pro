@@ -20,7 +20,9 @@ INCLUDEPATH += communication \
 SOURCES += communication/Crazyflie.cpp \
     communication/CrazyRadio.cpp \
     communication/CRTPPacket.cpp \
-    communication/TOC.cpp
+    communication/TOC.cpp \
+    math/lowpass.cpp \
+    math/pi_controller.cpp
 
 
 HEADERS  += communication/Crazyflie.h \
@@ -31,7 +33,9 @@ HEADERS  += communication/Crazyflie.h \
     math/stl_utils.h \
     math/logic.h \
     math/functions.h \
-    math/constants.h
+    math/constants.h \
+    math/lowpass.h \
+    math/pi_controller.h
 
 
 # Include library libusb-1.0.21

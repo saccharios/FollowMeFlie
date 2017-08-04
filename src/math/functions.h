@@ -25,3 +25,21 @@ float deg2rad(float deg)
     return WrapAround(deg/180.0f*pi, -pi, pi);
 }
 
+
+template <typename T>
+T Limit(T input, T min, T max)
+{
+    if(input > max)
+    {
+        return max;
+    }
+    else if (input < min)
+    {
+        return min;
+    }
+    else
+    {
+        return input;
+    }
+}
+

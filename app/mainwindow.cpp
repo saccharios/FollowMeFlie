@@ -16,9 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
     _crazyFlieCaller(_crazyFlie, parent),
-    _cameraViewPainter(_crazyFlieCaller.SensorValues().stabilizer.roll,
-                       _crazyFlieCaller.SensorValues().stabilizer.yaw,
-                       _crazyFlieCaller.SensorValues().stabilizer.pitch),
+    _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,
+                       _crazyFlie.GetSensorValues().stabilizer.yaw,
+                       _crazyFlie.GetSensorValues().stabilizer.pitch),
      _trackingColor(),
     _camera(),
     _extractColor(_trackingColor.GetColor())
@@ -57,26 +57,26 @@ MainWindow::~MainWindow()
 }
 void MainWindow::display_sensor_values()
  {
-     ui->actRoll->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.roll));
-     ui->actYaw->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.yaw));
-     ui->actPitch->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.pitch));
-     ui->actThrust->setPlainText( QString::number(_crazyFlieCaller.SensorValues().stabilizer.thrust));
-     ui->actAcc_x->setPlainText( QString::number(_crazyFlieCaller.SensorValues().acceleration.x));
-     ui->actAcc_y->setPlainText( QString::number(_crazyFlieCaller.SensorValues().acceleration.y));
-     ui->actAcc_z->setPlainText( QString::number(_crazyFlieCaller.SensorValues().acceleration.z));
-     ui->actAcc_zw->setPlainText( QString::number(_crazyFlieCaller.SensorValues().acceleration.zw));
-     ui->actBatterStatus->setPlainText( QString::number(_crazyFlieCaller.SensorValues().battery.state));
-     ui->actBatteryLevel->setPlainText( QString::number(_crazyFlieCaller.SensorValues().battery.level));
-     ui->actGyro_x->setPlainText( QString::number(_crazyFlieCaller.SensorValues().gyrometer.x));
-     ui->actGyro_y->setPlainText( QString::number(_crazyFlieCaller.SensorValues().gyrometer.y));
-     ui->actGyro_z->setPlainText( QString::number(_crazyFlieCaller.SensorValues().gyrometer.z));
-     ui->actMag_x->setPlainText( QString::number(_crazyFlieCaller.SensorValues().magnetometer.x));
-     ui->actMag_y->setPlainText( QString::number(_crazyFlieCaller.SensorValues().magnetometer.y));
-     ui->actMag_z->setPlainText( QString::number(_crazyFlieCaller.SensorValues().magnetometer.z));
-     ui->actAsl->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.asl));
-     ui->actAslLong->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.aslLong));
-     ui->actTemperature->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.temperature));
-     ui->actPressure->setPlainText( QString::number(_crazyFlieCaller.SensorValues().barometer.pressure));
+     ui->actRoll->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.roll));
+     ui->actYaw->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.yaw));
+     ui->actPitch->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.pitch));
+     ui->actThrust->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.thrust));
+     ui->actAcc_x->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.x));
+     ui->actAcc_y->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.y));
+     ui->actAcc_z->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.z));
+     ui->actAcc_zw->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.zw));
+     ui->actBatterStatus->setPlainText( QString::number(_crazyFlie.GetSensorValues().battery.state));
+     ui->actBatteryLevel->setPlainText( QString::number(_crazyFlie.GetSensorValues().battery.level));
+     ui->actGyro_x->setPlainText( QString::number(_crazyFlie.GetSensorValues().gyrometer.x));
+     ui->actGyro_y->setPlainText( QString::number(_crazyFlie.GetSensorValues().gyrometer.y));
+     ui->actGyro_z->setPlainText( QString::number(_crazyFlie.GetSensorValues().gyrometer.z));
+     ui->actMag_x->setPlainText( QString::number(_crazyFlie.GetSensorValues().magnetometer.x));
+     ui->actMag_y->setPlainText( QString::number(_crazyFlie.GetSensorValues().magnetometer.y));
+     ui->actMag_z->setPlainText( QString::number(_crazyFlie.GetSensorValues().magnetometer.z));
+     ui->actAsl->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.asl));
+     ui->actAslLong->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.aslLong));
+     ui->actTemperature->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.temperature));
+     ui->actPressure->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.pressure));
 
      // Also update connection status
      DisplayConnectionStatus();

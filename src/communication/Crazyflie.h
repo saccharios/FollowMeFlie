@@ -38,12 +38,12 @@
 #include "math/logic.h"
 
 enum class State {
-    STATE_ZERO = 0,
-    STATE_READ_PARAMETERS_TOC = 1,
-    STATE_READ_LOGS_TOC = 2,
-    STATE_START_LOGGING = 3,
-    STATE_ZERO_MEASUREMENTS = 4,
-    STATE_NORMAL_OPERATION = 5
+    ZERO = 0,
+    READ_PARAMETERS_TOC = 1,
+    READ_LOGS_TOC = 2,
+    START_LOGGING = 3,
+    ZERO_MEASUREMENTS = 4,
+    NORMAL_OPERATION = 5
 };
 
 struct SetPoint
@@ -132,7 +132,6 @@ public:
     //    removed or somehow else disconnected from the host machine. If it
     //    returns 'true', the dongle connection works fine.
     void Update();
-    bool IsCopterConnected();
 
     bool IsDisconnected();
     bool IsConnecting();
