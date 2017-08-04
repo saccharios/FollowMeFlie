@@ -1,7 +1,8 @@
 #pragma once
 #include <QWidget>
 #include <QImage>
-QPoint World2CameraCoord(QPointF point, QWidget* widget);
+
+
 class BackGroundBase
 {
 public:

@@ -26,7 +26,8 @@ HEADERS  += mainwindow.h \
     qt_util.h \
     trackingcolor.h \
     imageprocess/camera.h \
-    imageprocess/extractcolor.h
+    imageprocess/extractcolor.h \
+    opencv_utils.h
 
 
 FORMS    += mainwindow.ui

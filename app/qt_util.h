@@ -1,7 +1,8 @@
 #pragma once
 #include <QPoint>
 #include <QPointF>
-
+namespace qt_utils
+{
 
 QPoint rotate(QPoint const & p , float const & angle) // angle in radians
 {
@@ -12,6 +13,7 @@ QPoint rotate(QPoint const & p , float const & angle) // angle in radians
     q.setY(p.x()*sina + p.y() * cosa);
     return q;
 }
+
 QPointF rotate(QPointF const & p , float const & angle) // angle in radians
 {
     float cosa = cos(angle);
@@ -20,5 +22,6 @@ QPointF rotate(QPointF const & p , float const & angle) // angle in radians
     q.setX(p.x()*cosa - p.y() * sina);
     q.setY(p.x()*sina + p.y() * cosa);
     return q;
+}
 
 }

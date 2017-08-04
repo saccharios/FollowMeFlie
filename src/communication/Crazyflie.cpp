@@ -247,7 +247,6 @@ void Crazyflie::UpateSensorValues()
 
 bool Crazyflie::IsConnectionTimeout()
 {
-    std::cout << _ackMissCounter << "  " << _ackMissTolerance <<std::endl;
     return _ackMissCounter == _ackMissTolerance+1;
 }
 // TODO SF: Simplifly setpoint setting

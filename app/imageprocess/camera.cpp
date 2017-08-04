@@ -63,6 +63,8 @@ void Camera::Update()
         if(_activated && _capture->isOpened())
         {
             _state = CameraState::RUNNING;
+            _resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
+            _resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
         }
         else if(!_activated)
         {

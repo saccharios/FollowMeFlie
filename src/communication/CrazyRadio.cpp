@@ -28,11 +28,8 @@
 
 #include "CrazyRadio.h"
 #include <chrono>
-//#include <thread>
 #undef _GLIBCXX_HAS_GTHREADS
 #include "../../../mingw_std_threads/mingw.thread.h"
-#include <mutex>
-#include "../../../mingw_std_threads/mingw.mutex.h"
 
 
 

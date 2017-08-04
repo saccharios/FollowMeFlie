@@ -3,7 +3,7 @@
 #include<memory>
 #include "opencv2/opencv.hpp"
 
-
+// Forward declaration
 namespace cv {
 class VideoCapture;
 }
@@ -18,11 +18,18 @@ public:
         CONNECTING = 1,
         RUNNING = 2,
     };
+    struct CameraResolution
+    {
+        int width = 0;
+        int height = 0;
+    };
 
     Camera();
     void Activate(bool activate);
     void Update();
     CameraState GetState() const {return _state; }
+    CameraResolution const & GetResolution() const {return _resolution;}
+
 signals:
     void ImgReadyForDisplay(QImage const &);
     void ImgReadyForProcessing(cv::Mat const &);
@@ -32,5 +39,6 @@ private:
 
     cv::VideoCapture* _capture;
 
+    CameraResolution _resolution;
     void FetchImage();
 };

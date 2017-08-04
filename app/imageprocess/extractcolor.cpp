@@ -1,5 +1,5 @@
 #include "extractcolor.h"
-
+#include "opencv_utils.h"
 
 cv::Scalar QColor2Scalar(QColor const & color)
 {
@@ -16,7 +16,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     // Create lower and upper color bounds
     cv::Scalar colorToFilter= QColor2Scalar(_colorToFilter);
     int tolerance = 20;
-    cv::Scalar colorLower(colorToFilter[0] - tolerance, 70,50);
+    cv::Scalar colorLower(colorToFilter[0] - tolerance, 80,80); // h, s, v
     cv::Scalar colorUpper(colorToFilter[0] + tolerance, 255,255);
 
     // Convet input image to hsv space
@@ -63,8 +63,8 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     params.maxThreshold = 255;
     // Filter by Area.
     params.filterByArea = true;
-    params.minArea = 500;
-    params.maxArea = 999999;
+    params.minArea = 100;
+    params.maxArea = 50000;
 
     // Filter by Circularity
     params.filterByCircularity = false;
@@ -81,17 +81,22 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     cv::threshold (imgThresholded, imgThresholded, 70, 255, CV_THRESH_BINARY_INV);
 
     // Detect blobs.
-    std::vector<cv::KeyPoint> keypoints;
-    detector->detect( imgThresholded, keypoints );
+    std::vector<cv::KeyPoint> keyPoints;
+    detector->detect( imgThresholded, keyPoints );
 
     // Draw detected blobs as red circles.
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-    cv::Mat img_with_keypoints;
-    cv::drawKeypoints( imgThresholded, keypoints, img_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    cv::Mat imgWithKeypoints;
+    cv::drawKeypoints( imgThresholded, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
+    cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
 
+    auto largestKeyPoint = cv_utils::GetLargestKeyPoint(keyPoints);
 
-    cv::imshow("Thresholded Frame", img_with_keypoints); // Show output image
+    auto cameraSize = imgWithKeypoints.size();
+    auto midPtCoord = cv_utils::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
+// In pixels
+    std::cout << midPtCoord.x << " " << midPtCoord.y << " " << largestKeyPoint.size << std::endl;
 
 //    Distance distance;
 //    emit NewDistance(distance);
