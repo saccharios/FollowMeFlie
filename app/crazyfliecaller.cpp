@@ -1,10 +1,13 @@
 #include "crazyfliecaller.h"
+#include "communication/Crazyflie.h"
+#include "control/commander.h"
 
-CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) :
+CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, Commander & commander, QObject *parent) :
     QObject(parent),
     _timer_t0(),
     _timer_t2(),
-    _crazyFlie(crazyFlie)
+    _crazyFlie(crazyFlie),
+    _commander(commander)
 {
     // Execute Update() every 10ms. Add it to the event loop:
     QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(Update()));
@@ -17,6 +20,7 @@ CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, QObject *parent) :
 
 void CrazyFlieCaller::Update()
 {
+    _commander.Update();
     _crazyFlie.Update();
 }
 

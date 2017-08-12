@@ -22,7 +22,8 @@ SOURCES += communication/Crazyflie.cpp \
     communication/CRTPPacket.cpp \
     communication/TOC.cpp \
     math/lowpass.cpp \
-    math/pi_controller.cpp
+    math/pi_controller.cpp \
+    control/commander.cpp
 
 
 HEADERS  += communication/Crazyflie.h \
@@ -35,7 +36,8 @@ HEADERS  += communication/Crazyflie.h \
     math/functions.h \
     math/constants.h \
     math/lowpass.h \
-    math/pi_controller.h
+    math/pi_controller.h \
+    control/commander.h
 
 
 # Include library libusb-1.0.21

@@ -15,13 +15,14 @@ MainWindow::MainWindow(QWidget *parent) :
     _timer_t1(),
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
-    _crazyFlieCaller(_crazyFlie, parent),
+    _crazyFlieCaller(_crazyFlie, _commander, parent),
     _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,
                        _crazyFlie.GetSensorValues().stabilizer.yaw,
                        _crazyFlie.GetSensorValues().stabilizer.pitch),
      _trackingColor(),
     _camera(),
-    _extractColor(_trackingColor.GetColor())
+    _extractColor(_trackingColor.GetColor()),
+    _commander(_crazyFlie)
 {
     ui->setupUi(this);
 
@@ -155,7 +156,8 @@ void MainWindow::on_pushButton_setThrust_clicked()
     if(_crazyFlie.IsConnected())
     {
             _crazyFlie.SetSendSetpoints(true);
-            _crazyFlie.SetThrust(20001);
+            _crazyFlie.SetThrust(0);
+//            _crazyFlie.SetThrust(20001);
     }
 }
 
@@ -206,7 +208,7 @@ void MainWindow::on_pushButton_CameraOnlyMode_clicked()
     bool activate = (_camera.GetState() == Camera::CameraState::DISABLED);
     if(activate)
     {
-    _cameraViewPainter.SetCameraBackGround();
+        _cameraViewPainter.SetCameraBackGround();
     }
     else
     {
@@ -218,4 +220,10 @@ void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 void MainWindow::on_pushButton_Stop_clicked()
 {
     _camera.Activate(false);
+    _commander.Stop();
+}
+
+void MainWindow::on_pushButton_hoverMode_clicked()
+{
+    _commander.ActivateHoverMode(true);
 }

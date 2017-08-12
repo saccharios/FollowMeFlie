@@ -52,6 +52,10 @@ struct SetPoint
     float pitch;
     float yaw;
     uint16_t thrust;
+    void Print()
+    {
+        std::cout << "roll = " << roll << " pitch = " << pitch << " yaw = " << yaw << " thrust = " << thrust << std::endl;
+    }
 };
 struct Barometer
 {
@@ -71,7 +75,7 @@ struct Accelerometer
 struct Gyrometer
 {
     float x;
-        float y;
+    float y;
     float z;
 };
 struct Battery
@@ -113,6 +117,8 @@ public:
     void SetPitch(float pitch);
     //    Yaw values are in degree, ranging from -180.0deg to 180.0deg.
     void SetYaw(float yaw);
+
+    void SetSetPoint(SetPoint setPoint);
 
     void SetSendSetpoints(bool sendSetpoints);
 

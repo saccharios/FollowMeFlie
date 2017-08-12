@@ -9,7 +9,7 @@
 #include "trackingcolor.h"
 #include "imageprocess/camera.h"
 #include "imageprocess/extractcolor.h"
-
+#include "control/commander.h"
 
 namespace Ui {
 class MainWindow;
@@ -44,6 +44,8 @@ private slots:
 
     void UpdateCamera();
 
+    void on_pushButton_hoverMode_clicked();
+
 private:
     // GUI related
     Ui::MainWindow *ui;
@@ -59,6 +61,8 @@ private:
     TrackingColor _trackingColor;
     Camera _camera;
     ExtractColor _extractColor;
+    Commander _commander;
+
 
     void DisplayConnectionStatus();
 };

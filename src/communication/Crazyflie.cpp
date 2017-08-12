@@ -249,6 +249,17 @@ bool Crazyflie::IsConnectionTimeout()
 {
     return _ackMissCounter == _ackMissTolerance+1;
 }
+
+
+void Crazyflie::SetSetPoint(SetPoint setPoint)
+{
+    SetThrust(setPoint.thrust);
+    SetYaw(setPoint.yaw);
+    SetRoll(setPoint.roll);
+    SetPitch(setPoint.pitch);
+}
+
+
 // TODO SF: Simplifly setpoint setting
 void Crazyflie::SetThrust(int thrust)
 {

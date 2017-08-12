@@ -11,8 +11,7 @@ public:
                   double gain_correction,
                   double feed_fwd,
                   double limit_lower,
-                  double limit_upper
-                  ) :
+                  double limit_upper ):
         _sampling_time(sampling_time),
         _gain_proportional(gain_proportional),
         _time_constant_inverse(time_constant_inverse),
