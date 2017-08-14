@@ -136,7 +136,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -148,7 +148,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>300</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_StabVal">
@@ -215,7 +215,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>300</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_AccVal">
@@ -282,7 +282,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>224</height>
+        <height>121</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -338,7 +338,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>224</height>
+        <height>131</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -392,10 +392,10 @@
      <widget class="QWidget" name="gridLayoutWidget_6">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>10</y>
-        <width>351</width>
-        <height>148</height>
+        <width>341</width>
+        <height>61</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BatteryVal">
@@ -454,7 +454,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>300</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">
@@ -641,7 +641,7 @@
      <x>0</x>
      <y>0</y>
      <width>686</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFollowMeFle">

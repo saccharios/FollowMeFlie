@@ -1,10 +1,10 @@
 #include "pi_controller.h"
 #include "math/functions.h"
 
-double PI_Controller::Update(double error)
+float PI_Controller::Update(float error)
 {
     auto proportional_part = error * _gain_proportional;
-    auto gain_integral_scaled = _sampling_time * _time_constant_inverse;
+    auto gain_integral_scaled = static_cast<float>(_sampling_time)/1000.0f * _time_constant_inverse;
     _integral_part += gain_integral_scaled * error + _anti_windup * _gain_correction;
     auto output_unlimited = _integral_part + proportional_part + _feed_fwd;
 

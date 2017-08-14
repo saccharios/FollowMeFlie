@@ -82,8 +82,12 @@ bool Crazyflie::ReadTOCLogs()
 
 bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
-    auto data = ConvertTouint8_tVect(setPoint.roll);
-    auto pitchVect = ConvertTouint8_tVect( -setPoint.pitch); // Warning: Is negated here.
+    // In python client, this line implementes the x-mode
+    auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
+    auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
+
+    auto data = ConvertTouint8_tVect(roll);
+    auto pitchVect = ConvertTouint8_tVect( -pitch); // Warning: Is negated here.
     auto yawVect = ConvertTouint8_tVect(setPoint.yaw);
     auto thrustVect = ConvertTouint8_tVect(setPoint.thrust);
 
@@ -173,6 +177,7 @@ void Crazyflie::Update()
         {
             // Send the current set point based on the previous calculations
             SendSetpoint(_sendSetPoint);
+            _isSendingSetpoints = false;
         }
         else
         {

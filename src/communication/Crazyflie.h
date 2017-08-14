@@ -100,6 +100,7 @@ struct SensorValues
     Magnetometer magnetometer;
 };
 
+static int crazyflieUpdateSamplingTime = 10;
 
 class Crazyflie {
 

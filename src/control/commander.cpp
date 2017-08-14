@@ -11,10 +11,10 @@
 Commander::Commander(Crazyflie & crazyflie) :
     _crazyflie(crazyflie),
   _hoverModeIsActive(false),
-  _piYaw (sampling_time, 1.0f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
-  _piRoll (sampling_time, 1.0f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
-  _piPitch(sampling_time, 1.0f, 0.0f, 0.0f, 0.0f, -180.0,180.0f),
-  _zAcceleration(sampling_time, 0.0f, 0.0f, 0.0f, 0.0f, 10.0f,10.0f) // What is the unit of acc z?
+  _piYaw (crazyflieUpdateSamplingTime, 0.5f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
+  _piRoll (crazyflieUpdateSamplingTime, 0.5f, 0.2f, 0.0f, 0.0f, -180.0f,180.0f),
+  _piPitch(crazyflieUpdateSamplingTime, 0.5f, 0.2f, 0.0f, 0.0f, -180.0,180.0f),
+  _zAcceleration(crazyflieUpdateSamplingTime, 0.0f, 0.0f, 0.0f, 0.0f, 10.0f,10.0f) // What is the unit of acc z?
 {}
 
 void Commander::Update()
@@ -33,6 +33,7 @@ void Commander::Update()
         std::cout << "Reference: ";
         setPoint.Print();
         std::cout << "----------------------------------------\n";
+
         _crazyflie.SetSetPoint(setPoint);
         _crazyflie.SetSendSetpoints(true);
     }
