@@ -59,6 +59,19 @@ enum class RadioSettings{
     _testdummy = 1
 };
 
+enum class DongleConfiguration{
+    SET_RADIO_CHANNEL = 0x01,
+    SET_RADIO_ADDRESS = 0x02,
+    SET_DATA_RATE = 0x03,
+    SET_RADIO_POWER = 0x04,
+    SET_RADIO_ARD = 0x05,
+    SET_RADIO_ARC = 0x06,
+    ACK_ENABLE = 0x10,
+    SET_CONT_CARRIER = 0x20,
+    SCANN_CHANNELS = 0x21,
+    LAUCH_BOOTLOADER = 0xFF
+};
+
 // Communication class to connect to and communicate via the CrazyRadio USB dongle.
 
 // The class is capable of finding the CrazyRadio USB dongle on the
@@ -144,7 +157,7 @@ private:
     sptrPacket ReadAck();
 
     sptrPacket WriteData(uint8_t * data, int length);
-    bool WriteControl(uint8_t* data, int length, uint8_t request, uint16_t value, uint16_t index);
+    bool WriteControl(uint8_t* data, int length, DongleConfiguration request, uint16_t value, uint16_t index);
     bool ReadData(uint8_t* data, int maxLength, int & actualLength);
 
     void SetARC(int ARC);

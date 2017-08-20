@@ -262,11 +262,17 @@ bool CrazyRadio::ReadData(uint8_t* data, int maxLength, int & actualLength)
     return false;
 }
 
-bool CrazyRadio::WriteControl(uint8_t* data, int length, uint8_t request, uint16_t value, uint16_t index)
+bool CrazyRadio::WriteControl(uint8_t* data, int length, DongleConfiguration  request, uint16_t value, uint16_t index)
 {
     int timeout = 1000;
 
-    /*int nReturn = */libusb_control_transfer(_device, LIBUSB_REQUEST_TYPE_VENDOR, request, value, index, data, length, timeout);
+    /*int nReturn = */libusb_control_transfer(_device,
+                                              LIBUSB_REQUEST_TYPE_VENDOR, static_cast<uint8_t>(request),
+                                              value,
+                                              index,
+                                              data,
+                                              length,
+                                              timeout);
 
     // if(nReturn == 0) {
     //   return true;
@@ -279,7 +285,7 @@ bool CrazyRadio::WriteControl(uint8_t* data, int length, uint8_t request, uint16
 void CrazyRadio::SetARC(int ARC)
 {
     _arc = ARC;
-    WriteControl(nullptr, 0, 0x06, ARC, 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARC, ARC, 0);
 }
 
 void CrazyRadio::setChannel(int channel)
@@ -292,7 +298,7 @@ int CrazyRadio::GetChannel() const
 }
 void CrazyRadio::WriteChannel(int channel)
 {
-    WriteControl(nullptr, 0, 0x01, channel, 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_RADIO_CHANNEL, channel, 0);
 }
 
 void CrazyRadio::SetDataRate(std::string dataRate)
@@ -320,7 +326,7 @@ void CrazyRadio::WriteDataRate(std::string dataRate)
         dataRateCoded = 2;
     }
 
-    WriteControl(nullptr, 0, 0x03, dataRateCoded, 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_DATA_RATE, dataRateCoded, 0);
 }
 
 
@@ -339,14 +345,14 @@ void CrazyRadio::SetARDTime(int ARDTime)
         T = 0xf;
     }
 
-    WriteControl(nullptr, 0, 0x05, T, 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARD, T, 0);
 }
 
 void CrazyRadio::SetARDBytes(int ARDBytes)
 {
     _ardBytes = ARDBytes;
 
-    WriteControl(nullptr, 0, 0x05, 0x80 | ARDBytes, 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARD, 0x80 | ARDBytes, 0);
 }
 
 PowerSettings CrazyRadio::Power()
@@ -358,21 +364,21 @@ void CrazyRadio::SetPower(PowerSettings power)
 {
     _power = power;
 
-    WriteControl(nullptr, 0, 0x04, static_cast<unsigned short>(power), 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_RADIO_POWER, static_cast<unsigned short>(power), 0);
 }
 
 void CrazyRadio::SetAddress(uint8_t*  address)
 {
     _address = address;
 
-    WriteControl(address, 5, 0x02, 0, 0);
+    WriteControl(address, 5, DongleConfiguration::SET_RADIO_ADDRESS, 0, 0);
 }
 
 void CrazyRadio::SetContCarrier(bool contCarrier)
 {
     _contCarrier = contCarrier;
 
-    WriteControl(nullptr, 0, 0x20, (contCarrier ? 1 : 0), 0);
+    WriteControl(nullptr, 0, DongleConfiguration::SET_CONT_CARRIER, (contCarrier ? 1 : 0), 0);
 }
 
 bool CrazyRadio::ClaimInterface(int interface)
