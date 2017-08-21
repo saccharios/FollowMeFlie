@@ -120,10 +120,14 @@ public:
     void SetYaw(float yaw);
 
     void SetSetPoint(SetPoint setPoint);
+    void SetVelocityRef(float vx, float vy, float vz);
+
 
     void SetSendSetpoints(bool sendSetpoints);
-
     bool IsSendingSetpoints();
+
+    void SetSendingVelocityRef(bool isSendingVelocityRef);
+    bool IsSendingVelocityRef();
 
     SensorValues const & GetSensorValues() const {return _sensorValues;}
 
@@ -147,6 +151,8 @@ public:
 
    bool IsConnectionTimeout();
 
+   void ConvertBodyFrameToIntertialFrame(float x_b, float y_b, float z_b, float & x_i, float & y_i, float & z_i);
+
 private:
     CrazyRadio & _crazyRadio;
 
@@ -156,9 +162,12 @@ private:
     SetPoint _sendSetPoint;
     SetPoint _maxSetPoint;
 
+    float _vx, _vy,_vz;
+
     int _minThrust;
 
     bool _isSendingSetpoints;
+    bool _isSendingVelocityRef;
 
     bool _startConnecting;
     State _state;
@@ -177,6 +186,8 @@ private:
     bool ReadTOCLogs();
 
     bool SendSetpoint(SetPoint setPoint);
+
+    bool SendVelocityRef(float vx, float vy, float vz);
 
     void StartLogging();
     void StopLogging();

@@ -75,6 +75,7 @@ enum class Port{
     Parameters = 2,
     Commander = 3,
     Log = 5,
+    Commander_Generic = 7,
     Debug = 14,
     Link = 15
 };

@@ -156,6 +156,12 @@ void CrazyRadio::ReadRadioSettings()
         SetDataRate("250K");
         break;
     }
+    case RadioSettings::_0802M:
+    {
+        setChannel(80);
+        SetDataRate("2M");
+        break;
+    }
     }
     std::cout << "Opening radio " << dongleNBR << "/" << GetChannel() << "/" << GetDataRate() << std::endl;
 }

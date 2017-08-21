@@ -29,6 +29,7 @@
 #include "Crazyflie.h"
 #include <chrono>
 #include "math/clock_gettime.h"
+#include "math/constants.h"
 
 
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
@@ -39,6 +40,7 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _maxSetPoint({45.0,45.0,180.0,60000}),
     _minThrust(0),
     _isSendingSetpoints(false),
+    _isSendingVelocityRef(false),
     _startConnecting(false),
     _state (State::ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
@@ -82,6 +84,7 @@ bool Crazyflie::ReadTOCLogs()
 
 bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
+    // TODO SF Is this needed?
     // In python client, this line implementes the x-mode
     auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
     auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
@@ -100,6 +103,27 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
     return _crazyRadio.SendPacketAndCheck(std::move(packet));
 }
 
+bool  Crazyflie::SendVelocityRef(float vx, float vy, float vz)
+{
+    std::vector<uint8_t> data;
+    uint8_t inidicator = 1;
+    auto vx_vect = ConvertTouint8_tVect(vx);
+    auto vy_vect = ConvertTouint8_tVect(vy);
+    auto vz_vect = ConvertTouint8_tVect(vz);
+    auto yaw_vect = ConvertTouint8_tVect(0.0f);
+    data.push_back(inidicator);
+    data.insert(data.end(), vx_vect.begin(), vx_vect.end());
+    data.insert(data.end(), vy_vect.begin(), vy_vect.end());
+    data.insert(data.end(), vz_vect.begin(), vz_vect.end());
+    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
+
+    CRTPPacket  packet(Port::Commander_Generic,Channel::TOC, std::move(data));
+
+    return _crazyRadio.SendPacketAndCheck(std::move(packet));
+}
+
+
+
 void Crazyflie::StartConnecting(bool enable)
 {
     _startConnecting = enable;
@@ -109,12 +133,12 @@ void Crazyflie::StartConnecting(bool enable)
 void Crazyflie::Update()
 {
     // TODO SF How to restart the state machine properly?
-//    if(!_stateMachineIsEnabled)
-//    {
-//        _state = State::STATE_ZERO;
-//        StopLogging();
-//        return false;
-//    }
+    //    if(!_stateMachineIsEnabled)
+    //    {
+    //        _state = State::STATE_ZERO;
+    //        StopLogging();
+    //        return false;
+    //    }
 
     switch(_state)
     {
@@ -122,7 +146,7 @@ void Crazyflie::Update()
     {
         if(_startConnecting)
         {
-             _ackMissCounter = 0;
+            _ackMissCounter = 0;
             _state = State::READ_PARAMETERS_TOC;
         }
         break;
@@ -179,6 +203,11 @@ void Crazyflie::Update()
             SendSetpoint(_sendSetPoint);
             _isSendingSetpoints = false;
         }
+        else if(_isSendingVelocityRef)
+        {
+            SendVelocityRef(_vx, _vy, _vz);
+            _isSendingVelocityRef = false;
+        }
         else
         {
             // Send a ping packet for keepalive
@@ -206,8 +235,8 @@ void Crazyflie::Update()
         break;
     } // end switch
 
-  //  if(_state != State::STATE_ZERO)
- /*   {
+    //  if(_state != State::STATE_ZERO)
+    /*   {
         if(_crazyRadio.AckReceived())
         {
             _ackMissCounter = 0;
@@ -219,10 +248,10 @@ void Crazyflie::Update()
         }*/
     //}
     UpateSensorValues();
-//    if(_state!= State::STATE_ZERO)
-//    {
-//        std::cout << "state = " <<static_cast<int>(_state )<< std::endl;
-//    }
+    //    if(_state!= State::STATE_ZERO)
+    //    {
+    //        std::cout << "state = " <<static_cast<int>(_state )<< std::endl;
+    //    }
     //    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
 }
 
@@ -264,6 +293,13 @@ void Crazyflie::SetSetPoint(SetPoint setPoint)
     SetPitch(setPoint.pitch);
 }
 
+
+void Crazyflie::SetVelocityRef(float vx, float vy, float vz)
+{
+    _vx = vx;
+    _vy = vy;
+    _vz = vz;
+}
 
 // TODO SF: Simplifly setpoint setting
 void Crazyflie::SetThrust(int thrust)
@@ -353,10 +389,18 @@ void Crazyflie::SetSendSetpoints(bool sendSetpoints)
 {
     _isSendingSetpoints = sendSetpoints;
 }
+void Crazyflie::SetSendingVelocityRef(bool isSendingVelocityRef)
+{
+    _isSendingVelocityRef = isSendingVelocityRef;
+}
 
 bool Crazyflie::IsSendingSetpoints()
 {
     return _isSendingSetpoints;
+}
+bool Crazyflie::IsSendingVelocityRef()
+{
+    return _isSendingVelocityRef;
 }
 
 double Crazyflie::GetSensorValue(std::string strName)
@@ -451,4 +495,24 @@ void Crazyflie::DisableAltimeterLogging()
     _tocLogs.UnregisterLoggingBlock("barometer");
 }
 
+
+void Crazyflie::ConvertBodyFrameToIntertialFrame(float x_b, float y_b, float z_b, float & x_i, float & y_i, float & z_i)
+{
+
+        auto const & sensorValues = GetSensorValues();
+
+        auto sin_roll = sinf(sensorValues.stabilizer.roll/180.0f*pi);
+        auto cos_roll = cosf(sensorValues.stabilizer.roll/180.0f*pi);
+        auto sin_pitch = sinf(sensorValues.stabilizer.pitch/180.0f*pi);
+        auto cos_pitch = cosf(sensorValues.stabilizer.pitch/180.0f*pi);
+        auto sin_yaw = sinf(sensorValues.stabilizer.yaw/180.0f*pi);
+        auto cos_yaw = cosf(sensorValues.stabilizer.yaw/180.0f*pi);
+
+        x_b = -x_b; // X-Axis is in negative direction (SED not NED on drone)
+
+        x_i = cos_yaw * cos_pitch*x_b + (cos_yaw * sin_pitch * sin_roll -  sin_yaw  * cos_roll)*y_b + (cos_yaw*sin_pitch*cos_roll + sin_yaw*sin_roll)* z_b;
+        y_i = sin_yaw  * cos_pitch*x_b + (sin_yaw  * sin_pitch * sin_roll + cos_yaw * cos_roll)*y_b + (sin_yaw*sin_pitch*cos_roll  - cos_yaw*sin_roll)* z_b;
+        z_i  = -sin_pitch  * x_b + cos_pitch * sin_roll * y_b + cos_pitch * cos_roll*z_b;
+
+}
 

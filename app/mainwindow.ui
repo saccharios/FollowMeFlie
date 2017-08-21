@@ -72,7 +72,7 @@
     </item>
     <item>
      <property name="text">
-      <string>testdummy</string>
+      <string>0/80/2M</string>
      </property>
     </item>
    </widget>
@@ -136,7 +136,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -282,7 +282,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>121</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -338,7 +338,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>131</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -395,7 +395,7 @@
         <x>20</x>
         <y>10</y>
         <width>341</width>
-        <height>61</height>
+        <height>148</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BatteryVal">
@@ -454,7 +454,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">
@@ -641,7 +641,7 @@
      <x>0</x>
      <y>0</y>
      <width>686</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFollowMeFle">
