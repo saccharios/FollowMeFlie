@@ -13,14 +13,16 @@ SOURCES += src/test_main.cpp \
     src/stlutils_test.cpp \
     src/toc_test.cpp \
     src/logic_test.cpp \
-    src/math_function_test.cpp
+    src/math_function_test.cpp \
+    src/math_types_test.cpp
 
 HEADERS  += \
     src/crtppacket_test.h \
     src/stlutils_test.h \
     src/toc_test.h \
     src/logic_test.h \
-    src/math_function_test.h
+    src/math_function_test.h \
+    src/math_types_test.h
 
 # Include Google Test
 goolgetest_path = E:/Code/GTest

@@ -37,7 +37,8 @@ HEADERS  += communication/Crazyflie.h \
     math/constants.h \
     math/lowpass.h \
     math/pi_controller.h \
-    control/commander.h
+    control/commander.h \
+    math/types.h
 
 
 # Include library libusb-1.0.21

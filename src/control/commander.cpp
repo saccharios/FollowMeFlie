@@ -1,5 +1,7 @@
 #include "control/commander.h"
 #include "math/constants.h"
+#include "math/types.h"
+
 //    PI_Controller(double sampling_time,
 //                  double gain_proportional,
 //                  double time_constant_inverse,
@@ -11,11 +13,12 @@
 
 Commander::Commander(Crazyflie & crazyflie) :
     _crazyflie(crazyflie),
-  _hoverModeIsActive(false),
-  _piYaw (crazyflieUpdateSamplingTime, 0.0f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
-  _piRoll (crazyflieUpdateSamplingTime, 0.0f, 0.2f, 0.0f, 0.0f, -180.0f,180.0f),
-  _piPitch(crazyflieUpdateSamplingTime, 0.0f, 0.2f, 0.0f, 0.0f, -180.0,180.0f),
-  _zAcceleration(crazyflieUpdateSamplingTime, 0.0f, 0.0f, 0.0f, 0.0f, 10.0f,10.0f) // What is the unit of acc z?
+    _hoverModeIsActive(false),
+    _samplingTime(static_cast<float>(crazyflieUpdateSamplingTime)*0.001f),
+    _piYaw (_samplingTime*0.001f, 0.0f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
+    _piRoll (_samplingTime*0.001f, 0.0f, 0.2f, 0.0f, 0.0f, -180.0f,180.0f),
+    _piPitch(_samplingTime*0.001f, 0.0f, 0.2f, 0.0f, 0.0f, -180.0,180.0f),
+    _zAcceleration(_samplingTime*0.001f, 0.0f, 0.0f, 0.0f, 0.0f, 10.0f,10.0f) // What is the unit of acc z?
 {}
 
 void Commander::Update()
@@ -24,21 +27,22 @@ void Commander::Update()
     {
         auto const & sensorValues = _crazyflie.GetSensorValues();
 
-        auto acc_x_b = sensorValues.acceleration.x;
-        auto acc_y_b = sensorValues.acceleration.y;
-        auto acc_z_b = sensorValues.acceleration.z;
-
-        float  acc_x_i;
-        float  acc_y_i;
-        float  acc_z_i;
-        _crazyflie.ConvertBodyFrameToIntertialFrame(acc_x_b, acc_y_b, acc_z_b, acc_x_i,acc_y_i,acc_z_i);
+        Acceleration acceleration_body_frame = {sensorValues.acceleration.x, sensorValues.acceleration.y, sensorValues.acceleration.z};
 
 
-        std::cout << "acc_x_i = " << acc_x_i << " acc_y_i = " << acc_y_i << " acc_z_i = " << acc_z_i << std::endl;
-//        _crazyflie.SetVelocityRef(0.0f,0.0f,0.0f);
-//        _crazyflie.SetSendingVelocityRef(true);
-//        _crazyflie.SetSetPoint(setPoint);
-//        _crazyflie.SetSendSetpoints(true);
+        Acceleration acceleration_intertial_frame = _crazyflie.ConvertBodyFrameToIntertialFrame(acceleration_body_frame);
+
+
+        std::cout << "acc_x_i = " << acceleration_intertial_frame[0] << " acc_y_i = " << acceleration_intertial_frame[1] << " acc_z_i = " << acceleration_intertial_frame[2] << std::endl;
+
+        static Velocity velocity;
+        velocity += acceleration_intertial_frame * _samplingTime;;
+        std::cout << "v_x = " << velocity[0] << " v_y = " << velocity[1] << " v_z = " << velocity[2] << std::endl;
+
+        //        _crazyflie.SetVelocityRef(0.0f,0.0f,0.0f);
+        //        _crazyflie.SetSendingVelocityRef(true);
+        //        _crazyflie.SetSetPoint(setPoint);
+        //        _crazyflie.SetSendSetpoints(true);
     }
 
 }

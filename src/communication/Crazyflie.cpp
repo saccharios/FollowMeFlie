@@ -189,6 +189,9 @@ void Crazyflie::Update()
         // not done at the moment, though. Reason: No readings to zero at
         // the moment. This might change when altitude becomes available.
 
+
+
+
         _state = State::NORMAL_OPERATION;
         break;
     }
@@ -496,23 +499,26 @@ void Crazyflie::DisableAltimeterLogging()
 }
 
 
-void Crazyflie::ConvertBodyFrameToIntertialFrame(float x_b, float y_b, float z_b, float & x_i, float & y_i, float & z_i)
+std::array<float,3> Crazyflie::ConvertBodyFrameToIntertialFrame(std::array<float,3> const & value_in_body)
 {
 
-        auto const & sensorValues = GetSensorValues();
+    auto const & sensorValues = GetSensorValues();
 
-        auto sin_roll = sinf(sensorValues.stabilizer.roll/180.0f*pi);
-        auto cos_roll = cosf(sensorValues.stabilizer.roll/180.0f*pi);
-        auto sin_pitch = sinf(sensorValues.stabilizer.pitch/180.0f*pi);
-        auto cos_pitch = cosf(sensorValues.stabilizer.pitch/180.0f*pi);
-        auto sin_yaw = sinf(sensorValues.stabilizer.yaw/180.0f*pi);
-        auto cos_yaw = cosf(sensorValues.stabilizer.yaw/180.0f*pi);
+    auto sin_roll = sinf(sensorValues.stabilizer.roll/180.0f*pi);
+    auto cos_roll = cosf(sensorValues.stabilizer.roll/180.0f*pi);
+    auto sin_pitch = sinf(sensorValues.stabilizer.pitch/180.0f*pi);
+    auto cos_pitch = cosf(sensorValues.stabilizer.pitch/180.0f*pi);
+    auto sin_yaw = sinf(sensorValues.stabilizer.yaw/180.0f*pi);
+    auto cos_yaw = cosf(sensorValues.stabilizer.yaw/180.0f*pi);
 
-        x_b = -x_b; // X-Axis is in negative direction (SED not NED on drone)
 
-        x_i = cos_yaw * cos_pitch*x_b + (cos_yaw * sin_pitch * sin_roll -  sin_yaw  * cos_roll)*y_b + (cos_yaw*sin_pitch*cos_roll + sin_yaw*sin_roll)* z_b;
-        y_i = sin_yaw  * cos_pitch*x_b + (sin_yaw  * sin_pitch * sin_roll + cos_yaw * cos_roll)*y_b + (sin_yaw*sin_pitch*cos_roll  - cos_yaw*sin_roll)* z_b;
-        z_i  = -sin_pitch  * x_b + cos_pitch * sin_roll * y_b + cos_pitch * cos_roll*z_b;
-
+    auto x_b = -value_in_body[0]; // X-Axis is in negative direction (SED not NED on drone)
+    auto y_b = value_in_body[1];
+    auto z_b = value_in_body[2];
+    std::array<float,3> value_in_inertial;
+    value_in_inertial[0] = cos_yaw * cos_pitch*x_b + (cos_yaw * sin_pitch * sin_roll -  sin_yaw  * cos_roll)*y_b + (cos_yaw*sin_pitch*cos_roll + sin_yaw*sin_roll)* z_b;
+    value_in_inertial[1] = sin_yaw  * cos_pitch*x_b + (sin_yaw  * sin_pitch * sin_roll + cos_yaw * cos_roll)*y_b + (sin_yaw*sin_pitch*cos_roll  - cos_yaw*sin_roll)* z_b;
+    value_in_inertial[2]  = -sin_pitch  * x_b + cos_pitch * sin_roll * y_b + cos_pitch * cos_roll*z_b;
+    return value_in_inertial;
 }
 

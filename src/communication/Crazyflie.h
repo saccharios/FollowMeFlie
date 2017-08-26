@@ -100,7 +100,7 @@ struct SensorValues
     Magnetometer magnetometer;
 };
 
-static int crazyflieUpdateSamplingTime = 10;
+static int crazyflieUpdateSamplingTime = 10; // in ms
 
 class Crazyflie {
 
@@ -151,7 +151,7 @@ public:
 
    bool IsConnectionTimeout();
 
-   void ConvertBodyFrameToIntertialFrame(float x_b, float y_b, float z_b, float & x_i, float & y_i, float & z_i);
+   std::array<float,3> ConvertBodyFrameToIntertialFrame(std::array<float,3> const & value_in_body);
 
 private:
     CrazyRadio & _crazyRadio;

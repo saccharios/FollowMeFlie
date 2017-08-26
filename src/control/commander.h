@@ -31,6 +31,7 @@ public:
 private:
     Crazyflie & _crazyflie;
     bool _hoverModeIsActive;
+    float _samplingTime;
 
     PI_Controller _piYaw;
     PI_Controller _piRoll;
