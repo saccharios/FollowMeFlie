@@ -36,7 +36,7 @@
 #include "TOC.h"
 #include <memory>
 #include "math/logic.h"
-
+#include "math/types.h"
 enum class State {
     ZERO = 0,
     READ_PARAMETERS_TOC = 1,
@@ -120,7 +120,7 @@ public:
     void SetYaw(float yaw);
 
     void SetSetPoint(SetPoint setPoint);
-    void SetVelocityRef(float vx, float vy, float vz);
+    void SetVelocityRef(Velocity velocity);
 
 
     void SetSendSetpoints(bool sendSetpoints);
@@ -162,7 +162,10 @@ private:
     SetPoint _sendSetPoint;
     SetPoint _maxSetPoint;
 
-    float _vx, _vy,_vz;
+    Velocity _velocity = {};
+    Acceleration _accelerationOffset = {};
+    SetPoint _setPointOffset = {};
+
 
     int _minThrust;
 
@@ -187,7 +190,7 @@ private:
 
     bool SendSetpoint(SetPoint setPoint);
 
-    bool SendVelocityRef(float vx, float vy, float vz);
+    bool SendVelocityRef(Velocity velocity);
 
     void StartLogging();
     void StopLogging();

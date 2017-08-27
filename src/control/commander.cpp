@@ -33,7 +33,7 @@ void Commander::Update()
         Acceleration acceleration_intertial_frame = _crazyflie.ConvertBodyFrameToIntertialFrame(acceleration_body_frame);
 
 
-        std::cout << "acc_x_i = " << acceleration_intertial_frame[0] << " acc_y_i = " << acceleration_intertial_frame[1] << " acc_z_i = " << acceleration_intertial_frame[2] << std::endl;
+//        std::cout << "acc_x_i = " << acceleration_intertial_frame[0] << " acc_y_i = " << acceleration_intertial_frame[1] << " acc_z_i = " << acceleration_intertial_frame[2] << std::endl;
 
         static Velocity velocity;
         velocity += acceleration_intertial_frame * _samplingTime;;

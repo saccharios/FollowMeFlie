@@ -84,7 +84,7 @@ bool Crazyflie::ReadTOCLogs()
 
 bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
-    // TODO SF Is this needed?
+    // TODO SF Is x-mode needed?
     // In python client, this line implementes the x-mode
     auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
     auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
@@ -103,13 +103,13 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
     return _crazyRadio.SendPacketAndCheck(std::move(packet));
 }
 
-bool  Crazyflie::SendVelocityRef(float vx, float vy, float vz)
+bool  Crazyflie::SendVelocityRef(Velocity velocity)
 {
     std::vector<uint8_t> data;
     uint8_t inidicator = 1;
-    auto vx_vect = ConvertTouint8_tVect(vx);
-    auto vy_vect = ConvertTouint8_tVect(vy);
-    auto vz_vect = ConvertTouint8_tVect(vz);
+    auto vx_vect = ConvertTouint8_tVect(velocity[0]);
+    auto vy_vect = ConvertTouint8_tVect(velocity[1]);
+    auto vz_vect = ConvertTouint8_tVect(velocity[2]);
     auto yaw_vect = ConvertTouint8_tVect(0.0f);
     data.push_back(inidicator);
     data.insert(data.end(), vx_vect.begin(), vx_vect.end());
@@ -184,15 +184,30 @@ void Crazyflie::Update()
     case State::ZERO_MEASUREMENTS:
     {
         _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-
+        _crazyRadio.SendPingPacket();
         // NOTE(winkler): Here, we can do measurement zero'ing. This is
         // not done at the moment, though. Reason: No readings to zero at
         // the moment. This might change when altitude becomes available.
 
 
+        _setPointOffset.roll = GetSensorValue("stabilizer.roll");
+        _setPointOffset.yaw= 0.0f;
+        _setPointOffset.pitch = GetSensorValue("stabilizer.pitch");
+        _setPointOffset.thrust = GetSensorValue("stabilizer.thrust");
+        _accelerationOffset[0] = GetSensorValue("acc.x");
+        _accelerationOffset[1] = GetSensorValue("acc.y");
+        _accelerationOffset[2] = GetSensorValue("acc.z");
 
+//        _setPointOffset.Print();
+//        std::cout << "acc_x_offset = " << _accelerationOffset[0] << " acc_y_offset = " << _accelerationOffset[1] << " acc_z_offset = " << _accelerationOffset[2] << std::endl;
 
+         // In the first six queries the acceleration value is still zero
+        static int counter = 0;
+        if(counter > 7)
+        {
         _state = State::NORMAL_OPERATION;
+        }
+        ++counter;
         break;
     }
     case State::NORMAL_OPERATION:
@@ -208,7 +223,7 @@ void Crazyflie::Update()
         }
         else if(_isSendingVelocityRef)
         {
-            SendVelocityRef(_vx, _vy, _vz);
+            SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;
         }
         else
@@ -232,6 +247,13 @@ void Crazyflie::Update()
             _state = State::ZERO;
         }
 
+        static int cntr = 0;
+        if ( cntr < 500 && cntr % 10 == 0)
+//        {
+//            _sensorValues.stabilizer.Print();
+//            std::cout << "acc_x = " << _sensorValues.acceleration.x << " acc_y = " << _sensorValues.acceleration.y << " acc_z = " << _sensorValues.acceleration.z << std::endl;
+//        }
+//        ++cntr;
         break;
     }
     default:
@@ -260,17 +282,17 @@ void Crazyflie::Update()
 
 void Crazyflie::UpateSensorValues()
 {
-    _sensorValues.stabilizer.roll = GetSensorValue("stabilizer.roll");
-    _sensorValues.stabilizer.yaw= GetSensorValue("stabilizer.yaw");
-    _sensorValues.stabilizer.pitch = GetSensorValue("stabilizer.pitch");
-    _sensorValues.stabilizer.thrust = GetSensorValue("stabilizer.thrust");
+    _sensorValues.stabilizer.roll = GetSensorValue("stabilizer.roll") - _setPointOffset.roll;
+    _sensorValues.stabilizer.yaw= GetSensorValue("stabilizer.yaw") - _setPointOffset.yaw;
+    _sensorValues.stabilizer.pitch = GetSensorValue("stabilizer.pitch") - _setPointOffset.pitch;
+    _sensorValues.stabilizer.thrust = GetSensorValue("stabilizer.thrust") - _setPointOffset.thrust;
     _sensorValues.barometer.pressure = GetSensorValue("baro.pressure");
     _sensorValues.barometer.asl = GetSensorValue("baro.asl");
     _sensorValues.barometer.aslLong= GetSensorValue("baro.aslLong");
     _sensorValues.barometer.temperature = GetSensorValue("baro.temperature");
-    _sensorValues.acceleration.x = GetSensorValue("acc.x");
-    _sensorValues.acceleration.y = GetSensorValue("acc.y");
-    _sensorValues.acceleration.z = GetSensorValue("acc.z");
+    _sensorValues.acceleration.x = GetSensorValue("acc.x") - _accelerationOffset[0];
+    _sensorValues.acceleration.y = GetSensorValue("acc.y") - _accelerationOffset[1];
+    _sensorValues.acceleration.z = GetSensorValue("acc.z") - _accelerationOffset[2];
     _sensorValues.acceleration.zw = GetSensorValue("acc.zw");
     _sensorValues.battery.level = GetSensorValue("pm.vbat");
     _sensorValues.battery.state = GetSensorValue("pm.state");
@@ -297,11 +319,9 @@ void Crazyflie::SetSetPoint(SetPoint setPoint)
 }
 
 
-void Crazyflie::SetVelocityRef(float vx, float vy, float vz)
+void Crazyflie::SetVelocityRef(Velocity velocity)
 {
-    _vx = vx;
-    _vy = vy;
-    _vz = vz;
+    _velocity = velocity;
 }
 
 // TODO SF: Simplifly setpoint setting

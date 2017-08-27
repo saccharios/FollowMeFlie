@@ -23,7 +23,8 @@ SOURCES += communication/Crazyflie.cpp \
     communication/TOC.cpp \
     math/lowpass.cpp \
     math/pi_controller.cpp \
-    control/commander.cpp
+    control/commander.cpp \
+    math/types.cpp
 
 
 HEADERS  += communication/Crazyflie.h \
