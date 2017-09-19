@@ -1,7 +1,5 @@
 include(../defaults.pri)
 
-CONFIG -= qt
-
 TARGET = FollowMeFlie
 TEMPLATE = lib
 
@@ -24,7 +22,8 @@ SOURCES += communication/Crazyflie.cpp \
     math/lowpass.cpp \
     math/pi_controller.cpp \
     control/commander.cpp \
-    math/types.cpp
+    math/types.cpp \
+    control/extendedkalmanfilter.cpp
 
 
 HEADERS  += communication/Crazyflie.h \
@@ -39,7 +38,8 @@ HEADERS  += communication/Crazyflie.h \
     math/lowpass.h \
     math/pi_controller.h \
     control/commander.h \
-    math/types.h
+    math/types.h \
+    control/extendedkalmanfilter.h
 
 
 # Include library libusb-1.0.21
@@ -50,4 +50,7 @@ LIBS += -L$${libubs_path}/MinGW32/static -llibusb-1.0
 
 
 DEPENDPATH += $${libubs_path}/MinGW32/static
+
+# Include Eigen library
+INCLUDEPATH += "E:\Code\lib\eigen-3.3.4"
 
