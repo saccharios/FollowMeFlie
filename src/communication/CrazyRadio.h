@@ -55,8 +55,8 @@ enum class PowerSettings {
     P_0DBM = 3
 };
 enum class RadioSettings{
-    _080250K = 0,
-    _0802M = 1
+    _0802M = 0,
+    _080250K = 1
 };
 
 enum class DongleConfiguration{

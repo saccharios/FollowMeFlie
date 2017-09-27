@@ -65,14 +65,17 @@
     <property name="editable">
      <bool>false</bool>
     </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
     <item>
      <property name="text">
-      <string>0/80/250K</string>
+      <string>0/80/2M</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>0/80/2M</string>
+      <string>0/80/250K</string>
      </property>
     </item>
    </widget>
@@ -136,7 +139,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -215,7 +218,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_AccVal">
@@ -282,7 +285,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>151</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -454,7 +457,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>151</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">

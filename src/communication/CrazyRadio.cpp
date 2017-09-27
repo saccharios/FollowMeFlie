@@ -36,7 +36,7 @@
 
 
 CrazyRadio::CrazyRadio() :
-    _radioSettings(RadioSettings::_080250K),
+    _radioSettings(RadioSettings::_0802M),
     _context(nullptr),
     _devDevice(nullptr),
     _device(nullptr),
@@ -149,13 +149,13 @@ void CrazyRadio::ReadRadioSettings()
     int dongleNBR = 0;
     switch(_radioSettings)
     {
-    default:
     case RadioSettings::_080250K:
     {
         setChannel(80);
         SetDataRate("250K");
         break;
     }
+    default:
     case RadioSettings::_0802M:
     {
         setChannel(80);

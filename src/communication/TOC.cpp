@@ -47,7 +47,7 @@ bool TOC::RequestMetaData()
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-    if(receivedPacketIsValid)
+    if(receivedPacketIsValid && received->GetData().size() > 2)
     {
         if(received->GetData().at(1) == 0x01)
         {
@@ -148,9 +148,9 @@ bool TOC::StartLogging(std::string name, std::string blockName)
             CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
             bool receivedPacketIsValid  = false;
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket), receivedPacketIsValid);
-            if(receivedPacketIsValid)
+            auto const & dataReceived = received->GetData();
+            if(receivedPacketIsValid && dataReceived.size() > 4)
             {
-                auto const & dataReceived = received->GetData();
                 if(     dataReceived.at(1) == 0x01 &&
                         dataReceived.at(2) == logBlock.id &&
                         dataReceived.at(3) == 0x00)
@@ -208,9 +208,9 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
 
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(registerBlock), receivedPacketIsValid);
-    if(receivedPacketIsValid)
+    auto const & dataReceived = received->GetData();
+    if(receivedPacketIsValid && dataReceived.size() > 4)
     {
-        auto const & dataReceived = received->GetData();
         if(dataReceived.at(1) == 0x00 &&
                 dataReceived.at(2) == id &&
                 dataReceived.at(3) == 0x00)
