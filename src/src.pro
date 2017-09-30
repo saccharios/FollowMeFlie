@@ -30,7 +30,6 @@ HEADERS  += communication/Crazyflie.h \
     communication/CrazyRadio.h \
     communication/CRTPPacket.h \
     communication/TOC.h \
-    math/clock_gettime.h \
     math/stl_utils.h \
     math/logic.h \
     math/functions.h \
