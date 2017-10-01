@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _timer_t1(),
     _crazyRadio(),
     _crazyFlie(_crazyRadio),
-    _crazyFlieCaller(_crazyFlie, _commander, parent),
     _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,
                        _crazyFlie.GetSensorValues().stabilizer.yaw,
                        _crazyFlie.GetSensorValues().stabilizer.pitch),
@@ -26,17 +25,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Actions
-    connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
-    connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(display_not_connecting_box()));
 
     // Event loop on main window
-    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
-    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
-    QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
-    _timer_t0.start(30); // time in ms
-    _timer_t1.start(100); // time in ms
-//    _timer_t2.start(500); // time in ms
+    // T0
+    _timer_t0.start(crazyflieUpdateSamplingTime); // time in ms
+    QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCrazyFlie()));
+    // T1
+    _timer_t1.start(30); // time in ms
+    QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
+
+    // T2
+    _timer_t2.start(100); // time in ms
+    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
 
     // Custom widgets
     ui->Layout_CameraView->addWidget(&_cameraViewPainter);
@@ -50,7 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Connections
     QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
-
+    QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
+    QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(display_not_connecting_box()));
 
 }
 MainWindow::~MainWindow()
@@ -235,4 +237,11 @@ void MainWindow::on_pushButton_Stop_clicked()
 void MainWindow::on_pushButton_hoverMode_clicked()
 {
     _commander.ActivateHoverMode(true);
+}
+
+
+void MainWindow::UpdateCrazyFlie()
+{
+    _commander.Update();
+    _crazyFlie.Update();
 }

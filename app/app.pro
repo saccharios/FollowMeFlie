@@ -13,7 +13,6 @@ CONFIG += console # Print console output in external console
 
 SOURCES +=  main.cpp \
     mainwindow.cpp \
-    crazyfliecaller.cpp \
     cameraviewpainter.cpp \
     trackingcolor.cpp \
     imageprocess/camera.cpp \
@@ -21,7 +20,6 @@ SOURCES +=  main.cpp \
 
 
 HEADERS  += mainwindow.h \
-    crazyfliecaller.h \
     cameraviewpainter.h \
     qt_util.h \
     trackingcolor.h \

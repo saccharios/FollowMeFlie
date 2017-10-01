@@ -151,17 +151,28 @@ void Crazyflie::Update()
     }
     case State::READ_PARAMETERS_TOC:
     {
-        bool success = ReadTOCParameters();
-        if(success)
-        {
-            _state =State:: READ_LOGS_TOC;
-        }
-
-        if(_crazyRadio.LastSendAndReceiveFailed())
+        if( !_crazyRadio.IsUsbConnectionOk())
         {
             _state = State::ZERO;
             _startConnecting = false;
             emit NotConnecting();
+
+        }
+        else
+        {
+
+            bool success = ReadTOCParameters();
+            if(success)
+            {
+                _state =State:: READ_LOGS_TOC;
+            }
+
+            if(_crazyRadio.LastSendAndReceiveFailed())
+            {
+                _state = State::ZERO;
+                _startConnecting = false;
+                emit NotConnecting();
+            }
         }
         break;
     }
@@ -245,38 +256,13 @@ void Crazyflie::Update()
             _state = State::ZERO;
         }
 
-        static int cntr = 0;
-        if ( cntr < 500 && cntr % 10 == 0)
-//        {
-//            _sensorValues.stabilizer.Print();
-//            std::cout << "acc_x = " << _sensorValues.acceleration.x << " acc_y = " << _sensorValues.acceleration.y << " acc_z = " << _sensorValues.acceleration.z << std::endl;
-//        }
-//        ++cntr;
-
         break;
     }
     default:
         break;
     } // end switch
 
-    //  if(_state != State::STATE_ZERO)
-    /*   {
-        if(_crazyRadio.AckReceived())
-        {
-            _ackMissCounter = 0;
-        }
-        else if(_ackMissCounter < _ackMissTolerance)
-        {
-            std::cout << _ackMissCounter << std::endl;
-            ++_ackMissCounter;
-        }*/
-    //}
     UpateSensorValues();
-    //    if(_state!= State::STATE_ZERO)
-    //    {
-    //        std::cout << "state = " <<static_cast<int>(_state )<< std::endl;
-    //    }
-    //    return _crazyRadio.IsUsbConnectionOk(); // TODO SF: For what is this needed?
 }
 
 void Crazyflie::UpateSensorValues()
