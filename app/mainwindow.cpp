@@ -27,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Actions
-    connect(&_crazyFlieCaller, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
+    connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
+    connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(display_not_connecting_box()));
 
     // Event loop on main window
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
@@ -85,6 +86,14 @@ void MainWindow::display_sensor_values()
 void MainWindow::display_connection_timeout_box()
 {
     QMessageBox msgBox;
+    msgBox.setWindowTitle("Connection Error");
+    msgBox.setText("Connection Time out.");
+    msgBox.exec();
+}
+void MainWindow::display_not_connecting_box()
+{
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Connection Error");
     msgBox.setText("Could not connect to CrazyFlie.");
     msgBox.setInformativeText("Have you turned it on?");
     msgBox.exec();

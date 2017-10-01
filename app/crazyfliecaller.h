@@ -18,10 +18,7 @@ public:
 
 public slots:
     void Update();
-    void CheckConnectionTimeout();
 
-signals:
-    void ConnectionTimeout();
 
 private:
         QTimer _timer_t0;

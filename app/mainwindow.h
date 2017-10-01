@@ -30,6 +30,7 @@ private slots:
     void on_exitApp_clicked();
     void display_sensor_values();
     void display_connection_timeout_box();
+    void display_not_connecting_box();
 
     void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
     void on_actionExit_triggered();

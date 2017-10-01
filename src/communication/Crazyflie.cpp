@@ -28,9 +28,7 @@
 
 #include "Crazyflie.h"
 #include <chrono>
-//#include "math/clock_gettime.h"
 #include "math/constants.h"
-
 
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
@@ -153,7 +151,6 @@ void Crazyflie::Update()
     }
     case State::READ_PARAMETERS_TOC:
     {
-        // TODO SF State machine is in busy wait in this state if the crazy flie is not turned on. This should not be.
         bool success = ReadTOCParameters();
         if(success)
         {
@@ -164,6 +161,7 @@ void Crazyflie::Update()
         {
             _state = State::ZERO;
             _startConnecting = false;
+            emit NotConnecting();
         }
         break;
     }
@@ -240,10 +238,10 @@ void Crazyflie::Update()
         {
             ++_ackMissCounter;
         }
-        if( _ackMissCounter == _ackMissTolerance )
+        else
         {
-            ++_ackMissCounter;
             _startConnecting = false;
+            emit ConnectionTimeout();
             _state = State::ZERO;
         }
 
@@ -254,6 +252,7 @@ void Crazyflie::Update()
 //            std::cout << "acc_x = " << _sensorValues.acceleration.x << " acc_y = " << _sensorValues.acceleration.y << " acc_z = " << _sensorValues.acceleration.z << std::endl;
 //        }
 //        ++cntr;
+
         break;
     }
     default:
@@ -303,12 +302,6 @@ void Crazyflie::UpateSensorValues()
     _sensorValues.magnetometer.y = GetSensorValue("mag.y");
     _sensorValues.magnetometer.z = GetSensorValue("mag.z");
 }
-
-bool Crazyflie::IsConnectionTimeout()
-{
-    return _ackMissCounter == _ackMissTolerance+1;
-}
-
 
 void Crazyflie::SetSetPoint(SetPoint setPoint)
 {

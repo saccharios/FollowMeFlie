@@ -39,9 +39,9 @@ void Commander::Update()
         velocity += acceleration_intertial_frame * _samplingTime;;
         std::cout << "v_x = " << velocity[0] << " v_y = " << velocity[1] << " v_z = " << velocity[2] << std::endl;
 
-        //        _crazyflie.SetVelocityRef(0.0f,0.0f,0.0f);
-        //        _crazyflie.SetSendingVelocityRef(true);
-        //        _crazyflie.SetSetPoint(setPoint);
+                _crazyflie.SetVelocityRef(Velocity{0.0f,0.0f,0.0f});
+                _crazyflie.SetSendingVelocityRef(true);
+                //_crazyflie.SetSetPoint(setPoint);
         //        _crazyflie.SetSendSetpoints(true);
     }
 

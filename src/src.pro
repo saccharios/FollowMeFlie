@@ -1,4 +1,5 @@
 include(../defaults.pri)
+QT += core gui
 
 TARGET = FollowMeFlie
 TEMPLATE = lib

@@ -10,7 +10,6 @@ CrazyFlieCaller::CrazyFlieCaller(Crazyflie & crazyFlie, Commander & commander, Q
     _commander(commander)
 {
     QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(Update()));
-    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(CheckConnectionTimeout()));
     _timer_t0.start(crazyflieUpdateSamplingTime); // time in ms
     _timer_t2.start(500); // time in ms
 }
@@ -23,14 +22,6 @@ void CrazyFlieCaller::Update()
     _crazyFlie.Update();
 }
 
-void CrazyFlieCaller::CheckConnectionTimeout()
-{
-    if(_crazyFlie.IsConnectionTimeout())
-    {
-        std::cout << "conn timeout\n";
-        emit ConnectionTimeout();
-    }
-}
 
 
 

@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include "QOBJECT"
 
 #include <cmath>
 #include "CrazyRadio.h"
@@ -37,6 +38,7 @@
 #include <memory>
 #include "math/logic.h"
 #include "math/types.h"
+
 enum class State {
     ZERO = 0,
     READ_PARAMETERS_TOC = 1,
@@ -102,7 +104,9 @@ struct SensorValues
 
 static int crazyflieUpdateSamplingTime = 10; // in ms
 
-class Crazyflie {
+class Crazyflie : public QObject
+{
+    Q_OBJECT
 
 public:
 
@@ -149,9 +153,11 @@ public:
     bool IsConnected();
 
 
-   bool IsConnectionTimeout();
-
    std::array<float,3> ConvertBodyFrameToIntertialFrame(std::array<float,3> const & value_in_body);
+signals:
+    void ConnectionTimeout();
+    void NotConnecting();
+
 
 private:
     CrazyRadio & _crazyRadio;
