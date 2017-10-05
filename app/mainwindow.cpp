@@ -245,3 +245,8 @@ void MainWindow::UpdateCrazyFlie()
     _commander.Update();
     _crazyFlie.Update();
 }
+
+void MainWindow::on_pushButton_SafeLandingMode_clicked()
+{
+    _crazyRadio.ReadParameter();
+}

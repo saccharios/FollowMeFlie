@@ -466,13 +466,15 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             // TODO(winkler): Do internal stuff with the data received here
             // (store current link quality, etc.). For now, ignore it.
 
-            // Actual data starts at buffer[1]
+            // Exctract port and channel information from buffer[1]
             Port port = static_cast<Port>((buffer[1] & 0xf0) >> 4);
             Channel channel = static_cast<Channel>(buffer[1] & 0b00000011);
+
+            // Actual data starts at buffer[2]
             std::vector<uint8_t> data;
             for(int i = 0; i < bytesRead; ++i)
             {
-                data.push_back(buffer[1+i]);
+                data.push_back(buffer[1+i]); // TODO SF: a) start reading buffer at position 2, b) stop reading at bytes Read. Change hard-coded data.at(i) with i being an enum or so with a meaning. Check data structure for logging packets, and parameter packets.
             }
             packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
         }
@@ -579,5 +581,58 @@ bool CrazyRadio::LastSendAndReceiveFailed() const
 {
     return    _lastSendAndReceiveFailed;
 }
+void CrazyRadio::ReadParameter()
+{
 
+    std::vector<uint8_t> data ={0,14}; // TODO SF:: Why need to add a preceding 0?
+    CRTPPacket packet(Port::Parameters, Channel::TOC, std::move(data)); // Channel 1 for reading - how to solve multiple channel assignments?
+    bool receivedPacketIsValid = false;
+    sptrPacket received = SendAndReceive(std::move(packet), receivedPacketIsValid);
+
+    if(receivedPacketIsValid)
+    {
+        std::cout << "Requesting toc acces :" << std::endl;
+        std::cout << "Port = " << (int) received->GetPort() << " Channel = " << (int)  received->GetChannel()  << " Data Size = ";
+
+        auto const & data = received->GetData();
+        std::cout << data.size()-1 << std::endl;
+        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 1)) << std::endl;
+        std::cout<<"param id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 2)) << std::endl;
+        std::cout<<"type id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 3)) << std::endl;
+        for(int i = 4; i < data.size(); ++i)
+        {
+
+            std::cout<< i <<" = " <<   ExtractData<uint8_t>(data, i) << std::endl;
+
+//            std::cout<< i <<" = " << static_cast<int>( ExtractData<uint8_t>(data, i)) << std::endl;
+
+        }
+    }
+        std::vector<uint8_t> data2 ={14}; // Here no preceding 0 is needed!
+    CRTPPacket packet2(Port::Parameters, Channel::Settings, std::move(data2)); // Channel 1 for reading - how to solve multiple channel assignments?
+    receivedPacketIsValid = false;
+    sptrPacket received2 = SendAndReceive(std::move(packet2), receivedPacketIsValid);
+
+    if(receivedPacketIsValid)
+    {
+        std::cout << "Reading: :" << std::endl;
+        std::cout << "Port = " << (int) received2->GetPort() << " Channel = " << (int)  received2->GetChannel()  << " Data Size = ";
+
+        auto const & data = received2->GetData();
+        std::cout << data.size()-1 << std::endl;
+        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 1)) << std::endl;
+        for(int i = 2; i < data.size(); ++i)
+        {
+                        std::cout<< i <<" = " << static_cast<int>( ExtractData<uint8_t>(data, i)) << std::endl;
+        }
+        std::cout<< "total data = " <<   ExtractData<float>(data, 2) << std::endl;
+    }
+
+
+
+
+
+
+
+}
 

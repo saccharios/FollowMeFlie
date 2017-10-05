@@ -43,6 +43,8 @@ private slots:
     void UpdateCrazyFlie();
 
 
+    void on_pushButton_SafeLandingMode_clicked();
+
 private:
     // GUI related
     Ui::MainWindow *ui;

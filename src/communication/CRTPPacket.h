@@ -79,10 +79,13 @@ enum class Port{
     Debug = 14,
     Link = 15
 };
+
+// TODO SF:: Channel definition depen on the port!
 enum class Channel{
     TOC = 0,
     Settings = 1,
-    Data = 2
+    Data = 2,
+    Misc = 3
 };
 
 // Class to hold and process communication-related data for the CRTProtocol

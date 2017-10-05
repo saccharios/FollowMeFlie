@@ -128,6 +128,8 @@ public:
     bool RadioIsConnected() const;
     bool LastSendAndReceiveFailed() const;
 
+    void ReadParameter();
+
 private:
     // The radio URI as supplied when initializing the class instance
     RadioSettings _radioSettings;
