@@ -472,9 +472,9 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
 
             // Actual data starts at buffer[2]
             std::vector<uint8_t> data;
-            for(int i = 0; i < bytesRead; ++i)
+            for(int i = 1; i < bytesRead+1; ++i)
             {
-                data.push_back(buffer[1+i]); // TODO SF: a) start reading buffer at position 2, b) stop reading at bytes Read. Change hard-coded data.at(i) with i being an enum or so with a meaning. Check data structure for logging packets, and parameter packets.
+                data.push_back(buffer[i]); // TODO SF: a) start reading buffer at position 2, b) stop reading at bytes Read. Change hard-coded data.at(i) with i being an enum or so with a meaning. Check data structure for logging packets, and parameter packets.
             }
             packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
         }
