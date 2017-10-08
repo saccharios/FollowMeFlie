@@ -276,13 +276,13 @@ void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
     for(auto const & packet : packets)
     {
         auto const & data = packet->GetData();
-        if(data.size() < 5)
+        if(data.size() < min_packet_size)
         {
             std::cout << "Data packet not large enough!\n";
             break;
         }
-        const std::vector<uint8_t> logdataVect(data.begin() + 5, data.end());
-        int blockID = data.at(1);
+        int blockID = data.at(blockID_byte);
+        const std::vector<uint8_t> logdataVect(data.begin() + log_data_length, data.end());
         bool found;
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
         if(found)

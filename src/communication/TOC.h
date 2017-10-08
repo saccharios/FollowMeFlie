@@ -71,6 +71,12 @@ struct LoggingBlock {
 
 class TOC {
 friend class TOC_Test; // Is friend for white-box testing.
+static constexpr std::size_t min_packet_size = 5;
+static constexpr std::size_t log_data_length = 5;
+static constexpr std::size_t blockID_byte = 1;
+
+
+
 public:
     TOC(CrazyRadio & crazyRadio, Port port);
 
