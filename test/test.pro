@@ -3,7 +3,7 @@ TEMPLATE = app
 # Use C++ 14
 CONFIG += c++14
 #CONFIG += console
-CONFIG -= qt
+#CONFIG -= qt
 
 INCLUDEPATH += test/src
 INCLUDEPATH += src

@@ -31,6 +31,8 @@
 #include <assert.h>
 #include "CRTPPacket.h"
 #include <iostream>
+#include "error_codes.h"
+
 TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
 
@@ -43,18 +45,24 @@ bool TOC::SendTOCPointerReset()
 
 bool TOC::RequestMetaData()
 {
-    std::vector<uint8_t> data = {1};
+    std::vector<uint8_t> data = {1}; // TODO SF : Should this be 3?
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-    if(receivedPacketIsValid && received->GetData().size() > 2)
+    if(receivedPacketIsValid && received->GetData().size() > 1)
     {
-        if(received->GetData().at(1) == 0x01)
+        if(received->GetData().at(TOCCommandByte) == 0x01)
         {
-            _itemCount = received->GetData().at(2); // is usually 0x81 == 129 decimal
+            _itemCount = received->GetData().at(1); // is usually 0x81 == 129 decimal
             return  true;
         }
+        else
+        {
+            emit FailedRequestMetaData(ConnectionErrors::FailedRequestMetaData);
+            return false;
+        }
     }
+    emit FailedRequestMetaData(ConnectionErrors::FailedRequestMetaData);
     return false;
 }
 
@@ -63,20 +71,21 @@ bool TOC::RequestInitialItem()
     return RequestItem({0});
 }
 
-bool TOC::RequestItem(uint8_t id)
-{
-    return RequestItem({0, id});
-}
 bool TOC::RequestItems()
 {
     for(uint8_t itemNr = 0; itemNr < _itemCount; itemNr++)
     {
         if( ! RequestItem(itemNr)) // If any of the requested items fail, return false
         {
+            emit FailedRequestItmes(ConnectionErrors::FailedRequestItem);
             return false;
         }
     }
     return true;
+}
+bool TOC::RequestItem(uint8_t id)
+{
+    return RequestItem({0, id});
 }
 
 bool TOC::RequestItem(std::vector<uint8_t> && data)
@@ -101,11 +110,10 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
     {
         auto const & data = packet->GetData();
 
-        if(data[1] == 0x0)
+        if(data.at(TOCCommandByte) == 0x0)
         { // Command identification ok?
-
             std::string name;
-            int index = 4;
+            int index = TOCGroupNameByte;
             while(data.at(index) != '\0')
             {
                 name += data.at(index);
@@ -121,12 +129,12 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
 
             TOCElement tocElement;
             tocElement.name = name;
-            tocElement.id = data.at(2);
-            tocElement.type = static_cast<ElementType>(data.at(3));
+            tocElement.id = data.at(TOCElementIDByte);
+            tocElement.type = static_cast<ElementType>(data.at(TOCElementTypeByte));
             tocElement.isLogging = false;
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
-   //         std::cout << "process packet " << name << std::endl;
+//            std::cout << "process item " << name << std::endl;
             return true;
         }
     }
@@ -144,23 +152,23 @@ bool TOC::StartLogging(std::string name, std::string blockName)
         TOCElement & element = STLUtils::ElementForName(_TOCElements, name, isContained);
         if(isContained)
         {
-            std::vector<uint8_t> data = {0x01, logBlock.id, static_cast<uint8_t>(element.type), element.id};
-            CRTPPacket logPacket(_port, Channel::Settings, std::move(data));
+            std::vector<uint8_t> data = {LogCmds::AppendBlock, logBlock.id, static_cast<uint8_t>(element.type), element.id};
+            CRTPPacket logPacket(_port, Channel::LogControl, std::move(data));
             bool receivedPacketIsValid  = false;
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket), receivedPacketIsValid);
             auto const & dataReceived = received->GetData();
-            if(receivedPacketIsValid && dataReceived.size() > 4)
+            if(receivedPacketIsValid && dataReceived.size() > 3)
             {
-                if(     dataReceived.at(1) == 0x01 &&
-                        dataReceived.at(2) == logBlock.id &&
-                        dataReceived.at(3) == 0x00)
+                if(     dataReceived.at(LogControlCommandByte) == 0x01 &&
+                        dataReceived.at(LogControlBlockIDByte) == logBlock.id &&
+                        dataReceived.at(LogControlEndByte) == 0x00)
                 {
                     logBlock.elementIDs.push_back(element.id);
                     return true;
                 }
                 else
                 {
-                    std::cout << dataReceived.at(3) << std::endl;
+                    std::cout << dataReceived.at(LogControlEndByte) << std::endl;
                 }
             }
         }
@@ -203,17 +211,19 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     UnregisterLoggingBlockID(id);
     // Regiter new block
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / frequency);// The sampling rate is in 100us units
-    std::vector<uint8_t> data =  {0x00, id, samplingRate};
-    CRTPPacket registerBlock(_port, Channel::Settings, std::move(data));
+    std::vector<uint8_t> data =  {LogCmds::CreateBlock, id, samplingRate};
+    CRTPPacket registerBlock(_port, Channel::LogControl, std::move(data));
 
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(registerBlock), receivedPacketIsValid);
     auto const & dataReceived = received->GetData();
-    if(receivedPacketIsValid && dataReceived.size() > 4)
+    if(receivedPacketIsValid && dataReceived.size() > 3)
     {
-        if(dataReceived.at(1) == 0x00 &&
-                dataReceived.at(2) == id &&
-                dataReceived.at(3) == 0x00)
+        std::cout << "block id = " << static_cast<int>(id) << std::endl;
+        received->PrintData();
+        if(dataReceived.at(LogControlCommandByte) == 0x00 &&
+                dataReceived.at(LogControlBlockIDByte) == id &&
+                dataReceived.at(LogControlEndByte) == 0x00)
         {
             LoggingBlock loggingBlock;
             loggingBlock.name = name;
@@ -236,9 +246,9 @@ bool TOC::EnableLogging(std::string blockName)
     if(isContained)
     {
         uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / logBlock.frequency);// The sampling rate is in 100us units
-        std::vector<uint8_t> data =  {0x03, logBlock.id, samplingRate};
+        std::vector<uint8_t> data =  {LogCmds::StartBlock, logBlock.id, samplingRate};
 
-        CRTPPacket enablePacket(_port, Channel::Settings, std::move(data));
+        CRTPPacket enablePacket(_port, Channel::LogControl, std::move(data));
 
         // Use SendAndReceive to make sure the crazyflie is ready.
         bool receivedPacketIsValid = false;
@@ -264,8 +274,8 @@ bool TOC::UnregisterLoggingBlock(std::string name)
 
 bool TOC::UnregisterLoggingBlockID(int id)
 {
-    std::vector<uint8_t> data = {0x02, static_cast<uint8_t>(id)};
-    CRTPPacket unregisterBlock(_port, Channel::Settings, std::move(data));
+    std::vector<uint8_t> data = {LogCmds::DeleteBlock, static_cast<uint8_t>(id)};
+    CRTPPacket unregisterBlock(_port, Channel::LogControl, std::move(data));
     bool receivedPacketIsValid = false;
     _crazyRadio.SendAndReceive(std::move(unregisterBlock), receivedPacketIsValid);
     return receivedPacketIsValid;
@@ -276,13 +286,13 @@ void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
     for(auto const & packet : packets)
     {
         auto const & data = packet->GetData();
-        if(data.size() < min_packet_size)
+        if(data.size() < LogMinPacketSize)
         {
             std::cout << "Data packet not large enough!\n";
             break;
         }
-        int blockID = data.at(blockID_byte);
-        const std::vector<uint8_t> logdataVect(data.begin() + log_data_length, data.end());
+        int blockID = data.at(LogBlockIDByte);
+        const std::vector<uint8_t> logdataVect(data.begin() + LogDataLength, data.end());
         bool found;
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
         if(found)

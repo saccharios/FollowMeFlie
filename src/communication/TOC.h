@@ -30,7 +30,7 @@
 
 
 #pragma once
-
+#include "QOBJECT"
 #include <list>
 #include <string>
 #include <cstdlib>
@@ -69,12 +69,34 @@ struct LoggingBlock {
 };
 
 
-class TOC {
-friend class TOC_Test; // Is friend for white-box testing.
-static constexpr std::size_t min_packet_size = 5;
-static constexpr std::size_t log_data_length = 5;
-static constexpr std::size_t blockID_byte = 1;
+class TOC : public QObject
+{
+    Q_OBJECT
+    friend class TOC_Test; // Is friend for white-box testing.
 
+    // Log packet
+    static constexpr std::size_t LogMinPacketSize = 4;
+    static constexpr std::size_t LogDataLength = 4;
+
+    static constexpr std::size_t LogBlockIDByte = 0;
+
+    static constexpr std::size_t LogControlCommandByte = 0;
+    static constexpr std::size_t LogControlBlockIDByte = 1;
+    static constexpr std::size_t LogControlEndByte = 2;
+
+    struct LogCmds
+    {
+        static constexpr uint8_t CreateBlock     = 0x00;
+        static constexpr uint8_t AppendBlock   = 0x01;
+        static constexpr uint8_t DeleteBlock     = 0x02;
+        static constexpr uint8_t StartBlock     = 0x03;
+    };
+
+    // TOC packet
+    static constexpr std::size_t TOCCommandByte = 0;
+    static constexpr std::size_t TOCElementIDByte= 1;
+    static constexpr std::size_t TOCElementTypeByte = 2;
+    static constexpr std::size_t TOCGroupNameByte = 3;
 
 
 public:
@@ -96,7 +118,9 @@ public:
 
 
     void ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets);
-
+signals:
+    FailedRequestMetaData(int );
+    FailedRequestItmes(int);
 private:
     CrazyRadio & _crazyRadio;
     Port _port;

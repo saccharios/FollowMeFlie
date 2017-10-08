@@ -82,7 +82,6 @@ bool Crazyflie::ReadTOCLogs()
 
 bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
-    // TODO SF Is x-mode needed?
     // In python client, this line implementes the x-mode
     auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
     auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
@@ -103,6 +102,7 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
 
 bool  Crazyflie::SendVelocityRef(Velocity velocity)
 {
+    // TODO SF  also x -mode?
     std::vector<uint8_t> data;
     uint8_t inidicator = 1;
     auto vx_vect = ConvertTouint8_tVect(velocity[0]);
@@ -137,6 +137,9 @@ void Crazyflie::Update()
     //        StopLogging();
     //        return false;
     //    }
+
+
+//    std::cout << "State = " << static_cast<int>(_state) << std::endl;
 
     switch(_state)
     {

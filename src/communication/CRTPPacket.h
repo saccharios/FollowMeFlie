@@ -83,7 +83,7 @@ enum class Port{
 // TODO SF:: Channel definition depen on the port!
 enum class Channel{
     TOC = 0,
-    Settings = 1,
+    LogControl = 1,
     Data = 2,
     Misc = 3
 };
@@ -116,6 +116,8 @@ public:
     Port GetPort() const;
 
     Channel GetChannel() const;
+
+    void PrintData() const;
 
 private:
     // Internal storage pointer for payload data inside the  packet

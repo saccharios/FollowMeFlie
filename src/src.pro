@@ -39,7 +39,8 @@ HEADERS  += communication/Crazyflie.h \
     math/pi_controller.h \
     control/commander.h \
     math/types.h \
-    control/extendedkalmanfilter.h
+    control/extendedkalmanfilter.h \
+    error_codes.h
 
 
 # Include library libusb-1.0.21

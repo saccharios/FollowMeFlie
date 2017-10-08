@@ -28,7 +28,7 @@
 
 #include "CRTPPacket.h"
 #include <vector>
-
+#include <iostream>
 template<>
 float ExtractData<float>(std::vector<uint8_t> const & data, int offset)
 {
@@ -87,6 +87,13 @@ Channel CRTPPacket::GetChannel() const
     return _channel;
 }
 
+void CRTPPacket::PrintData() const
+{
+    for(int i = 0; i < _data.size() ; ++i)
+    {
+        std::cout << "i = " << i << " data = " << static_cast<int>(_data.at(i)) << std::endl;
+    }
+}
 
 
 

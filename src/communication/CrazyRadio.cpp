@@ -284,7 +284,7 @@ bool CrazyRadio::WriteControl(uint8_t* data, int length, DongleConfiguration  re
     //   return true;
     // }
 
-    // Hack.
+    // Hack. TODO SF Fix
     return true;
 }
 
@@ -403,14 +403,16 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
 
     if(packet)
     {
+
         auto const & data = packet->GetData();
-        if(data.size() > 0)
+
+        if(data.size() >= 0)
         {
             switch(packet->GetPort() )
             {
             case Port::Console:
             { // Console
-                if(data.size() > 1)
+                if(data.size() > 0)
                 { // Implicit assumption that the data stored in data are uint8_ts
                     std::cout << "Console text: ";
                     for(auto const & element : data)
@@ -432,6 +434,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                 {
                     _loggingPackets.emplace_back(packet);
                 }
+             }
                 break;
             }
             case Port::Commander:
@@ -472,7 +475,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
 
             // Actual data starts at buffer[2]
             std::vector<uint8_t> data;
-            for(int i = 1; i < bytesRead+1; ++i)
+            for(int i = 2; i < bytesRead+1; ++i)
             {
                 data.push_back(buffer[i]); // TODO SF: a) start reading buffer at position 2, b) stop reading at bytes Read. Change hard-coded data.at(i) with i being an enum or so with a meaning. Check data structure for logging packets, and parameter packets.
             }
@@ -501,7 +504,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
 {
     sptrPacket received = nullptr;
     int cntr = 0;
-    while(received == nullptr && cntr < 10) // TODO SF Potential infinite loop
+    while(received == nullptr && cntr < 10)
     {
         received = SendPacket({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
         ++cntr;
@@ -609,7 +612,7 @@ void CrazyRadio::ReadParameter()
         }
     }
         std::vector<uint8_t> data2 ={14}; // Here no preceding 0 is needed!
-    CRTPPacket packet2(Port::Parameters, Channel::Settings, std::move(data2)); // Channel 1 for reading - how to solve multiple channel assignments?
+    CRTPPacket packet2(Port::Parameters, Channel::LogControl, std::move(data2)); // Channel 1 for reading - how to solve multiple channel assignments?
     receivedPacketIsValid = false;
     sptrPacket received2 = SendAndReceive(std::move(packet2), receivedPacketIsValid);
 
@@ -627,10 +630,6 @@ void CrazyRadio::ReadParameter()
         }
         std::cout<< "total data = " <<   ExtractData<float>(data, 2) << std::endl;
     }
-
-
-
-
 
 
 
