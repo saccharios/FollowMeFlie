@@ -401,6 +401,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
+    // If a packet is received, distribute it to the different ports
     if(packet)
     {
 
@@ -433,6 +434,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                 if(packet->GetChannel() == Channel::Data)
                 {
                     _loggingPackets.emplace_back(packet);
+                    //_toc_log.AddUnprocessedPacket(packet);
                 }
                 break;
             }
@@ -470,6 +472,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             // (store current link quality, etc.). For now, ignore it.
 
             // Exctract port and channel information from buffer[1]
+            // TODO SF Add Port and channel checking
             Port port = static_cast<Port>((buffer[1] & 0xf0) >> 4);
             Channel channel = static_cast<Channel>(buffer[1] & 0b00000011);
 

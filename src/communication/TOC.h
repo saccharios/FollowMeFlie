@@ -56,8 +56,7 @@ struct TOCElement {
     //The (ref) type of the log element
     ElementType type;
     std::string name;
-    bool isLogging;
-    double value;
+    float value;
 };
 
 
@@ -74,7 +73,7 @@ class TOC : public QObject
     Q_OBJECT
     friend class TOC_Test; // Is friend for white-box testing.
 
-    // Log packet
+    // Log packet, Log Toc
     static constexpr std::size_t LogMinPacketSize = 4;
     static constexpr std::size_t LogDataLength = 4;
 
@@ -92,7 +91,7 @@ class TOC : public QObject
         static constexpr uint8_t StartBlock     = 0x03;
     };
 
-    // TOC packet
+    // TOC packet Parameter Toc
     static constexpr std::size_t TOCCommandByte = 0;
     static constexpr std::size_t TOCElementIDByte= 1;
     static constexpr std::size_t TOCElementTypeByte = 2;
@@ -114,7 +113,7 @@ public:
 //    bool StopLogging(std::string name);
 //    bool IsLogging(std::string name);
 
-    double DoubleValue(std::string name);
+    float DoubleValue(std::string name);
 
 
     void ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets);

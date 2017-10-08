@@ -131,10 +131,9 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
             tocElement.name = name;
             tocElement.id = data.at(TOCElementIDByte);
             tocElement.type = static_cast<ElementType>(data.at(TOCElementTypeByte));
-            tocElement.isLogging = false;
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
-//            std::cout << "process item " << name << std::endl;
+            std::cout << "process item " <<   static_cast<int>(tocElement.id )<< " " <<name << std::endl;
             return true;
         }
     }
@@ -185,7 +184,7 @@ bool TOC::StartLogging(std::string name, std::string blockName)
 //    // TODO: Implement me.
 //}
 
-double TOC::DoubleValue(std::string name)
+float TOC::DoubleValue(std::string name)
 {
     bool found;
     auto & result = STLUtils::ElementForName(_TOCElements, name, found);
@@ -219,8 +218,6 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     auto const & dataReceived = received->GetData();
     if(receivedPacketIsValid && dataReceived.size() > 3)
     {
-        std::cout << "block id = " << static_cast<int>(id) << std::endl;
-        received->PrintData();
         if(dataReceived.at(LogControlCommandByte) == 0x00 &&
                 dataReceived.at(LogControlBlockIDByte) == id &&
                 dataReceived.at(LogControlEndByte) == 0x00)
@@ -294,10 +291,12 @@ void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
         int blockID = data.at(LogBlockIDByte);
         const std::vector<uint8_t> logdataVect(data.begin() + LogDataLength, data.end());
         bool found;
+        // Check if the one packet is in the logging block
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
         if(found)
         {
             int offset = 0;
+            // Distribute the content of the packet to the toc elements that are in the logging block.
             for(auto const & elementID : logBlock.elementIDs )
             {
                 TOCElement & element = STLUtils::ElementForID(_TOCElements, elementID , found);

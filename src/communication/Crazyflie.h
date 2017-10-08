@@ -221,7 +221,7 @@ private:
     void DisableAltimeterLogging();
 
     void UpateSensorValues();
-    double GetSensorValue(std::string name);
+    float GetSensorValue(std::string name);
 
 
 };

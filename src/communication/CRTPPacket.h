@@ -80,7 +80,7 @@ enum class Port{
     Link = 15
 };
 
-// TODO SF:: Channel definition depen on the port!
+// TODO SF:: Channel definition depend on the port!
 enum class Channel{
     TOC = 0,
     LogControl = 1,

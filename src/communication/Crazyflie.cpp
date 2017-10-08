@@ -164,8 +164,9 @@ void Crazyflie::Update()
         else
         {
 
-            bool success = ReadTOCParameters();
-            if(success)
+//            bool success = ReadTOCParameters();
+//            if(success)
+            if(true)
             {
                 _state =State:: READ_LOGS_TOC;
             }
@@ -408,7 +409,7 @@ bool Crazyflie::IsSendingVelocityRef()
     return _isSendingVelocityRef;
 }
 
-double Crazyflie::GetSensorValue(std::string strName)
+float Crazyflie::GetSensorValue(std::string strName)
 {
     return _tocLogs.DoubleValue(strName);
 }
