@@ -434,9 +434,9 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
                 {
                     _loggingPackets.emplace_back(packet);
                 }
-             }
                 break;
             }
+
             case Port::Commander:
             case Port::Debug:
             case Port::Link:

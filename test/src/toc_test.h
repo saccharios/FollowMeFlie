@@ -29,12 +29,12 @@ public:
          // Generate two packets
          auto data1 = ConvertTouint8_tVect(num1);
          auto data2 = ConvertTouint8_tVect(num2);
-         std::vector<uint8_t> data = {0,blockID1,0,0,0};
+         std::vector<uint8_t> data = {blockID1,0,0,0};
          data.insert(std::end(data), std::begin(data1), std::end(data1));
          data.insert(std::end(data), std::begin(data2), std::end(data2));
          auto packet1 = std::make_shared<CRTPPacket>(_port, _channel, std::move(data));
          _packets.emplace_back(std::move(packet1));
-         std::vector<uint8_t> load =  {0,blockID2,0,0,0,int1, int2};
+         std::vector<uint8_t> load =  {blockID2,0,0,0,int1, int2};
          auto packet2 = std::make_shared<CRTPPacket>(_port, _channel,std::move(load));
          _packets.emplace_back(std::move(packet2));
      }
