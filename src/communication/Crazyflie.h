@@ -184,7 +184,6 @@ private:
     State _state;
 
     TOC _tocParameters;
-    TOC _tocLogs;
     TOC_LOG::TocLog _logger;
 
     Negative_Edge_Detector _leaveConnectingState;
@@ -195,7 +194,6 @@ private:
     static constexpr float _frequency = 1000.0;
 
     bool ReadTOCParameters();
-    bool ReadTOCLogs();
     bool ReadLogger();
     bool SendSetpoint(SetPoint setPoint);
 

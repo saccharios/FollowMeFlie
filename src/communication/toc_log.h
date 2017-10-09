@@ -160,6 +160,8 @@ public:
 
     bool StartLogging(std::string name, std::string blockName);
 
+    float Value(std::string name);
+
 private:
     std::string ExtractName(Data const & data);
     bool AddElement( CrazyRadio::sptrPacket && packet);

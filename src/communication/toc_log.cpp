@@ -348,7 +348,12 @@ void TocLog::ProcessPackets()
     }
 }
 
-
+float TocLog::Value(std::string name)
+{
+    bool found;
+    auto & result = STLUtils::ElementForName(_elements, name, found);
+    return (found ? result.value : 0);
+}
 
 
 

@@ -42,7 +42,6 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _startConnecting(false),
     _state (State::ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
-    _tocLogs(_crazyRadio, Port::Log),
     _logger(_crazyRadio),
     _leaveConnectingState(),
     _sensorValues()
@@ -108,8 +107,7 @@ void Crazyflie::Update()
     case State::READ_LOGS_TOC:
     {
 
-        ReadLogger();
-        if(ReadTOCLogs())
+        if(ReadLogger())
         {
             _state = State::START_LOGGING;
         }
@@ -123,7 +121,11 @@ void Crazyflie::Update()
     }
     case State::ZERO_MEASUREMENTS:
     {
-        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+//        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+
+        _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        _logger.ProcessPackets();
+
         _crazyRadio.SendPingPacket();
         // NOTE(winkler): Here, we can do measurement zero'ing. This is
         // not done at the moment, though. Reason: No readings to zero at
@@ -153,7 +155,7 @@ void Crazyflie::Update()
     case State::NORMAL_OPERATION:
     {
         // Shove over the sensor readings from the radio to the Logs TOC.
-        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+//        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
         _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
         _logger.ProcessPackets();
 
@@ -210,19 +212,7 @@ bool Crazyflie::ReadTOCParameters()
     return false;
 }
 
-bool Crazyflie::ReadTOCLogs()
-{
-    auto meta_ok = _tocLogs.RequestMetaData();
-    if(meta_ok)
-    {
-        auto req = _tocLogs.RequestItems();
-        if(req)
-        {
-            return true;
-        }
-    }
-    return false;
-}
+
 bool Crazyflie::ReadLogger()
 {
     auto meta_ok = _logger.RequestInfo();
@@ -414,8 +404,8 @@ void Crazyflie::StopLogging()
 
 void Crazyflie::DisableLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("high-speed");
-    _tocLogs.UnregisterLoggingBlock("low-speed");
+    _logger.UnregisterLoggingBlock("high-speed");
+    _logger.UnregisterLoggingBlock("low-speed");
 }
 
 void Crazyflie::SetSendSetpoints(bool sendSetpoints)
@@ -438,18 +428,12 @@ bool Crazyflie::IsSendingVelocityRef()
 
 float Crazyflie::GetSensorValue(std::string strName)
 {
-    return _tocLogs.DoubleValue(strName);
+    return _logger.Value(strName);
 }
 
 
 void Crazyflie::EnableStabilizerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("stabilizer", _frequency);
-    _tocLogs.StartLogging("stabilizer.roll", "stabilizer");
-    _tocLogs.StartLogging("stabilizer.pitch", "stabilizer");
-    _tocLogs.StartLogging("stabilizer.yaw", "stabilizer");
-    _tocLogs.StartLogging("stabilizer.thrust", "stabilizer");
-
     _logger.RegisterLoggingBlock("stabilizer", _frequency);
     _logger.StartLogging("stabilizer.roll", "stabilizer");
     _logger.StartLogging("stabilizer.pitch", "stabilizer");
@@ -459,11 +443,6 @@ void Crazyflie::EnableStabilizerLogging()
 
 void Crazyflie::EnableGyroscopeLogging()
 {
-    _tocLogs.RegisterLoggingBlock("gyroscope", _frequency);
-    _tocLogs.StartLogging("gyro.x", "gyroscope");
-    _tocLogs.StartLogging("gyro.y", "gyroscope");
-    _tocLogs.StartLogging("gyro.z", "gyroscope");
-
     _logger.RegisterLoggingBlock("gyroscope", _frequency);
     _logger.StartLogging("gyro.x", "gyroscope");
     _logger.StartLogging("gyro.y", "gyroscope");
@@ -472,12 +451,6 @@ void Crazyflie::EnableGyroscopeLogging()
 
 void Crazyflie::EnableAccelerometerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("accelerometer", _frequency);
-    _tocLogs.StartLogging("acc.x", "accelerometer");
-    _tocLogs.StartLogging("acc.y", "accelerometer");
-    _tocLogs.StartLogging("acc.z", "accelerometer");
-    _tocLogs.StartLogging("acc.zw", "accelerometer");
-
     _logger.RegisterLoggingBlock("accelerometer", _frequency);
     _logger.StartLogging("acc.x", "accelerometer");
     _logger.StartLogging("acc.y", "accelerometer");
@@ -488,24 +461,21 @@ void Crazyflie::EnableAccelerometerLogging()
 
 void Crazyflie::DisableStabilizerLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("stabilizer");
+    _logger.UnregisterLoggingBlock("stabilizer");
 }
 
 void Crazyflie::DisableGyroscopeLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("gyroscope");
+    _logger.UnregisterLoggingBlock("gyroscope");
 }
 
 void Crazyflie::DisableAccelerometerLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("accelerometer");
+    _logger.UnregisterLoggingBlock("accelerometer");
 }
 
 void Crazyflie::EnableBatteryLogging()
 {
-    _tocLogs.RegisterLoggingBlock("battery", _frequency);
-    _tocLogs.StartLogging("pm.vbat", "battery");
-    _tocLogs.StartLogging("pm.state", "battery");
     _logger.RegisterLoggingBlock("battery", _frequency);
     _logger.StartLogging("pm.vbat", "battery");
     _logger.StartLogging("pm.state", "battery");
@@ -513,16 +483,11 @@ void Crazyflie::EnableBatteryLogging()
 
 void Crazyflie::DisableBatteryLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("battery");
+    _logger.UnregisterLoggingBlock("battery");
 }
 
 void Crazyflie::EnableMagnetometerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("magnetometer", _frequency);
-    _tocLogs.StartLogging("mag.x", "magnetometer");
-    _tocLogs.StartLogging("mag.y", "magnetometer");
-    _tocLogs.StartLogging("mag.z", "magnetometer");
-
     _logger.RegisterLoggingBlock("magnetometer", _frequency);
     _logger.StartLogging("mag.x", "magnetometer");
     _logger.StartLogging("mag.y", "magnetometer");
@@ -531,17 +496,11 @@ void Crazyflie::EnableMagnetometerLogging()
 
 void Crazyflie::DisableMagnetometerLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("magnetometer");
+    _logger.UnregisterLoggingBlock("magnetometer");
 }
 
 void Crazyflie::EnableBarometerLogging()
 {
-    _tocLogs.RegisterLoggingBlock("barometer", _frequency);
-    _tocLogs.StartLogging("baro.asl", "altimeter");
-    _tocLogs.StartLogging("baro.aslLong", "altimeter");
-    _tocLogs.StartLogging("baro.pressure", "altimeter");
-    _tocLogs.StartLogging("baro.temperature", "altimeter");
-
     _logger.RegisterLoggingBlock("barometer", _frequency);
     _logger.StartLogging("baro.asl", "altimeter");
     _logger.StartLogging("baro.aslLong", "altimeter");
@@ -551,7 +510,7 @@ void Crazyflie::EnableBarometerLogging()
 
 void Crazyflie::DisableAltimeterLogging()
 {
-    _tocLogs.UnregisterLoggingBlock("barometer");
+    _logger.UnregisterLoggingBlock("barometer");
 }
 
 
