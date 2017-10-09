@@ -49,6 +49,13 @@ CRTPPacket:: CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data
     _channel(channel)
 {}
 
+CRTPPacket:: CRTPPacket(Port port, uint8_t channel, std::vector<uint8_t> && data) :
+     _data (data),
+     _port (port),
+     _channel(static_cast<Channel>(channel))
+ {}
+
+
 std::vector<uint8_t> const & CRTPPacket::GetData() const
 {
     return _data;

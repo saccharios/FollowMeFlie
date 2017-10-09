@@ -43,6 +43,7 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _state (State::ZERO),
     _tocParameters(_crazyRadio, Port::Parameters),
     _tocLogs(_crazyRadio, Port::Log),
+    _logger(_crazyRadio),
     _leaveConnectingState(),
     _sensorValues()
 {}
@@ -51,82 +52,6 @@ Crazyflie::~Crazyflie()
 {
     StopLogging();
 }
-
-bool Crazyflie::ReadTOCParameters()
-{
-    if(_tocParameters.RequestMetaData() )
-    {
-        if(_tocParameters.RequestItems())
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Crazyflie::ReadTOCLogs()
-{
-    auto meta_ok = _tocLogs.RequestMetaData();
-    if(meta_ok)
-    {
-        auto req = _tocLogs.RequestItems();
-        if(req)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Crazyflie::SendSetpoint(SetPoint setPoint)
-{
-    // In python client, this line implementes the x-mode
-    auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
-    auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
-
-    auto data = ConvertTouint8_tVect(roll);
-    auto pitchVect = ConvertTouint8_tVect( -pitch); // Warning: Is negated here.
-    auto yawVect = ConvertTouint8_tVect(setPoint.yaw);
-    auto thrustVect = ConvertTouint8_tVect(setPoint.thrust);
-
-    data.insert(data.end(), pitchVect.begin(), pitchVect.end());
-    data.insert(data.end(), yawVect.begin(), yawVect.end());
-    data.insert(data.end(), thrustVect.begin(), thrustVect.end());
-
-    CRTPPacket  packet(Port::Commander,Channel::TOC, std::move(data));
-
-    return _crazyRadio.SendPacketAndCheck(std::move(packet));
-}
-
-bool  Crazyflie::SendVelocityRef(Velocity velocity)
-{
-    // TODO SF  also x -mode?
-    std::vector<uint8_t> data;
-    uint8_t inidicator = 1;
-    auto vx_vect = ConvertTouint8_tVect(velocity[0]);
-    auto vy_vect = ConvertTouint8_tVect(velocity[1]);
-    auto vz_vect = ConvertTouint8_tVect(velocity[2]);
-    auto yaw_vect = ConvertTouint8_tVect(0.0f);
-    data.push_back(inidicator);
-    data.insert(data.end(), vx_vect.begin(), vx_vect.end());
-    data.insert(data.end(), vy_vect.begin(), vy_vect.end());
-    data.insert(data.end(), vz_vect.begin(), vz_vect.end());
-    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
-
-    CRTPPacket  packet(Port::Commander_Generic,Channel::TOC, std::move(data));
-
-    return _crazyRadio.SendPacketAndCheck(std::move(packet));
-}
-
-
-
-void Crazyflie::StartConnecting(bool enable)
-{
-    _startConnecting = enable;
-}
-
 // Runs on 10ms.
 void Crazyflie::Update()
 {
@@ -182,6 +107,8 @@ void Crazyflie::Update()
     }
     case State::READ_LOGS_TOC:
     {
+
+        ReadLogger();
         if(ReadTOCLogs())
         {
             _state = State::START_LOGGING;
@@ -227,6 +154,8 @@ void Crazyflie::Update()
     {
         // Shove over the sensor readings from the radio to the Logs TOC.
         _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        _logger.ProcessPackets();
 
         if(_isSendingSetpoints)
         {
@@ -268,6 +197,104 @@ void Crazyflie::Update()
 
     UpateSensorValues();
 }
+bool Crazyflie::ReadTOCParameters()
+{
+    if(_tocParameters.RequestMetaData() )
+    {
+        if(_tocParameters.RequestItems())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Crazyflie::ReadTOCLogs()
+{
+    auto meta_ok = _tocLogs.RequestMetaData();
+    if(meta_ok)
+    {
+        auto req = _tocLogs.RequestItems();
+        if(req)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+bool Crazyflie::ReadLogger()
+{
+    auto meta_ok = _logger.RequestInfo();
+    if(meta_ok)
+    {
+        auto req = _logger.RequestItems();
+        if(req)
+        {
+            return true;
+        }
+        else
+        {
+            std::cout << "failed request items\n";
+            return false;
+        }
+    }
+    else
+    {
+        std::cout << "failed meta data\n";
+
+        return false;
+    }
+}
+
+bool Crazyflie::SendSetpoint(SetPoint setPoint)
+{
+    // In python client, this line implementes the x-mode
+    auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
+    auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
+
+    auto data = ConvertTouint8_tVect(roll);
+    auto pitchVect = ConvertTouint8_tVect( -pitch); // Warning: Is negated here.
+    auto yawVect = ConvertTouint8_tVect(setPoint.yaw);
+    auto thrustVect = ConvertTouint8_tVect(setPoint.thrust);
+
+    data.insert(data.end(), pitchVect.begin(), pitchVect.end());
+    data.insert(data.end(), yawVect.begin(), yawVect.end());
+    data.insert(data.end(), thrustVect.begin(), thrustVect.end());
+
+    CRTPPacket  packet(Port::Commander,Channel::TOC, std::move(data));
+
+    return _crazyRadio.SendPacketAndCheck(std::move(packet));
+}
+
+bool  Crazyflie::SendVelocityRef(Velocity velocity)
+{
+    // TODO SF  also x -mode?
+    std::vector<uint8_t> data;
+    uint8_t inidicator = 1;
+    auto vx_vect = ConvertTouint8_tVect(velocity[0]);
+    auto vy_vect = ConvertTouint8_tVect(velocity[1]);
+    auto vz_vect = ConvertTouint8_tVect(velocity[2]);
+    auto yaw_vect = ConvertTouint8_tVect(0.0f);
+    data.push_back(inidicator);
+    data.insert(data.end(), vx_vect.begin(), vx_vect.end());
+    data.insert(data.end(), vy_vect.begin(), vy_vect.end());
+    data.insert(data.end(), vz_vect.begin(), vz_vect.end());
+    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
+
+    CRTPPacket  packet(Port::Commander_Generic,Channel::TOC, std::move(data));
+
+    return _crazyRadio.SendPacketAndCheck(std::move(packet));
+}
+
+
+
+void Crazyflie::StartConnecting(bool enable)
+{
+    _startConnecting = enable;
+}
+
+
 
 void Crazyflie::UpateSensorValues()
 {
@@ -418,30 +445,44 @@ float Crazyflie::GetSensorValue(std::string strName)
 void Crazyflie::EnableStabilizerLogging()
 {
     _tocLogs.RegisterLoggingBlock("stabilizer", _frequency);
-
     _tocLogs.StartLogging("stabilizer.roll", "stabilizer");
     _tocLogs.StartLogging("stabilizer.pitch", "stabilizer");
     _tocLogs.StartLogging("stabilizer.yaw", "stabilizer");
     _tocLogs.StartLogging("stabilizer.thrust", "stabilizer");
+
+    _logger.RegisterLoggingBlock("stabilizer", _frequency);
+    _logger.StartLogging("stabilizer.roll", "stabilizer");
+    _logger.StartLogging("stabilizer.pitch", "stabilizer");
+    _logger.StartLogging("stabilizer.yaw", "stabilizer");
+    _logger.StartLogging("stabilizer.thrust", "stabilizer");
 }
 
 void Crazyflie::EnableGyroscopeLogging()
 {
     _tocLogs.RegisterLoggingBlock("gyroscope", _frequency);
-
     _tocLogs.StartLogging("gyro.x", "gyroscope");
     _tocLogs.StartLogging("gyro.y", "gyroscope");
     _tocLogs.StartLogging("gyro.z", "gyroscope");
+
+    _logger.RegisterLoggingBlock("gyroscope", _frequency);
+    _logger.StartLogging("gyro.x", "gyroscope");
+    _logger.StartLogging("gyro.y", "gyroscope");
+    _logger.StartLogging("gyro.z", "gyroscope");
 }
 
 void Crazyflie::EnableAccelerometerLogging()
 {
     _tocLogs.RegisterLoggingBlock("accelerometer", _frequency);
-
     _tocLogs.StartLogging("acc.x", "accelerometer");
     _tocLogs.StartLogging("acc.y", "accelerometer");
     _tocLogs.StartLogging("acc.z", "accelerometer");
     _tocLogs.StartLogging("acc.zw", "accelerometer");
+
+    _logger.RegisterLoggingBlock("accelerometer", _frequency);
+    _logger.StartLogging("acc.x", "accelerometer");
+    _logger.StartLogging("acc.y", "accelerometer");
+    _logger.StartLogging("acc.z", "accelerometer");
+    _logger.StartLogging("acc.zw", "accelerometer");
 }
 
 
@@ -463,9 +504,11 @@ void Crazyflie::DisableAccelerometerLogging()
 void Crazyflie::EnableBatteryLogging()
 {
     _tocLogs.RegisterLoggingBlock("battery", _frequency);
-
     _tocLogs.StartLogging("pm.vbat", "battery");
     _tocLogs.StartLogging("pm.state", "battery");
+    _logger.RegisterLoggingBlock("battery", _frequency);
+    _logger.StartLogging("pm.vbat", "battery");
+    _logger.StartLogging("pm.state", "battery");
 }
 
 void Crazyflie::DisableBatteryLogging()
@@ -476,10 +519,14 @@ void Crazyflie::DisableBatteryLogging()
 void Crazyflie::EnableMagnetometerLogging()
 {
     _tocLogs.RegisterLoggingBlock("magnetometer", _frequency);
-
     _tocLogs.StartLogging("mag.x", "magnetometer");
     _tocLogs.StartLogging("mag.y", "magnetometer");
     _tocLogs.StartLogging("mag.z", "magnetometer");
+
+    _logger.RegisterLoggingBlock("magnetometer", _frequency);
+    _logger.StartLogging("mag.x", "magnetometer");
+    _logger.StartLogging("mag.y", "magnetometer");
+    _logger.StartLogging("mag.z", "magnetometer");
 }
 
 void Crazyflie::DisableMagnetometerLogging()
@@ -494,6 +541,12 @@ void Crazyflie::EnableBarometerLogging()
     _tocLogs.StartLogging("baro.aslLong", "altimeter");
     _tocLogs.StartLogging("baro.pressure", "altimeter");
     _tocLogs.StartLogging("baro.temperature", "altimeter");
+
+    _logger.RegisterLoggingBlock("barometer", _frequency);
+    _logger.StartLogging("baro.asl", "altimeter");
+    _logger.StartLogging("baro.aslLong", "altimeter");
+    _logger.StartLogging("baro.pressure", "altimeter");
+    _logger.StartLogging("baro.temperature", "altimeter");
 }
 
 void Crazyflie::DisableAltimeterLogging()

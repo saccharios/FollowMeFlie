@@ -38,6 +38,8 @@
 #include <memory>
 #include "math/logic.h"
 #include "math/types.h"
+#include "toc_log.h"
+
 
 enum class State {
     ZERO = 0,
@@ -183,6 +185,7 @@ private:
 
     TOC _tocParameters;
     TOC _tocLogs;
+    TOC_LOG::TocLog _logger;
 
     Negative_Edge_Detector _leaveConnectingState;
 
@@ -193,7 +196,7 @@ private:
 
     bool ReadTOCParameters();
     bool ReadTOCLogs();
-
+    bool ReadLogger();
     bool SendSetpoint(SetPoint setPoint);
 
     bool SendVelocityRef(Velocity velocity);

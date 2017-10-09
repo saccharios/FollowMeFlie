@@ -49,11 +49,8 @@ enum class ElementType : uint8_t{
     FLOAT = 7
 };
 
-// Storage element for logged variable identities
 struct TOCElement {
-    //The numerical ID of the log element on the copters internal table
     uint8_t id;
-    //The (ref) type of the log element
     ElementType type;
     std::string name;
     float value;

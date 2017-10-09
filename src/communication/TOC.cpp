@@ -133,7 +133,7 @@ bool TOC::ProcessItem( CrazyRadio::sptrPacket && packet)
             tocElement.type = static_cast<ElementType>(data.at(TOCElementTypeByte));
             tocElement.value = 0;
             _TOCElements.emplace_back(tocElement);
-            std::cout << "process item " <<   static_cast<int>(tocElement.id )<< " " <<name << std::endl;
+//            std::cout << "process item " <<   static_cast<int>(tocElement.id )<< " " <<name << std::endl;
             return true;
         }
     }

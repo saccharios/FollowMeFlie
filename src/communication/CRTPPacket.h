@@ -94,6 +94,7 @@ class CRTPPacket {
 public:
     CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
     CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data) ;
+    CRTPPacket(Port port, uint8_t channel, std::vector<uint8_t> && data) ;
 
     // Disable copy/move ctor + copy/move assignment
     CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor

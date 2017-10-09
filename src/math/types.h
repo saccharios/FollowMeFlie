@@ -18,3 +18,6 @@ std::array<float,3> operator+(std::array<float,3> const & lhs, std::array<float,
 using Matrix12 = Eigen::Matrix<float,12,12>;
 
 
+using Data = std::vector<uint8_t>;
+
+
