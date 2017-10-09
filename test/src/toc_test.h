@@ -3,10 +3,10 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include "communication/TOC.h"
+#include "communication/toc_log.h"
 #include "communication/CRTPPacket.h"
 #include "communication/CrazyRadio.h"
 #include <memory>
-
 class TOC_Test : public testing::Test
 {
     // TOC_Test if friend of TOC
@@ -41,9 +41,9 @@ public:
 
 
 
-    void run_test_ok();
-    void run_test_id_not_found();
-
+    void Run_TestOk();
+    void Run_TestIDNotFound();
+    void Run_GetFirstFreeID();
 
 };
 
@@ -51,9 +51,13 @@ public:
 
 TEST_F(TOC_Test, ProcessLogPacketsOK)
 {
-    run_test_ok();
+    Run_TestOk();
 }
 TEST_F(TOC_Test, ProcessLogPacketsIDWrong)
 {
-    run_test_id_not_found();
+    Run_TestIDNotFound();
+}
+TEST_F(TOC_Test, GetFirstFreeID)
+{
+    Run_GetFirstFreeID();
 }

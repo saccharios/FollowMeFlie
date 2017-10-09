@@ -184,7 +184,7 @@ private:
     State _state;
 
     TOC _tocParameters;
-    TOC_LOG::TocLog _logger;
+    TocLog _logger;
 
     Negative_Edge_Detector _leaveConnectingState;
 

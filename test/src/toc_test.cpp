@@ -1,7 +1,7 @@
 #include "toc_test.h"
 
 
-void TOC_Test::run_test_ok()
+void TOC_Test::Run_TestOk()
 {
     CrazyRadio crazyRadio;
     TOC toc(crazyRadio, _port);
@@ -48,7 +48,7 @@ void TOC_Test::run_test_ok()
     EXPECT_FLOAT_EQ(toc._TOCElements.at(3).value, num2);
 }
 
-void TOC_Test::run_test_id_not_found()
+void TOC_Test::Run_TestIDNotFound()
 {
     CrazyRadio crazyRadio;
     TOC toc(crazyRadio, _port);
@@ -88,5 +88,33 @@ void TOC_Test::run_test_id_not_found()
     toc._TOCElements.push_back(tocElement);
 
     EXPECT_DEATH(toc.ProcessLogPackets(_packets),"");
-
 }
+
+void TOC_Test::Run_GetFirstFreeID()
+{
+    CrazyRadio crazyRadio;
+    TocLog toc(crazyRadio);
+    // Setup TOC
+
+    TocLog::LoggingBlock block1;
+    block1.id = 0;
+    TocLog::LoggingBlock block2;
+    block2.id = 1;
+    TocLog::LoggingBlock block3;
+    block3.id = 3;
+    toc._loggingBlocks.emplace_back(block1);
+    toc._loggingBlocks.emplace_back(block2);
+    toc._loggingBlocks.emplace_back(block3);
+
+    auto id = toc.GetFirstFreeID();
+    EXPECT_EQ(id, 2);
+    TocLog::LoggingBlock block4;
+    block4.id = 2;
+    toc._loggingBlocks.emplace_back(block4);
+    id = toc.GetFirstFreeID();
+    EXPECT_EQ(id, 4);
+}
+
+
+
+

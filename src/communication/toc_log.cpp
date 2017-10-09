@@ -1,9 +1,6 @@
 #include "toc_log.h"
 #include "types.h"
 #include "stl_utils.h"
-namespace TOC_LOG
-{
-
 
 bool TocLog::RequestInfo()
 {
@@ -114,17 +111,7 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
     assert(frequency > 0);
     // Preparation
     UnregisterLoggingBlock(name);
-    //    uint8_t id = 0;
-    //    bool isContained =  true;
-    //    while(isContained)
-    //    {
-    //        STLUtils::ElementForID(_loggingBlocks, id, isContained);
-    //        if(isContained)
-    //        {
-    //            id++;
-    //        }
-    //    }
-    //    UnregisterLoggingBlockID(id);
+
     uint8_t id = GetFirstFreeID();
 
     // Regiter new block
@@ -357,12 +344,3 @@ float TocLog::Value(std::string name)
 
 
 
-
-
-
-
-
-
-
-
-}

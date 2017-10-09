@@ -2,13 +2,10 @@
 #include "toc_base.h"
 #include "CRTPPacket.h"
 #include "math/types.h"
-namespace TOC_LOG
-{
-
-
 
 class TocLog : public TocBase
 {
+    friend class TOC_Test; // Is friend for white-box testing.
     using Base = TocBase;
     struct Channels
     {
@@ -178,4 +175,3 @@ private:
 
 
 };
-}
