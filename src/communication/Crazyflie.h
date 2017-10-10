@@ -45,9 +45,8 @@ enum class State {
     ZERO = 0,
     READ_PARAMETERS_TOC = 1,
     READ_LOGS_TOC = 2,
-    START_LOGGING = 3,
-    ZERO_MEASUREMENTS = 4,
-    NORMAL_OPERATION = 5
+    ZERO_MEASUREMENTS = 3,
+    NORMAL_OPERATION = 4
 };
 
 struct SetPoint
@@ -183,7 +182,7 @@ private:
     bool _startConnecting;
     State _state;
 
-    TOC _tocParameters;
+    TocParameter _parameters;
     TocLog _logger;
 
     Negative_Edge_Detector _leaveConnectingState;

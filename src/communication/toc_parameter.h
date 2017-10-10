@@ -1,11 +1,7 @@
-#ifndef TOC_PARAMETER_H
-#define TOC_PARAMETER_H
+#pragma once
 
-
-class toc_parameter
+class TocParameter
 {
 public:
-    toc_parameter();
+    TocParameter();
 };
-
-#endif // TOC_PARAMETER_H

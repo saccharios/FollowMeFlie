@@ -88,10 +88,9 @@ void Crazyflie::Update()
         }
         else
         {
-
-//            bool success = ReadTOCParameters();
-//            if(success)
-            if(true)
+            // Setup Parameter TOC
+            bool success = ReadTOCParameters();
+            if(success)
             {
                 _state =State:: READ_LOGS_TOC;
             }
@@ -107,17 +106,12 @@ void Crazyflie::Update()
     }
     case State::READ_LOGS_TOC:
     {
-
+        // Setup Logging TOC
         if(ReadLogger())
         {
-            _state = State::START_LOGGING;
+            StartLogging();
+            _state = State::ZERO_MEASUREMENTS;
         }
-        break;
-    }
-    case State::START_LOGGING:
-    {
-        StartLogging();
-        _state = State::ZERO_MEASUREMENTS;
         break;
     }
     case State::ZERO_MEASUREMENTS:
@@ -200,38 +194,47 @@ void Crazyflie::Update()
 }
 bool Crazyflie::ReadTOCParameters()
 {
-    if(_tocParameters.RequestMetaData() )
+    bool  info_ok = _parameters.RequestInfo();
+    if(info_ok)
     {
-        if(_tocParameters.RequestItems())
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-bool Crazyflie::ReadLogger()
-{
-    auto meta_ok = _logger.RequestInfo();
-    if(meta_ok)
-    {
-        auto req = _logger.RequestItems();
-        if(req)
+        bool items_ok = _parameters.RequestItems();
+        if(items_ok)
         {
             return true;
         }
         else
         {
-            std::cout << "failed request items\n";
+            std::cout << "Parameter TOC: Failed to get items\n";
             return false;
         }
     }
     else
     {
-        std::cout << "failed meta data\n";
+        std::cout << "Parameter TOC: Failed to get info\n";
+        return false;
+    }
+}
 
+
+bool Crazyflie::ReadLogger()
+{
+    bool  info_ok = _logger.RequestInfo();
+    if(info_ok)
+    {
+        bool items_ok = _logger.RequestItems();
+        if(items_ok)
+        {
+            return true;
+        }
+        else
+        {
+            std::cout << "Logger TOC: Failed to get items\n";
+            return false;
+        }
+    }
+    else
+    {
+        std::cout << "Logger TOC: Failed to get info\n";
         return false;
     }
 }
