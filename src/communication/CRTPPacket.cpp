@@ -29,8 +29,11 @@
 #include "CRTPPacket.h"
 #include <vector>
 #include <iostream>
+#include "math/types.h"
+
+
 template<>
-float ExtractData<float>(std::vector<uint8_t> const & data, int offset)
+float ExtractData<float>(Data const & data, int offset)
 {
     constexpr int typeLength = sizeof(float);
     uint32_t bits = 0;
@@ -43,20 +46,20 @@ float ExtractData<float>(std::vector<uint8_t> const & data, int offset)
 }
 
 
-CRTPPacket:: CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data) :
+CRTPPacket:: CRTPPacket(Port port, Channel channel, Data && data) :
     _data (data),
     _port (port),
     _channel(channel)
 {}
 
-CRTPPacket:: CRTPPacket(Port port, uint8_t channel, std::vector<uint8_t> && data) :
+CRTPPacket:: CRTPPacket(Port port, uint8_t channel, Data && data) :
      _data (data),
      _port (port),
      _channel(static_cast<Channel>(channel))
  {}
 
 
-std::vector<uint8_t> const & CRTPPacket::GetData() const
+Data const & CRTPPacket::GetData() const
 {
     return _data;
 }

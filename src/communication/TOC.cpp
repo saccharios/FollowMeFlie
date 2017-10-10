@@ -32,20 +32,23 @@
 #include "CRTPPacket.h"
 #include <iostream>
 #include "error_codes.h"
+#include "math/types.h"
+#include "math/types.h"
+
 
 TOC::TOC(CrazyRadio & crazyRadio, Port port) : _crazyRadio(crazyRadio), _port(port), _itemCount(0)
 {}
 
 bool TOC::SendTOCPointerReset()
 {
-    std::vector<uint8_t> data = {0};
+    Data data = {0};
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     return  _crazyRadio.SendPacketAndCheck(std::move(packet));
 }
 
 bool TOC::RequestMetaData()
 {
-    std::vector<uint8_t> data = {1}; // TODO SF : Should this be 3?
+    Data data = {1}; // TODO SF : Should this be 3?
     CRTPPacket packet(_port, Channel::TOC, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
@@ -88,7 +91,7 @@ bool TOC::RequestItem(uint8_t id)
     return RequestItem({0, id});
 }
 
-bool TOC::RequestItem(std::vector<uint8_t> && data)
+bool TOC::RequestItem(Data && data)
 {
     CRTPPacket  packet(_port, Channel::TOC, std::move(data));
     bool receivedPacketIsValid = false;
@@ -151,7 +154,7 @@ bool TOC::StartLogging(std::string name, std::string blockName)
         TOCElement & element = STLUtils::ElementForName(_TOCElements, name, isContained);
         if(isContained)
         {
-            std::vector<uint8_t> data = {LogCmds::AppendBlock, logBlock.id, static_cast<uint8_t>(element.type), element.id};
+            Data data = {LogCmds::AppendBlock, logBlock.id, static_cast<uint8_t>(element.type), element.id};
             CRTPPacket logPacket(_port, Channel::LogControl, std::move(data));
             bool receivedPacketIsValid  = false;
             auto received = _crazyRadio.SendAndReceive(std::move(logPacket), receivedPacketIsValid);
@@ -210,7 +213,7 @@ bool TOC::RegisterLoggingBlock(std::string name, double frequency)
     UnregisterLoggingBlockID(id);
     // Regiter new block
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / frequency);// The sampling rate is in 100us units
-    std::vector<uint8_t> data =  {LogCmds::CreateBlock, id, samplingRate};
+    Data data =  {LogCmds::CreateBlock, id, samplingRate};
     CRTPPacket registerBlock(_port, Channel::LogControl, std::move(data));
 
     bool receivedPacketIsValid = false;
@@ -243,7 +246,7 @@ bool TOC::EnableLogging(std::string blockName)
     if(isContained)
     {
         uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / logBlock.frequency);// The sampling rate is in 100us units
-        std::vector<uint8_t> data =  {LogCmds::StartBlock, logBlock.id, samplingRate};
+        Data data =  {LogCmds::StartBlock, logBlock.id, samplingRate};
 
         CRTPPacket enablePacket(_port, Channel::LogControl, std::move(data));
 
@@ -271,7 +274,7 @@ bool TOC::UnregisterLoggingBlock(std::string name)
 
 bool TOC::UnregisterLoggingBlockID(int id)
 {
-    std::vector<uint8_t> data = {LogCmds::DeleteBlock, static_cast<uint8_t>(id)};
+    Data data = {LogCmds::DeleteBlock, static_cast<uint8_t>(id)};
     CRTPPacket unregisterBlock(_port, Channel::LogControl, std::move(data));
     bool receivedPacketIsValid = false;
     _crazyRadio.SendAndReceive(std::move(unregisterBlock), receivedPacketIsValid);
@@ -289,7 +292,7 @@ void TOC::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
             break;
         }
         int blockID = data.at(LogBlockIDByte);
-        const std::vector<uint8_t> logdataVect(data.begin() + LogDataLength, data.end());
+        const Data logdataVect(data.begin() + LogDataLength, data.end());
         bool found;
         // Check if the one packet is in the logging block
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);

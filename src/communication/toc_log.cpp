@@ -1,12 +1,13 @@
 #include "toc_log.h"
 #include "types.h"
 #include "stl_utils.h"
+#include "math/types.h"
 
 bool TocLog::RequestInfo()
 {
 
     using channel = Channels::Access;
-    std::vector<uint8_t> data = {channel::Commands::GetInfo::id};
+    Data data = {channel::Commands::GetInfo::id};
     CRTPPacket packet(Port::Log, channel::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
@@ -43,7 +44,7 @@ bool TocLog::RequestItem(uint8_t id)
 {
     using channel = Channels::Access;
 
-    std::vector<uint8_t> data = {channel::Commands::GetItem::id,id};
+    Data data = {channel::Commands::GetItem::id,id};
     CRTPPacket  packet(Port::Log, channel::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);

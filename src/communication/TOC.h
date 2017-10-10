@@ -61,7 +61,7 @@ struct LoggingBlock {
     std::string name;
     uint8_t id;
     double frequency;
-    std::vector<uint8_t> elementIDs;
+    Data elementIDs;
 };
 
 
@@ -125,7 +125,7 @@ private:
     std::vector<LoggingBlock> _loggingBlocks;
 
     bool RequestInitialItem();
-    bool RequestItem(std::vector<uint8_t> && data);
+    bool RequestItem(Data && data);
     bool RequestItem(uint8_t id);
     bool ProcessItem(CrazyRadio::sptrPacket && packet);
 

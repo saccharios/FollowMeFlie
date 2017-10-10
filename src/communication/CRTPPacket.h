@@ -35,17 +35,18 @@
 #include <cstring>
 #include <vector>
 #include <stdint.h>
+#include "math/types.h"
 
 
 // Convert to vector<uint8_t>
 template<typename T>
-std::vector<uint8_t> ConvertTouint8_tVect(T element)
+Data ConvertTouint8_tVect(T element)
 {
     // Reinterpret element as array of 8-byte uint8_t
     uint8_t* uint8_t_array = reinterpret_cast<uint8_t *>(&element);
     // Create vector from the array
     constexpr int size = sizeof(T) / sizeof(uint8_t);
-    std::vector<uint8_t> result;
+    Data result;
     for(int i = 0; i < size; ++i)
     {
         result.push_back(uint8_t_array[i]);
@@ -55,7 +56,7 @@ std::vector<uint8_t> ConvertTouint8_tVect(T element)
 
 // Convert from vector<uint8_t> to given type
 template<typename T>
-T ExtractData(std::vector<uint8_t> const & data, int offset)
+T ExtractData(Data const & data, int offset)
 {
     int typeLength = sizeof(T);
     T bits = 0;
@@ -67,7 +68,7 @@ T ExtractData(std::vector<uint8_t> const & data, int offset)
     return value;
 }
 template<>
-float ExtractData<float>(std::vector<uint8_t> const & data, int offset);
+float ExtractData<float>(Data const & data, int offset);
 
 
 enum class Port{
@@ -93,8 +94,8 @@ class CRTPPacket {
 
 public:
     CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
-    CRTPPacket(Port port, Channel channel, std::vector<uint8_t> && data) ;
-    CRTPPacket(Port port, uint8_t channel, std::vector<uint8_t> && data) ;
+    CRTPPacket(Port port, Channel channel, Data && data) ;
+    CRTPPacket(Port port, uint8_t channel, Data && data) ;
 
     // Disable copy/move ctor + copy/move assignment
     CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
@@ -103,7 +104,7 @@ public:
     CRTPPacket& operator=(CRTPPacket&&) & = default;       // Move assignment operator
 
 
-    std::vector<uint8_t> const & GetData() const;
+    Data const & GetData() const;
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
@@ -122,7 +123,7 @@ public:
 
 private:
     // Internal storage pointer for payload data inside the  packet
-    std::vector<uint8_t> _data;
+    Data _data;
     // The copter port the packet will be delivered to
     Port _port;
     // The copter channel the packet will be delivered to

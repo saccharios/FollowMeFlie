@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include "communication/CRTPPacket.h"
+#include "math/types.h"
 
 
 class CRTPPacketTest : public ::testing::Test
@@ -14,7 +15,7 @@ private:
 TEST_F(CRTPPacketTest, Construction)
 {
 
-    std::vector<uint8_t> data;
+    Data data;
     data.push_back(0);
     data.push_back(1);
     data.push_back(2);
@@ -117,7 +118,7 @@ TEST_F(CRTPPacketTest, ReconstructData)
     auto myVect1 = ConvertTouint8_tVect(num[0]);
     auto myVect2 = ConvertTouint8_tVect(num[1]);
     auto myVect3 = ConvertTouint8_tVect(num[2]);
-    std::vector<uint8_t> myVect;
+    Data myVect;
     myVect.insert(std::end(myVect), std::begin(myVect1), std::end(myVect1));
     myVect.insert(std::end(myVect), std::begin(myVect2), std::end(myVect2));
     myVect.insert(std::end(myVect), std::begin(myVect3), std::end(myVect3));
@@ -137,7 +138,7 @@ TEST_F(CRTPPacketTest, ReconstructData)
 }
 //TEST_F(CRTPPacketTest, TimerCopyCtorVsMoveCtor)
 //{
-//    std::vector<uint8_t> data;
+//    Data data;
 //    data.push_back(0);
 //    data.push_back(1);
 //    data.push_back(2);
@@ -162,7 +163,7 @@ TEST_F(CRTPPacketTest, ReconstructData)
 //}
 TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
 {
-    std::vector<uint8_t> data;
+    Data data;
     data.push_back(0);
     data.push_back(1);
     data.push_back(2);

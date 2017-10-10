@@ -30,6 +30,7 @@
 #include <chrono>
 #undef _GLIBCXX_HAS_GTHREADS
 #include "../../../mingw_std_threads/mingw.thread.h"
+#include "math/types.h"
 
 
 
@@ -477,7 +478,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             Channel channel = static_cast<Channel>(buffer[1] & 0b00000011);
 
             // Actual data starts at buffer[2]
-            std::vector<uint8_t> data;
+            Data data;
             for(int i = 2; i < bytesRead+1; ++i)
             {
                 data.push_back(buffer[i]); // TODO SF: a) start reading buffer at position 2, b) stop reading at bytes Read. Change hard-coded data.at(i) with i being an enum or so with a meaning. Check data structure for logging packets, and parameter packets.
@@ -590,7 +591,7 @@ bool CrazyRadio::LastSendAndReceiveFailed() const
 void CrazyRadio::ReadParameter()
 {
 
-    std::vector<uint8_t> data ={0,14}; // TODO SF:: Why need to add a preceding 0?
+    Data data ={0,14}; // TODO SF:: Why need to add a preceding 0?
     CRTPPacket packet(Port::Parameters, Channel::TOC, std::move(data)); // Channel 1 for reading - how to solve multiple channel assignments?
     bool receivedPacketIsValid = false;
     sptrPacket received = SendAndReceive(std::move(packet), receivedPacketIsValid);
@@ -614,7 +615,7 @@ void CrazyRadio::ReadParameter()
 
         }
     }
-        std::vector<uint8_t> data2 ={14}; // Here no preceding 0 is needed!
+        Data data2 ={14}; // Here no preceding 0 is needed!
     CRTPPacket packet2(Port::Parameters, Channel::LogControl, std::move(data2)); // Channel 1 for reading - how to solve multiple channel assignments?
     receivedPacketIsValid = false;
     sptrPacket received2 = SendAndReceive(std::move(packet2), receivedPacketIsValid);

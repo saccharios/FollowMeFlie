@@ -29,6 +29,7 @@
 #include "Crazyflie.h"
 #include <chrono>
 #include "math/constants.h"
+#include "math/types.h"
 
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
@@ -258,7 +259,7 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
 bool  Crazyflie::SendVelocityRef(Velocity velocity)
 {
     // TODO SF  also x -mode?
-    std::vector<uint8_t> data;
+    Data data;
     uint8_t inidicator = 1;
     auto vx_vect = ConvertTouint8_tVect(velocity[0]);
     auto vy_vect = ConvertTouint8_tVect(velocity[1]);
