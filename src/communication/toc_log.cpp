@@ -180,9 +180,22 @@ bool TocLog::UnregisterLoggingBlockID(uint8_t id)
 
 uint8_t TocLog::GetFirstFreeID()
 {
-    static uint8_t i = -1;
-    ++i;
-    return i;
+    std::vector<LoggingBlock>  vec = _loggingBlocks;
+    // Sort ascending
+    std::sort(vec.begin(), vec.end(), [](LoggingBlock a, LoggingBlock b) {
+        return b.id > a.id;
+    });
+    uint8_t next = 0;
+    for( LoggingBlock const & block : vec)
+    {
+        if (block.id != next)
+        {
+            return next;
+        }
+        ++next;
+    }
+
+    return next;
 }
 
 bool TocLog::StartLogging(std::string name, std::string blockName)

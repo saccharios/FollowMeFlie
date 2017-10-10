@@ -94,8 +94,12 @@ void TOC_Test::Run_GetFirstFreeID()
 {
     CrazyRadio crazyRadio;
     TocLog toc(crazyRadio);
-    // Setup TOC
 
+    // Empty logginBlocks Vector
+    int id = toc.GetFirstFreeID();
+    EXPECT_EQ(0,id);
+
+    // Setup TOC
     TocLog::LoggingBlock block1;
     block1.id = 0;
     TocLog::LoggingBlock block2;
@@ -106,13 +110,13 @@ void TOC_Test::Run_GetFirstFreeID()
     toc._loggingBlocks.emplace_back(block2);
     toc._loggingBlocks.emplace_back(block3);
 
-    auto id = toc.GetFirstFreeID();
-    EXPECT_EQ(id, 2);
+    id = toc.GetFirstFreeID();
+    EXPECT_EQ(2, id);
     TocLog::LoggingBlock block4;
     block4.id = 2;
     toc._loggingBlocks.emplace_back(block4);
     id = toc.GetFirstFreeID();
-    EXPECT_EQ(id, 4);
+    EXPECT_EQ( 4, id);
 }
 
 
