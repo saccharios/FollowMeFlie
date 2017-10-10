@@ -229,7 +229,6 @@ CrazyRadio::sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
     int actWritten;
     int retValue = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &actWritten, 1000);
 
-    // TODO SF Bug is here, If copter turned off this does not return nullptr
     if(retValue == 0 && actWritten == length)
     {
         return ReadAck();
@@ -408,8 +407,9 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
 
         auto const & data = packet->GetData();
 
-        if(data.size() >= 0)
+        if(data.size() > 0)
         {
+            // Dispatch incoming packet according to port and channel
             switch(packet->GetPort() )
             {
             case Port::Console:
@@ -481,7 +481,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             Data data;
             for(int i = 2; i < bytesRead+1; ++i)
             {
-                data.push_back(buffer[i]); // TODO SF: a) start reading buffer at position 2, b) stop reading at bytes Read. Change hard-coded data.at(i) with i being an enum or so with a meaning. Check data structure for logging packets, and parameter packets.
+                data.push_back(buffer[i]);
             }
             packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
         }

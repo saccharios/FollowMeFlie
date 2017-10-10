@@ -31,18 +31,17 @@
 #include <iostream>
 #include "math/types.h"
 
-
 template<>
 float ExtractData<float>(Data const & data, int offset)
 {
     constexpr int typeLength = sizeof(float);
-    uint32_t bits = 0;
+    IntFloat bits;
+    bits.int_value = 0;
     for(int i = 0; i < typeLength; ++i)
     {
-        bits |= (data.at(offset + i) << 8*i);
+        bits.int_value |= (data.at(offset + i) << 8*i);
     }
-    float value = *reinterpret_cast<float *>(&bits);
-    return value;
+    return bits.float_value;
 }
 
 

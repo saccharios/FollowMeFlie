@@ -20,4 +20,10 @@ using Matrix12 = Eigen::Matrix<float,12,12>;
 
 using Data = std::vector<uint8_t>;
 
+union IntFloat
+{
+    float float_value;
+    int int_value;
+};
+
 
