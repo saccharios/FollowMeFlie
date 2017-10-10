@@ -1,12 +1,10 @@
 #pragma once
-#include "toc_base.h"
 #include "CRTPPacket.h"
 #include "math/types.h"
-
-class TocLog : public TocBase
+#include "CrazyRadio.h"
+class TocLog
 {
     friend class TOC_Test; // Is friend for white-box testing.
-    using Base = TocBase;
     struct Channels
     {
         struct Access
@@ -124,11 +122,15 @@ class TocLog : public TocBase
 
 public:
     TocLog(CrazyRadio & crazyRadio) :
-     Base(crazyRadio)
+        _crazyRadio(crazyRadio),
+      _itemCount(0),
+      _elements(),
+      _loggingBlocks()
+
     {}
 
 
-    Port GetPort() override
+    Port GetPort()
     {
         return Port::Log;
     }
@@ -142,15 +144,7 @@ public:
     bool RequestItems();
     bool RequestItem(uint8_t id);
 
-    void AddUnprocessedPacket(CrazyRadio::sptrPacket && packet) override
-    {
-        _unprocessedPackets.emplace_back(packet);
-    }
-
-
     void ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets);
-    void ProcessPackets() override;
-
 
     bool RegisterLoggingBlock(std::string name, float frequency);
     bool UnregisterLoggingBlock(std::string name);
@@ -166,12 +160,8 @@ private:
     bool EnableLogging(LoggingBlock const & loggingBlock);
     bool UnregisterLoggingBlockID(uint8_t id);
 
-
-
-    int _itemCount = 0;
+    CrazyRadio & _crazyRadio;
+    int _itemCount;
     std::vector<TocLogElement> _elements;
     std::vector<LoggingBlock> _loggingBlocks;
-    std::vector<CrazyRadio::sptrPacket> _unprocessedPackets;
-
-
 };

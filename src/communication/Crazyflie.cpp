@@ -124,7 +124,6 @@ void Crazyflie::Update()
 //        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
         _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-        _logger.ProcessPackets();
 
         _crazyRadio.SendPingPacket();
         // NOTE(winkler): Here, we can do measurement zero'ing. This is
@@ -157,7 +156,6 @@ void Crazyflie::Update()
         // Shove over the sensor readings from the radio to the Logs TOC.
 //        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
         _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-        _logger.ProcessPackets();
 
         if(_isSendingSetpoints)
         {

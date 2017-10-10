@@ -42,7 +42,6 @@ HEADERS  += communication/Crazyflie.h \
     math/types.h \
     control/extendedkalmanfilter.h \
     error_codes.h \
-    communication/toc_base.h \
     communication/toc_log.h
 
 

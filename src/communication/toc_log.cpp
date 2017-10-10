@@ -194,7 +194,6 @@ uint8_t TocLog::GetFirstFreeID()
         }
         ++next;
     }
-
     return next;
 }
 
@@ -233,18 +232,9 @@ bool TocLog::StartLogging(std::string name, std::string blockName)
     return false;
 }
 
+
 void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
 {
-    _unprocessedPackets = packets;
-}
-
-
-void TocLog::ProcessPackets()
-{
-    std::vector<CrazyRadio::sptrPacket> packets;
-    std::swap(packets,_unprocessedPackets );
-
-
     for(auto const & packet : packets)
     {
         auto const & data = packet->GetData();
