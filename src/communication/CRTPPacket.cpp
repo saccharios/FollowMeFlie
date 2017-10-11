@@ -56,6 +56,11 @@ CRTPPacket:: CRTPPacket(Port port, uint8_t channel, Data && data) :
      _port (port),
      _channel(static_cast<Channel>(channel))
  {}
+CRTPPacket:: CRTPPacket(uint8_t port, uint8_t channel, Data && data) :
+    _data (data),
+    _port (static_cast<Port>(port)),
+    _channel(static_cast<Channel>(channel))
+{}
 
 
 Data const & CRTPPacket::GetData() const
@@ -91,6 +96,11 @@ Port CRTPPacket::GetPort() const
     return _port;
 }
 
+uint8_t CRTPPacket::GetPort_Int() const
+{
+    return static_cast<uint8_t>(_port);
+}
+
 Channel CRTPPacket::GetChannel() const
 {
     return _channel;
@@ -98,7 +108,7 @@ Channel CRTPPacket::GetChannel() const
 
 void CRTPPacket::PrintData() const
 {
-    for(int i = 0; i < _data.size() ; ++i)
+    for(std::size_t i = 0; i < _data.size() ; ++i)
     {
         std::cout << "i = " << i << " data = " << static_cast<int>(_data.at(i)) << std::endl;
     }

@@ -1,109 +1,7 @@
 #include "toc_log.h"
-#include "types.h"
 #include "stl_utils.h"
 #include "math/types.h"
 
-bool TocLog::RequestInfo()
-{
-
-    using channel = Channels::Access;
-    Data data = {channel::Commands::GetInfo::id};
-    CRTPPacket packet(Port::Log, channel::id, std::move(data));
-    bool receivedPacketIsValid = false;
-    auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-    if(receivedPacketIsValid && received->GetData().size() > 1)
-    {
-        if(received->GetData().at(channel::Commands::GetInfo::Bytes::CmdID) ==channel::Commands::GetInfo::id)
-        {
-            _itemCount = received->GetData().at(channel::Commands::GetInfo::Bytes::ItemCount); // is usually 0x81 == 129 decimal
-            std::cout << "_itemCount =" << _itemCount << std::endl;
-            return  true;
-        }
-        else
-        {
-            // TODO SF Error handling
-            return false;
-        }
-    }
-    // TODO SF Error handling
-    return false;
-}
-bool TocLog::RequestItems()
-{
-    for(uint8_t itemNr = 0; itemNr < _itemCount; itemNr++)
-    {
-        if( ! RequestItem(itemNr)) // If any of the requested items fail, return false
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool TocLog::RequestItem(uint8_t id)
-{
-    using channel = Channels::Access;
-
-    Data data = {channel::Commands::GetItem::id,id};
-    CRTPPacket  packet(Port::Log, channel::id, std::move(data));
-    bool receivedPacketIsValid = false;
-    auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-    if(receivedPacketIsValid)
-    {
-        return AddElement(std::move(received));
-    }
-    else
-    {
-        // TODO SF Error handling
-        return false;
-    }
-}
-
-
-bool TocLog::AddElement( CrazyRadio::sptrPacket && packet)
-{
-    using channel = Channels::Access;
-    if(packet->GetPort() == Port::Log && static_cast<uint8_t>(packet->GetChannel() )== channel::id)
-    {
-        auto const & data = packet->GetData();
-
-        if(data.at(channel::Commands::GetItem::Bytes::CmdID) == channel::Commands::GetItem::id)
-        {
-
-            TocLogElement element;
-            element.name = ExtractName(data);
-            element.id = data.at(channel::Commands::GetItem::Bytes::ID);
-            element.type = static_cast<ElementType>(data.at(channel::Commands::GetItem::Bytes::Type));
-            element.value = 0;
-            _elements.emplace_back(element);
-            return true;
-        }
-    }
-    // TODO SF Error handling
-    return false;
-}
-
-std::string TocLog::ExtractName(Data const & data)
-{
-    using channel = Channels::Access;
-    std::string name;
-    int index = channel::Commands::GetItem::Bytes::Group;
-    // Read in group name, it is a zero terminated string
-    while(data.at(index) != '\0')
-    {
-        name += data.at(index);
-        ++index;
-    }
-    name += ".";
-    ++index;
-    // Read in name, it is a zero terminated string
-    while(data.at(index) != '\0')
-    {
-        name += data.at(index);
-        ++index;
-    }
-    return name;
-}
 
 
 bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
@@ -125,9 +23,9 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
     auto const & dataReceived = received->GetData();
     if(receivedPacketIsValid && dataReceived.size() > 3)
     {
-        if(dataReceived.at(channel::Commands::CreateBlock::Bytes::CmdID) ==  channel::Commands::CreateBlock::id &&
-                dataReceived.at(channel::Commands::CreateBlock::Bytes::BlockId) == id &&
-                dataReceived.at(channel::Commands::CreateBlock::Bytes::End) == 0)
+        if(dataReceived.at(channel::Commands::CreateBlock::Answer::CmdID) ==  channel::Commands::CreateBlock::id &&
+                dataReceived.at(channel::Commands::CreateBlock::Answer::BlockId) == id &&
+                dataReceived.at(channel::Commands::CreateBlock::Answer::End) == 0)
         {
             LoggingBlock loggingBlock;
             loggingBlock.name = name;
@@ -205,7 +103,7 @@ bool TocLog::StartLogging(std::string name, std::string blockName)
     LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
     {
-        TocLogElement & element = STLUtils::ElementForName(_elements, name, isContained);
+        TOCElement & element = STLUtils::ElementForName(_elements, name, isContained);
         if(isContained)
         {
             Data data = {channel::Commands::AppendBlock::id, logBlock.id, static_cast<uint8_t>(element.type), element.id};
@@ -244,7 +142,7 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
             std::cout << "Data packet not large enough!\n";
             break;
         }
-        int blockID = data.at(Channels::Data::Bytes::Blockid);
+        int blockID = data.at(Channels::Data::Answer::Blockid);
         const Data logdataVect(data.begin() +Channels::Data:: LogDataLength, data.end());
         bool found;
         // Check if the  packet is in a logging block

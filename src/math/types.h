@@ -26,4 +26,22 @@ union IntFloat
     int int_value;
 };
 
+enum class ElementType : uint8_t
+{
+    UINT8  = 1,
+    UINT16  = 2,
+    UINT32  = 3,
+    INT8  = 4,
+    INT16  = 5,
+    INT32  = 6,
+    FLOAT = 7
+};
 
+
+struct TOCElement
+{
+    uint8_t id;
+    std::string name;
+    ElementType type;
+    float value;
+};

@@ -39,22 +39,6 @@
 #include "CRTPPacket.h"
 #include <memory>
 
-enum class ElementType : uint8_t{
-    UINT8  = 1,
-    UINT16  = 2,
-    UINT32  = 3,
-    INT8  = 4,
-    INT16  = 5,
-    INT32  = 6,
-    FLOAT = 7
-};
-
-struct TOCElement {
-    uint8_t id;
-    ElementType type;
-    std::string name;
-    float value;
-};
 
 
 struct LoggingBlock {

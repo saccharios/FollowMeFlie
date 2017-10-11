@@ -96,6 +96,7 @@ public:
     CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
     CRTPPacket(Port port, Channel channel, Data && data) ;
     CRTPPacket(Port port, uint8_t channel, Data && data) ;
+    CRTPPacket(uint8_t port, uint8_t channel, Data && data) ;
 
     // Disable copy/move ctor + copy/move assignment
     CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
@@ -116,7 +117,7 @@ public:
     int GetSendableDataLength() const;
 
     Port GetPort() const;
-
+    uint8_t GetPort_Int() const;
     Channel GetChannel() const;
 
     void PrintData() const;

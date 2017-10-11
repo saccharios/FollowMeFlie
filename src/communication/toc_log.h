@@ -2,6 +2,8 @@
 #include "CRTPPacket.h"
 #include "math/types.h"
 #include "CrazyRadio.h"
+#include "toc_shared.h"
+
 class TocLog
 {
     friend class TOC_Test; // Is friend for white-box testing.
@@ -15,22 +17,20 @@ class TocLog
                 struct GetItem
                 {
                     static constexpr uint8_t id = 0;
-                    struct Bytes
+                    struct Answer
                     {
                         static constexpr uint8_t CmdID = 0;
                         static constexpr uint8_t ID = 1;
                         static constexpr uint8_t Type = 2;
                         static constexpr uint8_t Group = 3; // 3 to N, null terminated string
 //                        static constexpr uint8_t Name = N; N to M, null terminated string
-
-
                     };
 
                 };
                 struct GetInfo
                 {
                     static constexpr uint8_t id = 1;
-                    struct Bytes
+                    struct Answer
                     {
                         static constexpr uint8_t CmdID = 0;
                         static constexpr uint8_t ItemCount = 1;
@@ -51,7 +51,8 @@ class TocLog
                 struct CreateBlock
                 {
                     static constexpr uint8_t id     = 0;
-                    struct Bytes
+                    struct Answer
+
                     {
                         static constexpr uint8_t CmdID = 0;
                         static constexpr uint8_t BlockId = 1;
@@ -68,6 +69,7 @@ class TocLog
                     static constexpr uint8_t End    = 2;
                 };
 
+                // TODO SF Implement
                 static constexpr uint8_t DeleteBlock   = 2;
                 static constexpr uint8_t StartBlock     = 3;
                 static constexpr uint8_t StopBlock     = 4;
@@ -79,7 +81,7 @@ class TocLog
         struct Data
         {
             static constexpr int id = 2;
-            struct Bytes
+            struct Answer
             {
                 static constexpr int Blockid = 0;
                 static constexpr int Timestamp = 1;
@@ -91,31 +93,13 @@ class TocLog
 
     };
 
-    enum class ElementType : uint8_t{
-        UINT8  = 1,
-        UINT16  = 2,
-        UINT32  = 3,
-        INT8  = 4,
-        INT16  = 5,
-        INT32  = 6,
-        FLOAT = 7
-    };
-
-
-    struct TocLogElement
-    {
-        uint8_t id;
-        std::string name;
-        ElementType type;
-        float value;
-    };
 
     struct LoggingBlock
     {
         uint8_t id;
         std::string name;
         float frequency;
-        std::vector<TocLogElement*> elements; // Has no ownership over TocLogElements.
+        std::vector<TOCElement*> elements; // Has no ownership over TocLogElements.
     };
 
 
@@ -125,7 +109,8 @@ public:
         _crazyRadio(crazyRadio),
       _itemCount(0),
       _elements(),
-      _loggingBlocks()
+      _loggingBlocks(),
+      _shared_impl(_itemCount, _elements, crazyRadio )
 
     {}
 
@@ -140,9 +125,9 @@ public:
         return static_cast<int>(Port::Log);
     }
 
-    bool RequestInfo();
-    bool RequestItems();
-    bool RequestItem(uint8_t id);
+    bool RequestInfo() {return _shared_impl.RequestInfo();}
+    bool RequestItems() {return _shared_impl.RequestItems();}
+    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
     void ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets);
 
@@ -161,7 +146,8 @@ private:
     bool UnregisterLoggingBlockID(uint8_t id);
 
     CrazyRadio & _crazyRadio;
-    int _itemCount;
-    std::vector<TocLogElement> _elements;
+    unsigned int _itemCount;
+    std::vector<TOCElement> _elements;
     std::vector<LoggingBlock> _loggingBlocks;
+    TOCShared<static_cast<int>(Port::Log), Channels::Access> _shared_impl;
 };

@@ -26,7 +26,8 @@ SOURCES += communication/Crazyflie.cpp \
     math/types.cpp \
     control/extendedkalmanfilter.cpp \
     communication/toc_log.cpp \
-    communication/toc_parameter.cpp
+    communication/toc_parameter.cpp \
+    communication/toc_shared.cpp
 
 
 HEADERS  += communication/Crazyflie.h \
@@ -44,7 +45,8 @@ HEADERS  += communication/Crazyflie.h \
     control/extendedkalmanfilter.h \
     error_codes.h \
     communication/toc_log.h \
-    communication/toc_parameter.h
+    communication/toc_parameter.h \
+    communication/toc_shared.h
 
 
 # Include library libusb-1.0.21

@@ -39,9 +39,10 @@
 #include "math/logic.h"
 #include "math/types.h"
 #include "toc_log.h"
+#include "toc_parameter.h"
 
-
-enum class State {
+enum class State
+{
     ZERO = 0,
     READ_PARAMETERS_TOC = 1,
     READ_LOGS_TOC = 2,

@@ -42,7 +42,7 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _isSendingVelocityRef(false),
     _startConnecting(false),
     _state (State::ZERO),
-    _tocParameters(_crazyRadio, Port::Parameters),
+    _parameters(_crazyRadio),
     _logger(_crazyRadio),
     _leaveConnectingState(),
     _sensorValues()
@@ -89,7 +89,8 @@ void Crazyflie::Update()
         else
         {
             // Setup Parameter TOC
-            bool success = ReadTOCParameters();
+//            bool success = ReadTOCParameters();
+            bool success = true;
             if(success)
             {
                 _state =State:: READ_LOGS_TOC;
