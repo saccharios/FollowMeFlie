@@ -23,9 +23,9 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
     auto const & dataReceived = received->GetData();
     if(receivedPacketIsValid && dataReceived.size() > 3)
     {
-        if(dataReceived.at(channel::Commands::CreateBlock::Answer::CmdID) ==  channel::Commands::CreateBlock::id &&
-                dataReceived.at(channel::Commands::CreateBlock::Answer::BlockId) == id &&
-                dataReceived.at(channel::Commands::CreateBlock::Answer::End) == 0)
+        if(dataReceived.at(channel::Commands::CreateBlock::AnswerByte::CmdID) ==  channel::Commands::CreateBlock::id &&
+                dataReceived.at(channel::Commands::CreateBlock::AnswerByte::BlockId) == id &&
+                dataReceived.at(channel::Commands::CreateBlock::AnswerByte::End) == 0)
         {
             LoggingBlock loggingBlock;
             loggingBlock.name = name;
@@ -142,7 +142,7 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
             std::cout << "Data packet not large enough!\n";
             break;
         }
-        int blockID = data.at(Channels::Data::Answer::Blockid);
+        int blockID = data.at(Channels::Data::AnswerByte::Blockid);
         const Data logdataVect(data.begin() +Channels::Data:: LogDataLength, data.end());
         bool found;
         // Check if the  packet is in a logging block

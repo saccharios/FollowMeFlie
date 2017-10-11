@@ -89,8 +89,7 @@ void Crazyflie::Update()
         else
         {
             // Setup Parameter TOC
-//            bool success = ReadTOCParameters();
-            bool success = true;
+            bool success = ReadTOCParameters();
             if(success)
             {
                 _state =State:: READ_LOGS_TOC;

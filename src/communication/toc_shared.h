@@ -24,9 +24,9 @@ public:
         auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
         if(receivedPacketIsValid && received->GetData().size() > 1)
         {
-            if(received->GetData().at(Channel::Commands::GetInfo::Answer::CmdID) == Channel::Commands::GetInfo::id)
+            if(received->GetData().at(Channel::Commands::GetInfo::AnswerByte::CmdID) == Channel::Commands::GetInfo::id)
             {
-                _itemCount = received->GetData().at(Channel::Commands::GetInfo::Answer::ItemCount); // is usually 0x81 == 129 decimal
+                _itemCount = received->GetData().at(Channel::Commands::GetInfo::AnswerByte::ItemCount); // is usually 0x81 == 129 decimal
                 std::cout << "_itemCount =" << _itemCount << std::endl;
                 return  true;
             }
@@ -78,13 +78,13 @@ private:
         {
             auto const & data = packet->GetData();
 
-            if(data.at(Channel::Commands::GetItem::Answer::CmdID) == Channel::Commands::GetItem::id)
+            if(data.at(Channel::Commands::GetItem::AnswerByte::CmdID) == Channel::Commands::GetItem::id)
             {
 
                 TOCElement element;
                 element.name = ExtractName(data);
-                element.id = data.at(Channel::Commands::GetItem::Answer::ID);
-                element.type = static_cast<ElementType>(data.at(Channel::Commands::GetItem::Answer::Type));
+                element.id = data.at(Channel::Commands::GetItem::AnswerByte::ID);
+                element.type = static_cast<ElementType>(data.at(Channel::Commands::GetItem::AnswerByte::Type));
                 element.value = 0;
                 _elements.emplace_back(element);
                 return true;
@@ -97,7 +97,7 @@ private:
     std::string ExtractName(Data const & data)
     {
         std::string name;
-        int index = Channel::Commands::GetItem::Answer::Group;
+        int index = Channel::Commands::GetItem::AnswerByte::Group;
         // Read in group name, it is a zero terminated string
         while(data.at(index) != '\0')
         {

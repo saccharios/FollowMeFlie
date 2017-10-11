@@ -7,6 +7,7 @@
 class TocLog
 {
     friend class TOC_Test; // Is friend for white-box testing.
+    // Channel documentation available at https://wiki.bitcraze.io/doc:crazyflie:crtp:log
     struct Channels
     {
         struct Access
@@ -17,24 +18,23 @@ class TocLog
                 struct GetItem
                 {
                     static constexpr uint8_t id = 0;
-                    struct Answer
+                    struct AnswerByte
                     {
                         static constexpr uint8_t CmdID = 0;
                         static constexpr uint8_t ID = 1;
                         static constexpr uint8_t Type = 2;
                         static constexpr uint8_t Group = 3; // 3 to N, null terminated string
-//                        static constexpr uint8_t Name = N; N to M, null terminated string
+                        // static constexpr uint8_t Name = N; N to M, null terminated string
                     };
-
                 };
                 struct GetInfo
                 {
                     static constexpr uint8_t id = 1;
-                    struct Answer
+                    struct AnswerByte
                     {
                         static constexpr uint8_t CmdID = 0;
                         static constexpr uint8_t ItemCount = 1;
-                        static constexpr uint8_t CRC        = 2;
+                        static constexpr uint8_t CRC32        = 2;
                         static constexpr uint8_t MaxPacket = 6;
                         static constexpr uint8_t MaxOperation = 7;
 
@@ -51,7 +51,7 @@ class TocLog
                 struct CreateBlock
                 {
                     static constexpr uint8_t id     = 0;
-                    struct Answer
+                    struct AnswerByte
 
                     {
                         static constexpr uint8_t CmdID = 0;
@@ -81,7 +81,7 @@ class TocLog
         struct Data
         {
             static constexpr int id = 2;
-            struct Answer
+            struct AnswerByte
             {
                 static constexpr int Blockid = 0;
                 static constexpr int Timestamp = 1;
@@ -111,7 +111,6 @@ public:
       _elements(),
       _loggingBlocks(),
       _shared_impl(_itemCount, _elements, crazyRadio )
-
     {}
 
 
