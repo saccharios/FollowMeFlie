@@ -2,21 +2,21 @@
 
 #include "gtest/gtest.h"
 #include <iostream>
-#include "communication/TOC.h"
 #include "communication/toc_log.h"
+#include "communication/toc_parameter.h"
 #include "communication/CRTPPacket.h"
 #include "communication/CrazyRadio.h"
 #include <memory>
 #include "math/types.h"
 
-class TOC_Test : public testing::Test
+class TOC_Log_Test : public testing::Test
 {
-    // TOC_Test if friend of TOC
+    // TOC_Log_Test if friend of TOC Log
 private:
     using sptrPacket = std::shared_ptr<CRTPPacket>;
     std::vector<sptrPacket> _packets;
-     Port _port = Port::Log;
-     Channel _channel = Channel::Data;
+     int _port = 5; // Log Port
+     int _channel = 2; // Data channel
      float num1 = 1.6756;
      float num2 = 73.6756;
      uint8_t int1 = 17;
@@ -44,22 +44,17 @@ public:
 
 
     void Run_TestOk();
-    void Run_TestIDNotFound();
     void Run_GetFirstFreeID();
 
 };
 
 
 
-TEST_F(TOC_Test, ProcessLogPacketsOK)
+TEST_F(TOC_Log_Test, ProcessLogPacketsOK)
 {
     Run_TestOk();
 }
-TEST_F(TOC_Test, ProcessLogPacketsIDWrong)
-{
-    Run_TestIDNotFound();
-}
-TEST_F(TOC_Test, GetFirstFreeID)
+TEST_F(TOC_Log_Test, GetFirstFreeID)
 {
     Run_GetFirstFreeID();
 }

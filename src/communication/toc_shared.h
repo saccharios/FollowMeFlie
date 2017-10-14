@@ -26,7 +26,7 @@ public:
         {
             if(received->GetData().at(Channel::Commands::GetInfo::AnswerByte::CmdID) == Channel::Commands::GetInfo::id)
             {
-                _itemCount = received->GetData().at(Channel::Commands::GetInfo::AnswerByte::ItemCount); // is usually 0x81 == 129 decimal
+                _itemCount = received->GetData().at(Channel::Commands::GetInfo::AnswerByte::ItemCount);
                 std::cout << "_itemCount =" << _itemCount << std::endl;
                 return  true;
             }

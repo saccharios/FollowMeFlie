@@ -143,7 +143,7 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
             break;
         }
         int blockID = data.at(Channels::Data::AnswerByte::Blockid);
-        const Data logdataVect(data.begin() +Channels::Data:: LogDataLength, data.end());
+        const Data logdataVect(data.begin() +Channels::Data::AnswerByte::LogValues, data.end());
         bool found;
         // Check if the  packet is in a logging block
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
@@ -202,7 +202,7 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
                 case ElementType::FLOAT:
                 {
                     byteLength = 4;
-                    value =ExtractData<float>(logdataVect, offset);
+                    value = ExtractData<float>(logdataVect, offset);
                     break;
                 }
 

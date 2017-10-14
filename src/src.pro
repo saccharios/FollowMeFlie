@@ -16,24 +16,9 @@ INCLUDEPATH += communication \
     control
 
 
-SOURCES += communication/Crazyflie.cpp \
-    communication/CrazyRadio.cpp \
-    communication/CRTPPacket.cpp \
-    communication/TOC.cpp \
-    math/lowpass.cpp \
-    math/pi_controller.cpp \
-    control/commander.cpp \
-    math/types.cpp \
-    control/extendedkalmanfilter.cpp \
-    communication/toc_log.cpp \
-    communication/toc_parameter.cpp \
-    communication/toc_shared.cpp
-
-
 HEADERS  += communication/Crazyflie.h \
     communication/CrazyRadio.h \
     communication/CRTPPacket.h \
-    communication/TOC.h \
     math/stl_utils.h \
     math/logic.h \
     math/functions.h \
@@ -47,6 +32,20 @@ HEADERS  += communication/Crazyflie.h \
     communication/toc_log.h \
     communication/toc_parameter.h \
     communication/toc_shared.h
+
+SOURCES += communication/Crazyflie.cpp \
+    communication/CrazyRadio.cpp \
+    communication/CRTPPacket.cpp \
+    math/lowpass.cpp \
+    math/pi_controller.cpp \
+    control/commander.cpp \
+    math/types.cpp \
+    control/extendedkalmanfilter.cpp \
+    communication/toc_log.cpp \
+    communication/toc_parameter.cpp \
+    communication/toc_shared.cpp
+
+
 
 
 # Include library libusb-1.0.21

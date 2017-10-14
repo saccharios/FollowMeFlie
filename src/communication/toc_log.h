@@ -6,7 +6,7 @@
 
 class TocLog
 {
-    friend class TOC_Test; // Is friend for white-box testing.
+    friend class TOC_Log_Test; // Is friend for white-box testing.
     // Channel documentation available at https://wiki.bitcraze.io/doc:crazyflie:crtp:log
     struct Channels
     {
@@ -88,7 +88,6 @@ class TocLog
                 static constexpr int LogValues = 4;
             };
             static constexpr int LogMinPacketSize = 4;
-            static constexpr std::size_t LogDataLength = 4;
         };
 
     };
