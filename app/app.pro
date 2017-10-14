@@ -16,7 +16,9 @@ SOURCES +=  main.cpp \
     cameraviewpainter.cpp \
     trackingcolor.cpp \
     imageprocess/camera.cpp \
-    imageprocess/extractcolor.cpp
+    imageprocess/extractcolor.cpp \
+    parameter_window.cpp \
+    actual_values_window.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -25,10 +27,14 @@ HEADERS  += mainwindow.h \
     trackingcolor.h \
     imageprocess/camera.h \
     imageprocess/extractcolor.h \
-    opencv_utils.h
+    opencv_utils.h \
+    parameter_window.h \
+    actual_values_window.h
 
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    parameter_window.ui \
+    actual_values_window.ui
 
 LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 

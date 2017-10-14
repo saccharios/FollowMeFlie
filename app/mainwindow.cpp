@@ -148,7 +148,7 @@ void MainWindow::on_connectRadio_clicked()
     }
 }
 
-void MainWindow::on_radioSettingsOptions_currentIndexChanged(int index)
+void MainWindow::on_radioSettings_Options_currentIndexChanged(int index)
 {
     _crazyRadio.SetRadioSettings(index);
 }
@@ -249,4 +249,19 @@ void MainWindow::UpdateCrazyFlie()
 void MainWindow::on_pushButton_SafeLandingMode_clicked()
 {
     _crazyRadio.ReadParameter();
+}
+
+
+void MainWindow::on_pushButton_ActualValues_clicked()
+{
+    if(_actualValuesWindow == nullptr)
+    {
+        _actualValuesWindow = new ActualValuesWindow(this);
+        _actualValuesWindow->show();
+    }
+    else
+    {
+        delete _actualValuesWindow;
+        _actualValuesWindow= nullptr;
+    }
 }

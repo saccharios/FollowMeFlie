@@ -53,7 +53,7 @@
      <string>Disconnect</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="radioSettingsOptions">
+   <widget class="QComboBox" name="radioSettings_Options">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -151,7 +151,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_StabVal">
@@ -218,7 +218,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>151</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_AccVal">
@@ -285,7 +285,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>151</height>
+        <height>224</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_GyroVal">
@@ -341,7 +341,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>224</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_MagVal">
@@ -457,7 +457,7 @@
         <x>10</x>
         <y>10</y>
         <width>351</width>
-        <height>141</height>
+        <height>300</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="Layout_BaroVal">
@@ -637,6 +637,32 @@
      <string>Stop</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_ActualValues">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>110</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Actual Values</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_ParameterTable">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>140</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Parameter Table</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -644,7 +670,7 @@
      <x>0</x>
      <y>0</y>
      <width>686</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFollowMeFle">

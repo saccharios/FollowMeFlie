@@ -10,6 +10,9 @@
 #include "imageprocess/camera.h"
 #include "imageprocess/extractcolor.h"
 #include "control/commander.h"
+#include "actual_values_window.h"
+#include "parameter_window.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -26,7 +29,7 @@ public:
 private slots:
     void on_disconnectRadio_clicked();
     void on_connectRadio_clicked();
-    void on_radioSettingsOptions_currentIndexChanged(int index);
+    void on_radioSettings_Options_currentIndexChanged(int index);
     void on_exitApp_clicked();
     void display_sensor_values();
     void display_connection_timeout_box();
@@ -45,9 +48,16 @@ private slots:
 
     void on_pushButton_SafeLandingMode_clicked();
 
+
+    void on_pushButton_ActualValues_clicked();
+
 private:
-    // GUI related
-    Ui::MainWindow *ui;
+    // GUI Windows and Widgets
+    Ui::MainWindow* ui;
+    ActualValuesWindow* _actualValuesWindow;
+    ParameterWindow* _parameterWindow;
+
+    // Timer
     QTimer _timer_t0;
     QTimer _timer_t1;
     QTimer _timer_t2;
