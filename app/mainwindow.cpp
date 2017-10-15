@@ -256,7 +256,8 @@ void MainWindow::on_pushButton_ActualValues_clicked()
 {
     if(_actualValuesWindow == nullptr)
     {
-        _actualValuesWindow = new ActualValuesWindow(this);
+        _actualValuesWindow = new ActualValuesWindow();
+        _actualValuesWindow->SetUp();
         _actualValuesWindow->show();
     }
     else
