@@ -7,10 +7,16 @@
 #include "communication/Crazyflie.h"
 #include <QMessageBox>
 #include "opencv2/opencv.hpp"
+#include "actual_values_model.h"
+#include <QTableView>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+     _actualValuesWindow(nullptr),
+     _parameterWindow(nullptr),
+     _actualValuesTable(nullptr),
+    _actualValuesModel(0),
     _timer_t0(),
     _timer_t1(),
     _crazyRadio(),
@@ -24,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _commander(_crazyFlie)
 {
     ui->setupUi(this);
-
 
     // Event loop on main window
     // T0
@@ -254,15 +259,34 @@ void MainWindow::on_pushButton_SafeLandingMode_clicked()
 
 void MainWindow::on_pushButton_ActualValues_clicked()
 {
-    if(_actualValuesWindow == nullptr)
+//    if(_actualValuesWindow == nullptr)
+//    {
+//        _actualValuesWindow = new ActualValuesWindow();
+//        _actualValuesWindow->SetUp();
+//        _actualValuesWindow->show();
+//    }
+//    else
+//    {
+//        delete _actualValuesWindow;
+//        _actualValuesWindow= nullptr;
+//    }
+
+
+    if(_actualValuesTable == nullptr)
     {
-        _actualValuesWindow = new ActualValuesWindow();
-        _actualValuesWindow->SetUp();
-        _actualValuesWindow->show();
+        _actualValuesTable = new QTableView();
+        _actualValuesTable->setModel(&_actualValuesModel);
+        _actualValuesTable->verticalHeader()->hide();
+        _actualValuesTable->show();
     }
     else
     {
-        delete _actualValuesWindow;
-        _actualValuesWindow= nullptr;
+        delete _actualValuesTable;
+        _actualValuesTable = nullptr;
     }
+
+
+
+
+
 }

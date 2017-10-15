@@ -18,7 +18,8 @@ SOURCES +=  main.cpp \
     imageprocess/camera.cpp \
     imageprocess/extractcolor.cpp \
     parameter_window.cpp \
-    actual_values_window.cpp
+    actual_values_window.cpp \
+    actual_values_model.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     imageprocess/extractcolor.h \
     opencv_utils.h \
     parameter_window.h \
-    actual_values_window.h
+    actual_values_window.h \
+    actual_values_model.h
 
 
 FORMS    += mainwindow.ui \

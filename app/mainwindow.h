@@ -12,8 +12,8 @@
 #include "control/commander.h"
 #include "actual_values_window.h"
 #include "parameter_window.h"
-
-
+#include <QTableView>
+#include "actual_values_model.h"
 namespace Ui {
 class MainWindow;
 }
@@ -56,6 +56,8 @@ private:
     Ui::MainWindow* ui;
     ActualValuesWindow* _actualValuesWindow;
     ParameterWindow* _parameterWindow;
+    QTableView* _actualValuesTable;
+    ActualValuesModel _actualValuesModel;
 
     // Timer
     QTimer _timer_t0;
