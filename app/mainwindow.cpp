@@ -257,19 +257,6 @@ void MainWindow::on_pushButton_SafeLandingMode_clicked()
 
 void MainWindow::on_pushButton_ActualValues_clicked()
 {
-//    if(_actualValuesWindow == nullptr)
-//    {
-//        _actualValuesWindow = new ActualValuesWindow();
-//        _actualValuesWindow->SetUp();
-//        _actualValuesWindow->show();
-//    }
-//    else
-//    {
-//        delete _actualValuesWindow;
-//        _actualValuesWindow= nullptr;
-//    }
-
-
     if(_actualValuesTable == nullptr)
     {
         _actualValuesTable = new QTableView();
@@ -282,9 +269,4 @@ void MainWindow::on_pushButton_ActualValues_clicked()
         delete _actualValuesTable;
         _actualValuesTable = nullptr;
     }
-
-
-
-
-
 }

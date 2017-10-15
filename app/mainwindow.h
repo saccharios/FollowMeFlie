@@ -12,6 +12,8 @@
 #include "control/commander.h"
 #include <QTableView>
 #include "actual_values_model.h"
+
+
 namespace Ui {
 class MainWindow;
 }
