@@ -8,13 +8,49 @@
 #include <QMessageBox>
 #include "opencv2/opencv.hpp"
 #include "actual_values_model.h"
+#include "parameter_model.h"
 #include <QTableView>
+
+
+void SetupTableViewWidget(QTableView* tableView)
+{
+    // Hide vertical header
+    tableView->verticalHeader()->hide();
+    // Resize columns and rows to fit content
+    tableView->resizeColumnsToContents();
+    tableView->resizeRowsToContents();
+    // Resize TableView Widget to match content size
+    int w = 0;
+    int h = 0;
+    w += tableView->contentsMargins().left() + tableView->contentsMargins().right();
+    h +=  tableView->contentsMargins().top()+ tableView->contentsMargins().bottom();
+    h +=  tableView->horizontalHeader()->height();
+    for (int i=0; i<tableView->model()->columnCount(); ++i)
+    {
+        w += tableView->columnWidth(i);
+    }
+    for (int i=0; i < 6; ++i) // Minimum 6 rows are shown.
+    {
+        h += tableView->rowHeight(i);
+    }
+
+    tableView->setMinimumWidth(w);
+//    tableView->setMaximumWidth(w);
+    tableView->setMinimumHeight(h);
+//    tableView->setMaximumHeight(h);
+
+
+    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+}
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
      _actualValuesTable(nullptr),
+     _parameterTable(nullptr),
     _actualValuesModel(0),
+    _parameterModel(0),
     _timer_t0(),
     _timer_t1(),
     _crazyRadio(),
@@ -28,7 +64,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _commander(_crazyFlie)
 {
     ui->setupUi(this);
-
     // Event loop on main window
     // T0
     _timer_t0.start(crazyflieUpdateSamplingTime); // time in ms
@@ -261,7 +296,8 @@ void MainWindow::on_pushButton_ActualValues_clicked()
     {
         _actualValuesTable = new QTableView();
         _actualValuesTable->setModel(&_actualValuesModel);
-        _actualValuesTable->verticalHeader()->hide();
+        SetupTableViewWidget(_actualValuesTable);
+        _parameterTable->setWindowTitle("Actual Values");
         _actualValuesTable->show();
     }
     else
@@ -270,3 +306,23 @@ void MainWindow::on_pushButton_ActualValues_clicked()
         _actualValuesTable = nullptr;
     }
 }
+
+void MainWindow::on_pushButton_ParameterTable_clicked()
+{
+    if(_parameterTable == nullptr)
+    {
+        _parameterTable = new QTableView();
+        _parameterTable->setModel(&_parameterModel);
+
+        SetupTableViewWidget(_parameterTable);
+        _parameterTable->setWindowTitle("Parameter Table");
+        _parameterTable->show();
+    }
+    else
+    {
+        delete _parameterTable;
+        _parameterTable = nullptr;
+    }
+}
+
+

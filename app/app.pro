@@ -34,9 +34,7 @@ HEADERS  += mainwindow.h \
     parameter_model.h
 
 
-FORMS    += mainwindow.ui \
-    parameter_window.ui \
-    actual_values_window.ui
+FORMS    += mainwindow.ui
 
 LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 

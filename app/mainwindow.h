@@ -12,6 +12,7 @@
 #include "control/commander.h"
 #include <QTableView>
 #include "actual_values_model.h"
+#include "parameter_model.h"
 
 
 namespace Ui {
@@ -51,11 +52,15 @@ private slots:
 
     void on_pushButton_ActualValues_clicked();
 
+    void on_pushButton_ParameterTable_clicked();
+
 private:
     // GUI Windows and Widgets
     Ui::MainWindow* ui;
     QTableView* _actualValuesTable;
+    QTableView* _parameterTable;
     ActualValuesModel _actualValuesModel;
+    ParameterModel _parameterModel;
 
     // Timer
     QTimer _timer_t0;

@@ -9,7 +9,7 @@ ParameterModel::ParameterModel(QObject *parent):
 //    _header[Columns::Group] = QString("Group");
 //    _header[Columns::Name] = QString("Name");
 //    _header[Columns::Value] = QString("Value");
-    _header[Columns::Edit] = QString("Edit");
+    _header[Columns::Edit] = QString("Edit Value");
 }
 
 QVariant ParameterModel::headerData(int section, Qt::Orientation orientation, int role) const
