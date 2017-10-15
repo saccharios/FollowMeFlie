@@ -105,19 +105,6 @@
      <string>Connection Status: </string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_setThrust">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>10</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>SetSomeThrust_Test</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
@@ -670,7 +657,7 @@
      <x>0</x>
      <y>0</y>
      <width>686</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFollowMeFle">

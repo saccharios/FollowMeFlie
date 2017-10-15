@@ -28,6 +28,11 @@
 
 // \author Jan Winkler
 
+
+// With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
+// Update SF: I disabled the locking-functionality in the firmware.
+
+
 #pragma once
 
 #include "QOBJECT"

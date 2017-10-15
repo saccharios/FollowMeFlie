@@ -196,22 +196,6 @@ void MainWindow::on_exitApp_clicked()
     QCoreApplication::quit();
 }
 
-
-void MainWindow::on_pushButton_setThrust_clicked()
-{
-    // With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
-    // Update SF: I disabled the locking-functionality in the firmware.
-
-    if(_crazyFlie.IsConnected())
-    {
-            _crazyFlie.SetSendSetpoints(true);
-            _crazyFlie.SetThrust(0);
-//            _crazyFlie.SetThrust(20001);
-    }
-}
-
-
-
 void MainWindow::on_actionExit_triggered()
 {
     QCoreApplication::quit();
@@ -297,7 +281,7 @@ void MainWindow::on_pushButton_ActualValues_clicked()
         _actualValuesTable = new QTableView();
         _actualValuesTable->setModel(&_actualValuesModel);
         SetupTableViewWidget(_actualValuesTable);
-        _parameterTable->setWindowTitle("Actual Values");
+        _actualValuesTable->setWindowTitle("Actual Values");
         _actualValuesTable->show();
     }
     else

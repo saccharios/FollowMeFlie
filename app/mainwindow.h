@@ -36,7 +36,6 @@ private slots:
     void display_connection_timeout_box();
     void display_not_connecting_box();
     void on_actionExit_triggered();
-    void on_pushButton_setThrust_clicked();
     void on_verticalSlider_hue_valueChanged(int value);
     void on_pushButton_CameraOnlyMode_clicked();
     void on_pushButton_Stop_clicked();

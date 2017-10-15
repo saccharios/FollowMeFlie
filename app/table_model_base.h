@@ -36,6 +36,6 @@ protected:
         Value = 3,
         Edit = 4
     };
-    std::array<QString,rows> _values;
+    std::vector<QString> _values;
     std::map<Columns, QString>  _header;
 };
