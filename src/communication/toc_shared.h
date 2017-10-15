@@ -82,7 +82,22 @@ private:
             {
 
                 TOCElement element;
-                element.name = ExtractName(data);
+
+                int index = Channel::Commands::GetItem::AnswerByte::Group;
+                // Read in group name, it is a zero terminated string
+                while(data.at(index) != '\0')
+                {
+                    element.group += data.at(index);
+                    ++index;
+                }
+                ++index;
+                // Read in name, it is a zero terminated string
+                while(data.at(index) != '\0')
+                {
+                    element.name_only += data.at(index);
+                    ++index;
+                }
+                element.name = element.group +"."+  element.name_only;
                 element.id = data.at(Channel::Commands::GetItem::AnswerByte::ID);
                 element.type = static_cast<ElementType>(data.at(Channel::Commands::GetItem::AnswerByte::Type));
                 element.value = 0;
@@ -93,28 +108,6 @@ private:
         // TODO SF Error handling
         return false;
     }
-
-    std::string ExtractName(Data const & data)
-    {
-        std::string name;
-        int index = Channel::Commands::GetItem::AnswerByte::Group;
-        // Read in group name, it is a zero terminated string
-        while(data.at(index) != '\0')
-        {
-            name += data.at(index);
-            ++index;
-        }
-        name += ".";
-        ++index;
-        // Read in name, it is a zero terminated string
-        while(data.at(index) != '\0')
-        {
-            name += data.at(index);
-            ++index;
-        }
-        return name;
-    }
-
 
     unsigned int & _itemCount;
     std::vector<TOCElement> & _elements;

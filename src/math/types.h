@@ -41,7 +41,9 @@ enum class ElementType : uint8_t
 struct TOCElement
 {
     uint8_t id;
-    std::string name;
+    std::string group;
+    std::string name_only;
+    std::string name; // TODO SF Is combined name : group +"."+name_only
     ElementType type;
     float value;
 };
