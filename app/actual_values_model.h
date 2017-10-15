@@ -13,11 +13,11 @@ class ActualValuesModel : public QAbstractTableModel
         Group = 1,
         Name = 2,
         Value = 3,
-        Edit = 4,
-        Count = 5
+        Edit = 4
     };
 
     static constexpr int rows = 2;
+    static constexpr int cols = 5;
 public:
     explicit ActualValuesModel(QObject *parent = 0);
 

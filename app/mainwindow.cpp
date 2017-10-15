@@ -13,8 +13,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-     _actualValuesWindow(nullptr),
-     _parameterWindow(nullptr),
      _actualValuesTable(nullptr),
     _actualValuesModel(0),
     _timer_t0(),

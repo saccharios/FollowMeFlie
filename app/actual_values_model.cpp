@@ -26,27 +26,28 @@ QVariant ActualValuesModel::headerData(int section, Qt::Orientation orientation,
 
 int ActualValuesModel::rowCount(const QModelIndex &parent) const
 {
+    if (parent.isValid())
+    {
+        return 0;
+    }
 
     return rows;
-//    if (parent.isValid())
-//        return 0;
-
-    // FIXME: Implement me!
 }
 
 int ActualValuesModel::columnCount(const QModelIndex &parent) const
 {
-
-        return static_cast<int>(Columns::Count);
-    //    if (parent.isValid())
-//        return 0;
-
-    // FIXME: Implement me!
+    if (parent.isValid())
+    {
+        return 0;
+    }
+    return cols;
 }
 QVariant ActualValuesModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
+    {
         return QVariant();
+    }
 
     if (role == Qt::DisplayRole)
     {
@@ -71,34 +72,20 @@ bool ActualValuesModel::setData(const QModelIndex &index, const QVariant &value,
     {
         if (role == Qt::EditRole)
         {
-            //save value from editor to member m_gridData
             _values[index.row()] = value.toString();
-            //for presentation purposes only: build and emit a joined string
-//            QString result;
-//            for(int row= 0; row < 2; row++)
-//            {
-//                for(int col= 0; col < 4; col++)
-//                {
-//                    result += m_gridData[row][col] + " ";
-//                }
-//            }
             emit editCompleted( _values[index.row()] );
         }
     }
     return true;
 
-//    if (data(index, role) != value) {
-//        // FIXME: Implement me!
-//        emit dataChanged(index, index, QVector<int>() << role);
-//        return true;
-//    }
-//    return false;
 }
 
 Qt::ItemFlags ActualValuesModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
+    {
         return Qt::NoItemFlags;
+    }
 
     if(index.column() == static_cast<int>(Columns::Edit))
     {

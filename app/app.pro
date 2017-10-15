@@ -17,9 +17,8 @@ SOURCES +=  main.cpp \
     trackingcolor.cpp \
     imageprocess/camera.cpp \
     imageprocess/extractcolor.cpp \
-    parameter_window.cpp \
-    actual_values_window.cpp \
-    actual_values_model.cpp
+    actual_values_model.cpp \
+    table_model_base.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -29,9 +28,8 @@ HEADERS  += mainwindow.h \
     imageprocess/camera.h \
     imageprocess/extractcolor.h \
     opencv_utils.h \
-    parameter_window.h \
-    actual_values_window.h \
-    actual_values_model.h
+    actual_values_model.h \
+    table_model_base.h
 
 
 FORMS    += mainwindow.ui \

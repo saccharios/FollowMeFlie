@@ -10,8 +10,6 @@
 #include "imageprocess/camera.h"
 #include "imageprocess/extractcolor.h"
 #include "control/commander.h"
-#include "actual_values_window.h"
-#include "parameter_window.h"
 #include <QTableView>
 #include "actual_values_model.h"
 namespace Ui {
@@ -54,8 +52,6 @@ private slots:
 private:
     // GUI Windows and Widgets
     Ui::MainWindow* ui;
-    ActualValuesWindow* _actualValuesWindow;
-    ParameterWindow* _parameterWindow;
     QTableView* _actualValuesTable;
     ActualValuesModel _actualValuesModel;
 
