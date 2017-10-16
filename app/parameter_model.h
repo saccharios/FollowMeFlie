@@ -11,7 +11,7 @@ class ParameterModel : public TableModelBase
     static constexpr int rows = 2;
     static constexpr int cols = 5;
 public:
-    explicit ParameterModel(QObject *parent = 0);
+    explicit ParameterModel(std::vector<TOCElement> const & tocElements, QObject *parent);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

@@ -17,8 +17,8 @@ void SetupTableViewWidget(QTableView* tableView)
     // Hide vertical header
     tableView->verticalHeader()->hide();
     // Resize columns and rows to fit content
-    tableView->resizeColumnsToContents();
-    tableView->resizeRowsToContents();
+//    tableView->resizeColumnsToContents();
+//    tableView->resizeRowsToContents();
     // Resize TableView Widget to match content size
     int w = 0;
     int h = 0;
@@ -49,8 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
      _actualValuesTable(nullptr),
      _parameterTable(nullptr),
-    _actualValuesModel(0),
-    _parameterModel(0),
+     _dataForActualValuesModel(),
+    _actualValuesModel(_dataForActualValuesModel, nullptr),
+    _parameterModel(_dataForActualValuesModel, nullptr),
     _timer_t0(),
     _timer_t1(),
     _crazyRadio(),
@@ -92,6 +93,24 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
     QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(display_not_connecting_box()));
 
+
+    // For testing purposes
+    TOCElement e1;
+    e1.id = 0;
+    e1.group = "Stabilizer";
+    e1.name_only = "Acc_x";
+    e1.name = e1.group + "." + e1.name_only;
+    e1.type = ElementType::UINT8;
+    e1.value = 10;
+    _dataForActualValuesModel.emplace_back(e1);
+    TOCElement e;
+    e1.id = 4;
+    e1.group = "Stabilizer";
+    e1.name_only = "Acc_y";
+    e1.name = e1.group + "." + e1.name_only;
+    e1.type = ElementType::UINT8;
+    e1.value = 20;
+    _dataForActualValuesModel.emplace_back(e1);
 }
 MainWindow::~MainWindow()
 {
@@ -310,3 +329,17 @@ void MainWindow::on_pushButton_ParameterTable_clicked()
 }
 
 
+
+void MainWindow::on_pushButton_TestAddElement_clicked()
+{
+    static int index = 0;
+    ++index;
+    TOCElement e;
+    e.id = index;
+    _dataForActualValuesModel.push_back(e);
+}
+
+void MainWindow::on_pushButton_TestRemoveElement_clicked()
+{
+    _dataForActualValuesModel.pop_back();
+}

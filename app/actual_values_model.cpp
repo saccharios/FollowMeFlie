@@ -1,7 +1,7 @@
 #include "actual_values_model.h"
 
-ActualValuesModel::ActualValuesModel(QObject *parent):
-    Base(parent)
+ActualValuesModel::ActualValuesModel(std::vector<TOCElement> const & tocElements, QObject *parent):
+    Base(tocElements, parent)
 {}
 
 
@@ -15,11 +15,6 @@ QVariant ActualValuesModel::headerData(int section, Qt::Orientation orientation,
         }
     }
     return QVariant();
-}
-
-int ActualValuesModel::rowCount(const QModelIndex & /*parent*/) const
-{
-    return rows;
 }
 
 int ActualValuesModel::columnCount(const QModelIndex & /*parent*/) const

@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QTimer>
@@ -53,11 +52,17 @@ private slots:
 
     void on_pushButton_ParameterTable_clicked();
 
+    void on_pushButton_TestAddElement_clicked();
+
+    void on_pushButton_TestRemoveElement_clicked();
+
 private:
     // GUI Windows and Widgets
     Ui::MainWindow* ui;
     QTableView* _actualValuesTable;
     QTableView* _parameterTable;
+
+    std::vector<TOCElement> _dataForActualValuesModel;
     ActualValuesModel _actualValuesModel;
     ParameterModel _parameterModel;
 
@@ -78,5 +83,3 @@ private:
 
     void DisplayConnectionStatus();
 };
-
-#endif // MAINWINDOW_H

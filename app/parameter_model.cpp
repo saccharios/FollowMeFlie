@@ -1,8 +1,8 @@
 #include "parameter_model.h"
 
 
-ParameterModel::ParameterModel(QObject *parent):
-    Base(parent)
+ParameterModel::ParameterModel(std::vector<TOCElement> const & tocElements, QObject *parent):
+    Base(tocElements, parent)
 {
     // Is already added by the bas class
 //    _header[Columns::Index] = QString("Index");
@@ -39,7 +39,7 @@ QVariant ParameterModel::data(const QModelIndex &index, int role) const
     {
         if(index.column() == static_cast<int>(Columns::Edit))
         {
-            return _values[index.row()];
+//            return _values[index.row()];
         }
         else
         {
@@ -56,8 +56,8 @@ bool ParameterModel::setData(const QModelIndex &index, const QVariant &value, in
     {
         if (role == Qt::EditRole)
         {
-            _values[index.row()] = value.toString();
-            emit editCompleted( _values[index.row()] );
+//            _values[index.row()] = value.toString();
+//            emit editCompleted( _values[index.row()] );
         }
     }
     return true;
