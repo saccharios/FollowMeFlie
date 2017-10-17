@@ -10,6 +10,7 @@
 #include "actual_values_model.h"
 #include "parameter_model.h"
 #include <QTableView>
+#include <QScrollBar>
 
 
 void SetupTableViewWidget(QTableView* tableView)
@@ -23,6 +24,7 @@ void SetupTableViewWidget(QTableView* tableView)
     int w = 0;
     int h = 0;
     w += tableView->contentsMargins().left() + tableView->contentsMargins().right();
+    w += tableView->horizontalScrollBar()->width()/4; // TODO SF: Somehow the width of the horizontalScrollBar is way too large?
     h +=  tableView->contentsMargins().top()+ tableView->contentsMargins().bottom();
     h +=  tableView->horizontalHeader()->height();
     for (int i=0; i<tableView->model()->columnCount(); ++i)
@@ -35,7 +37,7 @@ void SetupTableViewWidget(QTableView* tableView)
     }
 
     tableView->setMinimumWidth(w);
-//    tableView->setMaximumWidth(w);
+    tableView->setMaximumWidth(w);
     tableView->setMinimumHeight(h);
 //    tableView->setMaximumHeight(h);
 
