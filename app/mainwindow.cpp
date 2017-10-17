@@ -46,16 +46,16 @@ void SetupTableViewWidget(QTableView* tableView)
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    _crazyRadio(),
+    _crazyFlie(_crazyRadio),
     ui(new Ui::MainWindow),
      _actualValuesTable(nullptr),
      _parameterTable(nullptr),
      _dataForActualValuesModel(),
-    _actualValuesModel(_dataForActualValuesModel, nullptr),
+    _actualValuesModel(_crazyFlie.GetLogElements(), nullptr),
     _parameterModel(_dataForActualValuesModel, nullptr),
     _timer_t0(),
     _timer_t1(),
-    _crazyRadio(),
-    _crazyFlie(_crazyRadio),
     _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,
                        _crazyFlie.GetSensorValues().stabilizer.yaw,
                        _crazyFlie.GetSensorValues().stabilizer.pitch),
@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // T2
     _timer_t2.start(100); // time in ms
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
 
     // Custom widgets

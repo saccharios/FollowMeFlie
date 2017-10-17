@@ -33,21 +33,40 @@ int ParameterModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return cols;
 }
+
 QVariant ParameterModel::data(const QModelIndex &index, int role) const
 {
+    if (!index.isValid())
+        return QVariant();
+
+
     if (role == Qt::DisplayRole)
     {
+        if(index.column() == 0)
+        {
+            return QString::number(_tocElements.at(index.row()).id);
+        }
+        if(index.column() == 1)
+        {
+            return QString::fromStdString(_tocElements.at(index.row()).group);
+        }
+        if(index.column() == 2)
+        {
+            return QString::fromStdString(_tocElements.at(index.row()).name_only);
+        }
+        if(index.column() == 3)
+        {
+            return QString::number(_tocElements.at(index.row()).value);
+        }
         if(index.column() == static_cast<int>(Columns::Edit))
         {
 //            return _values[index.row()];
         }
-        else
-        {
-            return Base::data(index, role);
-        }
     }
     return QVariant();
 }
+
+
 
 bool ParameterModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {

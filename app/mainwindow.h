@@ -57,6 +57,9 @@ private slots:
     void on_pushButton_TestRemoveElement_clicked();
 
 private:
+    CrazyRadio _crazyRadio;
+    Crazyflie _crazyFlie;
+
     // GUI Windows and Widgets
     Ui::MainWindow* ui;
     QTableView* _actualValuesTable;
@@ -72,8 +75,6 @@ private:
     QTimer _timer_t2;
 
     // Function related
-    CrazyRadio _crazyRadio;
-    Crazyflie _crazyFlie;
     CameraViewPainter _cameraViewPainter;
     TrackingColor _trackingColor;
     Camera _camera;

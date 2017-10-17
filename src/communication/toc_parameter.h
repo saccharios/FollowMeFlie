@@ -107,6 +107,12 @@ public:
     bool RequestItems() {return _shared_impl.RequestItems();}
     bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
+    std::vector<TOCElement> const &
+    GetElements() const
+    {
+        return _elements;
+    }
+
 private:
     CrazyRadio & _crazyRadio;
     unsigned int _itemCount;

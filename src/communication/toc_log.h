@@ -136,6 +136,12 @@ public:
 
     float Value(std::string name);
 
+    std::vector<TOCElement> const &
+    GetElements() const
+    {
+        return _elements;
+    }
+
 private:
     std::string ExtractName(Data const & data);
     bool AddElement( CrazyRadio::sptrPacket && packet);

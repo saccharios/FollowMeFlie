@@ -160,6 +160,13 @@ public:
 
 
    std::array<float,3> ConvertBodyFrameToIntertialFrame(std::array<float,3> const & value_in_body);
+
+   std::vector<TOCElement> const &
+   GetLogElements () const
+   {
+       return _logger.GetElements();
+   }
+
 signals:
     void ConnectionTimeout();
     void NotConnecting();

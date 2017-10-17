@@ -22,34 +22,6 @@ QVariant TableModelBase::headerData(int section, Qt::Orientation orientation, in
     return QVariant();
 }
 
-QVariant TableModelBase::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-
-    if (role == Qt::DisplayRole)
-    {
-        if(index.column() == 0)
-        {
-            return QString::number(_tocElements.at(index.row()).id);
-        }
-        if(index.column() == 1)
-        {
-            return QString::fromStdString(_tocElements.at(index.row()).group);
-        }
-        if(index.column() == 2)
-        {
-            return QString::fromStdString(_tocElements.at(index.row()).name_only);
-        }
-        if(index.column() == 3)
-        {
-            return QString::number(_tocElements.at(index.row()).value);
-        }
-    }
-    return QVariant();
-}
-
 
 
 int TableModelBase::rowCount(const QModelIndex & parent) const

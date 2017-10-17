@@ -9,7 +9,7 @@ class TableModelBase : public QAbstractTableModel
 public:
     explicit TableModelBase(std::vector<TOCElement> const & tocElements, QObject *parent = 0);
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override = 0;
     // Header:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override = 0;
 
