@@ -73,11 +73,11 @@ void Crazyflie::Update()
         if(_startConnecting)
         {
             _ackMissCounter = 0;
-            _state = State::READ_PARAMETERS_TOC;
+            _state = State::SETUP_PARAMETERS;
         }
         break;
     }
-    case State::READ_PARAMETERS_TOC:
+    case State::SETUP_PARAMETERS:
     {
         if( !_crazyRadio.IsUsbConnectionOk())
         {
@@ -92,7 +92,7 @@ void Crazyflie::Update()
             bool success = SetupParameters();
             if(success)
             {
-                _state =State:: READ_LOGS_TOC;
+                _state =State::READ_PARAMETERS;
             }
 
             if(_crazyRadio.LastSendAndReceiveFailed())
@@ -104,7 +104,16 @@ void Crazyflie::Update()
         }
         break;
     }
-    case State::READ_LOGS_TOC:
+    case State::READ_PARAMETERS:
+    {
+        bool success = _parameters.ReadAll();
+        if(success)
+        {
+            _state =State::SETUP_LOGGER;
+        }
+        break;
+    }
+    case State::SETUP_LOGGER:
     {
         // Setup Logging TOC
         if(SetupLogger())

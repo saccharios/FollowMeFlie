@@ -107,6 +107,12 @@ public:
     bool RequestItems() {return _shared_impl.RequestItems();}
     bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
+    bool ReadAll();
+    bool ReadElement(uint8_t id);
+    bool ReadElement(TOCElement & element);
+
+
+
     std::vector<TOCElement> const &
     GetElements() const
     {

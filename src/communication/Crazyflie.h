@@ -48,10 +48,11 @@
 enum class State
 {
     ZERO = 0,
-    READ_PARAMETERS_TOC = 1,
-    READ_LOGS_TOC = 2,
-    ZERO_MEASUREMENTS = 3,
-    NORMAL_OPERATION = 4
+    SETUP_PARAMETERS = 1,
+    READ_PARAMETERS = 2,
+    SETUP_LOGGER = 3,
+    ZERO_MEASUREMENTS = 4,
+    NORMAL_OPERATION = 5
 };
 
 struct SetPoint
