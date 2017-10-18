@@ -142,16 +142,7 @@ public:
     SensorValues const & GetSensorValues() const {return _sensorValues;}
 
     void StartConnecting(bool enable);
-    //    Should be called during every 'cycle' of the main program using
-    //    this class. Things like sensor reading processing, integral
-    //    calculation and controller signal application are performed
-    //    here. This function also triggers communication with the
-    //    copter. Not calling it for too long will cause a disconnect from
-    //    the copter's radio.
-    //    Returns a boolean value denoting the current status of the
-    //    radio dongle. If it returns 'false', the dongle was most likely
-    //    removed or somehow else disconnected from the host machine. If it
-    //    returns 'true', the dongle connection works fine.
+
     void Update();
 
     bool IsDisconnected();
@@ -165,6 +156,11 @@ public:
    GetLogElements () const
    {
        return _logger.GetElements();
+   }
+   std::vector<TOCElement> const &
+   GetParameterElements() const
+   {
+       return _parameters.GetElements();
    }
 
 signals:
@@ -204,8 +200,8 @@ private:
 
     static constexpr float _frequency = 1000.0;
 
-    bool ReadTOCParameters();
-    bool ReadLogger();
+    bool SetupParameters();
+    bool SetupLogger();
     bool SendSetpoint(SetPoint setPoint);
 
     bool SendVelocityRef(Velocity velocity);

@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
      _parameterTable(nullptr),
      _dataForActualValuesModel(),
     _actualValuesModel(_crazyFlie.GetLogElements(), nullptr),
-    _parameterModel(_dataForActualValuesModel, nullptr),
+    _parameterModel(_crazyFlie.GetParameterElements(), nullptr),
     _timer_t0(),
     _timer_t1(),
     _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,

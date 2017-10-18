@@ -24,11 +24,6 @@ QVariant ParameterModel::headerData(int section, Qt::Orientation orientation, in
     return QVariant();
 }
 
-int ParameterModel::rowCount(const QModelIndex & /*parent*/) const
-{
-    return rows;
-}
-
 int ParameterModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return cols;

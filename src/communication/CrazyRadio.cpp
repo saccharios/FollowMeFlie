@@ -603,10 +603,10 @@ void CrazyRadio::ReadParameter()
 
         auto const & data = received->GetData();
         std::cout << data.size()-1 << std::endl;
-        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 1)) << std::endl;
-        std::cout<<"param id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 2)) << std::endl;
-        std::cout<<"type id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 3)) << std::endl;
-        for(int i = 4; i < data.size(); ++i)
+        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 0)) << std::endl;
+        std::cout<<"param id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 1)) << std::endl;
+        std::cout<<"type id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 2)) << std::endl;
+        for(int i = 3; i < data.size(); ++i)
         {
 
             std::cout<< i <<" = " <<   ExtractData<uint8_t>(data, i) << std::endl;
@@ -627,12 +627,12 @@ void CrazyRadio::ReadParameter()
 
         auto const & data = received2->GetData();
         std::cout << data.size()-1 << std::endl;
-        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 1)) << std::endl;
-        for(unsigned int i = 2; i < data.size(); ++i)
+        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 0)) << std::endl;
+        for(unsigned int i = 1; i < data.size(); ++i)
         {
                         std::cout<< i <<" = " << static_cast<int>( ExtractData<uint8_t>(data, i)) << std::endl;
         }
-        std::cout<< "total data = " <<   ExtractData<float>(data, 2) << std::endl;
+        std::cout<< "total data = " <<   ExtractData<float>(data, 1) << std::endl;
     }
 
 
