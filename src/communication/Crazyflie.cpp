@@ -88,8 +88,7 @@ void Crazyflie::Update()
         }
         else
         {
-            // Setup Parameter TOC
-            bool success = SetupParameters();
+            bool success = _parameters.Setup();
             if(success)
             {
                 _state =State::READ_PARAMETERS;
@@ -115,8 +114,8 @@ void Crazyflie::Update()
     }
     case State::SETUP_LOGGER:
     {
-        // Setup Logging TOC
-        if(SetupLogger())
+        bool success = _logger.Setup();
+        if(success)
         {
             StartLogging();
             _state = State::ZERO_MEASUREMENTS;
@@ -125,8 +124,6 @@ void Crazyflie::Update()
     }
     case State::ZERO_MEASUREMENTS:
     {
-        //        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-
         _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
         _crazyRadio.SendPingPacket();
@@ -201,75 +198,6 @@ void Crazyflie::Update()
 
     UpateSensorValues();
 }
-bool Crazyflie::SetupParameters()
-{
-    // This function is called periodically. It may be that it takes more than one sampling period to
-    // execute it. Use this bool guards to prevent a deadlock on the crazyflie.
-    static bool is_running = false;
-    if(!is_running)
-    {
-        is_running = true;
-        bool  info_ok = _parameters.RequestInfo();
-        if(info_ok)
-        {
-            bool items_ok = _parameters.RequestItems();
-            if(items_ok)
-            {
-                is_running = false;
-                return true;
-            }
-            else
-            {
-                std::cout << "Parameter TOC: Failed to get items\n";
-                is_running = false;
-                return false;
-            }
-        }
-        else
-        {
-            std::cout << "Parameter TOC: Failed to get info\n";
-            is_running = false;
-            return false;
-        }
-    }
-    return false;
-}
-
-
-bool Crazyflie::SetupLogger()
-{
-
-    // This function is called periodically. It may be that it takes more than one sampling period to
-    // execute it. Use this bool guards to prevent a deadlock on the crazyflie.
-    static bool is_running = false;
-    if(!is_running)
-    {
-        is_running = true;
-        bool  info_ok = _logger.RequestInfo();
-        if(info_ok)
-        {
-            bool items_ok = _logger.RequestItems();
-            if(items_ok)
-            {
-                is_running = false;
-                return true;
-            }
-            else
-            {
-                std::cout << "Logger TOC: Failed to get items\n";
-                is_running = false;
-                return false;
-            }
-        }
-        else
-        {
-            std::cout << "Logger TOC: Failed to get info\n";
-            is_running = false;
-            return false;
-        }
-    }
-    return false;
-}
 
 bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
@@ -312,12 +240,10 @@ bool  Crazyflie::SendVelocityRef(Velocity velocity)
 }
 
 
-
 void Crazyflie::StartConnecting(bool enable)
 {
     _startConnecting = enable;
 }
-
 
 
 void Crazyflie::UpateSensorValues()

@@ -14,7 +14,39 @@ public:
         _crazyRadio(crazyRadio)
     {}
 
-
+    bool Setup()
+    {
+        // This function is called periodically. It may be that it takes more than one sampling period to
+        // execute it. Use this bool guards to prevent a deadlock on the crazyflie.
+        static bool is_running = false;
+        if(!is_running)
+        {
+            is_running = true;
+            bool  info_ok = RequestInfo();
+            if(info_ok)
+            {
+                bool items_ok = RequestItems();
+                if(items_ok)
+                {
+                    is_running = false;
+                    return true;
+                }
+                else
+                {
+                    std::cout << "Parameter TOC: Failed to get items\n";
+                    is_running = false;
+                    return false;
+                }
+            }
+            else
+            {
+                std::cout << "Parameter TOC: Failed to get info\n";
+                is_running = false;
+                return false;
+            }
+        }
+        return false;
+    }
 
     bool RequestInfo()
     {

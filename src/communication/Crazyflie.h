@@ -196,13 +196,10 @@ private:
 
     Negative_Edge_Detector _leaveConnectingState;
 
-
     SensorValues _sensorValues;
 
     static constexpr float _frequency = 1000.0;
 
-    bool SetupParameters();
-    bool SetupLogger();
     bool SendSetpoint(SetPoint setPoint);
 
     bool SendVelocityRef(Velocity velocity);

@@ -123,6 +123,7 @@ public:
         return static_cast<int>(Port::Log);
     }
 
+    bool Setup() {return _shared_impl.Setup();}
     bool RequestInfo() {return _shared_impl.RequestInfo();}
     bool RequestItems() {return _shared_impl.RequestItems();}
     bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
