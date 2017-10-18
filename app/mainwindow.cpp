@@ -10,40 +10,8 @@
 #include "actual_values_model.h"
 #include "parameter_model.h"
 #include <QTableView>
-#include <QScrollBar>
 
-
-void SetupTableViewWidget(QTableView* tableView)
-{
-    // Hide vertical header
-    tableView->verticalHeader()->hide();
-    // Resize columns and rows to fit content
-//    tableView->resizeColumnsToContents();
-//    tableView->resizeRowsToContents();
-    // Resize TableView Widget to match content size
-    int w = 0;
-    int h = 0;
-    w += tableView->contentsMargins().left() + tableView->contentsMargins().right();
-    w += tableView->horizontalScrollBar()->width()/4; // TODO SF: Somehow the width of the horizontalScrollBar is way too large?
-    h +=  tableView->contentsMargins().top()+ tableView->contentsMargins().bottom();
-    h +=  tableView->horizontalHeader()->height();
-    for (int i=0; i<tableView->model()->columnCount(); ++i)
-    {
-        w += tableView->columnWidth(i);
-    }
-    for (int i=0; i < 6; ++i) // Minimum 6 rows are shown.
-    {
-        h += tableView->rowHeight(i);
-    }
-
-    tableView->setMinimumWidth(w);
-    tableView->setMaximumWidth(w);
-    tableView->setMinimumHeight(h);
-//    tableView->setMaximumHeight(h);
-
-
-    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-}
+#include "qt_util.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -302,7 +270,7 @@ void MainWindow::on_pushButton_ActualValues_clicked()
     {
         _actualValuesTable = new QTableView();
         _actualValuesTable->setModel(&_actualValuesModel);
-        SetupTableViewWidget(_actualValuesTable);
+        qt_utils::SetupTableViewWidget(_actualValuesTable);
         _actualValuesTable->setWindowTitle("Actual Values");
         _actualValuesTable->show();
     }
@@ -320,7 +288,7 @@ void MainWindow::on_pushButton_ParameterTable_clicked()
         _parameterTable = new QTableView();
         _parameterTable->setModel(&_parameterModel);
 
-        SetupTableViewWidget(_parameterTable);
+        qt_utils::SetupTableViewWidget(_parameterTable);
         _parameterTable->setWindowTitle("Parameter Table");
         _parameterTable->show();
     }

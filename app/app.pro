@@ -19,7 +19,8 @@ SOURCES +=  main.cpp \
     imageprocess/extractcolor.cpp \
     actual_values_model.cpp \
     table_model_base.cpp \
-    parameter_model.cpp
+    parameter_model.cpp \
+    qt_uitl.cpp
 
 
 HEADERS  += mainwindow.h \
