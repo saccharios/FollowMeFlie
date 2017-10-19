@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-
+#include <iostream>
 #include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
 
 using Acceleration = std::array<float,3>;
@@ -34,9 +34,12 @@ enum class ElementType : uint8_t
     INT8  = 4,
     INT16  = 5,
     INT32  = 6,
-    FLOAT = 7
+    FLOAT =7,
+    UINT64  = 11,
+    INT64  = 12,
+    DOUBLE = 13,
+    FP16 = 14
 };
-
 
 struct TOCElement
 {
@@ -46,4 +49,8 @@ struct TOCElement
     std::string name; // TODO SF Is combined name : group +"."+name_only
     ElementType type;
     float value;
+    void Print()
+    {
+        std::cout << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << std::endl;
+    }
 };

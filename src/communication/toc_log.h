@@ -101,8 +101,6 @@ class TocLog
         std::vector<TOCElement*> elements; // Has no ownership over TocLogElements.
     };
 
-
-
 public:
     TocLog(CrazyRadio & crazyRadio) :
         _crazyRadio(crazyRadio),

@@ -13,7 +13,7 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
 
     uint8_t id = GetFirstFreeID();
 
-    // Regiter new block
+    // Register new block
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / frequency);// The sampling rate is in 100us units
     Data data =  {channel::Commands::CreateBlock::id, id, samplingRate};
     CRTPPacket packet(Port::Log, channel::id, std::move(data));
@@ -154,82 +154,56 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
             for(auto const & element : logBlock.elements)
             {
                 int byteLength = 0;
-                float value = 0;
+                // TODO SF Is there a way to omit this switch?
+                _shared_impl.SetValueToElement(element, logdataVect, offset);
                 switch(element->type)
                 {
                 case ElementType::UINT8:
                 {
                     byteLength = 1;
-                    value = static_cast<float>(ExtractData<uint8_t>(logdataVect, offset));
                     break;
                 }
 
                 case ElementType::UINT16:
                 {
                     byteLength =2;
-                    value = static_cast<float>(ExtractData<uint16_t>(logdataVect, offset));
                     break;
                 }
 
                 case ElementType::UINT32:
                 {
                     byteLength = 4;
-                    value = static_cast<float>(ExtractData<uint32_t>(logdataVect, offset));
                     break;
                 }
 
                 case ElementType::INT8:
                 {
                     byteLength = 1;
-                    value = static_cast<float>(ExtractData<int8_t>(logdataVect, offset));
                     break;
                 }
 
                 case ElementType::INT16:
                 {
                     byteLength = 2;
-                    value = static_cast<float>(ExtractData<int16_t>(logdataVect, offset));
                     break;
                 }
 
                 case ElementType::INT32:
                 {
                     byteLength = 4;
-                    value = static_cast<float>(ExtractData<int32_t>(logdataVect, offset));
                     break;
                 }
 
                 case ElementType::FLOAT:
                 {
                     byteLength = 4;
-                    value = ExtractData<float>(logdataVect, offset);
                     break;
                 }
-
-                    //                    case 8:
-                    //                    { // FP16
-                    // NOTE(winkler): This is untested code (as no FP16
-                    // variable gets advertised yet). This has to be tested
-                    // and is to be used carefully. I will do that as soon
-                    // as I find time for it.
-                    //                        byteLength = 2;
-                    //                        uint8_t cBuffer1[byteLength];
-                    //                        uint8_t cBuffer2[4];
-                    //                        memcpy(cBuffer1, &logdata[offset], byteLength);
-                    //                        cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
-                    //                        cBuffer2[1] = 0;
-                    //                        cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
-                    //                        cBuffer2[3] = cBuffer1[1];
-                    //                        memcpy(&value, cBuffer2, 4); // Put it into the float variable
-                    //                    } break;
-
                 default:
                 { // Unknown. This hopefully never happens.
                     break;
                 }
                 }
-
-                element->value = value;
                 offset += byteLength;
             }
         }

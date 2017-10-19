@@ -41,35 +41,22 @@ class TocParameter
         struct Read
         {
             static constexpr uint8_t id = 1;
-            struct Commands
+            // Note: Channel Read has no different commands
+            struct AnswerByte
             {
-                struct ReadElement
-                {
-                    static constexpr uint8_t id = 0;
-                    struct AnswerByte
-                    {
-                        static constexpr uint8_t CmdID = 0;
-                        static constexpr uint8_t Value = 1; // Length and type according to TOC
-                    };
-                };
+                static constexpr uint8_t CmdID = 0;
+                static constexpr uint8_t Value = 1; // Length and type according to TOC
             };
         };
         struct Write
         {
             static constexpr uint8_t id = 2;
-            struct Commands
+            // Note: Channel Write has no different commands
+            struct AnswerByte
             {
-                struct WriteElement
-                {
-                    static constexpr uint8_t id = 0;
-                    struct AnswerByte
-                    {
-                        static constexpr uint8_t CmdID = 0;
-                        static constexpr uint8_t Value = 1; // Length and type according to TOC
-                    };
-                };
+                static constexpr uint8_t CmdID = 0;
+                static constexpr uint8_t Value = 1; // Length and type according to TOC
             };
-
         };
         struct Misc
         {
@@ -91,9 +78,23 @@ class TocParameter
 
     };
 
-
-
 public:
+
+    enum class ParameterElementType  : uint8_t
+    {
+            UINT8  = 0x08,
+            UINT16  = 0x09,
+            UINT32  = 0x0A,
+            UINT64  = 0x0B,
+            INT8  = 0x00,
+            INT16  = 0x01,
+            INT32  = 0x02,
+            INT64  = 0x03,
+            FP16   = 0x05,
+            FLOAT = 0x06,
+            DOUBLE= 0x07,
+    };
+
     TocParameter(CrazyRadio & crazyRadio) :
         _crazyRadio(crazyRadio),
       _itemCount(0),
@@ -109,7 +110,6 @@ public:
     bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
     bool ReadAll();
-    bool ReadElement(uint8_t id);
     bool ReadElement(TOCElement & element);
 
 

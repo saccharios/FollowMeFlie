@@ -1,8 +1,9 @@
 #pragma once
 #include "math/types.h"
 #include "CrazyRadio.h"
+#include "CRTPPacket.h"
 
-template<uint8_t Port, typename Channel>
+template<uint8_t port, typename channel>
 class TOCShared
 {
 public:
@@ -50,15 +51,15 @@ public:
 
     bool RequestInfo()
     {
-        Data data = {Channel::Commands::GetInfo::id};
-        CRTPPacket packet(Port, Channel::id, std::move(data));
+        Data data = {channel::Commands::GetInfo::id};
+        CRTPPacket packet(port, channel::id, std::move(data));
         bool receivedPacketIsValid = false;
         auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
         if(receivedPacketIsValid && received->GetData().size() > 1)
         {
-            if(received->GetData().at(Channel::Commands::GetInfo::AnswerByte::CmdID) == Channel::Commands::GetInfo::id)
+            if(received->GetData().at(channel::Commands::GetInfo::AnswerByte::CmdID) == channel::Commands::GetInfo::id)
             {
-                _itemCount = received->GetData().at(Channel::Commands::GetInfo::AnswerByte::ItemCount);
+                _itemCount = received->GetData().at(channel::Commands::GetInfo::AnswerByte::ItemCount);
                 std::cout << "_itemCount =" << _itemCount << std::endl;
                 return  true;
             }
@@ -86,8 +87,8 @@ public:
 
     bool RequestItem(uint8_t id)
     {
-        Data data = {Channel::Commands::GetItem::id,id};
-        CRTPPacket  packet(Port, Channel::id, std::move(data));
+        Data data = {channel::Commands::GetItem::id,id};
+        CRTPPacket  packet(port, channel::id, std::move(data));
         bool receivedPacketIsValid = false;
         auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
         if(receivedPacketIsValid)
@@ -102,20 +103,113 @@ public:
     }
 
 
+    void SetValueToElement(TOCElement* element, Data const & logdataVect, int offset) const
+    {
+        switch(element->type)
+        {
+        case ElementType::UINT8:
+        {
+            element->value = static_cast<float>(ExtractData<uint8_t>(logdataVect, offset));
+            break;
+        }
+
+        case ElementType::UINT16:
+        {
+            element->value = static_cast<float>(ExtractData<uint16_t>(logdataVect, offset));
+            break;
+        }
+
+        case ElementType::UINT32:
+        {
+            element->value = static_cast<float>(ExtractData<uint32_t>(logdataVect, offset));
+            break;
+        }
+        case ElementType::UINT64:
+        {
+            element->value  = 0;
+//            element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
+            break;
+        }
+
+        case ElementType::INT8:
+        {
+            element->value = static_cast<float>(ExtractData<int8_t>(logdataVect, offset));
+            break;
+        }
+
+        case ElementType::INT16:
+        {
+            element->value = static_cast<float>(ExtractData<int16_t>(logdataVect, offset));
+            break;
+        }
+
+        case ElementType::INT32:
+        {
+            element->value = static_cast<float>(ExtractData<int32_t>(logdataVect, offset));
+            break;
+        }
+        case ElementType::INT64:
+        {
+//            element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
+            element->value  = 0;
+            break;
+        }
+
+        case ElementType::FLOAT:
+        {
+            element->value = ExtractData<float>(logdataVect, offset);
+            break;
+        }
+        case ElementType::DOUBLE:
+        {
+//            element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
+            element->value = 0;
+            break;
+        }
+        case ElementType::FP16:
+        {
+            element->value = 0;
+            break;
+        }
+
+            //                    case 8:
+            //                    { // FP16
+            // NOTE(winkler): This is untested code (as no FP16
+            // variable gets advertised yet). This has to be tested
+            // and is to be used carefully. I will do that as soon
+            // as I find time for it.
+            //                        byteLength = 2;
+            //                        uint8_t cBuffer1[byteLength];
+            //                        uint8_t cBuffer2[4];
+            //                        memcpy(cBuffer1, &logdata[offset], byteLength);
+            //                        cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
+            //                        cBuffer2[1] = 0;
+            //                        cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
+            //                        cBuffer2[3] = cBuffer1[1];
+            //                        memcpy(&value, cBuffer2, 4); // Put it into the float variable
+            //                    } break;
+
+        default:
+        { // Unknown. This hopefully never happens.
+            element->value = 0;
+            break;
+        }
+        }
+    }
 
 private:
     bool AddElement( CrazyRadio::sptrPacket && packet)
     {
-       if(packet->GetPort_Int() == Port && static_cast<uint8_t>(packet->GetChannel() )== Channel::id)
+        if(packet->GetPort_Int() == port && static_cast<uint8_t>(packet->GetChannel() )== channel::id)
         {
             auto const & data = packet->GetData();
 
-            if(data.at(Channel::Commands::GetItem::AnswerByte::CmdID) == Channel::Commands::GetItem::id)
+            if(data.at(channel::Commands::GetItem::AnswerByte::CmdID) == channel::Commands::GetItem::id)
             {
 
                 TOCElement element;
 
-                int index = Channel::Commands::GetItem::AnswerByte::Group;
+                int index = channel::Commands::GetItem::AnswerByte::Group;
                 // Read in group name, it is a zero terminated string
                 while(data.at(index) != '\0')
                 {
@@ -130,8 +224,17 @@ private:
                     ++index;
                 }
                 element.name = element.group +"."+  element.name_only;
-                element.id = data.at(Channel::Commands::GetItem::AnswerByte::ID);
-                element.type = static_cast<ElementType>(data.at(Channel::Commands::GetItem::AnswerByte::Type));
+                element.id = data.at(channel::Commands::GetItem::AnswerByte::ID);
+                if(port == static_cast<uint8_t>(Port::Parameters))
+                {
+                    element.type = ConvertParameterElementType(data.at(channel::Commands::GetItem::AnswerByte::Type));
+                    std::cout << static_cast<int>(element.type) << std::endl;
+                }
+                else
+                {
+                    element.type = static_cast<ElementType>(data.at(channel::Commands::GetItem::AnswerByte::Type));
+                }
+
                 element.value = 0;
                 _elements.emplace_back(element);
                 return true;
@@ -139,6 +242,48 @@ private:
         }
         // TODO SF Error handling
         return false;
+    }
+
+    ElementType ConvertParameterElementType(uint8_t type)
+    {
+        // Unfortunately the parameter toc has a different encoding for the types than the logger toc.
+        // Convert here this encoding to the same encoding.
+        std::cout << "converting "<< static_cast<int>(type) << "to " ;
+        switch(type)
+        {
+        case 0x00:
+            return ElementType::INT8;
+        case 0x01:
+            return ElementType::INT16;
+            break;
+        case 0x02:
+            return ElementType::INT32;
+        case 0x03:
+            return ElementType::INT64;
+            break;
+        case 0x05:
+            return ElementType::FP16;
+            break;
+        case 0x06:
+            return ElementType::FLOAT;
+            break;
+        case 0x07:
+            return ElementType::DOUBLE;
+        case 0x08:
+            return ElementType::UINT8;
+            break;
+        case 0x09:
+            return ElementType::UINT16;
+            break;
+        case 0x0A:
+            return ElementType::UINT32;
+            break;
+        case 0x0B:
+            return ElementType::UINT64;
+        default:
+            return ElementType::UINT8;
+            break;
+        }
     }
 
     unsigned int & _itemCount;
