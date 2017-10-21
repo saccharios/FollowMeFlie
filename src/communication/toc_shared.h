@@ -2,7 +2,7 @@
 #include "math/types.h"
 #include "CrazyRadio.h"
 #include "CRTPPacket.h"
-
+#include "math/stl_utils.h"
 template<uint8_t port, typename channel>
 class TOCShared
 {
@@ -208,7 +208,6 @@ private:
             {
 
                 TOCElement element;
-
                 int index = channel::Commands::GetItem::AnswerByte::Group;
                 // Read in group name, it is a zero terminated string
                 while(data.at(index) != '\0')
@@ -235,7 +234,13 @@ private:
                 }
 
                 element.value = 0;
-                _elements.emplace_back(element);
+                // Only add element if it does not exist yet
+                bool isAlreadyContained = false;
+                STLUtils::ElementForID(_elements, element.id, isAlreadyContained);
+                if(!isAlreadyContained)
+                {
+                    _elements.emplace_back(element);
+                }
                 return true;
             }
         }
