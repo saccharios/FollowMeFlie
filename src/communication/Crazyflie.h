@@ -172,7 +172,6 @@ public:
    }
 
 
-
 signals:
     void ConnectionTimeout();
     void NotConnecting();
@@ -238,6 +237,8 @@ private:
     void UpateSensorValues();
     float GetSensorValue(std::string name);
 
+    bool RegisterLoggingBlocks();
+    bool RegisterLogginBlock(bool & success, std::string name, float frequency);
 
 };
 

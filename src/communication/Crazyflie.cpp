@@ -343,13 +343,18 @@ bool Crazyflie::IsConnected()
 
 void Crazyflie::StartLogging()
 {
+
     // Register the desired sensor readings
+    bool success = RegisterLoggingBlocks();
+    if(success )
+    {
     EnableStabilizerLogging();
     EnableGyroscopeLogging();
     EnableAccelerometerLogging();
     EnableBatteryLogging();
     EnableMagnetometerLogging();
     EnableBarometerLogging();
+    }
 }
 
 void Crazyflie::StopLogging()
@@ -391,10 +396,39 @@ float Crazyflie::GetSensorValue(std::string strName)
     return _logger.Value(strName);
 }
 
+bool Crazyflie::RegisterLoggingBlocks()
+{
+    // Repeat as long as not all logging blocks are registered, at max max_try;
+    static std::array<bool,6> success ={false,false,false,false,false,false};
+    constexpr int max_try = 10;
+    static int cntr = 0;
+    RegisterLogginBlock(success[0], "stabilizer", _frequency);
+    RegisterLogginBlock(success[1], "gyroscope", _frequency);
+    RegisterLogginBlock(success[2], "accelerometer", _frequency);
+    RegisterLogginBlock(success[3], "battery", _frequency);
+    RegisterLogginBlock(success[4], "magnetometer", _frequency);
+    RegisterLogginBlock(success[5], "barometer", _frequency);
+    if ( (success[0] && success[1] && success[2] && success[3] && success[4] && success[5]) || cntr > max_try)
+    {
+        return true;
+    }
+    else
+    {
+        ++cntr;
+        return false;
+    }
+}
+
+bool Crazyflie::RegisterLogginBlock(bool & success, std::string name, float frequency)
+{
+    if(!success)
+    {
+        success = _logger.RegisterLoggingBlock(name, frequency);
+    }
+}
 
 void Crazyflie::EnableStabilizerLogging()
 {
-    _logger.RegisterLoggingBlock("stabilizer", _frequency);
     _logger.StartLogging("stabilizer.roll", "stabilizer");
     _logger.StartLogging("stabilizer.pitch", "stabilizer");
     _logger.StartLogging("stabilizer.yaw", "stabilizer");
@@ -403,7 +437,6 @@ void Crazyflie::EnableStabilizerLogging()
 
 void Crazyflie::EnableGyroscopeLogging()
 {
-    _logger.RegisterLoggingBlock("gyroscope", _frequency);
     _logger.StartLogging("gyro.x", "gyroscope");
     _logger.StartLogging("gyro.y", "gyroscope");
     _logger.StartLogging("gyro.z", "gyroscope");
@@ -411,7 +444,6 @@ void Crazyflie::EnableGyroscopeLogging()
 
 void Crazyflie::EnableAccelerometerLogging()
 {
-    _logger.RegisterLoggingBlock("accelerometer", _frequency);
     _logger.StartLogging("acc.x", "accelerometer");
     _logger.StartLogging("acc.y", "accelerometer");
     _logger.StartLogging("acc.z", "accelerometer");
@@ -436,7 +468,6 @@ void Crazyflie::DisableAccelerometerLogging()
 
 void Crazyflie::EnableBatteryLogging()
 {
-    _logger.RegisterLoggingBlock("battery", _frequency);
     _logger.StartLogging("pm.vbat", "battery");
     _logger.StartLogging("pm.state", "battery");
 }
@@ -448,7 +479,6 @@ void Crazyflie::DisableBatteryLogging()
 
 void Crazyflie::EnableMagnetometerLogging()
 {
-    _logger.RegisterLoggingBlock("magnetometer", _frequency);
     _logger.StartLogging("mag.x", "magnetometer");
     _logger.StartLogging("mag.y", "magnetometer");
     _logger.StartLogging("mag.z", "magnetometer");
@@ -461,7 +491,6 @@ void Crazyflie::DisableMagnetometerLogging()
 
 void Crazyflie::EnableBarometerLogging()
 {
-    _logger.RegisterLoggingBlock("barometer", _frequency);
     _logger.StartLogging("baro.asl", "altimeter");
     _logger.StartLogging("baro.aslLong", "altimeter");
     _logger.StartLogging("baro.pressure", "altimeter");
