@@ -3,7 +3,7 @@
 
 bool TocParameter::ReadAll()
 {
-    for(TOCElement element : _elements)
+    for(TOCElement & element : _elements)
     {
         bool success = ReadElement(element);
         if(!success)
@@ -28,13 +28,8 @@ bool TocParameter::ReadElement(TOCElement & element)
     {
         if(element.id == dataReceived.at(Channels::Read::AnswerByte::CmdID))
         {
-            std::cout << "data size = " << received->GetData().size() << std::endl;
-            for(unsigned int i = 0; i < dataReceived.size(); ++i)
-            {
-                std::cout << "i = " << static_cast<int>(i) << "  " << static_cast<int>(dataReceived.at(i)) << std::endl;
-            }
             _shared_impl.SetValueToElement(&element, dataReceived, Channels::Read::AnswerByte::Value);
-            element.Print();
+            emit ParameterRead(element.id);
             return true;
         }
         return false;

@@ -228,7 +228,6 @@ private:
                 if(port == static_cast<uint8_t>(Port::Parameters))
                 {
                     element.type = ConvertParameterElementType(data.at(channel::Commands::GetItem::AnswerByte::Type));
-                    std::cout << static_cast<int>(element.type) << std::endl;
                 }
                 else
                 {
@@ -248,7 +247,6 @@ private:
     {
         // Unfortunately the parameter toc has a different encoding for the types than the logger toc.
         // Convert here this encoding to the same encoding.
-        std::cout << "converting "<< static_cast<int>(type) << "to " ;
         switch(type)
         {
         case 0x00:

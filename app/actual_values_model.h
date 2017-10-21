@@ -15,7 +15,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
 
-    public slots:
+public slots:
     void UpdateActualValues();
 
 };

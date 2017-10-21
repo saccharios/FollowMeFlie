@@ -2,8 +2,11 @@
 #include "CrazyRadio.h"
 #include "math/types.h"
 #include "toc_shared.h"
-class TocParameter
+#include <QObject>
+
+class TocParameter : public QObject
 {
+    Q_OBJECT
     // Channel documentation available at https://wiki.bitcraze.io/doc:crazyflie:crtp:param
     struct Channels
     {
@@ -119,6 +122,8 @@ public:
     {
         return _elements;
     }
+signals:
+    void ParameterRead(uint8_t const &);
 
 private:
     CrazyRadio & _crazyRadio;

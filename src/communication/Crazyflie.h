@@ -158,11 +158,20 @@ public:
    {
        return _logger.GetElements();
    }
+
    std::vector<TOCElement> const &
    GetParameterElements() const
    {
        return _parameters.GetElements();
    }
+
+   TocParameter const &
+   GetParameterTOC() const
+   {
+       return _parameters;
+   }
+
+
 
 signals:
     void ConnectionTimeout();
