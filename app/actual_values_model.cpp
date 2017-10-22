@@ -58,3 +58,10 @@ void ActualValuesModel::UpdateActualValues()
     emit dataChanged(topLeft, bottomRight);
 }
 
+Qt::ItemFlags ActualValuesModel::flags(const QModelIndex &index) const
+{
+    Q_UNUSED(index);
+    return Qt::NoItemFlags;
+}
+
+

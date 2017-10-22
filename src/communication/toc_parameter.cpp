@@ -50,10 +50,9 @@ bool TocParameter::WriteValue(uint8_t id, float value)
     if(receivedPacketIsValid && dataReceived.size() > 1)
     {
         if( (id == dataReceived.at(Channels::Read::AnswerByte::CmdID)) )
-  //              && ()) // TODO SF Received value must be equal to sent value
         {
             bool isValid = false;
-            auto & element = STLUtils::ElementForID(_elements, id, isValid);
+            TOCElement & element = STLUtils::ElementForID(_elements, id, isValid);
             if(isValid)
             {
                 _shared_impl.SetValueToElement(&element, dataReceived, Channels::Write::AnswerByte::Value);

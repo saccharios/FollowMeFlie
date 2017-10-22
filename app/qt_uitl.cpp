@@ -47,7 +47,7 @@ void SetupTableViewWidget(QTableView* tableView)
     {
         w += tableView->columnWidth(i);
     }
-    for (int i=0; i < 6; ++i) // Minimum 6 rows are shown.
+    for (int i=0; i < 20; ++i) // Minimum 6 rows are shown.
     {
         h += tableView->rowHeight(i);
     }

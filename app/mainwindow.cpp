@@ -174,9 +174,7 @@ void MainWindow::on_connectRadio_clicked()
             on_connectRadio_clicked();
             break;
         }
-
         }
-
     }
 }
 
