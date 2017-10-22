@@ -398,25 +398,33 @@ float Crazyflie::GetSensorValue(std::string strName)
 
 bool Crazyflie::RegisterLoggingBlocks()
 {
-    // Repeat as long as not all logging blocks are registered, at max max_try;
-    static std::array<bool,6> success ={false,false,false,false,false,false};
-    constexpr int max_try = 10;
-    static int cntr = 0;
-    RegisterLogginBlock(success[0], "stabilizer", _frequency);
-    RegisterLogginBlock(success[1], "gyroscope", _frequency);
-    RegisterLogginBlock(success[2], "accelerometer", _frequency);
-    RegisterLogginBlock(success[3], "battery", _frequency);
-    RegisterLogginBlock(success[4], "magnetometer", _frequency);
-    RegisterLogginBlock(success[5], "barometer", _frequency);
-    if ( (success[0] && success[1] && success[2] && success[3] && success[4] && success[5]) || cntr > max_try)
+    static bool is_running = false;
+    if(!is_running)
     {
-        return true;
+        is_running = true;
+        // Repeat as long as not all logging blocks are registered, at max max_try;
+        static std::array<bool,6> success ={false,false,false,false,false,false};
+        constexpr int max_try = 10;
+        static int cntr = 0;
+        RegisterLogginBlock(success[0], "stabilizer", _frequency);
+        RegisterLogginBlock(success[1], "gyroscope", _frequency);
+        RegisterLogginBlock(success[2], "accelerometer", _frequency);
+        RegisterLogginBlock(success[3], "battery", _frequency);
+        RegisterLogginBlock(success[4], "magnetometer", _frequency);
+        RegisterLogginBlock(success[5], "barometer", _frequency);
+        if ( (success[0] && success[1] && success[2] && success[3] && success[4] && success[5]) || cntr > max_try)
+        {
+            is_running = false;
+            return true;
+        }
+        else
+        {
+            ++cntr;
+            is_running = false;
+            return false;
+        }
     }
-    else
-    {
-        ++cntr;
-        return false;
-    }
+
 }
 
 bool Crazyflie::RegisterLogginBlock(bool & success, std::string name, float frequency)

@@ -22,8 +22,6 @@ QVariant TableModelBase::headerData(int section, Qt::Orientation orientation, in
     return QVariant();
 }
 
-
-
 int TableModelBase::rowCount(const QModelIndex & parent) const
 {
     Q_UNUSED(parent);
@@ -34,11 +32,6 @@ bool TableModelBase::insertRows(int row, int count, const QModelIndex &parent )
 {
     Q_UNUSED(parent);
     beginInsertRows(QModelIndex(), row, row + count - 1);
-//    for (int i = 0; i < count; ++i)
-//    {
-//        TOCElement e;
-//        _tocElements.push_back(e);
-//    }
     endInsertRows();
     return true;
 }
@@ -47,10 +40,6 @@ bool TableModelBase::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent);
     beginRemoveRows(QModelIndex(), row, row + count - 1);
-
-//    for (int i = 0; i < count; ++i) {
-//        _tocElements.pop_back();
-//    }
     endRemoveRows();
     return true;
 

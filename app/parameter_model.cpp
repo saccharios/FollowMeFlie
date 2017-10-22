@@ -37,25 +37,25 @@ QVariant ParameterModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        if(index.column() == 0)
+        if(index.column() == static_cast<int>(Columns::Index))
         {
             return QString::number(_tocElements.at(index.row()).id);
         }
-        if(index.column() == 1)
+        if(index.column() == static_cast<int>(Columns::Group))
         {
             return QString::fromStdString(_tocElements.at(index.row()).group);
         }
-        if(index.column() == 2)
+        if(index.column() == static_cast<int>(Columns::Name))
         {
             return QString::fromStdString(_tocElements.at(index.row()).name_only);
         }
-        if(index.column() == 3)
+        if(index.column() == static_cast<int>(Columns::Value))
         {
             return QString::number(_tocElements.at(index.row()).value);
         }
         if(index.column() == static_cast<int>(Columns::Edit))
         {
-//            return _values[index.row()];
+            return QString::number(_tocElements.at(index.row()).value);
         }
     }
     return QVariant();
@@ -63,34 +63,35 @@ QVariant ParameterModel::data(const QModelIndex &index, int role) const
 
 
 
-//bool ParameterModel::setData(const QModelIndex &index, const QVariant &value, int role)
-//{
+bool ParameterModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
 
-//    if(index.column() == static_cast<int>(Columns::Edit))
-//    {
-//        if (role == Qt::EditRole)
-//        {
-////            _values[index.row()] = value.toString();
-////            emit editCompleted( _values[index.row()] );
-//        }
-//    }
-//    return true;
+    if(index.column() == static_cast<int>(Columns::Edit))
+    {
+        if (role == Qt::EditRole)
+        {
+            auto const & element =  _tocElements.at(index.row());
+            emit ParameterWrite(element.id, value.toFloat());
+            emit editCompleted( value.toString());
+        }
+    }
+    return true;
 
-//}
+}
 
-//Qt::ItemFlags ParameterModel::flags(const QModelIndex &index) const
-//{
-//    if (!index.isValid())
-//    {
-//        return Qt::NoItemFlags;
-//    }
+Qt::ItemFlags ParameterModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+    {
+        return Qt::NoItemFlags;
+    }
 
-//    if(index.column() == static_cast<int>(Columns::Edit))
-//    {
-//        return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
-//    }
-//    return Qt::NoItemFlags;
-//}
+    if(index.column() == static_cast<int>(Columns::Edit))
+    {
+        return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
+    }
+    return Qt::NoItemFlags;
+}
 
 
 void ParameterModel::UpdateParameter(uint8_t const & index)

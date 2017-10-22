@@ -63,7 +63,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
     QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
     QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(display_not_connecting_box()));
-    QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)), &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
+    QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)),
+                     &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
+    QObject::connect(&_parameterModel, SIGNAL( ParameterWrite(uint8_t, float)),
+                     &_crazyFlie.GetParameterTOC(), SLOT( WriteParameter(uint8_t, float)));
 
 
     // For testing purposes

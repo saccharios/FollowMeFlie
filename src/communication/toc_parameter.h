@@ -115,6 +115,7 @@ public:
     bool ReadAll();
     bool ReadElement(TOCElement & element);
 
+    bool WriteValue(uint8_t id, float value);
 
 
     std::vector<TOCElement> const &
@@ -124,7 +125,8 @@ public:
     }
 signals:
     void ParameterRead(uint8_t const &);
-
+public slots:
+    void WriteParameter(uint8_t, float);
 private:
     CrazyRadio & _crazyRadio;
     unsigned int _itemCount;

@@ -31,19 +31,19 @@ QVariant ActualValuesModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        if(index.column() == 0)
+        if(index.column() == static_cast<int>(Columns::Index))
         {
             return QString::number(_tocElements.at(index.row()).id);
         }
-        if(index.column() == 1)
+        if(index.column() == static_cast<int>(Columns::Group))
         {
             return QString::fromStdString(_tocElements.at(index.row()).group);
         }
-        if(index.column() == 2)
+        if(index.column() == static_cast<int>(Columns::Name))
         {
             return QString::fromStdString(_tocElements.at(index.row()).name_only);
         }
-        if(index.column() == 3)
+        if(index.column() == static_cast<int>(Columns::Value))
         {
             return QString::number(_tocElements.at(index.row()).value);
         }
