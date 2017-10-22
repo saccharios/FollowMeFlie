@@ -1,5 +1,5 @@
 #include "actual_values_model.h"
-
+#include <QColor>
 ActualValuesModel::ActualValuesModel(std::vector<TOCElement> const & tocElements, QObject *parent):
     Base(tocElements, parent)
 {
@@ -47,6 +47,10 @@ QVariant ActualValuesModel::data(const QModelIndex &index, int role) const
         {
             return QString::number(_tocElements.at(index.row()).value);
         }
+    }
+    else if(role == Qt::ForegroundRole )
+    {
+        return QVariant( QColor( Qt::black ) );
     }
     return QVariant();
 }
