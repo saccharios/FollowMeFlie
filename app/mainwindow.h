@@ -48,8 +48,6 @@ private slots:
     void on_pushButton_SafeLandingMode_clicked();
     void on_pushButton_ActualValues_clicked();
     void on_pushButton_ParameterTable_clicked();
-    void on_pushButton_TestAddElement_clicked();
-    void on_pushButton_TestRemoveElement_clicked();
 
 private:
     CrazyRadio _crazyRadio;
@@ -60,7 +58,6 @@ private:
     QTableView* _actualValuesTable;
     QTableView* _parameterTable;
 
-    std::vector<TOCElement> _dataForActualValuesModel; // TODO SF Remove
     ActualValuesModel _actualValuesModel;
     ParameterModel _parameterModel;
 

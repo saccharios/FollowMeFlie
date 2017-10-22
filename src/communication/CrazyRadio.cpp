@@ -588,54 +588,5 @@ bool CrazyRadio::LastSendAndReceiveFailed() const
 {
     return    _lastSendAndReceiveFailed;
 }
-void CrazyRadio::ReadParameter()
-{
 
-    Data data ={0,14}; // TODO SF:: Why need to add a preceding 0?
-    CRTPPacket packet(Port::Parameters, Channel::TOC, std::move(data)); // Channel 1 for reading - how to solve multiple channel assignments?
-    bool receivedPacketIsValid = false;
-    sptrPacket received = SendAndReceive(std::move(packet), receivedPacketIsValid);
-
-    if(receivedPacketIsValid)
-    {
-        std::cout << "Requesting toc acces :" << std::endl;
-        std::cout << "Port = " << (int) received->GetPort() << " Channel = " << (int)  received->GetChannel()  << " Data Size = ";
-
-        auto const & data = received->GetData();
-        std::cout << data.size()-1 << std::endl;
-        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 0)) << std::endl;
-        std::cout<<"param id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 1)) << std::endl;
-        std::cout<<"type id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 2)) << std::endl;
-        for(int i = 3; i < data.size(); ++i)
-        {
-
-            std::cout<< i <<" = " <<   ExtractData<uint8_t>(data, i) << std::endl;
-
-//            std::cout<< i <<" = " << static_cast<int>( ExtractData<uint8_t>(data, i)) << std::endl;
-
-        }
-    }
-        Data data2 ={14}; // Here no preceding 0 is needed!
-    CRTPPacket packet2(Port::Parameters, Channel::LogControl, std::move(data2)); // Channel 1 for reading - how to solve multiple channel assignments?
-    receivedPacketIsValid = false;
-    sptrPacket received2 = SendAndReceive(std::move(packet2), receivedPacketIsValid);
-
-    if(receivedPacketIsValid)
-    {
-        std::cout << "Reading: :" << std::endl;
-        std::cout << "Port = " << (int) received2->GetPort() << " Channel = " << (int)  received2->GetChannel()  << " Data Size = ";
-
-        auto const & data = received2->GetData();
-        std::cout << data.size()-1 << std::endl;
-        std::cout<<"msg id = " <<  static_cast<int>(ExtractData<uint8_t>(data, 0)) << std::endl;
-        for(unsigned int i = 1; i < data.size(); ++i)
-        {
-                        std::cout<< i <<" = " << static_cast<int>( ExtractData<uint8_t>(data, i)) << std::endl;
-        }
-        std::cout<< "total data = " <<   ExtractData<float>(data, 1) << std::endl;
-    }
-
-
-
-}
 

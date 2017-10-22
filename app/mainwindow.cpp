@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
      _actualValuesTable(nullptr),
      _parameterTable(nullptr),
-     _dataForActualValuesModel(),
     _actualValuesModel(_crazyFlie.GetLogElements(), nullptr),
     _parameterModel(_crazyFlie.GetParameterElements(), nullptr),
     _timer_t0(),
@@ -67,25 +66,6 @@ MainWindow::MainWindow(QWidget *parent) :
                      &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
     QObject::connect(&_parameterModel, SIGNAL( ParameterWrite(uint8_t, float)),
                      &_crazyFlie.GetParameterTOC(), SLOT( WriteParameter(uint8_t, float)));
-
-
-    // For testing purposes
-    TOCElement e1;
-    e1.id = 0;
-    e1.group = "Stabilizer";
-    e1.name_only = "Acc_x";
-    e1.name = e1.group + "." + e1.name_only;
-    e1.type = ElementType::UINT8;
-    e1.value = 10;
-    _dataForActualValuesModel.emplace_back(e1);
-    TOCElement e;
-    e1.id = 4;
-    e1.group = "Stabilizer";
-    e1.name_only = "Acc_y";
-    e1.name = e1.group + "." + e1.name_only;
-    e1.type = ElementType::UINT8;
-    e1.value = 20;
-    _dataForActualValuesModel.emplace_back(e1);
 }
 MainWindow::~MainWindow()
 {
@@ -262,7 +242,6 @@ void MainWindow::UpdateCrazyFlie()
 
 void MainWindow::on_pushButton_SafeLandingMode_clicked()
 {
-    _crazyRadio.ReadParameter();
 }
 
 
@@ -299,20 +278,4 @@ void MainWindow::on_pushButton_ParameterTable_clicked()
         delete _parameterTable;
         _parameterTable = nullptr;
     }
-}
-
-
-
-void MainWindow::on_pushButton_TestAddElement_clicked()
-{
-    static int index = 0;
-    ++index;
-    TOCElement e;
-    e.id = index;
-    _dataForActualValuesModel.push_back(e);
-}
-
-void MainWindow::on_pushButton_TestRemoveElement_clicked()
-{
-    _dataForActualValuesModel.pop_back();
 }

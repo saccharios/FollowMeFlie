@@ -650,32 +650,6 @@
      <string>Parameter Table</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_TestAddElement">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>160</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test_Add_Element</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_TestRemoveElement">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>180</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test_Remove_Element</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
