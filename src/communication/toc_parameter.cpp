@@ -16,9 +16,6 @@ bool TocParameter::ReadAll()
 
 bool TocParameter::ReadElement(TOCElement & element)
 {
-    // TODO SF Implement
-    // Check if the requested element is in the _elements at all.
-
     Data data ={element.id};
     CRTPPacket packet(Port::Parameters, Channels::Read::id, std::move(data)); // Channel 1 for reading - how to solve multiple channel assignments?
     bool receivedPacketIsValid = false;

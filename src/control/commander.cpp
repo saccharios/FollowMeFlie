@@ -23,6 +23,7 @@ Commander::Commander(Crazyflie & crazyflie) :
 
 void Commander::Update()
 {
+    static Velocity velocity;
     if(_hoverModeIsActive)
     {
         auto const & sensorValues = _crazyflie.GetSensorValues();
@@ -33,16 +34,25 @@ void Commander::Update()
         Acceleration acceleration_intertial_frame = _crazyflie.ConvertBodyFrameToIntertialFrame(acceleration_body_frame);
 
 
-//        std::cout << "acc_x_i = " << acceleration_intertial_frame[0] << " acc_y_i = " << acceleration_intertial_frame[1] << " acc_z_i = " << acceleration_intertial_frame[2] << std::endl;
+        std::cout << "acc_x_i = " << acceleration_intertial_frame[0] << " acc_y_i = " << acceleration_intertial_frame[1] << " acc_z_i = " << acceleration_intertial_frame[2] << std::endl;
 
-        static Velocity velocity;
         velocity += acceleration_intertial_frame * _samplingTime;;
         std::cout << "v_x = " << velocity[0] << " v_y = " << velocity[1] << " v_z = " << velocity[2] << std::endl;
 
-                _crazyflie.SetVelocityRef(Velocity{0.0f,0.0f,0.0f});
-                _crazyflie.SetSendingVelocityRef(true);
-                //_crazyflie.SetSetPoint(setPoint);
-        //        _crazyflie.SetSendSetpoints(true);
+        // In python client, this line implementes the x-mode
+        float vx = -1.0f*velocity[0];
+        float vy = -1.0f* velocity[1];
+        float vz = -1.0f* velocity[2];
+//        auto vxx = (vx-vy)*SQRT2;
+//        auto vyy = (vx+vy)*SQRT2;
+        _crazyflie.SetVelocityRef(Velocity{vx, vy, vz});
+        _crazyflie.SetSendingVelocityRef(true);
+//        _crazyflie.SetSetPoint(SetPoint{0.0,0.0,0.0,35000});
+//        _crazyflie.SetSendSetpoints(true);
+    }
+    else
+    {
+        velocity = {0.0f,0.0f,0.0f};
     }
 
 }

@@ -34,14 +34,12 @@ public:
                 }
                 else
                 {
-                    std::cout << "Parameter TOC: Failed to get items\n";
                     is_running = false;
                     return false;
                 }
             }
             else
             {
-                std::cout << "Parameter TOC: Failed to get info\n";
                 is_running = false;
                 return false;
             }
@@ -60,7 +58,6 @@ public:
             if(received->GetData().at(channel::Commands::GetInfo::AnswerByte::CmdID) == channel::Commands::GetInfo::id)
             {
                 _itemCount = received->GetData().at(channel::Commands::GetInfo::AnswerByte::ItemCount);
-                std::cout << "_itemCount =" << _itemCount << std::endl;
                 return  true;
             }
             else
@@ -127,7 +124,7 @@ public:
         case ElementType::UINT64:
         {
             element->value  = 0;
-//            element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
+//            TODO SF: element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
             break;
         }
 
@@ -150,7 +147,7 @@ public:
         }
         case ElementType::INT64:
         {
-//            element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
+//            TODO SF:             element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
             element->value  = 0;
             break;
         }
@@ -162,7 +159,7 @@ public:
         }
         case ElementType::DOUBLE:
         {
-//            element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
+//            TODO SF:             element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
             element->value = 0;
             break;
         }

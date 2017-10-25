@@ -1,4 +1,5 @@
 #pragma once
 #include <cmath>
-float constexpr pi = M_PI;
-float constexpr pi2 = 2.0 * pi;
+constexpr float pi = M_PI;
+constexpr float pi2 = 2.0 * pi;
+constexpr float SQRT2 = 0.707f;

@@ -238,7 +238,7 @@ private:
     float GetSensorValue(std::string name);
 
     bool RegisterLoggingBlocks();
-    bool RegisterLogginBlock(bool & success, std::string name, float frequency);
+    void RegisterLogginBlock(bool & success, std::string name, float frequency);
 
 };
 

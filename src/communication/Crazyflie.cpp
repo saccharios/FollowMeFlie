@@ -155,7 +155,6 @@ void Crazyflie::Update()
     case State::NORMAL_OPERATION:
     {
         // Shove over the sensor readings from the radio to the Logs TOC.
-        //        _tocLogs.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
         _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
 
         if(_isSendingSetpoints)
@@ -202,8 +201,8 @@ void Crazyflie::Update()
 bool Crazyflie::SendSetpoint(SetPoint setPoint)
 {
     // In python client, this line implementes the x-mode
-    auto roll = (setPoint.roll - setPoint.pitch) *0.707f;
-    auto pitch = (setPoint.roll + setPoint.pitch) *0.707f;
+    auto roll = (setPoint.roll - setPoint.pitch) *SQRT2;
+    auto pitch = (setPoint.roll + setPoint.pitch) *SQRT2;
 
     auto data = ConvertTouint8_tVect(roll);
     auto pitchVect = ConvertTouint8_tVect( -pitch); // Warning: Is negated here.
@@ -223,12 +222,12 @@ bool  Crazyflie::SendVelocityRef(Velocity velocity)
 {
     // TODO SF  also x -mode?
     Data data;
-    uint8_t inidicator = 1;
+    uint8_t command = 1;
     auto vx_vect = ConvertTouint8_tVect(velocity[0]);
     auto vy_vect = ConvertTouint8_tVect(velocity[1]);
     auto vz_vect = ConvertTouint8_tVect(velocity[2]);
     auto yaw_vect = ConvertTouint8_tVect(0.0f);
-    data.push_back(inidicator);
+    data.push_back(command);
     data.insert(data.end(), vx_vect.begin(), vx_vect.end());
     data.insert(data.end(), vy_vect.begin(), vy_vect.end());
     data.insert(data.end(), vz_vect.begin(), vz_vect.end());
@@ -424,10 +423,10 @@ bool Crazyflie::RegisterLoggingBlocks()
             return false;
         }
     }
-
+    return false;
 }
 
-bool Crazyflie::RegisterLogginBlock(bool & success, std::string name, float frequency)
+void Crazyflie::RegisterLogginBlock(bool & success, std::string name, float frequency)
 {
     if(!success)
     {
