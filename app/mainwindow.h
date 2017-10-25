@@ -31,9 +31,9 @@ private slots:
     void on_connectRadio_clicked();
     void on_radioSettings_Options_currentIndexChanged(int index);
     void on_exitApp_clicked();
-    void display_sensor_values();
-    void display_connection_timeout_box();
-    void display_not_connecting_box();
+    void UpdateConnectionStatus();
+    void DisplayConnectionTimeoutBox();
+    void DisplayNotConnectingBox();
     void on_actionExit_triggered();
     void on_verticalSlider_hue_valueChanged(int value);
     void on_pushButton_CameraOnlyMode_clicked();

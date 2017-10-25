@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // T2
     _timer_t2.start(100); // time in ms
-    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(display_sensor_values()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(UpdateConnectionStatus()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
 
@@ -60,8 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Connections
     QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
-    QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(display_connection_timeout_box()));
-    QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(display_not_connecting_box()));
+    QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(DisplayConnectionTimeoutBox()));
+    QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(DisplayNotConnectingBox()));
     QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)),
                      &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
     QObject::connect(&_parameterModel, SIGNAL( ParameterWrite(uint8_t, float)),
@@ -71,40 +71,18 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-void MainWindow::display_sensor_values()
+void MainWindow::UpdateConnectionStatus()
  {
-     ui->actRoll->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.roll));
-     ui->actYaw->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.yaw));
-     ui->actPitch->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.pitch));
-     ui->actThrust->setPlainText( QString::number(_crazyFlie.GetSensorValues().stabilizer.thrust));
-     ui->actAcc_x->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.x));
-     ui->actAcc_y->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.y));
-     ui->actAcc_z->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.z));
-     ui->actAcc_zw->setPlainText( QString::number(_crazyFlie.GetSensorValues().acceleration.zw));
-     ui->actBatterStatus->setPlainText( QString::number(_crazyFlie.GetSensorValues().battery.state));
-     ui->actBatteryLevel->setPlainText( QString::number(_crazyFlie.GetSensorValues().battery.level));
-     ui->actGyro_x->setPlainText( QString::number(_crazyFlie.GetSensorValues().gyrometer.x));
-     ui->actGyro_y->setPlainText( QString::number(_crazyFlie.GetSensorValues().gyrometer.y));
-     ui->actGyro_z->setPlainText( QString::number(_crazyFlie.GetSensorValues().gyrometer.z));
-     ui->actMag_x->setPlainText( QString::number(_crazyFlie.GetSensorValues().magnetometer.x));
-     ui->actMag_y->setPlainText( QString::number(_crazyFlie.GetSensorValues().magnetometer.y));
-     ui->actMag_z->setPlainText( QString::number(_crazyFlie.GetSensorValues().magnetometer.z));
-     ui->actAsl->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.asl));
-     ui->actAslLong->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.aslLong));
-     ui->actTemperature->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.temperature));
-     ui->actPressure->setPlainText( QString::number(_crazyFlie.GetSensorValues().barometer.pressure));
-
-     // Also update connection status
      DisplayConnectionStatus();
  }
-void MainWindow::display_connection_timeout_box()
+void MainWindow::DisplayConnectionTimeoutBox()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle("Connection Error");
     msgBox.setText("Connection Time out.");
     msgBox.exec();
 }
-void MainWindow::display_not_connecting_box()
+void MainWindow::DisplayNotConnectingBox()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle("Connection Error");
