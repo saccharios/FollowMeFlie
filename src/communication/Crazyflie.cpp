@@ -117,8 +117,11 @@ void Crazyflie::Update()
         bool success = _logger.Setup();
         if(success)
         {
-            StartLogging();
-            _state = State::ZERO_MEASUREMENTS;
+            bool success2 = StartLogging();
+            if(success2)
+            {
+                _state = State::ZERO_MEASUREMENTS;
+            }
         }
         break;
     }
@@ -340,20 +343,41 @@ bool Crazyflie::IsConnected()
     return _state == State::NORMAL_OPERATION;
 }
 
-void Crazyflie::StartLogging()
+bool Crazyflie::StartLogging()
 {
-
-    // Register the desired sensor readings
-    bool success = RegisterLoggingBlocks();
-    if(success )
+    static bool is_running = false;
+    if(!is_running)
     {
-    EnableStabilizerLogging();
-    EnableGyroscopeLogging();
-    EnableAccelerometerLogging();
-    EnableBatteryLogging();
-    EnableMagnetometerLogging();
-    EnableBarometerLogging();
+        is_running = true;
+        // Register the desired sensor readings
+        bool success = RegisterLoggingBlocks();
+        if(success )
+        {
+            EnableStabilizerLogging();
+            EnableGyroscopeLogging();
+            EnableAccelerometerLogging();
+            EnableBatteryLogging();
+            EnableMagnetometerLogging();
+            EnableBarometerLogging();
+            EnablePWMLogging();
+            EnableRadioLogging();
+            EnablePIDAttitudeLogging();
+            EnablePIDRateLogging();
+            EnableControllerLogging();
+            EnableKalmanLogging();
+            EnablePosCtrlLogging();
+            EnableAltitudeEstimationLogging();
+            EnableMotorsLogging();
+            EnableSensorFusionLogging();
+            EnableCtrlTargetLogging();
+            EnableStateEstimateLogging();
+            is_running = false;
+            std::cout << "moving on\n";
+            return true;
+        }
+
     }
+    return false;
 }
 
 void Crazyflie::StopLogging()
@@ -415,7 +439,7 @@ bool Crazyflie::RegisterLoggingBlocks()
         RegisterLogginBlock(success[3], "battery", _frequency);
         RegisterLogginBlock(success[4], "magnetometer", _frequency);
         RegisterLogginBlock(success[5], "barometer", _frequency);
-        RegisterLogginBlock(success[6], "motors", _frequency);
+        RegisterLogginBlock(success[6], "motors_pwm", _frequency);
         RegisterLogginBlock(success[7], "radio", _frequency);
         RegisterLogginBlock(success[8], "pid_attitude", _frequency);
         RegisterLogginBlock(success[9], "pid_rate", _frequency);
@@ -423,7 +447,7 @@ bool Crazyflie::RegisterLoggingBlocks()
         RegisterLogginBlock(success[11], "kalman", _frequency);
         RegisterLogginBlock(success[12], "position_ctrl", _frequency);
         RegisterLogginBlock(success[13], "alt_est", _frequency);
-        RegisterLogginBlock(success[14], "motors_pwm", _frequency);
+        RegisterLogginBlock(success[14], "motors", _frequency);
         RegisterLogginBlock(success[15], "sensor_fusion", _frequency);
         RegisterLogginBlock(success[16], "ctrl_target", _frequency);
         RegisterLogginBlock(success[17], "state_estimate", _frequency);

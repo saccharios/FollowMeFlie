@@ -206,7 +206,7 @@ private:
 
     SensorValues _sensorValues;
 
-    static constexpr float _frequency = 1000.0;
+    static constexpr float _frequency = 1000.0; // 1000.0
 
     bool SendSetpoint(SetPoint setPoint);
 
@@ -218,7 +218,7 @@ private:
     bool RegisterLoggingBlocks();
     void RegisterLogginBlock(bool & success, std::string name, float frequency);
 
-    void StartLogging();
+    bool StartLogging();
     void StopLogging();
     void DisableLogging();
 
@@ -231,10 +231,8 @@ private:
     void EnableAccelerometerLogging();
     void DisableAccelerometerLogging();
 
-
     void EnableBatteryLogging();
     void DisableBatteryLogging();
-
 
     void EnableMagnetometerLogging();
     void DisableMagnetometerLogging();
