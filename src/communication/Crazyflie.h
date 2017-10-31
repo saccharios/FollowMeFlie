@@ -212,17 +212,25 @@ private:
 
     bool SendVelocityRef(Velocity velocity);
 
+    void UpateSensorValues();
+    float GetSensorValue(std::string name);
+
+    bool RegisterLoggingBlocks();
+    void RegisterLogginBlock(bool & success, std::string name, float frequency);
+
     void StartLogging();
     void StopLogging();
     void DisableLogging();
 
     void EnableStabilizerLogging();
-    void EnableGyroscopeLogging();
-    void EnableAccelerometerLogging();
-
     void DisableStabilizerLogging();
+
+    void EnableGyroscopeLogging();
     void DisableGyroscopeLogging();
+
+    void EnableAccelerometerLogging();
     void DisableAccelerometerLogging();
+
 
     void EnableBatteryLogging();
     void DisableBatteryLogging();
@@ -232,13 +240,34 @@ private:
     void DisableMagnetometerLogging();
 
     void EnableBarometerLogging();
-    void DisableAltimeterLogging();
+    void DisableBarometerLogging();
 
-    void UpateSensorValues();
-    float GetSensorValue(std::string name);
 
-    bool RegisterLoggingBlocks();
-    void RegisterLogginBlock(bool & success, std::string name, float frequency);
+
+    void EnablePWMLogging();
+    void DisableAccPWMLogging();
+    void EnableRadioLogging();
+    void DisableRadioLogging();
+    void EnablePIDAttitudeLogging();
+    void DisablePIDAttitudeLogging();
+    void EnablePIDRateLogging();
+    void DisablePIDRateLogging();
+    void EnableControllerLogging();
+    void DisableControllerLogging();
+    void EnableKalmanLogging();
+    void DisableKalmanLogging();
+    void EnablePosCtrlLogging();
+    void DisablePosCtrlLogging();
+    void EnableAltitudeEstimationLogging();
+    void DisableAltitudeEstimationLogging();
+    void EnableMotorsLogging();
+    void DisableMotorsLogging();
+    void EnableSensorFusionLogging();
+    void DisableSensorFusionLogging();
+    void EnableCtrlTargetLogging();
+    void DisableCtrlTargetLogging();
+    void EnableStateEstimateLogging();
+    void DisableStateEstimateLogging();
 
 };
 
