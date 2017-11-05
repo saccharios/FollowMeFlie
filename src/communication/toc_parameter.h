@@ -115,7 +115,7 @@ public:
     bool ReadAll();
     bool ReadElement(TOCElement & element);
 
-    bool WriteValue(uint8_t id, float value);
+    bool WriteValue(TOCElement & element, float value);
 
 
     std::vector<TOCElement> const &

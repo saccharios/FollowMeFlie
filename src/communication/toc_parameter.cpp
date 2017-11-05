@@ -1,6 +1,6 @@
 #include "toc_parameter.h"
 #include "CrazyRadio.h"
-
+#include "math/stl_utils.h"
 bool TocParameter::ReadAll()
 {
     for(TOCElement & element : _elements)
@@ -33,33 +33,107 @@ bool TocParameter::ReadElement(TOCElement & element)
     }
     return false;
 }
-bool TocParameter::WriteValue(uint8_t id, float value)
+bool TocParameter::WriteValue( TOCElement & element, float float_value)
 {
-    Data data ={id};
-    auto value_vector = ConvertTouint8_tVect(value);
-    data.insert( data.end(), value_vector.begin(), value_vector.end() );
+    Data data ={element.id};
 
-    CRTPPacket packet(Port::Parameters, Channels::Write::id, std::move(data)); // Channel 1 for reading - how to solve multiple channel assignments?
+    // Convert to value to data type of parameter
+    switch(element.type)
+    {
+    case ElementType::UINT8:
+    {
+
+        auto value = static_cast<uint8_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::UINT16:
+    {
+
+        auto value = static_cast<uint16_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::UINT32:
+    {
+
+        auto value = static_cast<uint32_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::UINT64:
+    {
+
+        auto value = static_cast<uint64_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::INT8:
+    {
+
+        auto value = static_cast<int8_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::INT16:
+    {
+
+        auto value = static_cast<int16_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::INT32:
+    {
+
+        auto value = static_cast<uint32_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::INT64:
+    {
+
+        auto value = static_cast<uint64_t>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::FLOAT:
+    {
+        Data value_vector = ConvertTouint8_tVect(float_value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+    case ElementType::DOUBLE:
+    {
+
+        auto value = static_cast<double>(float_value);
+        Data value_vector = ConvertTouint8_tVect(value);
+        data.insert( data.end(), value_vector.begin(), value_vector.end() );
+        break;
+    }
+
+    }
+
+
+    CRTPPacket packet(Port::Parameters, Channels::Write::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
     auto & dataReceived = received->GetData();
 
     if(receivedPacketIsValid && dataReceived.size() > 1)
     {
-        if( (id == dataReceived.at(Channels::Read::AnswerByte::CmdID)) )
+        if( (element.id == dataReceived.at(Channels::Read::AnswerByte::CmdID)) )
         {
-            bool isValid = false;
-            TOCElement & element = STLUtils::ElementForID(_elements, id, isValid);
-            if(isValid)
-            {
                 _shared_impl.SetValueToElement(&element, dataReceived, Channels::Write::AnswerByte::Value);
                 emit ParameterRead(element.id);
                 return true;
-            }
-            else
-            {
-                return false;
-            }
         }
         return false;
     }
@@ -69,5 +143,10 @@ bool TocParameter::WriteValue(uint8_t id, float value)
 
 void TocParameter::WriteParameter(uint8_t id, float value)
 {
-    WriteValue(id, value);
+    bool isValid = false;
+    TOCElement & element = STLUtils::ElementForID(_elements, id, isValid);
+    if(isValid)
+    {
+        WriteValue(element, value);
+    }
 }
