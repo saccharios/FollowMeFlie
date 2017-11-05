@@ -206,7 +206,7 @@ private:
 
     SensorValues _sensorValues;
 
-    static constexpr float _frequency = 1000.0; // 1000.0
+    static constexpr float _frequency = 1000.0f; // 1000.0
 
     bool SendSetpoint(SetPoint setPoint);
 
@@ -222,38 +222,22 @@ private:
     void StopLogging();
     void DisableLogging();
 
-    void EnableStabilizerLogging();
-    void DisableStabilizerLogging();
-
-    void EnableGyroscopeLogging();
-    void DisableGyroscopeLogging();
-
-    void EnableAccelerometerLogging();
-    void DisableAccelerometerLogging();
+    void EnableSensorsLogging();
+    void DisableSensorsLogging();
 
     void EnableBatteryLogging();
     void DisableBatteryLogging();
 
-    void EnableMagnetometerLogging();
-    void DisableMagnetometerLogging();
-
-    void EnableBarometerLogging();
-    void DisableBarometerLogging();
-
-
-
-    void EnablePWMLogging();
-    void DisableAccPWMLogging();
-    void EnableRadioLogging();
-    void DisableRadioLogging();
     void EnablePIDAttitudeLogging();
     void DisablePIDAttitudeLogging();
     void EnablePIDRateLogging();
     void DisablePIDRateLogging();
     void EnableControllerLogging();
     void DisableControllerLogging();
-    void EnableKalmanLogging();
-    void DisableKalmanLogging();
+    void EnableKalman1Logging();
+    void DisableKalman1Logging();
+    void EnableKalman2Logging();
+    void DisableKalman2Logging();
     void EnablePosCtrlLogging();
     void DisablePosCtrlLogging();
     void EnableAltitudeEstimationLogging();

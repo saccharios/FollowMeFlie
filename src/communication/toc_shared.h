@@ -124,7 +124,7 @@ public:
         case ElementType::UINT64:
         {
             element->value  = 0;
-//            TODO SF: element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
+            //            TODO SF: element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
             break;
         }
 
@@ -147,7 +147,7 @@ public:
         }
         case ElementType::INT64:
         {
-//            TODO SF:             element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
+            //            TODO SF:             element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
             element->value  = 0;
             break;
         }
@@ -159,7 +159,7 @@ public:
         }
         case ElementType::DOUBLE:
         {
-//            TODO SF:             element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
+            //            TODO SF:             element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
             element->value = 0;
             break;
         }
@@ -188,6 +188,7 @@ public:
 
         default:
         { // Unknown. This hopefully never happens.
+            std::cout << "unknown case!\n";
             element->value = 0;
             break;
         }

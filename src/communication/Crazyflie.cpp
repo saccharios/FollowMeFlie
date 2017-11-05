@@ -64,7 +64,7 @@ void Crazyflie::Update()
     //    }
 
 
-    //    std::cout << "State = " << static_cast<int>(_state) << std::endl;
+//        std::cout << "State = " << static_cast<int>(_state) << std::endl;
 
     switch(_state)
     {
@@ -345,49 +345,32 @@ bool Crazyflie::IsConnected()
 
 bool Crazyflie::StartLogging()
 {
-    static bool is_running = false;
-    if(!is_running)
-    {
-        is_running = true;
         // Register the desired sensor readings
         bool success = RegisterLoggingBlocks();
         if(success )
         {
-            EnableStabilizerLogging();
-            EnableGyroscopeLogging();
-            EnableAccelerometerLogging();
+            EnableSensorsLogging();
             EnableBatteryLogging();
-            EnableMagnetometerLogging();
-            EnableBarometerLogging();
-            EnablePWMLogging();
-            EnableRadioLogging();
             EnablePIDAttitudeLogging();
             EnablePIDRateLogging();
             EnableControllerLogging();
-            EnableKalmanLogging();
+            EnableKalman1Logging();
+            EnableKalman2Logging();
             EnablePosCtrlLogging();
             EnableAltitudeEstimationLogging();
             EnableMotorsLogging();
             EnableSensorFusionLogging();
             EnableCtrlTargetLogging();
             EnableStateEstimateLogging();
-            is_running = false;
-            std::cout << "moving on\n";
             return true;
         }
-
-    }
     return false;
 }
 
 void Crazyflie::StopLogging()
 {
-    DisableStabilizerLogging();
-    DisableGyroscopeLogging();
-    DisableAccelerometerLogging();
+    DisableSensorsLogging();
     DisableBatteryLogging();
-    DisableMagnetometerLogging();
-    DisableBarometerLogging();
 }
 
 void Crazyflie::DisableLogging()
@@ -422,42 +405,38 @@ float Crazyflie::GetSensorValue(std::string strName)
 bool Crazyflie::RegisterLoggingBlocks()
 {
     static bool is_running = false;
+    constexpr int max_try = 3;
+    static int cntr = 0;
     if(!is_running)
     {
         is_running = true;
         // Repeat as long as not all logging blocks are registered, at max max_try;
-        static constexpr int num_loggers = 18;
+        static constexpr int num_loggers = 13;
         static std::array<bool,num_loggers> success ={false,false,false,false,false,false,
                                            false,false,false,false,false,false,
-                                           false,false,false,false,false,false};
-        constexpr int max_try = 10;
-        static int cntr = 0;
+                                           false};
         // TODO SF:: Logging Blocks should be classes
-        RegisterLogginBlock(success[0], "stabilizer", _frequency);
-        RegisterLogginBlock(success[1], "gyroscope", _frequency);
-        RegisterLogginBlock(success[2], "accelerometer", _frequency);
-        RegisterLogginBlock(success[3], "battery", _frequency);
-        RegisterLogginBlock(success[4], "magnetometer", _frequency);
-        RegisterLogginBlock(success[5], "barometer", _frequency);
-        RegisterLogginBlock(success[6], "motors_pwm", _frequency);
-        RegisterLogginBlock(success[7], "radio", _frequency);
-        RegisterLogginBlock(success[8], "pid_attitude", _frequency);
-        RegisterLogginBlock(success[9], "pid_rate", _frequency);
-        RegisterLogginBlock(success[10], "controller", _frequency);
-        RegisterLogginBlock(success[11], "kalman", _frequency);
-        RegisterLogginBlock(success[12], "position_ctrl", _frequency);
-        RegisterLogginBlock(success[13], "alt_est", _frequency);
-        RegisterLogginBlock(success[14], "motors", _frequency);
-        RegisterLogginBlock(success[15], "sensor_fusion", _frequency);
-        RegisterLogginBlock(success[16], "ctrl_target", _frequency);
-        RegisterLogginBlock(success[17], "state_estimate", _frequency);
+        RegisterLogginBlock(success[0], "sensors", _frequency);
+        RegisterLogginBlock(success[1], "battery", _frequency);
+        RegisterLogginBlock(success[2], "pid_attitude", _frequency);
+        RegisterLogginBlock(success[3], "pid_rate", _frequency);
+        RegisterLogginBlock(success[4], "controller", _frequency);
+        RegisterLogginBlock(success[5], "kalman_1", _frequency);
+        RegisterLogginBlock(success[6], "kalman_2", _frequency);
+        RegisterLogginBlock(success[7], "position_ctrl", _frequency);
+        RegisterLogginBlock(success[8], "alt_est", _frequency);
+        RegisterLogginBlock(success[9], "motors", _frequency);
+        RegisterLogginBlock(success[10], "sensor_fusion", _frequency);
+        RegisterLogginBlock(success[11], "ctrl_target", _frequency);
+        RegisterLogginBlock(success[12], "state_estimate", _frequency);
+        std::cout << "next round, cntr = " << cntr << std::endl;
         bool total = true;
         for(int i = 0; i < num_loggers; ++i)
         {
             total = (total && success[i]);
         }
 
-        if ( total || cntr > max_try)
+        if ( total || (cntr > max_try) )
         {
             is_running = false;
             return true;
@@ -466,6 +445,7 @@ bool Crazyflie::RegisterLoggingBlocks()
         {
             ++cntr;
             is_running = false;
+            std::cout << "ret false\n";
             return false;
         }
     }
@@ -480,69 +460,38 @@ void Crazyflie::RegisterLogginBlock(bool & success, std::string name, float freq
     }
 }
 
-void Crazyflie::EnableStabilizerLogging()
+void Crazyflie::EnableSensorsLogging()
 {
-    _logger.StartLogging("stabilizer.roll", "stabilizer");
-    _logger.StartLogging("stabilizer.pitch", "stabilizer");
-    _logger.StartLogging("stabilizer.yaw", "stabilizer");
-    _logger.StartLogging("stabilizer.thrust", "stabilizer");
+    _logger.StartLogging("stabilizer.roll", "sensors");
+    _logger.StartLogging("stabilizer.pitch", "sensors");
+    _logger.StartLogging("stabilizer.yaw", "sensors");
+    _logger.StartLogging("stabilizer.thrust", "sensors");
+    _logger.StartLogging("gyro.x", "sensors");
+    _logger.StartLogging("gyro.y", "sensors");
+    _logger.StartLogging("gyro.z", "sensors");
+    _logger.StartLogging("acc.x", "sensors");
+    _logger.StartLogging("acc.y", "sensors");
+    _logger.StartLogging("acc.z", "sensors");
+    _logger.StartLogging("acc.zw", "sensors");
+    _logger.StartLogging("mag.x", "sensors");
+    _logger.StartLogging("mag.y", "sensors");
+    _logger.StartLogging("mag.z", "sensors");
+    _logger.StartLogging("baro.asl", "sensors");
+    _logger.StartLogging("baro.aslLong", "sensors");
+    _logger.StartLogging("baro.pressure", "sensors");
+    _logger.StartLogging("baro.temperature", "sensors");
 }
 
-void Crazyflie::DisableStabilizerLogging()
+void Crazyflie::DisableSensorsLogging()
 {
-    _logger.UnregisterLoggingBlock("stabilizer");
-}
-void Crazyflie::EnableGyroscopeLogging()
-{
-    _logger.StartLogging("gyro.x", "gyroscope");
-    _logger.StartLogging("gyro.y", "gyroscope");
-    _logger.StartLogging("gyro.z", "gyroscope");
-}
-
-void Crazyflie::DisableGyroscopeLogging()
-{
-    _logger.UnregisterLoggingBlock("gyroscope");
-}
-void Crazyflie::EnableAccelerometerLogging()
-{
-    _logger.StartLogging("acc.x", "accelerometer");
-    _logger.StartLogging("acc.y", "accelerometer");
-    _logger.StartLogging("acc.z", "accelerometer");
-    _logger.StartLogging("acc.zw", "accelerometer");
-}
-
-void Crazyflie::DisableAccelerometerLogging()
-{
-    _logger.UnregisterLoggingBlock("accelerometer");
-}
-
-void Crazyflie::EnablePWMLogging()
-{
-    _logger.StartLogging("pwm.m1_pwm", "motors_pwm");
-    _logger.StartLogging("pwm.m2_pwm", "motors_pwm");
-    _logger.StartLogging("pwm.m3_pwm", "motors_pwm");
-    _logger.StartLogging("pwm.m4_pwm", "motors_pwm");
-}
-
-void Crazyflie::DisableAccPWMLogging()
-{
-    _logger.UnregisterLoggingBlock("motors");
-}
-
-void Crazyflie::EnableRadioLogging()
-{
-    _logger.StartLogging("radio.rssi", "radio");
-}
-
-void Crazyflie::DisableRadioLogging()
-{
-    _logger.UnregisterLoggingBlock("radio");
+    _logger.UnregisterLoggingBlock("sensors");
 }
 
 void Crazyflie::EnableBatteryLogging()
 {
     _logger.StartLogging("pm.vbat", "battery");
     _logger.StartLogging("pm.state", "battery");
+    _logger.StartLogging("radio.rssi", "battery");
 }
 
 void Crazyflie::DisableBatteryLogging()
@@ -550,30 +499,6 @@ void Crazyflie::DisableBatteryLogging()
     _logger.UnregisterLoggingBlock("battery");
 }
 
-void Crazyflie::EnableMagnetometerLogging()
-{
-    _logger.StartLogging("mag.x", "magnetometer");
-    _logger.StartLogging("mag.y", "magnetometer");
-    _logger.StartLogging("mag.z", "magnetometer");
-}
-
-void Crazyflie::DisableMagnetometerLogging()
-{
-    _logger.UnregisterLoggingBlock("magnetometer");
-}
-
-void Crazyflie::EnableBarometerLogging()
-{
-    _logger.StartLogging("baro.asl", "barometer");
-    _logger.StartLogging("baro.aslLong", "barometer");
-    _logger.StartLogging("baro.pressure", "barometer");
-    _logger.StartLogging("baro.temperature", "barometer");
-}
-
-void Crazyflie::DisableBarometerLogging()
-{
-    _logger.UnregisterLoggingBlock("barometer");
-}
 void Crazyflie::EnablePIDAttitudeLogging()
 {
     _logger.StartLogging("pid_attitude.roll_outP", "pid_attitude");
@@ -625,48 +550,58 @@ void Crazyflie::DisableControllerLogging()
 {
     _logger.UnregisterLoggingBlock("controller");
 }
-void Crazyflie::EnableKalmanLogging()
+void Crazyflie::EnableKalman1Logging()
 {
-    _logger.StartLogging("kalman_states.ox", "kalman");
-    _logger.StartLogging("kalman_states.oy", "kalman");
-    _logger.StartLogging("kalman_states.vx", "kalman");
-    _logger.StartLogging("kalman_states.vy", "kalman");
-    _logger.StartLogging("kalman_pred.predNX", "kalman");
-    _logger.StartLogging("kalman_pred.predNY", "kalman");
-    _logger.StartLogging("kalman_pred.measNX", "kalman");
-    _logger.StartLogging("kalman_pred.measNY", "kalman");
-    _logger.StartLogging("kalman.inFlight", "kalman");
-    _logger.StartLogging("kalman.stateX", "kalman");
-    _logger.StartLogging("kalman.stateY", "kalman");
-    _logger.StartLogging("kalman.stateZ", "kalman");
-    _logger.StartLogging("kalman.statePX", "kalman");
-    _logger.StartLogging("kalman.statePY", "kalman");
-    _logger.StartLogging("kalman.statePZ", "kalman");
-    _logger.StartLogging("kalman.stateD0", "kalman");
-    _logger.StartLogging("kalman.stateD1", "kalman");
-    _logger.StartLogging("kalman.stateD2", "kalman");
-    _logger.StartLogging("kalman.stateSkew", "kalman");
-    _logger.StartLogging("kalman.varX", "kalman");
-    _logger.StartLogging("kalman.varY", "kalman");
-    _logger.StartLogging("kalman.varZ", "kalman");
-    _logger.StartLogging("kalman.varPX", "kalman");
-    _logger.StartLogging("kalman.varPY", "kalman");
-    _logger.StartLogging("kalman.varPZ", "kalman");
-    _logger.StartLogging("kalman.varD0", "kalman");
-    _logger.StartLogging("kalman.varD1", "kalman");
-    _logger.StartLogging("kalman.varD2", "kalman");
-    _logger.StartLogging("kalman.varD3", "kalman");
-    _logger.StartLogging("kalman.varSkew", "kalman");
-    _logger.StartLogging("kalman.q0", "kalman");
-    _logger.StartLogging("kalman.q1", "kalman");
-    _logger.StartLogging("kalman.q2", "kalman");
-    _logger.StartLogging("kalman.q3", "kalman");
+    _logger.StartLogging("kalman_states.ox", "kalman_1");
+    _logger.StartLogging("kalman_states.oy", "kalman_1");
+    _logger.StartLogging("kalman_states.vx", "kalman_1");
+    _logger.StartLogging("kalman_states.vy", "kalman_1");
+    _logger.StartLogging("kalman_pred.predNX", "kalman_1");
+    _logger.StartLogging("kalman_pred.predNY", "kalman_1");
+    _logger.StartLogging("kalman_pred.measNX", "kalman_1");
+    _logger.StartLogging("kalman_pred.measNY", "kalman_1");
+    _logger.StartLogging("kalman.inFlight", "kalman_1");
+    _logger.StartLogging("kalman.stateX", "kalman_1");
+    _logger.StartLogging("kalman.stateY", "kalman_1");
+    _logger.StartLogging("kalman.stateZ", "kalman_1");
+    _logger.StartLogging("kalman.statePX", "kalman_1");
+    _logger.StartLogging("kalman.statePY", "kalman_1");
+    _logger.StartLogging("kalman.statePZ", "kalman_1");
+    _logger.StartLogging("kalman.stateD0", "kalman_1");
+    _logger.StartLogging("kalman.stateD1", "kalman_1");
+    _logger.StartLogging("kalman.stateD2", "kalman_1");
+    _logger.StartLogging("kalman.stateSkew", "kalman_1");
 }
 
-void Crazyflie::DisableKalmanLogging()
+void Crazyflie::DisableKalman1Logging()
 {
-    _logger.UnregisterLoggingBlock("kalman");
+    _logger.UnregisterLoggingBlock("kalman_1");
 }
+
+void Crazyflie::EnableKalman2Logging()
+{
+        _logger.StartLogging("kalman.varX", "kalman_2");
+        _logger.StartLogging("kalman.varY", "kalman_2");
+        _logger.StartLogging("kalman.varZ", "kalman_2");
+        _logger.StartLogging("kalman.varPX", "kalman_2");
+        _logger.StartLogging("kalman.varPY", "kalman_2");
+        _logger.StartLogging("kalman.varPZ", "kalman_2");
+        _logger.StartLogging("kalman.varD0", "kalman_2");
+        _logger.StartLogging("kalman.varD1", "kalman_2");
+        _logger.StartLogging("kalman.varD2", "kalman_2");
+        _logger.StartLogging("kalman.varD3", "kalman_2");
+        _logger.StartLogging("kalman.varSkew", "kalman_2");
+        _logger.StartLogging("kalman.q0", "kalman_2");
+        _logger.StartLogging("kalman.q1", "kalman_2");
+        _logger.StartLogging("kalman.q2", "kalman_2");
+        _logger.StartLogging("kalman.q3", "kalman_2");
+}
+
+void Crazyflie::DisableKalman2Logging()
+{
+    _logger.UnregisterLoggingBlock("kalman_2");
+}
+
 void Crazyflie::EnablePosCtrlLogging()
 {
     _logger.StartLogging("posCtl.targetVX", "position_ctrl");
@@ -713,6 +648,10 @@ void Crazyflie::EnableMotorsLogging()
     _logger.StartLogging("motor.m2", "motors");
     _logger.StartLogging("motor.m3", "motors");
     _logger.StartLogging("motor.m4", "motors");
+    _logger.StartLogging("pwm.m1_pwm", "motors");
+    _logger.StartLogging("pwm.m2_pwm", "motors");
+    _logger.StartLogging("pwm.m3_pwm", "motors");
+    _logger.StartLogging("pwm.m4_pwm", "motors");
 }
 
 void Crazyflie::DisableMotorsLogging()

@@ -59,13 +59,21 @@ template<typename T>
 T ExtractData(Data const & data, int offset)
 {
     int typeLength = sizeof(T);
-    T bits = 0;
-    for(int i = 0; i < typeLength; ++i)
+    if(data.size() > offset +typeLength)
     {
-        bits |= (data.at(offset + i) << 8*i);
+        T bits = 0;
+        for(int i = 0; i < typeLength; ++i)
+        {
+            bits |= (data.at(offset + i) << 8*i);
+        }
+        T value = *reinterpret_cast<T *>(&bits);
+        return value;
     }
-    T value = *reinterpret_cast<T *>(&bits);
-    return value;
+    else
+    {
+        std::cout << "Packet is not large enough\n";
+        return 0;
+    }
 }
 template<>
 float ExtractData<float>(Data const & data, int offset);

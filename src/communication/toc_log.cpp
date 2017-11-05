@@ -154,8 +154,13 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
             for(auto const & element : logBlock.elements)
             {
                 int byteLength = 0;
-                // TODO SF Is there a way to omit this switch?
+                // TODO SF Is there a way to omit this switch?-> std::map
+
+//                std::cout << "SetValueToElement Start \n";
+//                element->Print();
                 _shared_impl.SetValueToElement(element, logdataVect, offset);
+//                std::cout << "SetValueToElement End \n";
+
                 switch(element->type)
                 {
                 case ElementType::UINT8:

@@ -37,9 +37,16 @@ float ExtractData<float>(Data const & data, int offset)
     constexpr int typeLength = sizeof(float);
     IntFloat bits;
     bits.int_value = 0;
-    for(int i = 0; i < typeLength; ++i)
+    if(data.size() > offset +typeLength)
     {
-        bits.int_value |= (data.at(offset + i) << 8*i);
+        for(int i = 0; i < typeLength; ++i)
+        {
+            bits.int_value |= (data.at(offset + i) << 8*i);
+        }
+    }
+    else
+    {
+        std::cout << "Packet is not large enough\n";
     }
     return bits.float_value;
 }
