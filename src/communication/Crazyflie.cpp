@@ -417,19 +417,18 @@ bool Crazyflie::RegisterLoggingBlocks()
                                            false};
         // TODO SF:: Logging Blocks should be classes
         RegisterLogginBlock(success[0], "sensors", _frequency);
-        RegisterLogginBlock(success[1], "battery", _frequency);
+        RegisterLogginBlock(success[1], "battery", _frequency/8.0f);
         RegisterLogginBlock(success[2], "pid_attitude", _frequency);
         RegisterLogginBlock(success[3], "pid_rate", _frequency);
         RegisterLogginBlock(success[4], "controller", _frequency);
-        RegisterLogginBlock(success[5], "kalman_1", _frequency);
-        RegisterLogginBlock(success[6], "kalman_2", _frequency);
-        RegisterLogginBlock(success[7], "position_ctrl", _frequency);
-        RegisterLogginBlock(success[8], "alt_est", _frequency);
-        RegisterLogginBlock(success[9], "motors", _frequency);
-        RegisterLogginBlock(success[10], "sensor_fusion", _frequency);
-        RegisterLogginBlock(success[11], "ctrl_target", _frequency);
-        RegisterLogginBlock(success[12], "state_estimate", _frequency);
-        std::cout << "next round, cntr = " << cntr << std::endl;
+        RegisterLogginBlock(success[5], "kalman_1", _frequency/2.0f);
+        RegisterLogginBlock(success[6], "kalman_2", _frequency/2.0f);
+        RegisterLogginBlock(success[7], "position_ctrl", _frequency/2.0f);
+        RegisterLogginBlock(success[8], "alt_est", _frequency/2.0f);
+        RegisterLogginBlock(success[9], "motors", _frequency/2.0f);
+        RegisterLogginBlock(success[10], "sensor_fusion", _frequency/2.0f);
+        RegisterLogginBlock(success[11], "ctrl_target", _frequency/2.0f);
+        RegisterLogginBlock(success[12], "state_estimate", _frequency/2.0f);
         bool total = true;
         for(int i = 0; i < num_loggers; ++i)
         {
@@ -445,7 +444,6 @@ bool Crazyflie::RegisterLoggingBlocks()
         {
             ++cntr;
             is_running = false;
-            std::cout << "ret false\n";
             return false;
         }
     }
