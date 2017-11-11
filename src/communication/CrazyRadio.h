@@ -76,7 +76,7 @@ enum class DongleConfiguration{
 
 // The class is capable of finding the CrazyRadio USB dongle on the
 // host computer, open and maintain a connection, and send/receive
-// data when communicating with the Crazyflie Nano copter using the
+// data when communicating with the Crazyflie copter using the
 // Crazy Radio Transfer Protocol as defined by Bitcraze.
 class CrazyRadio {
 
@@ -174,7 +174,7 @@ private:
 
     void ReadRadioSettings();
 
-    sptrPacket SendPacket(CRTPPacket && sendPacket);
+    sptrPacket SendPacketAndDistribute(CRTPPacket && sendPacket);
 
     float ConvertToDeviceVersion(short number) const;
 

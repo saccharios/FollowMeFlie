@@ -1,6 +1,7 @@
 #include "toc_parameter.h"
 #include "CrazyRadio.h"
 #include "math/stl_utils.h"
+#include "protocol.h"
 bool TocParameter::ReadAll()
 {
     for(TOCElement & element : _elements)
@@ -17,15 +18,15 @@ bool TocParameter::ReadAll()
 bool TocParameter::ReadElement(TOCElement & element)
 {
     Data data ={element.id};
-    CRTPPacket packet(Port::Parameters, Channels::Read::id, std::move(data)); // Channel 1 for reading - how to solve multiple channel assignments?
+    CRTPPacket packet(Port::Parameters, Parameter_Channels::Read::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
     auto & dataReceived = received->GetData();
     if(receivedPacketIsValid && dataReceived.size() > 1)
     {
-        if(element.id == dataReceived.at(Channels::Read::AnswerByte::CmdID))
+        if(element.id == dataReceived.at(Parameter_Channels::Read::AnswerByte::CmdID))
         {
-            _shared_impl.SetValueToElement(&element, dataReceived, Channels::Read::AnswerByte::Value);
+            _shared_impl.SetValueToElement(&element, dataReceived, Parameter_Channels::Read::AnswerByte::Value);
             emit ParameterRead(element.id);
             return true;
         }
@@ -121,24 +122,22 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 
     }
 
-
-    CRTPPacket packet(Port::Parameters, Channels::Write::id, std::move(data));
+    CRTPPacket packet(Port::Parameters, Parameter_Channels::Write::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
     auto & dataReceived = received->GetData();
 
     if(receivedPacketIsValid && dataReceived.size() > 1)
     {
-        if( (element.id == dataReceived.at(Channels::Read::AnswerByte::CmdID)) )
+        if( (element.id == dataReceived.at(Parameter_Channels::Read::AnswerByte::CmdID)) )
         {
-                _shared_impl.SetValueToElement(&element, dataReceived, Channels::Write::AnswerByte::Value);
+                _shared_impl.SetValueToElement(&element, dataReceived, Parameter_Channels::Write::AnswerByte::Value);
                 emit ParameterRead(element.id);
                 return true;
         }
         return false;
     }
     return false;
-
 }
 
 void TocParameter::WriteParameter(uint8_t id, float value)

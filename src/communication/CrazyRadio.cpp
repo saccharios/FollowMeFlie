@@ -31,7 +31,7 @@
 #undef _GLIBCXX_HAS_GTHREADS
 #include "../../../mingw_std_threads/mingw.thread.h"
 #include "math/types.h"
-
+#include "communication/protocol.h"
 
 
 
@@ -394,10 +394,10 @@ bool CrazyRadio::ClaimInterface(int interface)
 }
 bool CrazyRadio::SendPacketAndCheck(CRTPPacket && sendPacket)
 {
-    return SendPacket(std::move(sendPacket)) != nullptr;
+    return SendPacketAndDistribute(std::move(sendPacket)) != nullptr;
 }
 
-CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
+CrazyRadio::sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
@@ -431,11 +431,10 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacket(CRTPPacket  && sendPacket)
             }
 
             case Port::Log:
-            { // Logging
-                if(packet->GetChannel() == Channel::Data)
+            {
+                if(packet->GetChannel() == Logger_Channels::Data::id)
                 {
                     _loggingPackets.emplace_back(packet);
-                    //_toc_log.AddUnprocessedPacket(packet);
                 }
                 break;
             }
@@ -475,7 +474,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
             // Exctract port and channel information from buffer[1]
             // TODO SF Add Port and channel checking
             Port port = static_cast<Port>((buffer[1] & 0xf0) >> 4);
-            Channel channel = static_cast<Channel>(buffer[1] & 0b00000011);
+            uint8_t channel = static_cast<uint8_t>(buffer[1] & 0b00000011);
 
             // Actual data starts at buffer[2]
             Data data;
@@ -510,7 +509,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
     int cntr = 0;
     while(received == nullptr && cntr < 10)
     {
-        received = SendPacket({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
+        received = SendPacketAndDistribute({Port::Console,Console_Channels::Print::id,{static_cast<uint8_t>(0xff)}});
         ++cntr;
     }
     return received;
@@ -534,7 +533,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool
     {
         if(resendCounter == 0)
         {
-            received = SendPacket(std::move(sendPacket)); // TODO How is it possible to be moved from multiple times???
+            received = SendPacketAndDistribute(std::move(sendPacket)); // TODO How is it possible to be moved from multiple times???
             resendCounter = retriesTotal;
             ++totalCounter;
             go_on = (totalCounter < totalCounterMax );
@@ -570,7 +569,7 @@ std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    return SendPacketAndCheck({Port::Console,Channel::TOC,{static_cast<uint8_t>(0xff)}});
+    return SendPacketAndCheck({Port::Console,0,{static_cast<uint8_t>(0xff)}});
 }
 
 bool CrazyRadio::RadioIsConnected() const

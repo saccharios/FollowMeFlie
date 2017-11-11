@@ -79,7 +79,8 @@ template<>
 float ExtractData<float>(Data const & data, int offset);
 
 
-enum class Port{
+enum class Port
+{
     Console = 0,
     Parameters = 2,
     Commander = 3,
@@ -89,54 +90,39 @@ enum class Port{
     Link = 15
 };
 
-// TODO SF:: Channel definition depend on the port!
-enum class Channel{
-    TOC = 0,
-    LogControl = 1,
-    Data = 2,
-    Misc = 3
-};
-
 // Class to hold and process communication-related data for the CRTProtocol
-class CRTPPacket {
-
+class CRTPPacket
+{
 public:
-    CRTPPacket() : _data(), _port(Port::Console), _channel(Channel::TOC) {}
-    CRTPPacket(Port port, Channel channel, Data && data) ;
     CRTPPacket(Port port, uint8_t channel, Data && data) ;
     CRTPPacket(uint8_t port, uint8_t channel, Data && data) ;
 
     // Disable copy/move ctor + copy/move assignment
-    CRTPPacket(const CRTPPacket&) = delete;               // Copy constructor
-    CRTPPacket(CRTPPacket &&) = default;                    // Move constructor
+    CRTPPacket(const CRTPPacket&) = delete;                 // Copy constructor
+    CRTPPacket(CRTPPacket &&) = default;                        // Move constructor
     CRTPPacket& operator=(const CRTPPacket&) & = delete;  // Copy assignment operator
-    CRTPPacket& operator=(CRTPPacket&&) & = default;       // Move assignment operator
+    CRTPPacket& operator=(CRTPPacket&&) & = default;        // Move assignment operator
 
 
     Data const & GetData() const;
 
     // Prepares a sendable block of data based on the CCRTPPacket details
     // A block of data is prepared that contains the packet header
-    // (channel, port), the payload data and a finishing byte
-    // (0x27).
+    // (channel, port), the payload data and a finishing byte (0x27).
     uint8_t * SendableData() const;
 
-    // Returns the length of a sendable data block
     int GetSendableDataLength() const;
 
     Port GetPort() const;
     uint8_t GetPort_Int() const;
-    Channel GetChannel() const;
+    uint8_t GetChannel() const;
 
     void PrintData() const;
 
 private:
-    // Internal storage pointer for payload data inside the  packet
     Data _data;
-    // The copter port the packet will be delivered to
     Port _port;
-    // The copter channel the packet will be delivered to
-    Channel _channel;
+    uint8_t _channel;
 
 };
 

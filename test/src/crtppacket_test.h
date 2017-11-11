@@ -4,7 +4,7 @@
 #include <chrono>
 #include "communication/CRTPPacket.h"
 #include "math/types.h"
-
+#include "communication/protocol.h"
 
 class CRTPPacketTest : public ::testing::Test
 {
@@ -21,7 +21,7 @@ TEST_F(CRTPPacketTest, Construction)
     data.push_back(2);
     data.push_back(51);
     Port port = Port::Log;
-    Channel channel = Channel::Data;
+    uint8_t channel = Logger_Channels::Data::id;
 
     CRTPPacket packet(port, channel, std::move(data));
     EXPECT_EQ(packet.GetChannel(), channel);
@@ -29,7 +29,7 @@ TEST_F(CRTPPacketTest, Construction)
     //    EXPECT_DEATH(CRTPPacket(7, 0, data), "");
     //    EXPECT_DEATH(CRTPPacket(0, 7, data), "");
     //    EXPECT_DEATH(CRTPPacket(0, -2, data), "");
-    int header = (static_cast<int>(port) << 4) | 0b00001100 | (static_cast<int>(channel) & 0x03); // 0x03
+    int header = (static_cast<int>(port) << 4) | 0b00001100 | (channel & 0x03); // 0x03
     EXPECT_EQ(static_cast<int>(packet.SendableData()[0]), header);
 
     for(unsigned int i = 0; i < data.size(); ++i)
@@ -169,7 +169,7 @@ TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
     data.push_back(2);
     data.push_back(51);
     Port port = Port::Log;
-    Channel channel = Channel::Data;
+    uint8_t channel = Logger_Channels::Data::id;
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     CRTPPacket packet_2(port, channel, std::move(data));

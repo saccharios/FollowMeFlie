@@ -31,7 +31,8 @@ HEADERS  += communication/Crazyflie.h \
     error_codes.h \
     communication/toc_log.h \
     communication/toc_parameter.h \
-    communication/toc_shared.h
+    communication/toc_shared.h \
+    communication/protocol.h
 
 SOURCES += communication/Crazyflie.cpp \
     communication/CrazyRadio.cpp \

@@ -30,7 +30,7 @@
 #include <chrono>
 #include "math/constants.h"
 #include "math/types.h"
-
+#include "protocol.h"
 Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _crazyRadio(crazyRadio),
     _ackMissTolerance(100),
@@ -216,7 +216,7 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
     data.insert(data.end(), yawVect.begin(), yawVect.end());
     data.insert(data.end(), thrustVect.begin(), thrustVect.end());
 
-    CRTPPacket  packet(Port::Commander,Channel::TOC, std::move(data));
+    CRTPPacket  packet(Port::Commander, Commander_Channels::Setpoint::id, std::move(data));
 
     return _crazyRadio.SendPacketAndCheck(std::move(packet));
 }
@@ -236,7 +236,7 @@ bool  Crazyflie::SendVelocityRef(Velocity velocity)
     data.insert(data.end(), vz_vect.begin(), vz_vect.end());
     data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
 
-    CRTPPacket  packet(Port::Commander_Generic,Channel::TOC, std::move(data));
+    CRTPPacket  packet(Port::Commander_Generic, CommanderGeneric_Channels::GenericSetpoint::id, std::move(data));
 
     return _crazyRadio.SendPacketAndCheck(std::move(packet));
 }

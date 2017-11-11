@@ -52,21 +52,15 @@ float ExtractData<float>(Data const & data, int offset)
 }
 
 
-CRTPPacket:: CRTPPacket(Port port, Channel channel, Data && data) :
-    _data (data),
-    _port (port),
-    _channel(channel)
-{}
-
 CRTPPacket:: CRTPPacket(Port port, uint8_t channel, Data && data) :
      _data (data),
      _port (port),
-     _channel(static_cast<Channel>(channel))
+     _channel(channel)
  {}
 CRTPPacket:: CRTPPacket(uint8_t port, uint8_t channel, Data && data) :
     _data (data),
     _port (static_cast<Port>(port)),
-    _channel(static_cast<Channel>(channel))
+    _channel(channel)
 {}
 
 
@@ -108,7 +102,7 @@ uint8_t CRTPPacket::GetPort_Int() const
     return static_cast<uint8_t>(_port);
 }
 
-Channel CRTPPacket::GetChannel() const
+uint8_t CRTPPacket::GetChannel() const
 {
     return _channel;
 }

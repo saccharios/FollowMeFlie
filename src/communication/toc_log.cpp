@@ -1,12 +1,12 @@
 #include "toc_log.h"
 #include "stl_utils.h"
 #include "math/types.h"
-
+#include "protocol.h"
 
 
 bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
 {
-    using channel = Channels::Control;
+    using channel = Logger_Channels::Control;
     assert(frequency > 0);
     // Preparation
     UnregisterLoggingBlock(name);
@@ -42,7 +42,7 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
 
 bool TocLog::EnableLogging(LoggingBlock const & loggingBlock)
 {
-    using channel = Channels::Control;
+    using channel = Logger_Channels::Control;
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / loggingBlock.frequency);// The sampling rate is in 100us units
     Data data =  {channel::Commands::StartBlock, loggingBlock.id, samplingRate};
 
@@ -69,7 +69,7 @@ bool TocLog::UnregisterLoggingBlock(std::string name)
 
 bool TocLog::UnregisterLoggingBlockID(uint8_t id)
 {
-    using channel = Channels::Control;
+    using channel = Logger_Channels::Control;
     Data data = {channel::Commands::DeleteBlock, static_cast<uint8_t>(id)};
     CRTPPacket packet(Port::Log, channel::id, std::move(data));
     bool receivedPacketIsValid = false;
@@ -98,7 +98,7 @@ uint8_t TocLog::GetFirstFreeID()
 
 bool TocLog::StartLogging(std::string name, std::string blockName)
 {
-    using channel = Channels::Control;
+    using channel = Logger_Channels::Control;
     bool isContained;
     LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
@@ -137,13 +137,13 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
     for(auto const & packet : packets)
     {
         auto const & data = packet->GetData();
-        if(data.size() < Channels::Data::LogMinPacketSize)
+        if(data.size() < Logger_Channels::Data::LogMinPacketSize)
         {
             std::cout << "Data packet not large enough!\n";
             break;
         }
-        int blockID = data.at(Channels::Data::AnswerByte::Blockid);
-        const Data logdataVect(data.begin() +Channels::Data::AnswerByte::LogValues, data.end());
+        int blockID = data.at(Logger_Channels::Data::AnswerByte::Blockid);
+        const Data logdataVect(data.begin() + Logger_Channels::Data::AnswerByte::LogValues, data.end());
         bool found;
         // Check if the  packet is in a logging block
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
