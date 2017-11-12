@@ -1,5 +1,5 @@
 #include "toc_parameter.h"
-#include "CrazyRadio.h"
+#include "crazy_radio.h"
 #include "math/stl_utils.h"
 #include "protocol.h"
 

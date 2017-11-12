@@ -12,30 +12,32 @@ TEMPLATE = app
 CONFIG += console # Print console output in external console
 
 SOURCES +=  main.cpp \
-    mainwindow.cpp \
-    cameraviewpainter.cpp \
-    trackingcolor.cpp \
     imageprocess/camera.cpp \
-    imageprocess/extractcolor.cpp \
     actual_values_model.cpp \
     table_model_base.cpp \
     parameter_model.cpp \
-    qt_uitl.cpp
+    qt_uitl.cpp \
+    main_window.cpp \
+    tracking_color.cpp \
+    camera_view_painter.cpp \
+    imageprocess/extract_color.cpp
 
 
-HEADERS  += mainwindow.h \
-    cameraviewpainter.h \
+HEADERS  += \
     qt_util.h \
-    trackingcolor.h \
     imageprocess/camera.h \
-    imageprocess/extractcolor.h \
     opencv_utils.h \
     actual_values_model.h \
     table_model_base.h \
-    parameter_model.h
+    parameter_model.h \
+    tracking_color.h \
+    camera_view_painter.h \
+    main_window.h \
+    imageprocess/extract_color.h
 
 
-FORMS    += mainwindow.ui
+FORMS    += \
+    main_window.ui
 
 LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 

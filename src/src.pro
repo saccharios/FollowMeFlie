@@ -16,9 +16,7 @@ INCLUDEPATH += communication \
     control
 
 
-HEADERS  += communication/Crazyflie.h \
-    communication/CrazyRadio.h \
-    communication/CRTPPacket.h \
+HEADERS  += \
     math/stl_utils.h \
     math/logic.h \
     math/functions.h \
@@ -26,25 +24,29 @@ HEADERS  += communication/Crazyflie.h \
     math/lowpass.h \
     math/pi_controller.h \
     math/types.h \
-    control/extendedkalmanfilter.h \
     error_codes.h \
     communication/toc_log.h \
     communication/toc_parameter.h \
     communication/toc_shared.h \
     communication/protocol.h \
-    control/crazy_flie_commander.h
+    control/crazy_flie_commander.h \
+    communication/crtp_packet.h \
+    communication/crazy_radio.h \
+    communication/crazy_flie.h \
+    control/extended_kalmanfilter.h
 
-SOURCES += communication/Crazyflie.cpp \
-    communication/CrazyRadio.cpp \
-    communication/CRTPPacket.cpp \
+SOURCES += \
     math/lowpass.cpp \
     math/pi_controller.cpp \
     control/commander.cpp \
     math/types.cpp \
-    control/extendedkalmanfilter.cpp \
     communication/toc_log.cpp \
     communication/toc_parameter.cpp \
-    communication/toc_shared.cpp
+    communication/toc_shared.cpp \
+    communication/crazy_radio.cpp \
+    communication/crazy_flie.cpp \
+    communication/crtp_packet.cpp \
+    control/extended_kalmanfilter.cpp
 
 
 

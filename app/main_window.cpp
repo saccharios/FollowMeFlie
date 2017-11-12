@@ -1,10 +1,10 @@
-#include "mainwindow.h"
+#include "main_window.h"
 #include "ui_mainwindow.h"
 #include <memory>
 
 #include <iostream>
 #include <QDebug>
-#include "communication/Crazyflie.h"
+#include "communication/crazy_flie.h"
 #include <QMessageBox>
 #include "opencv2/opencv.hpp"
 #include "actual_values_model.h"

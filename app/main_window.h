@@ -2,12 +2,12 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include "communication/CrazyRadio.h"
-#include "communication/CrazyFlie.h"
-#include "cameraviewpainter.h"
-#include "trackingcolor.h"
+#include "communication/crazy_radio.h"
+#include "communication/crazy_flie.h"
+#include "camera_view_painter.h"
+#include "tracking_color.h"
 #include "imageprocess/camera.h"
-#include "imageprocess/extractcolor.h"
+#include "imageprocess/extract_color.h"
 #include "control/crazy_flie_commander.h"
 #include <QTableView>
 #include "actual_values_model.h"

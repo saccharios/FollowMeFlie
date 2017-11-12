@@ -1,7 +1,7 @@
 #pragma once
-#include "CRTPPacket.h"
+#include "crtp_packet.h"
 #include "math/types.h"
-#include "CrazyRadio.h"
+#include "crazy_radio.h"
 #include "toc_shared.h"
 #include "protocol.h"
 class TocLog

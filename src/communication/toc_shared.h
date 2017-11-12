@@ -1,7 +1,7 @@
 #pragma once
 #include "math/types.h"
-#include "CrazyRadio.h"
-#include "CRTPPacket.h"
+#include "crazy_radio.h"
+#include "crtp_packet.h"
 #include "math/stl_utils.h"
 #include "protocol.h"
 

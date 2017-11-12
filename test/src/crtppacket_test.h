@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <chrono>
-#include "communication/CRTPPacket.h"
+#include "communication/crtp_packet.h"
 #include "math/types.h"
 #include "communication/protocol.h"
 

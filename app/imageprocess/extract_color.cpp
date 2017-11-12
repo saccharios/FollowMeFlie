@@ -1,4 +1,4 @@
-#include "extractcolor.h"
+#include "extract_color.h"
 #include "opencv_utils.h"
 #include "math/constants.h"
 cv::Scalar QColor2Scalar(QColor const & color)

@@ -1,5 +1,5 @@
 #pragma once
-#include "CrazyRadio.h"
+#include "crazy_radio.h"
 #include "math/types.h"
 #include "toc_shared.h"
 #include <QObject>

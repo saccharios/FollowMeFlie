@@ -1,4 +1,4 @@
-#include "cameraviewpainter.h"
+#include "camera_view_painter.h"
 #include <QPainter>
 #include <QPoint>
 #include <QPointF>

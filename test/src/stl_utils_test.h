@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include "math/stl_utils.h"
-#include "communication/CRTPPacket.h"
+#include "communication/crtp_packet.h"
 
 class STLUtils_Test : public testing::Test
 {

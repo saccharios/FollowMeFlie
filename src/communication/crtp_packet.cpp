@@ -26,7 +26,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "CRTPPacket.h"
+#include "crtp_packet.h"
 #include <vector>
 #include <iostream>
 #include "math/types.h"

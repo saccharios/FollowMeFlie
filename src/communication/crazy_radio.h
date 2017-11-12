@@ -41,7 +41,7 @@
 #include <sstream>
 #include <memory>
 
-#include "CRTPPacket.h"
+#include "crtp_packet.h"
 
 
 enum class PowerSettings {
@@ -86,41 +86,20 @@ public:
     CrazyRadio();
     ~CrazyRadio();
 
-    // The first available USB dongle will be opened and claimed for
-    // communication. The connection will be maintained and used to
-    // communicate with a Crazyflie Nano quadcopter in range.
     void StartRadio();
-
     void StopRadio();
 
-    // Returns the current setting for power usage by the USB dongle
     PowerSettings Power();
-
     void SetPower(PowerSettings power);
 
     bool SendPacketAndCheck(CRTPPacket && sendPacket);
-
     sptrPacket SendAndReceive(CRTPPacket && sendPacket, bool & valid);
-
-    // Sends out an empty dummy packet
-    //  Only contains the payload `0xff`, as used for empty packet requests. Mostly used for waiting or keepalive.
     bool SendPingPacket();
-
-    // Waits for the next non-empty packet.
-    // Sends out dummy packets until a reply is non-empty and then returns this reply.
     sptrPacket WaitForPacket();
 
-    // Whether or not the copter is answering sent packets.
-    // Returns whether the copter is actually answering sent packets with
-    //  a set ACK flag. If this is not the case, it is either switched off or out of range.
     bool AckReceived();
-
-    // Whether or not the USB connection is still operational.
-    // Checks if the USB read/write calls yielded any errors.
     bool IsUsbConnectionOk();
 
-    // Returns a list of all collected logging related (i.e. originating from port 5) packets. This is called by the Crazyflie class
-    //  automatically when performing cycle().
     std::vector<sptrPacket> PopLoggingPackets();
 
     void SetRadioSettings(int index);
@@ -129,9 +108,7 @@ public:
     bool LastSendAndReceiveFailed() const;
 
 private:
-    // The radio URI as supplied when initializing the class instance
     RadioSettings _radioSettings;
-    // The current USB context as supplied by libusb
     libusb_context* _context;
     libusb_device* _devDevice;
     libusb_device_handle* _device;

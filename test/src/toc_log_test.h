@@ -4,8 +4,8 @@
 #include <iostream>
 #include "communication/toc_log.h"
 #include "communication/toc_parameter.h"
-#include "communication/CRTPPacket.h"
-#include "communication/CrazyRadio.h"
+#include "communication/crtp_packet.h"
+#include "communication/crazy_radio.h"
 #include <memory>
 #include "math/types.h"
 

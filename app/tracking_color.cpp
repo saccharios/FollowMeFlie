@@ -1,4 +1,4 @@
-#include "trackingcolor.h"
+#include "tracking_color.h"
 
 void TrackingColor::paintEvent(QPaintEvent* /*event*/)
 {

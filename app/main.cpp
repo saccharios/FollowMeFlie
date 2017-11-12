@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "main_window.h"
 #include <QApplication>
 #include <QCameraInfo>
 
@@ -6,7 +6,7 @@
 //#include <QtMultimediaWidgets>
 #include <QDebug>
 #include <memory>
-#include "communication/Crazyflie.h"
+#include "communication/crazy_flie.h"
 
 bool checkCameraAvailability()
 {

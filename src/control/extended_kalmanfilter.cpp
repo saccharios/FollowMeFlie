@@ -1,4 +1,4 @@
-#include "extendedkalmanfilter.h"
+#include "extended_kalmanfilter.h"
 
 ExtendedKalmanFilter::ExtendedKalmanFilter()
 {
