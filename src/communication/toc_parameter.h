@@ -58,6 +58,6 @@ private:
     CrazyRadio & _crazyRadio;
     unsigned int _itemCount;
     std::vector<TOCElement> _elements;
-    TOCShared<static_cast<int>(Port::Parameters), Parameter_Channels::Access> _shared_impl;
+    TOCShared<Parameter::id, Parameter::Access> _shared_impl;
 
 };

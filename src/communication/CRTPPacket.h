@@ -79,22 +79,10 @@ template<>
 float ExtractData<float>(Data const & data, int offset);
 
 
-enum class Port
-{
-    Console = 0,
-    Parameters = 2,
-    Commander = 3,
-    Log = 5,
-    Commander_Generic = 7,
-    Debug = 14,
-    Link = 15
-};
-
 // Class to hold and process communication-related data for the CRTProtocol
 class CRTPPacket
 {
 public:
-    CRTPPacket(Port port, uint8_t channel, Data && data) ;
     CRTPPacket(uint8_t port, uint8_t channel, Data && data) ;
 
     // Disable copy/move ctor + copy/move assignment
@@ -113,15 +101,14 @@ public:
 
     int GetSendableDataLength() const;
 
-    Port GetPort() const;
-    uint8_t GetPort_Int() const;
+    uint8_t GetPort() const;
     uint8_t GetChannel() const;
 
     void PrintData() const;
 
 private:
     Data _data;
-    Port _port;
+    uint8_t _port;
     uint8_t _channel;
 
 };

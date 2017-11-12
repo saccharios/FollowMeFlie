@@ -46,20 +46,15 @@ float ExtractData<float>(Data const & data, int offset)
     }
     else
     {
-        std::cout << "Packet is not large enough\n";
+        //std::cout << "Packet is not large enough\n";
     }
     return bits.float_value;
 }
 
 
-CRTPPacket:: CRTPPacket(Port port, uint8_t channel, Data && data) :
-     _data (data),
-     _port (port),
-     _channel(channel)
- {}
 CRTPPacket:: CRTPPacket(uint8_t port, uint8_t channel, Data && data) :
     _data (data),
-    _port (static_cast<Port>(port)),
+    _port (port),
     _channel(channel)
 {}
 
@@ -92,14 +87,9 @@ int CRTPPacket::GetSendableDataLength() const
     return _data.size() + 1;//2;
 }
 
-Port CRTPPacket::GetPort() const
+uint8_t CRTPPacket::GetPort() const
 {
     return _port;
-}
-
-uint8_t CRTPPacket::GetPort_Int() const
-{
-    return static_cast<uint8_t>(_port);
 }
 
 uint8_t CRTPPacket::GetChannel() const

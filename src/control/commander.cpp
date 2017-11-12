@@ -1,4 +1,4 @@
-#include "control/commander.h"
+#include "control/crazy_flie_commander.h"
 #include "math/constants.h"
 #include "math/types.h"
 
@@ -11,7 +11,7 @@
 //                  double limit_upper ):
 
 
-Commander::Commander(Crazyflie & crazyflie) :
+CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie) :
     _crazyflie(crazyflie),
     _hoverModeIsActive(false),
     _samplingTime(static_cast<float>(crazyflieUpdateSamplingTime)*0.001f),
@@ -21,7 +21,7 @@ Commander::Commander(Crazyflie & crazyflie) :
     _zAcceleration(_samplingTime*0.001f, 0.0f, 0.0f, 0.0f, 0.0f, 10.0f,10.0f) // What is the unit of acc z?
 {}
 
-void Commander::Update()
+void CrazyFlieCommander::Update()
 {
     static Velocity velocity;
     if(_hoverModeIsActive)

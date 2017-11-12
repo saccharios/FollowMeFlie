@@ -2,6 +2,7 @@
 #include "CrazyRadio.h"
 #include "math/stl_utils.h"
 #include "protocol.h"
+
 bool TocParameter::ReadAll()
 {
     for(TOCElement & element : _elements)
@@ -18,15 +19,15 @@ bool TocParameter::ReadAll()
 bool TocParameter::ReadElement(TOCElement & element)
 {
     Data data ={element.id};
-    CRTPPacket packet(Port::Parameters, Parameter_Channels::Read::id, std::move(data));
+    CRTPPacket packet(Parameter::id, Parameter::Read::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
     auto & dataReceived = received->GetData();
     if(receivedPacketIsValid && dataReceived.size() > 1)
     {
-        if(element.id == dataReceived.at(Parameter_Channels::Read::AnswerByte::CmdID))
+        if(element.id == dataReceived.at(Parameter::Read::AnswerByte::CmdID))
         {
-            _shared_impl.SetValueToElement(&element, dataReceived, Parameter_Channels::Read::AnswerByte::Value);
+            _shared_impl.SetValueToElement(&element, dataReceived, Parameter::Read::AnswerByte::Value);
             emit ParameterRead(element.id);
             return true;
         }
@@ -122,16 +123,16 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 
     }
 
-    CRTPPacket packet(Port::Parameters, Parameter_Channels::Write::id, std::move(data));
+    CRTPPacket packet(Parameter::id, Parameter::Write::id, std::move(data));
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
     auto & dataReceived = received->GetData();
 
     if(receivedPacketIsValid && dataReceived.size() > 1)
     {
-        if( (element.id == dataReceived.at(Parameter_Channels::Read::AnswerByte::CmdID)) )
+        if( (element.id == dataReceived.at(Parameter::Read::AnswerByte::CmdID)) )
         {
-                _shared_impl.SetValueToElement(&element, dataReceived, Parameter_Channels::Write::AnswerByte::Value);
+                _shared_impl.SetValueToElement(&element, dataReceived, Parameter::Write::AnswerByte::Value);
                 emit ParameterRead(element.id);
                 return true;
         }

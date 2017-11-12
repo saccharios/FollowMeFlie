@@ -6,7 +6,7 @@
 
 bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
 {
-    using channel = Logger_Channels::Control;
+    using channel = Logger::Control;
     assert(frequency > 0);
     // Preparation
     UnregisterLoggingBlock(name);
@@ -16,7 +16,7 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
     // Register new block
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / frequency);// The sampling rate is in 100us units
     Data data =  {channel::Commands::CreateBlock::id, id, samplingRate};
-    CRTPPacket packet(Port::Log, channel::id, std::move(data));
+    CRTPPacket packet(Logger::id, channel::id, std::move(data));
 
     bool receivedPacketIsValid = false;
     auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
@@ -42,11 +42,11 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
 
 bool TocLog::EnableLogging(LoggingBlock const & loggingBlock)
 {
-    using channel = Logger_Channels::Control;
+    using channel = Logger::Control;
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / loggingBlock.frequency);// The sampling rate is in 100us units
     Data data =  {channel::Commands::StartBlock, loggingBlock.id, samplingRate};
 
-    CRTPPacket packet(Port::Log, channel::id, std::move(data));
+    CRTPPacket packet(Logger::id, channel::id, std::move(data));
 
     // Use SendAndReceive to make sure the crazyflie is ready.
     bool receivedPacketIsValid = false;
@@ -69,9 +69,9 @@ bool TocLog::UnregisterLoggingBlock(std::string name)
 
 bool TocLog::UnregisterLoggingBlockID(uint8_t id)
 {
-    using channel = Logger_Channels::Control;
+    using channel = Logger::Control;
     Data data = {channel::Commands::DeleteBlock, static_cast<uint8_t>(id)};
-    CRTPPacket packet(Port::Log, channel::id, std::move(data));
+    CRTPPacket packet(Logger::id, channel::id, std::move(data));
     bool receivedPacketIsValid = false;
     _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
     return receivedPacketIsValid;
@@ -98,7 +98,7 @@ uint8_t TocLog::GetFirstFreeID()
 
 bool TocLog::StartLogging(std::string name, std::string blockName)
 {
-    using channel = Logger_Channels::Control;
+    using channel = Logger::Control;
     bool isContained;
     LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
     if(isContained)
@@ -107,7 +107,7 @@ bool TocLog::StartLogging(std::string name, std::string blockName)
         if(isContained)
         {
             Data data = {channel::Commands::AppendBlock::id, logBlock.id, static_cast<uint8_t>(element.type), element.id};
-            CRTPPacket packet(Port::Log, channel::id, std::move(data));
+            CRTPPacket packet(Logger::id, channel::id, std::move(data));
             bool receivedPacketIsValid  = false;
             auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
             auto const & dataReceived = received->GetData();
@@ -137,13 +137,13 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
     for(auto const & packet : packets)
     {
         auto const & data = packet->GetData();
-        if(data.size() < Logger_Channels::Data::LogMinPacketSize)
+        if(data.size() < Logger::Data::LogMinPacketSize)
         {
             std::cout << "Data packet not large enough!\n";
             break;
         }
-        int blockID = data.at(Logger_Channels::Data::AnswerByte::Blockid);
-        const Data logdataVect(data.begin() + Logger_Channels::Data::AnswerByte::LogValues, data.end());
+        int blockID = data.at(Logger::Data::AnswerByte::Blockid);
+        const Data logdataVect(data.begin() + Logger::Data::AnswerByte::LogValues, data.end());
         bool found;
         // Check if the  packet is in a logging block
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);

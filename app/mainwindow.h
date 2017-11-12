@@ -8,7 +8,7 @@
 #include "trackingcolor.h"
 #include "imageprocess/camera.h"
 #include "imageprocess/extractcolor.h"
-#include "control/commander.h"
+#include "control/crazy_flie_commander.h"
 #include <QTableView>
 #include "actual_values_model.h"
 #include "parameter_model.h"
@@ -71,7 +71,7 @@ private:
     TrackingColor _trackingColor;
     Camera _camera;
     ExtractColor _extractColor;
-    Commander _commander;
+    CrazyFlieCommander _commander;
 
 
     void DisplayConnectionStatus();

@@ -3,6 +3,8 @@
 #include "CrazyRadio.h"
 #include "CRTPPacket.h"
 #include "math/stl_utils.h"
+#include "protocol.h"
+
 template<uint8_t port, typename channel>
 class TOCShared
 {
@@ -198,7 +200,7 @@ public:
 private:
     bool AddElement( CrazyRadio::sptrPacket && packet)
     {
-        if(packet->GetPort_Int() == port && static_cast<uint8_t>(packet->GetChannel() )== channel::id)
+        if(packet->GetPort() == port && static_cast<uint8_t>(packet->GetChannel() )== channel::id)
         {
             auto const & data = packet->GetData();
 
@@ -222,7 +224,7 @@ private:
                 }
                 element.name = element.group +"."+  element.name_only;
                 element.id = data.at(channel::Commands::GetItem::AnswerByte::ID);
-                if(port == static_cast<uint8_t>(Port::Parameters))
+                if(port == Parameter::id)
                 {
                     element.type = ConvertParameterElementType(data.at(channel::Commands::GetItem::AnswerByte::Type));
                 }

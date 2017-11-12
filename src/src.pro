@@ -25,14 +25,14 @@ HEADERS  += communication/Crazyflie.h \
     math/constants.h \
     math/lowpass.h \
     math/pi_controller.h \
-    control/commander.h \
     math/types.h \
     control/extendedkalmanfilter.h \
     error_codes.h \
     communication/toc_log.h \
     communication/toc_parameter.h \
     communication/toc_shared.h \
-    communication/protocol.h
+    communication/protocol.h \
+    control/crazy_flie_commander.h
 
 SOURCES += communication/Crazyflie.cpp \
     communication/CrazyRadio.cpp \

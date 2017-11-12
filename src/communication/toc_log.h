@@ -26,14 +26,9 @@ public:
     {}
 
 
-    Port GetPort()
+    uint8_t GetPort()
     {
-        return Port::Log;
-    }
-
-    static int GetPortID()
-    {
-        return static_cast<int>(Port::Log);
+        return Logger::id;
     }
 
     bool Setup() {return _shared_impl.Setup();}
@@ -67,5 +62,5 @@ private:
     unsigned int _itemCount;
     std::vector<TOCElement> _elements;
     std::vector<LoggingBlock> _loggingBlocks;
-    TOCShared<static_cast<int>(Port::Log), Logger_Channels::Access> _shared_impl;
+    TOCShared<Logger::id, Logger::Access> _shared_impl;
 };

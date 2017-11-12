@@ -6,11 +6,11 @@
 
 
 
-class Commander
+class CrazyFlieCommander
 {
     float sampling_time = 10.0; // TODO Generalize with crazyfliecaller
 public:
-    Commander(Crazyflie & crazyflie);
+    CrazyFlieCommander(Crazyflie & crazyflie);
 
 
 
@@ -37,7 +37,4 @@ private:
     PI_Controller _piRoll;
     PI_Controller _piPitch;
     PI_Controller _zAcceleration;
-
-
-
 };

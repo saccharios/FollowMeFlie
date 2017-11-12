@@ -1,8 +1,9 @@
 #pragma once
 
 // Channel documentation available at https://wiki.bitcraze.io/doc:crazyflie:crtp:log
-struct Logger_Channels
+struct Logger
 {
+    static constexpr uint8_t id = 5;
     struct Access
     {
         static constexpr uint8_t id = 0;
@@ -64,9 +65,9 @@ struct Logger_Channels
 
             // TODO SF Implement
             static constexpr uint8_t DeleteBlock   = 2;
-            static constexpr uint8_t StartBlock     = 3;
-            static constexpr uint8_t StopBlock     = 4;
-            static constexpr uint8_t Reset           = 5;
+            static constexpr uint8_t StartBlock      = 3;
+            static constexpr uint8_t StopBlock      = 4;
+            static constexpr uint8_t Reset             = 5;
 
         };
 
@@ -86,8 +87,9 @@ struct Logger_Channels
 };
 
 // Channel documentation available at https://wiki.bitcraze.io/doc:crazyflie:crtp:param
-struct Parameter_Channels
+struct Parameter
 {
+    static constexpr uint8_t id = 2;
     struct Access
     {
         static constexpr uint8_t id = 0;
@@ -158,26 +160,39 @@ struct Parameter_Channels
     };
 };
 
-struct CommanderGeneric_Channels
+struct CommanderGeneric
 {
+    static constexpr uint8_t id = 7;
     struct GenericSetpoint
     {
         static constexpr uint8_t id = 0;
     };
 };
 
-struct Commander_Channels
+struct Commander
 {
+    static constexpr uint8_t id = 3;
     struct Setpoint
     {
         static constexpr uint8_t id = 0;
     };
 };
 
-struct Console_Channels
+struct Console
 {
+    static constexpr uint8_t id = 0;
     struct Print
     {
         static constexpr uint8_t id = 0;
     };
+};
+struct Debug
+{
+    static constexpr uint8_t id = 14;
+    // TODO SF:: Implement if needed
+};
+struct Link
+{
+    static constexpr uint8_t id = 15;
+    // TODO SF:: Implement if needed
 };

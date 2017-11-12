@@ -412,7 +412,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPa
             // Dispatch incoming packet according to port and channel
             switch(packet->GetPort() )
             {
-            case Port::Console:
+            case Console::id:
             { // Console
                 if(data.size() > 0)
                 { // Implicit assumption that the data stored in data are uint8_ts
@@ -430,19 +430,20 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPa
                 break;
             }
 
-            case Port::Log:
+            case Logger::id:
             {
-                if(packet->GetChannel() == Logger_Channels::Data::id)
+                if(packet->GetChannel() == Logger::Data::id)
                 {
                     _loggingPackets.emplace_back(packet);
                 }
                 break;
             }
 
-            case Port::Commander:
-            case Port::Debug:
-            case Port::Link:
-            case Port::Parameters:
+            case Commander::id:
+            case CommanderGeneric::id:
+            case Debug::id:
+            case Link::id:
+            case Parameter::id:
             default:
                 break;
             }
@@ -473,7 +474,7 @@ CrazyRadio::sptrPacket CrazyRadio::ReadAck()
 
             // Exctract port and channel information from buffer[1]
             // TODO SF Add Port and channel checking
-            Port port = static_cast<Port>((buffer[1] & 0xf0) >> 4);
+            uint8_t port = static_cast<uint8_t>((buffer[1] & 0xf0) >> 4);
             uint8_t channel = static_cast<uint8_t>(buffer[1] & 0b00000011);
 
             // Actual data starts at buffer[2]
@@ -509,7 +510,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
     int cntr = 0;
     while(received == nullptr && cntr < 10)
     {
-        received = SendPacketAndDistribute({Port::Console,Console_Channels::Print::id,{static_cast<uint8_t>(0xff)}});
+        received = SendPacketAndDistribute({Console::id, Console::Print::id,{static_cast<uint8_t>(0xff)}});
         ++cntr;
     }
     return received;
@@ -569,7 +570,7 @@ std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
 
 bool CrazyRadio::SendPingPacket()
 {
-    return SendPacketAndCheck({Port::Console,0,{static_cast<uint8_t>(0xff)}});
+    return SendPacketAndCheck({Console::id, Console::Print::id, {static_cast<uint8_t>(0xff)}});
 }
 
 bool CrazyRadio::RadioIsConnected() const

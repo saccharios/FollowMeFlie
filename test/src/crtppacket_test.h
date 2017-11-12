@@ -20,8 +20,8 @@ TEST_F(CRTPPacketTest, Construction)
     data.push_back(1);
     data.push_back(2);
     data.push_back(51);
-    Port port = Port::Log;
-    uint8_t channel = Logger_Channels::Data::id;
+    uint8_t port = Logger::id;
+    uint8_t channel = Logger::Data::id;
 
     CRTPPacket packet(port, channel, std::move(data));
     EXPECT_EQ(packet.GetChannel(), channel);
@@ -168,8 +168,8 @@ TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
     data.push_back(1);
     data.push_back(2);
     data.push_back(51);
-    Port port = Port::Log;
-    uint8_t channel = Logger_Channels::Data::id;
+    uint8_t port = Logger::id;
+    uint8_t channel = Logger::Data::id;
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     CRTPPacket packet_2(port, channel, std::move(data));
