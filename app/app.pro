@@ -33,7 +33,8 @@ HEADERS  += \
     tracking_color.h \
     camera_view_painter.h \
     main_window.h \
-    imageprocess/extract_color.h
+    imageprocess/extract_color.h \
+    time_levels.h
 
 
 FORMS    += \

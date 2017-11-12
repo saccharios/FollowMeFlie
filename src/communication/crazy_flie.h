@@ -58,8 +58,8 @@ struct Gyrometer
 };
 struct Battery
 {
-    double level;
-    float state;
+    double  level;
+    float      state;
 };
 
 struct Magnetometer
@@ -70,15 +70,13 @@ struct Magnetometer
 };
 struct SensorValues
 {
-    SetPoint stabilizer;
-    Barometer barometer;
-    Accelerometer acceleration;
-    Gyrometer gyrometer;
-    Battery battery;
-    Magnetometer magnetometer;
+    SetPoint             stabilizer;
+    Barometer          barometer;
+    Accelerometer   acceleration;
+    Gyrometer          gyrometer;
+    Battery                battery;
+    Magnetometer    magnetometer;
 };
-
-static int crazyflieUpdateSamplingTime = 10; // in ms
 
 class Crazyflie : public QObject
 {
@@ -90,14 +88,10 @@ public:
     Crazyflie(CrazyRadio & crazyRadio);
     ~Crazyflie();
 
-    // The thrust value to send (> 10000)
     void SetThrust(int thrust);
-    //    Roll values are in degree, ranging from -180.0deg to 180.0deg.
-    void SetRoll(float roll);
-    //    Pitch values are in degree, ranging from -180.0deg to 180.0deg.
-    void SetPitch(float pitch);
-    //    Yaw values are in degree, ranging from -180.0deg to 180.0deg.
-    void SetYaw(float yaw);
+    void SetRoll(float roll); // In degree, -180° to 180°
+    void SetPitch(float pitch); // In degree, -180° to 180°
+    void SetYaw(float yaw); // In degree, -180° to 180°
 
     void SetSetPoint(SetPoint setPoint);
     void SetVelocityRef(Velocity velocity);
@@ -144,7 +138,6 @@ public:
 signals:
     void ConnectionTimeout();
     void NotConnecting();
-
 
 private:
     CrazyRadio & _crazyRadio;

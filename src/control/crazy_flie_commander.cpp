@@ -11,10 +11,10 @@
 //                  double limit_upper ):
 
 
-CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie) :
+CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
     _hoverModeIsActive(false),
-    _samplingTime(static_cast<float>(crazyflieUpdateSamplingTime)*0.001f),
+    _samplingTime(samplingTime),
     _piYaw (_samplingTime*0.001f, 0.0f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
     _piRoll (_samplingTime*0.001f, 0.0f, 0.2f, 0.0f, 0.0f, -180.0f,180.0f),
     _piPitch(_samplingTime*0.001f, 0.0f, 0.2f, 0.0f, 0.0f, -180.0,180.0f),

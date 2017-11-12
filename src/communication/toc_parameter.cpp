@@ -120,7 +120,13 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
         data.insert( data.end(), value_vector.begin(), value_vector.end() );
         break;
     }
-
+    case ElementType::FP16:
+    default:
+    {
+        std::cout << "Unknown data type for writing value\n";
+        return false;
+        break;
+    }
     }
 
     CRTPPacket packet(Parameter::id, Parameter::Write::id, std::move(data));

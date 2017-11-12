@@ -12,7 +12,7 @@
 #include <QTableView>
 
 #include "qt_util.h"
-
+#include "time_levels.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
      _trackingColor(),
     _camera(),
     _extractColor(_trackingColor.GetColor()),
-    _commander(_crazyFlie)
+    _commander(_crazyFlie, crazyflieUpdateSamplingTime_seconds)
 {
     ui->setupUi(this);
     // Event loop on main window

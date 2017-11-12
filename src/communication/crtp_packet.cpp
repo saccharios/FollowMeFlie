@@ -34,12 +34,12 @@
 template<>
 float ExtractData<float>(Data const & data, int offset)
 {
-    constexpr int typeLength = sizeof(float);
+    constexpr unsigned int typeLength = sizeof(float);
     IntFloat bits;
     bits.int_value = 0;
     if(data.size() > offset +typeLength)
     {
-        for(int i = 0; i < typeLength; ++i)
+        for(unsigned int i = 0; i < typeLength; ++i)
         {
             bits.int_value |= (data.at(offset + i) << 8*i);
         }

@@ -13,9 +13,9 @@ Data ConvertTouint8_tVect(T element)
     // Reinterpret element as array of 8-byte uint8_t
     uint8_t* uint8_t_array = reinterpret_cast<uint8_t *>(&element);
     // Create vector from the array
-    constexpr int size = sizeof(T) / sizeof(uint8_t);
+    constexpr unsigned int size = sizeof(T) / sizeof(uint8_t);
     Data result;
-    for(int i = 0; i < size; ++i)
+    for(unsigned int i = 0; i < size; ++i)
     {
         result.push_back(uint8_t_array[i]);
     }
@@ -26,11 +26,11 @@ Data ConvertTouint8_tVect(T element)
 template<typename T>
 T ExtractData(Data const & data, int offset)
 {
-    int typeLength = sizeof(T);
+    constexpr unsigned int typeLength = sizeof(T);
     if(data.size() > offset +typeLength)
     {
         T bits = 0;
-        for(int i = 0; i < typeLength; ++i)
+        for(unsigned int i = 0; i < typeLength; ++i)
         {
             bits |= (data.at(offset + i) << 8*i);
         }

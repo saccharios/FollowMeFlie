@@ -8,11 +8,8 @@
 
 class CrazyFlieCommander
 {
-    float sampling_time = 10.0; // TODO Generalize with crazyfliecaller
 public:
-    CrazyFlieCommander(Crazyflie & crazyflie);
-
-
+    CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime);
 
     void ActivateHoverMode(bool activate)
     {

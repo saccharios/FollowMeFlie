@@ -38,7 +38,6 @@ HEADERS  += \
 SOURCES += \
     math/lowpass.cpp \
     math/pi_controller.cpp \
-    control/commander.cpp \
     math/types.cpp \
     communication/toc_log.cpp \
     communication/toc_parameter.cpp \
@@ -46,7 +45,8 @@ SOURCES += \
     communication/crazy_radio.cpp \
     communication/crazy_flie.cpp \
     communication/crtp_packet.cpp \
-    control/extended_kalmanfilter.cpp
+    control/extended_kalmanfilter.cpp \
+    control/crazy_flie_commander.cpp
 
 
 
