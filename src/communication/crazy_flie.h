@@ -114,7 +114,7 @@ public:
     bool IsConnected();
 
 
-   std::array<float,3> ConvertBodyFrameToIntertialFrame(std::array<float,3> const & value_in_body);
+   Eigen::Vector3f ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body);
 
    std::vector<TOCElement> const &
    GetLogElements () const

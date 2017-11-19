@@ -33,6 +33,8 @@ bool EnumerateCameras(std::vector<int> & camIdx)
 //    std::cout << std::endl << camIdx.size() << " cam(s) available";
 
 //    return (camIdx.size()>0); // returns success
+    Q_UNUSED(camIdx);
+    return false;
 }
 Camera::Camera () :
      _state(CameraState::DISABLED),

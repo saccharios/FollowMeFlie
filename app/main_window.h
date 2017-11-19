@@ -14,7 +14,8 @@
 #include "parameter_model.h"
 
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 

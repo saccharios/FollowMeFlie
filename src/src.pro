@@ -32,8 +32,7 @@ HEADERS  += \
     control/crazy_flie_commander.h \
     communication/crtp_packet.h \
     communication/crazy_radio.h \
-    communication/crazy_flie.h \
-    control/extended_kalmanfilter.h
+    communication/crazy_flie.h
 
 SOURCES += \
     math/lowpass.cpp \
@@ -45,7 +44,6 @@ SOURCES += \
     communication/crazy_radio.cpp \
     communication/crazy_flie.cpp \
     communication/crtp_packet.cpp \
-    control/extended_kalmanfilter.cpp \
     control/crazy_flie_commander.cpp
 
 

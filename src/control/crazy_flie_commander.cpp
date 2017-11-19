@@ -45,7 +45,8 @@ void CrazyFlieCommander::Update()
         float vz = -1.0f* velocity[2];
 //        auto vxx = (vx-vy)*SQRT2;
 //        auto vyy = (vx+vy)*SQRT2;
-        _crazyflie.SetVelocityRef(Velocity{vx, vy, vz});
+//        _crazyflie.SetVelocityRef(Velocity{vx, vy, vz});
+        _crazyflie.SetVelocityRef(Velocity{0.0, 0.0, 0.0});
         _crazyflie.SetSendingVelocityRef(true);
 //        _crazyflie.SetSetPoint(SetPoint{0.0,0.0,0.0,35000});
 //        _crazyflie.SetSendSetpoints(true);
@@ -54,5 +55,4 @@ void CrazyFlieCommander::Update()
     {
         velocity = {0.0f,0.0f,0.0f};
     }
-
 }

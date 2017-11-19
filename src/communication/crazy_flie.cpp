@@ -28,6 +28,8 @@ Crazyflie::~Crazyflie()
 // Runs on 10ms.
 void Crazyflie::Update()
 {
+    // TODO SF: Alternative way of implementing state machine
+
     // TODO SF How to restart the state machine properly?
     //    if(!_stateMachineIsEnabled)
     //    {
@@ -100,32 +102,11 @@ void Crazyflie::Update()
     }
     case State::ZERO_MEASUREMENTS:
     {
+        // TODO SF : Remove this state
         _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-
         _crazyRadio.SendPingPacket();
-        // NOTE(winkler): Here, we can do measurement zero'ing. This is
-        // not done at the moment, though. Reason: No readings to zero at
-        // the moment. This might change when altitude becomes available.
-
-
-        _setPointOffset.roll = GetSensorValue("stabilizer.roll");
-        _setPointOffset.yaw= 0.0f;
-        _setPointOffset.pitch = GetSensorValue("stabilizer.pitch");
-        _setPointOffset.thrust = GetSensorValue("stabilizer.thrust");
-        _accelerationOffset[0] = GetSensorValue("acc.x");
-        _accelerationOffset[1] = GetSensorValue("acc.y");
-        _accelerationOffset[2] = GetSensorValue("acc.z");
-
-        //        _setPointOffset.Print();
-        //        std::cout << "acc_x_offset = " << _accelerationOffset[0] << " acc_y_offset = " << _accelerationOffset[1] << " acc_z_offset = " << _accelerationOffset[2] << std::endl;
-
-        // In the first six queries the acceleration value is still zero
-        static int counter = 0;
-        if(counter > 7)
-        {
-            _state = State::NORMAL_OPERATION;
-        }
-        ++counter;
+        // NOTE : ter;
+        _state = State::NORMAL_OPERATION;
         break;
     }
     case State::NORMAL_OPERATION:
@@ -671,7 +652,7 @@ void Crazyflie::DisableStateEstimateLogging()
 }
 
 
-std::array<float,3> Crazyflie::ConvertBodyFrameToIntertialFrame(std::array<float,3> const & value_in_body)
+Eigen::Vector3f Crazyflie::ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body)
 {
 
     auto const & sensorValues = GetSensorValues();
@@ -687,7 +668,7 @@ std::array<float,3> Crazyflie::ConvertBodyFrameToIntertialFrame(std::array<float
     auto x_b = -value_in_body[0]; // X-Axis is in negative direction (SED not NED on drone)
     auto y_b = value_in_body[1];
     auto z_b = value_in_body[2];
-    std::array<float,3> value_in_inertial;
+    Eigen::Vector3f value_in_inertial;
     value_in_inertial[0] = cos_yaw * cos_pitch*x_b + (cos_yaw * sin_pitch * sin_roll -  sin_yaw  * cos_roll)*y_b + (cos_yaw*sin_pitch*cos_roll + sin_yaw*sin_roll)* z_b;
     value_in_inertial[1] = sin_yaw  * cos_pitch*x_b + (sin_yaw  * sin_pitch * sin_roll + cos_yaw * cos_roll)*y_b + (sin_yaw*sin_pitch*cos_roll  - cos_yaw*sin_roll)* z_b;
     value_in_inertial[2]  = -sin_pitch  * x_b + cos_pitch * sin_roll * y_b + cos_pitch * cos_roll*z_b;

@@ -12,7 +12,6 @@ SOURCES += src/test_main.cpp \
     src/crtppacket_test.cpp \
     src/logic_test.cpp \
     src/math_function_test.cpp \
-    src/math_types_test.cpp \
     src/toc_log_test.cpp \
     src/stl_utils_test.cpp
 
@@ -20,7 +19,6 @@ HEADERS  += \
     src/crtppacket_test.h \
     src/logic_test.h \
     src/math_function_test.h \
-    src/math_types_test.h \
     src/toc_log_test.h \
     src/stl_utils_test.h
 

@@ -39,7 +39,7 @@ T ExtractData(Data const & data, int offset)
     }
     else
     {
-        std::cout << "Packet is not large enough\n";
+//        std::cout << "Packet is not large enough\n";
         return 0;
     }
 }

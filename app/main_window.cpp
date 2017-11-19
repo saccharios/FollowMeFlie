@@ -39,11 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _timer_t0.start(crazyflieUpdateSamplingTime); // time in ms
     QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCrazyFlie()));
     // T1
-    _timer_t1.start(30); // time in ms
+    _timer_t1.start(cameraUpdateSamplingTime); // time in ms
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
 
     // T2
-    _timer_t2.start(100); // time in ms
+    _timer_t2.start(guiUpdateSamplingTime); // time in ms
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(UpdateConnectionStatus()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
