@@ -40,7 +40,6 @@ SOURCES += \
     math/types.cpp \
     communication/toc_log.cpp \
     communication/toc_parameter.cpp \
-    communication/toc_shared.cpp \
     communication/crazy_radio.cpp \
     communication/crazy_flie.cpp \
     communication/crtp_packet.cpp \

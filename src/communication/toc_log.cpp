@@ -2,7 +2,7 @@
 #include "stl_utils.h"
 #include "math/types.h"
 #include "protocol.h"
-
+#include <map>
 
 bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
 {
@@ -113,9 +113,9 @@ bool TocLog::StartLogging(std::string name, std::string blockName)
             auto const & dataReceived = received->GetData();
             if(receivedPacketIsValid && dataReceived.size() > 3)
             {
-                if(     dataReceived.at(channel::Commands::AppendBlock::CmdID) == channel::Commands::AppendBlock::id &&
-                        dataReceived.at(channel::Commands::AppendBlock::BlockId) == logBlock.id &&
-                        dataReceived.at(channel::Commands::AppendBlock::End) == 0)
+                if( dataReceived.at(channel::Commands::AppendBlock::CmdID) == channel::Commands::AppendBlock::id &&
+                     dataReceived.at(channel::Commands::AppendBlock::BlockId) == logBlock.id &&
+                     dataReceived.at(channel::Commands::AppendBlock::End) == 0)
                 {
                     logBlock.elements.emplace_back(&element);
                     return true;
@@ -131,6 +131,16 @@ bool TocLog::StartLogging(std::string name, std::string blockName)
     return false;
 }
 
+std::map<ElementType, int> typeToInt =
+{
+    {ElementType::UINT8, 1},
+    {ElementType::UINT16, 2},
+    {ElementType::UINT32, 4},
+    {ElementType::INT8, 1},
+    {ElementType::INT16, 2},
+    {ElementType::INT32, 4},
+    {ElementType::FLOAT, 4}
+};
 
 void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
 {
@@ -151,65 +161,14 @@ void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
         {
             int offset = 0;
             // Distribute the content of the packet to the toc elements that are in the logging block.
-            for(auto const & element : logBlock.elements)
+            for(TOCElement* const & element : logBlock.elements)
             {
-                int byteLength = 0;
-                // TODO SF Is there a way to omit this switch?-> std::map
-
-//                std::cout << "SetValueToElement Start \n";
-//                element->Print();
                 _shared_impl.SetValueToElement(element, logdataVect, offset);
-//                std::cout << "SetValueToElement End \n";
-
-                switch(element->type)
-                {
-                case ElementType::UINT8:
-                {
-                    byteLength = 1;
-                    break;
-                }
-
-                case ElementType::UINT16:
-                {
-                    byteLength =2;
-                    break;
-                }
-
-                case ElementType::UINT32:
-                {
-                    byteLength = 4;
-                    break;
-                }
-
-                case ElementType::INT8:
-                {
-                    byteLength = 1;
-                    break;
-                }
-
-                case ElementType::INT16:
-                {
-                    byteLength = 2;
-                    break;
-                }
-
-                case ElementType::INT32:
-                {
-                    byteLength = 4;
-                    break;
-                }
-
-                case ElementType::FLOAT:
-                {
-                    byteLength = 4;
-                    break;
-                }
-                default:
-                { // Unknown. This hopefully never happens.
-                    break;
-                }
-                }
-                offset += byteLength;
+                 if(element->name == "baro.asl")
+                 {
+                         std::cout << "baro asl: " << element->value << std::endl;
+                 }
+                 offset += typeToInt[element->type];
             }
         }
 

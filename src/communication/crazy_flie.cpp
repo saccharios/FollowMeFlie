@@ -127,7 +127,8 @@ void Crazyflie::Update()
         }
         else
         {
-            // Send a ping packet for keepalive
+            // Can only receive packes (also logge packets) if a packet is sent.
+            // Send a dummy packet if no command is sent.
             _crazyRadio.SendPingPacket();
         }
 

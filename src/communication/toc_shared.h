@@ -4,6 +4,7 @@
 #include "crtp_packet.h"
 #include "math/stl_utils.h"
 #include "protocol.h"
+#include <map>
 
 template<uint8_t port, typename channel>
 class TOCShared
@@ -126,6 +127,7 @@ public:
         case ElementType::UINT64:
         {
             element->value  = 0;
+            std::cout << "Type UINT64 not implemented for " << element->name << std::endl;
             //            TODO SF: element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
             break;
         }
@@ -149,6 +151,7 @@ public:
         }
         case ElementType::INT64:
         {
+            std::cout << "Type INT64 not implemented for " << element->name << std::endl;
             //            TODO SF:             element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
             element->value  = 0;
             break;
@@ -161,16 +164,18 @@ public:
         }
         case ElementType::DOUBLE:
         {
+            std::cout << "Type DOUBLE not implemented for " << element->name << std::endl;
             //            TODO SF:             element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
             element->value = 0;
             break;
         }
         case ElementType::FP16:
         {
+            // TODO SF Implement FP16
+            std::cout << "Type FP16 not implemented for " << element->name << std::endl;
             element->value = 0;
             break;
         }
-
             //                    case 8:
             //                    { // FP16
             // NOTE(winkler): This is untested code (as no FP16
@@ -190,7 +195,7 @@ public:
 
         default:
         { // Unknown. This hopefully never happens.
-            std::cout << "unknown case!\n";
+            std::cout << "Invalid type of " << element->name << std::endl;
             element->value = 0;
             break;
         }
@@ -226,7 +231,7 @@ private:
                 element.id = data.at(channel::Commands::GetItem::AnswerByte::ID);
                 if(port == Parameter::id)
                 {
-                    element.type = ConvertParameterElementType(data.at(channel::Commands::GetItem::AnswerByte::Type));
+                    element.type = convertParameterElementType[data.at(channel::Commands::GetItem::AnswerByte::Type)];
                 }
                 else
                 {
@@ -247,47 +252,22 @@ private:
         // TODO SF Error handling
         return false;
     }
-
-    ElementType ConvertParameterElementType(uint8_t type)
-    {
         // Unfortunately the parameter toc has a different encoding for the types than the logger toc.
         // Convert here this encoding to the same encoding.
-        switch(type)
-        {
-        case 0x00:
-            return ElementType::INT8;
-        case 0x01:
-            return ElementType::INT16;
-            break;
-        case 0x02:
-            return ElementType::INT32;
-        case 0x03:
-            return ElementType::INT64;
-            break;
-        case 0x05:
-            return ElementType::FP16;
-            break;
-        case 0x06:
-            return ElementType::FLOAT;
-            break;
-        case 0x07:
-            return ElementType::DOUBLE;
-        case 0x08:
-            return ElementType::UINT8;
-            break;
-        case 0x09:
-            return ElementType::UINT16;
-            break;
-        case 0x0A:
-            return ElementType::UINT32;
-            break;
-        case 0x0B:
-            return ElementType::UINT64;
-        default:
-            return ElementType::UINT8;
-            break;
-        }
-    }
+    std::map<int, ElementType> convertParameterElementType =
+    {
+        {0x00, ElementType::INT8},
+        {0x01, ElementType::INT16},
+        {0x02, ElementType::INT32},
+        {0x03, ElementType::INT64},
+        {0x05, ElementType::FP16},
+        {0x06, ElementType::FLOAT},
+        {0x07, ElementType::DOUBLE},
+         {0x08, ElementType::UINT8},
+         {0x09, ElementType::UINT16},
+         {0x0A, ElementType::UINT32},
+         {0x0B, ElementType::UINT64}
+    };
 
     unsigned int & _itemCount;
     std::vector<TOCElement> & _elements;

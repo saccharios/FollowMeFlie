@@ -63,4 +63,6 @@ private:
     std::vector<TOCElement> _elements;
     std::vector<LoggingBlock> _loggingBlocks;
     TOCShared<Logger::id, Logger::Access> _shared_impl;
+
+
 };
