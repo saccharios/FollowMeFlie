@@ -1,4 +1,4 @@
-#include "crazy_radio.h"
+#include "radio_dongle.h"
 #include <chrono>
 #undef _GLIBCXX_HAS_GTHREADS
 #include "../../../mingw_std_threads/mingw.thread.h"
@@ -6,7 +6,7 @@
 #include "communication/protocol.h"
 
 
-CrazyRadio::CrazyRadio() :
+RadioDongle::RadioDongle() :
     _radioSettings(RadioSettings::_0802M),
     _context(nullptr),
     _devDevice(nullptr),
@@ -22,14 +22,13 @@ CrazyRadio::CrazyRadio() :
     _deviceVersion(0.0f),
     _ackReceived(false),
     _loggingPackets(),
-    _radioIsConnected(false),
-    _lastSendAndReceiveFailed(false)
+    _radioIsConnected(false)
 {
 //    int returnVal = libusb_init(&_context);
     // Do error checking here.
     libusb_init(&_context);
 }
-CrazyRadio::~CrazyRadio()
+RadioDongle::~RadioDongle()
 {
     CloseDevice();
 
@@ -40,7 +39,7 @@ CrazyRadio::~CrazyRadio()
     }
 }
 
-void CrazyRadio::CloseDevice()
+void RadioDongle::CloseDevice()
 {
     if(_device)
     {
@@ -52,7 +51,7 @@ void CrazyRadio::CloseDevice()
     }
 }
 
-std::vector<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
+std::vector<libusb_device*> RadioDongle::ListDevices(int vendorID, int productID)
 {
     std::vector<libusb_device*> devices;
     ssize_t count;
@@ -80,7 +79,7 @@ std::vector<libusb_device*> CrazyRadio::ListDevices(int vendorID, int productID)
     return devices;
 }
 
-bool CrazyRadio::OpenUSBDongle()
+bool RadioDongle::OpenUSBDongle()
 {
     CloseDevice();
     auto devices = ListDevices(0x1915, 0x7777);
@@ -110,12 +109,12 @@ bool CrazyRadio::OpenUSBDongle()
 
     return false;
 }
-void CrazyRadio::SetRadioSettings(int index)
+void RadioDongle::SetRadioSettings(int index)
 {
     _radioSettings = static_cast<RadioSettings>(index);
 }
 
-void CrazyRadio::ReadRadioSettings()
+void RadioDongle::ReadRadioSettings()
 {
     int dongleNBR = 0;
     switch(_radioSettings)
@@ -137,7 +136,7 @@ void CrazyRadio::ReadRadioSettings()
     std::cout << "Opening radio " << dongleNBR << "/" << GetChannel() << "/" << GetDataRate() << std::endl;
 }
 
-void CrazyRadio::StartRadio()
+void RadioDongle::StartRadio()
 {
     _radioIsConnected = false;
     auto USBDongleIsOpen = OpenUSBDongle();
@@ -189,55 +188,57 @@ void CrazyRadio::StartRadio()
 }
 
 
-void CrazyRadio::StopRadio()
+void RadioDongle::StopRadio()
 {
 
 }
 
-CrazyRadio::sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
+bool RadioDongle::WriteData(uint8_t * data, int length)
 {
     int actWritten;
     int retValue = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &actWritten, 1000);
 
     if(retValue == 0 && actWritten == length)
     {
-        return ReadAck();
+        return true;
     }
-    else
+    switch(retValue)
     {
-        return nullptr;
+    case 0:
+        std::cout << "Writing data failed partially\n";
+    case LIBUSB_ERROR_TIMEOUT:
+        std::cout << "USB timeout" << std::endl;
+        break;
+    default:
+        break;
     }
+    return false;
 }
 
-bool CrazyRadio::ReadData(uint8_t* data, int maxLength, int & actualLength)
+
+
+bool RadioDongle::ReadData(uint8_t* data, int maxLength, int & actualLength)
 {
     int actRead;
     int retValue = libusb_bulk_transfer(_device, (0x81 | LIBUSB_ENDPOINT_IN), data,  maxLength, &actRead, 50);
 
-    if(retValue == 0)
+    switch(retValue)
     {
+    case 0:
         actualLength = actRead;
-
-        return true;
-    }
-    else
-    {
-        switch(retValue)
-        {
-        case LIBUSB_ERROR_TIMEOUT:
-            std::cout << "USB timeout" << std::endl;
-            break;
-
-        default:
-            break;
-        }
+    case LIBUSB_ERROR_TIMEOUT:
+        std::cout << "USB timeout" << std::endl;
         actualLength = maxLength;
+        break;
+    default:
+        actualLength = maxLength;
+        break;
     }
 
-    return false;
+    return (retValue == 0);
 }
 
-bool CrazyRadio::WriteRadioControl(uint8_t* data, int length, DongleConfiguration  request, uint16_t value, uint16_t index)
+bool RadioDongle::WriteRadioControl(uint8_t* data, int length, DongleConfiguration  request, uint16_t value, uint16_t index)
 {
     int timeout = 1000;
 
@@ -257,34 +258,34 @@ bool CrazyRadio::WriteRadioControl(uint8_t* data, int length, DongleConfiguratio
     return true;
 }
 
-void CrazyRadio::SetARC(int ARC)
+void RadioDongle::SetARC(int ARC)
 {
     _arc = ARC;
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARC, ARC, 0);
 }
 
-void CrazyRadio::setChannel(int channel)
+void RadioDongle::setChannel(int channel)
 {
     _channel = channel;
 }
-int CrazyRadio::GetChannel() const
+int RadioDongle::GetChannel() const
 {
     return _channel;
 }
-void CrazyRadio::WriteChannel(int channel)
+void RadioDongle::WriteChannel(int channel)
 {
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_RADIO_CHANNEL, channel, 0);
 }
 
-void CrazyRadio::SetDataRate(std::string dataRate)
+void RadioDongle::SetDataRate(std::string dataRate)
 {
     _dataRate = dataRate;
 }
-std::string const & CrazyRadio::GetDataRate() const
+std::string const & RadioDongle::GetDataRate() const
 {
     return _dataRate;
 }
-void CrazyRadio::WriteDataRate(std::string dataRate)
+void RadioDongle::WriteDataRate(std::string dataRate)
 {
     int dataRateCoded = -1;
 
@@ -306,7 +307,7 @@ void CrazyRadio::WriteDataRate(std::string dataRate)
 
 
 
-void CrazyRadio::SetARDTime(int ARDTime)
+void RadioDongle::SetARDTime(int ARDTime)
 { // in uSec
     _ardTime = ARDTime;
 
@@ -323,239 +324,200 @@ void CrazyRadio::SetARDTime(int ARDTime)
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARD, T, 0);
 }
 
-void CrazyRadio::SetARDBytes(int ARDBytes)
+void RadioDongle::SetARDBytes(int ARDBytes)
 {
     _ardBytes = ARDBytes;
 
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARD, 0x80 | ARDBytes, 0);
 }
 
-PowerSettings CrazyRadio::Power()
+PowerSettings RadioDongle::Power()
 {
     return _power;
 }
 
-void CrazyRadio::SetPower(PowerSettings power)
+void RadioDongle::SetPower(PowerSettings power)
 {
     _power = power;
 
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_RADIO_POWER, static_cast<unsigned short>(power), 0);
 }
 
-void CrazyRadio::SetAddress(uint8_t*  address)
+void RadioDongle::SetAddress(uint8_t*  address)
 {
     _address = address;
 
     WriteRadioControl(address, 5, DongleConfiguration::SET_RADIO_ADDRESS, 0, 0);
 }
 
-void CrazyRadio::SetContCarrier(bool contCarrier)
+void RadioDongle::SetContCarrier(bool contCarrier)
 {
     _contCarrier = contCarrier;
 
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_CONT_CARRIER, (contCarrier ? 1 : 0), 0);
 }
 
-bool CrazyRadio::ClaimInterface(int interface)
+bool RadioDongle::ClaimInterface(int interface)
 {
     int errcode = libusb_claim_interface(_device, interface);
     return( errcode == 0);
 }
-bool CrazyRadio::SendPacketAndCheck(CRTPPacket && sendPacket)
-{
-    return SendPacketAndDistribute(std::move(sendPacket)) != nullptr;
-}
 
-CrazyRadio::sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPacket)
-{
-    auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
-    // If a packet is received, distribute it to the different ports
-    if(packet)
-    {
-
-        auto const & data = packet->GetData();
-
-        if(data.size() > 0)
-        {
-            // Dispatch incoming packet according to port and channel
-            switch(packet->GetPort() )
-            {
-            case Console::id:
-            { // Console
-                if(data.size() > 0)
-                { // Implicit assumption that the data stored in data are uint8_ts
-                    std::cout << "Console text: ";
-                    for(auto const & element : data)
-                    {
-                        std::cout << element;
-                    }
-                    std::cout << std::endl;
-                }
-                else // data.size() == 1
-                { // Special case where crazy flie is turned off. For error handling, set packet to nullptr.
-                    packet = nullptr;
-                }
-                break;
-            }
-
-            case Logger::id:
-            {
-                if(packet->GetChannel() == Logger::Data::id)
-                {
-                    _loggingPackets.emplace_back(packet);
-                }
-                break;
-            }
-
-            case Commander::id:
-            case CommanderGeneric::id:
-            case Debug::id:
-            case Link::id:
-            case Parameter::id:
-            default:
-                break;
-            }
-        }
-    }
-    return packet;
-}
-
-CrazyRadio::sptrPacket CrazyRadio::ReadAck()
+RadioDongle::sptrPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int totalLength)
 {
     sptrPacket packet = nullptr;
 
-    int bufferSize = 64;
-    uint8_t buffer[bufferSize];
-    int bytesRead = 0;
-    bool readDataOK = ReadData(buffer, bufferSize, bytesRead) ;
-    if( readDataOK )
+    // Analyse status byte
+    _ackReceived = buffer[0] & 0x01;
+    //bool bPowerDetector = cBuffer[0] & 0x2;
+    //int nRetransmissions = cBuffer[0] & 0xf0;
+
+    // TODO SF: Do internal stuff with the data received here
+    // (store current link quality, etc.). For now, ignore it.
+
+    // Exctract port and channel information from buffer[1]
+    // TODO SF Add Port and channel checking
+    uint8_t port = static_cast<uint8_t>((buffer[1] & 0xf0) >> 4);
+    uint8_t channel = static_cast<uint8_t>(buffer[1] & 0b00000011);
+
+    // Actual data starts at buffer[2]
+    Data data;
+    for(int i = 2; i < totalLength+1; ++i)
     {
-        if(bytesRead > 0)
-        {
-            // Analyse status byte
-            _ackReceived = buffer[0] & 0x01;
-            //bool bPowerDetector = cBuffer[0] & 0x2;
-            //int nRetransmissions = cBuffer[0] & 0xf0;
-
-            // TODO SF: Do internal stuff with the data received here
-            // (store current link quality, etc.). For now, ignore it.
-
-            // Exctract port and channel information from buffer[1]
-            // TODO SF Add Port and channel checking
-            uint8_t port = static_cast<uint8_t>((buffer[1] & 0xf0) >> 4);
-            uint8_t channel = static_cast<uint8_t>(buffer[1] & 0b00000011);
-
-            // Actual data starts at buffer[2]
-            Data data;
-            for(int i = 2; i < bytesRead+1; ++i)
-            {
-                data.push_back(buffer[i]);
-            }
-            packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
-        }
-        else
-        {
-            _ackReceived = false;
-        }
+        data.push_back(buffer[i]);
     }
+    packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
     return packet;
 }
 
-bool CrazyRadio::AckReceived()
+bool RadioDongle::AckReceived()
 {
     return _ackReceived;
 }
 
-bool CrazyRadio::IsUsbConnectionOk()
+bool RadioDongle::IsUsbConnectionOk()
 {
     libusb_device_descriptor descriptor;
     return (libusb_get_device_descriptor(_devDevice,	&descriptor) == 0);
 }
 
-CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
+std::vector<RadioDongle::sptrPacket> RadioDongle::PopLoggingPackets()
 {
-    sptrPacket received = nullptr;
-    int cntr = 0;
-    while(received == nullptr && cntr < 10)
-    {
-        received = SendPacketAndDistribute({Console::id, Console::Print::id,{static_cast<uint8_t>(0xff)}});
-        ++cntr;
-    }
-    return received;
-}
-
-// TODO SF:: Sending and receiving of packets should hav totally different structure.
-// 1) They should be independant of eacher other
-// 2) They should be on a timelevel and thus periodically executed
-// 3) Packets must be stored during the timelevel and processed upon signal (timed).
-CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool & valid)
-{
-    bool go_on = true;
-    int resendCounter = 0;
-    sptrPacket received = nullptr;
-    const int retriesTotal = 5 ;
-    int microsecondsWait = 100;
-    int totalCounter = 0;
-    const int totalCounterMax = 5;
-    _lastSendAndReceiveFailed = false;
-    while( go_on)
-    {
-        if(resendCounter == 0)
-        {
-            received = SendPacketAndDistribute(std::move(sendPacket)); // TODO How is it possible to be moved from multiple times???
-            resendCounter = retriesTotal;
-            ++totalCounter;
-            go_on = (totalCounter < totalCounterMax );
-        }
-        else
-        {
-            received = WaitForPacket();
-            --resendCounter;
-        }
-        if(received)
-        {
-            if(received->GetPort() == sendPacket.GetPort() && received->GetChannel() == sendPacket.GetChannel())
-            {
-                go_on = false;
-            }
-        }
-        else
-        {
-            std::this_thread::sleep_for(std::chrono::microseconds(microsecondsWait));
-        }
-    }
-    _lastSendAndReceiveFailed = ((totalCounter == totalCounterMax) && (resendCounter == retriesTotal));
-    valid = (received != nullptr);
-    return received;
-}
-
-std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
-{
-    std::vector<CrazyRadio::sptrPacket> packets;
+    std::vector<RadioDongle::sptrPacket> packets;
     packets.swap(_loggingPackets);
     return packets;
 }
 
-bool CrazyRadio::SendPingPacket()
+void RadioDongle::SendPingPacket()
 {
-    return SendPacketAndCheck({Console::id, Console::Print::id, {static_cast<uint8_t>(0xff)}});
+    RegisterPacketToSend({Console::id, Console::Print::id, {static_cast<uint8_t>(0xff)}});
 }
 
-bool CrazyRadio::RadioIsConnected() const
+bool RadioDongle::RadioIsConnected() const
 {
     return _radioIsConnected;
 }
 
-float CrazyRadio::ConvertToDeviceVersion(short number) const
+float RadioDongle::ConvertToDeviceVersion(short number) const
 {
     float version = static_cast<float>(number) / 100.0;
     return version;
 }
 
-bool CrazyRadio::LastSendAndReceiveFailed() const
+void RadioDongle::SendPacketsNow()
 {
-    return    _lastSendAndReceiveFailed;
+    // Call function periodically
+    // Send all packets that must be send (in the vector)
 }
 
+bool RadioDongle::SendPacket(CRTPPacket  && packet)
+{
+    return WriteData(packet.SendableData(), packet.GetSendableDataLength());
+}
 
+void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
+{
+    // Add packet to vector
+}
+
+void RadioDongle::RegisterAnswerPacket()
+{
+
+}
+
+void RadioDongle::ReceivePacket()
+{
+    // Call function periodically
+
+    int bufferSize = 64;
+    uint8_t buffer[bufferSize];
+    int bytesRead = 0;
+    // Read the raw data from the dongle
+    bool readDataOK = ReadData(buffer, bufferSize, bytesRead) ;
+    // Check validity of packet
+    if(!readDataOK || bytesRead == 0)
+    {
+        std::cout << "Radio dongle failed to read\n";
+        return;
+    }
+    // Convert the raw data to a packet
+    sptrPacket packet = CreatePacketFromData(buffer, bytesRead);
+    // Process the packe and distribute to ports + channels
+    ProcessPacket(packet);
+    // Check packet is a requested answer
+
+}
+
+void RadioDongle::ProcessPacket(sptrPacket & packet)
+{
+    // Distribute the packet according to port + channel
+    Data const & data = packet->GetData();
+
+    if(data.size() > 0)
+    {
+        // Dispatch incoming packet according to port and channel
+        switch(packet->GetPort() )
+        {
+        case Console::id:
+        { // Console
+            if(data.size() > 0)
+            { // Implicit assumption that the data stored in data are uint8_ts
+                std::cout << "Console text: ";
+                for(auto const & element : data)
+                {
+                    std::cout << element;
+                }
+                std::cout << std::endl;
+            }
+            else // data.size() == 1
+            { // Special case where crazy flie is turned off. For error handling, set packet to nullptr.
+                packet = nullptr;
+            }
+            break;
+        }
+
+        case Logger::id:
+        {
+            if(packet->GetChannel() == Logger::Data::id)
+            {
+                _loggingPackets.emplace_back(packet);
+            }
+            break;
+        }
+
+        case Commander::id:
+        case CommanderGeneric::id:
+        case Debug::id:
+        case Link::id:
+        case Parameter::id:
+        default:
+            break;
+        }
+    }
+}
+
+void RadioDongle::CheckAnswerPacket()
+{
+
+}

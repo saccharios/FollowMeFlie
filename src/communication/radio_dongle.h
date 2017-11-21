@@ -41,19 +41,13 @@ enum class DongleConfiguration{
     LAUCH_BOOTLOADER = 0xFF
 };
 
-// Communication class to connect to and communicate via the CrazyRadio USB dongle.
-
-// The class is capable of finding the CrazyRadio USB dongle on the
-// host computer, open and maintain a connection, and send/receive
-// data when communicating with the Crazyflie copter using the
-// Crazy Radio Transfer Protocol as defined by Bitcraze.
-class CrazyRadio {
+class RadioDongle {
 
 public:
     using sptrPacket = std::shared_ptr<CRTPPacket>;
 
-    CrazyRadio();
-    ~CrazyRadio();
+    RadioDongle();
+    ~RadioDongle();
 
     void StartRadio();
     void StopRadio();
@@ -61,10 +55,7 @@ public:
     PowerSettings Power();
     void SetPower(PowerSettings power);
 
-    bool SendPacketAndCheck(CRTPPacket && sendPacket);
-    sptrPacket SendAndReceive(CRTPPacket && sendPacket, bool & valid);
-    bool SendPingPacket();
-    sptrPacket WaitForPacket();
+    void  SendPingPacket();
 
     bool AckReceived();
     bool IsUsbConnectionOk();
@@ -74,7 +65,15 @@ public:
     void SetRadioSettings(int index);
 
     bool RadioIsConnected() const;
-    bool LastSendAndReceiveFailed() const;
+
+    void SendPacketsNow();// Periodically call this
+    bool SendPacket(CRTPPacket && packet); // Call when a packet is requested to send
+    void RegisterPacketToSend(CRTPPacket && packet);
+    void RegisterAnswerPacket();
+    void ReceivePacket(); // Periodically call this
+    void ProcessPacket(sptrPacket & packet);
+    void CheckAnswerPacket();
+
 
 private:
     RadioSettings _radioSettings;
@@ -93,17 +92,18 @@ private:
     bool _ackReceived;
     std::vector<sptrPacket> _loggingPackets;
     bool _radioIsConnected;
-    bool _lastSendAndReceiveFailed;
 
+    void ReadRadioSettings();
     std::vector<libusb_device*> ListDevices(int vendorID, int productID);
+    float ConvertToDeviceVersion(short number) const;
     bool OpenUSBDongle();
     bool ClaimInterface(int nInterface);
     void CloseDevice();
 
-    sptrPacket ReadAck();
+    sptrPacket CreatePacketFromData( uint8_t* buffer, int totalLength);
+    sptrPacket SendPacketAndDistribute(CRTPPacket && sendPacket);
 
-    sptrPacket WriteData(uint8_t * data, int length);
-    bool WriteRadioControl(uint8_t* data, int length, DongleConfiguration request, uint16_t value, uint16_t index);
+    bool WriteData(uint8_t * data, int length);
     bool ReadData(uint8_t* data, int maxLength, int & actualLength);
 
     void SetARC(int ARC);
@@ -117,12 +117,10 @@ private:
     void SetARDTime(int ARDTime);
     void SetAddress(uint8_t* address);
     void SetContCarrier(bool contCarrier);
+    bool WriteRadioControl(uint8_t* data, int length, DongleConfiguration request, uint16_t value, uint16_t index);
 
-    void ReadRadioSettings();
 
-    sptrPacket SendPacketAndDistribute(CRTPPacket && sendPacket);
 
-    float ConvertToDeviceVersion(short number) const;
 
 };
 
