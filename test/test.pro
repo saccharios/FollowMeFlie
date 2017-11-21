@@ -13,7 +13,8 @@ SOURCES += src/test_main.cpp \
     src/logic_test.cpp \
     src/math_function_test.cpp \
     src/toc_log_test.cpp \
-    src/stl_utils_test.cpp
+    src/stl_utils_test.cpp \
+    src/double_buffer_test.cpp
 
 HEADERS  += \
     src/crtppacket_test.h \
