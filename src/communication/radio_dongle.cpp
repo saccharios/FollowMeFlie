@@ -22,7 +22,8 @@ RadioDongle::RadioDongle() :
     _deviceVersion(0.0f),
     _ackReceived(false),
     _loggingPackets(),
-    _radioIsConnected(false)
+    _radioIsConnected(false),
+    _buffer()
 {
 //    int returnVal = libusb_init(&_context);
     // Do error checking here.
@@ -331,7 +332,7 @@ void RadioDongle::SetARDBytes(int ARDBytes)
     WriteRadioControl(nullptr, 0, DongleConfiguration::SET_RADIO_ARD, 0x80 | ARDBytes, 0);
 }
 
-PowerSettings RadioDongle::Power()
+RadioDongle::PowerSettings RadioDongle::Power()
 {
     return _power;
 }
@@ -364,10 +365,8 @@ bool RadioDongle::ClaimInterface(int interface)
 }
 
 
-RadioDongle::sptrPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int totalLength)
+CRTPPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int totalLength)
 {
-    sptrPacket packet = nullptr;
-
     // Analyse status byte
     _ackReceived = buffer[0] & 0x01;
     //bool bPowerDetector = cBuffer[0] & 0x2;
@@ -387,7 +386,7 @@ RadioDongle::sptrPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int 
     {
         data.push_back(buffer[i]);
     }
-    packet = std::make_shared<CRTPPacket>(port, channel, std::move(data));
+     CRTPPacket packet(port, channel, std::move(data));
     return packet;
 }
 
@@ -402,9 +401,9 @@ bool RadioDongle::IsUsbConnectionOk()
     return (libusb_get_device_descriptor(_devDevice,	&descriptor) == 0);
 }
 
-std::vector<RadioDongle::sptrPacket> RadioDongle::PopLoggingPackets()
+std::vector<CRTPPacket> RadioDongle::PopLoggingPackets()
 {
-    std::vector<RadioDongle::sptrPacket> packets;
+    std::vector<CRTPPacket> packets;
     packets.swap(_loggingPackets);
     return packets;
 }
@@ -429,6 +428,11 @@ void RadioDongle::SendPacketsNow()
 {
     // Call function periodically
     // Send all packets that must be send (in the vector)
+    _buffer.swap();
+    for(auto & packet: _buffer.side_a())
+    {
+        SendPacket(std::move(packet));
+    }
 }
 
 bool RadioDongle::SendPacket(CRTPPacket  && packet)
@@ -438,7 +442,7 @@ bool RadioDongle::SendPacket(CRTPPacket  && packet)
 
 void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
 {
-    // Add packet to vector
+    _buffer.side_b().emplace_back(std::move(packet));
 }
 
 void RadioDongle::RegisterAnswerPacket()
@@ -462,22 +466,22 @@ void RadioDongle::ReceivePacket()
         return;
     }
     // Convert the raw data to a packet
-    sptrPacket packet = CreatePacketFromData(buffer, bytesRead);
+    CRTPPacket packet = CreatePacketFromData(buffer, bytesRead);
     // Process the packe and distribute to ports + channels
-    ProcessPacket(packet);
+    ProcessPacket(std::move(packet));
     // Check packet is a requested answer
 
 }
 
-void RadioDongle::ProcessPacket(sptrPacket & packet)
+void RadioDongle::ProcessPacket(CRTPPacket && packet)
 {
     // Distribute the packet according to port + channel
-    Data const & data = packet->GetData();
+    Data const & data = packet.GetData();
 
     if(data.size() > 0)
     {
         // Dispatch incoming packet according to port and channel
-        switch(packet->GetPort() )
+        switch(packet.GetPort() )
         {
         case Console::id:
         { // Console
@@ -492,16 +496,15 @@ void RadioDongle::ProcessPacket(sptrPacket & packet)
             }
             else // data.size() == 1
             { // Special case where crazy flie is turned off. For error handling, set packet to nullptr.
-                packet = nullptr;
             }
             break;
         }
 
         case Logger::id:
         {
-            if(packet->GetChannel() == Logger::Data::id)
+            if(packet.GetChannel() == Logger::Data::id)
             {
-                _loggingPackets.emplace_back(packet);
+                _loggingPackets.emplace_back(std::move(packet));
             }
             break;
         }

@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include "communication/crazy_radio.h"
+#include "communication/radio_dongle.h"
 #include "communication/crazy_flie.h"
 #include "camera_view_painter.h"
 #include "tracking_color.h"
@@ -51,7 +51,7 @@ private slots:
     void on_pushButton_ParameterTable_clicked();
 
 private:
-    CrazyRadio _crazyRadio;
+    RadioDongle _radioDongle;
     Crazyflie _crazyFlie;
 
     // GUI Windows and Widgets

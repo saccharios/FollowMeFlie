@@ -1,11 +1,16 @@
 #pragma once
-#include <array>
-#include <iostream>
 #include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
+#include "communication/crtp_packet.h"
+#include <vector>
+#include <iostream>
+#include <memory>
+#include <stdint.h>
+class CRTPPacket; // Forward declaration
 
 using Acceleration = Eigen::Vector3f;
 using Velocity = Eigen::Vector3f;
 using Data = std::vector<uint8_t>;
+using sptrPacket = std::shared_ptr<CRTPPacket>;
 
 union IntFloat
 {
@@ -41,3 +46,4 @@ struct TOCElement
         std::cout << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << std::endl;
     }
 };
+

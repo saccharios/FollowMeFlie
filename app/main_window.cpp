@@ -16,8 +16,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    _crazyRadio(),
-    _crazyFlie(_crazyRadio),
+    _radioDongle(),
+    _crazyFlie(_radioDongle),
     ui(new Ui::MainWindow),
      _actualValuesTable(nullptr),
      _parameterTable(nullptr),
@@ -95,7 +95,7 @@ void MainWindow::DisplayNotConnectingBox()
 
 void MainWindow::on_disconnectRadio_clicked()
 {
-//    _crazyRadio.StopRadio();
+//    _radioDongle.StopRadio();
 //    _crazyFlie.EnableStateMachine(false);
 
     QMessageBox msgBox;
@@ -106,8 +106,8 @@ void MainWindow::on_disconnectRadio_clicked()
 
 void MainWindow::on_connectRadio_clicked()
 {
-    _crazyRadio.StartRadio();
-    if(_crazyRadio.RadioIsConnected())
+    _radioDongle.StartRadio();
+    if(_radioDongle.RadioIsConnected())
     {
         _crazyFlie.StartConnecting(true);
     }
@@ -138,7 +138,7 @@ void MainWindow::on_connectRadio_clicked()
 
 void MainWindow::on_radioSettings_Options_currentIndexChanged(int index)
 {
-    _crazyRadio.SetRadioSettings(index);
+    _radioDongle.SetRadioSettings(index);
 }
 
 void MainWindow::on_exitApp_clicked()

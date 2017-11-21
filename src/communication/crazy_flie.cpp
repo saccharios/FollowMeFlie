@@ -4,8 +4,8 @@
 #include "math/types.h"
 #include "protocol.h"
 
-Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
-    _crazyRadio(crazyRadio),
+Crazyflie::Crazyflie(RadioDongle & radioDongle) :
+    _radioDongle(radioDongle),
     _ackMissTolerance(100),
     _ackMissCounter(0),
     _sendSetPoint(),
@@ -15,8 +15,8 @@ Crazyflie::Crazyflie(CrazyRadio & crazyRadio) :
     _isSendingVelocityRef(false),
     _startConnecting(false),
     _state (State::ZERO),
-    _parameters(_crazyRadio),
-    _logger(_crazyRadio),
+    _parameters(_radioDongle),
+    _logger(_radioDongle),
     _leaveConnectingState(),
     _sensorValues()
 {}
@@ -54,7 +54,7 @@ void Crazyflie::Update()
     }
     case State::SETUP_PARAMETERS:
     {
-        if( !_crazyRadio.IsUsbConnectionOk())
+        if( !_radioDongle.IsUsbConnectionOk())
         {
             _state = State::ZERO;
             _startConnecting = false;
@@ -67,13 +67,6 @@ void Crazyflie::Update()
             if(success)
             {
                 _state =State::READ_PARAMETERS;
-            }
-
-            if(_crazyRadio.LastSendAndReceiveFailed())
-            {
-                _state = State::ZERO;
-                _startConnecting = false;
-                emit NotConnecting();
             }
         }
         break;
@@ -103,8 +96,8 @@ void Crazyflie::Update()
     case State::ZERO_MEASUREMENTS:
     {
         // TODO SF : Remove this state
-        _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
-        _crazyRadio.SendPingPacket();
+        _logger.ProcessLogPackets(_radioDongle.PopLoggingPackets());
+        _radioDongle.SendPingPacket();
         // NOTE : ter;
         _state = State::NORMAL_OPERATION;
         break;
@@ -112,7 +105,7 @@ void Crazyflie::Update()
     case State::NORMAL_OPERATION:
     {
         // Shove over the sensor readings from the radio to the Logs TOC.
-        _logger.ProcessLogPackets(_crazyRadio.PopLoggingPackets());
+        _logger.ProcessLogPackets(_radioDongle.PopLoggingPackets());
 
         if(_isSendingSetpoints)
         {
@@ -129,10 +122,10 @@ void Crazyflie::Update()
         {
             // Can only receive packes (also logge packets) if a packet is sent.
             // Send a dummy packet if no command is sent.
-            _crazyRadio.SendPingPacket();
+            _radioDongle.SendPingPacket();
         }
 
-        if(_crazyRadio.AckReceived())
+        if(_radioDongle.AckReceived())
         {
             _ackMissCounter = 0;
         }
@@ -173,7 +166,9 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
 
     CRTPPacket  packet(Commander::id, Commander::Setpoint::id, std::move(data));
 
-    return _crazyRadio.SendPacketAndCheck(std::move(packet));
+//    return _radioDongle.SendPacketAndCheck(std::move(packet));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+    return false;
 }
 
 bool  Crazyflie::SendVelocityRef(Velocity velocity)
@@ -192,8 +187,9 @@ bool  Crazyflie::SendVelocityRef(Velocity velocity)
     data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
 
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::GenericSetpoint::id, std::move(data));
-
-    return _crazyRadio.SendPacketAndCheck(std::move(packet));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+    return false;
+//    return _radioDongle.SendPacketAndCheck(std::move(packet));
 }
 
 

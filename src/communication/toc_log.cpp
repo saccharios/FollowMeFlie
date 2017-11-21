@@ -17,26 +17,27 @@ bool TocLog::RegisterLoggingBlock(std::string name, float frequency)
     uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / frequency);// The sampling rate is in 100us units
     Data data =  {channel::Commands::CreateBlock::id, id, samplingRate};
     CRTPPacket packet(Logger::id, channel::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
 
-    bool receivedPacketIsValid = false;
-    auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-    auto const & dataReceived = received->GetData();
-    if(receivedPacketIsValid && dataReceived.size() > 3)
-    {
-        if(dataReceived.at(channel::Commands::CreateBlock::AnswerByte::CmdID) ==  channel::Commands::CreateBlock::id &&
-                dataReceived.at(channel::Commands::CreateBlock::AnswerByte::BlockId) == id &&
-                dataReceived.at(channel::Commands::CreateBlock::AnswerByte::End) == 0)
-        {
-            LoggingBlock loggingBlock;
-            loggingBlock.name = name;
-            loggingBlock.id = id;
-            loggingBlock.frequency = frequency;
-            _loggingBlocks.emplace_back(loggingBlock);
-            std::cout << "Registered logging block `" << name << "'" << std::endl;
+    //    bool receivedPacketIsValid = false;
+//    auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
+//    auto const & dataReceived = received->GetData();
+//    if(receivedPacketIsValid && dataReceived.size() > 3)
+//    {
+//        if(dataReceived.at(channel::Commands::CreateBlock::AnswerByte::CmdID) ==  channel::Commands::CreateBlock::id &&
+//                dataReceived.at(channel::Commands::CreateBlock::AnswerByte::BlockId) == id &&
+//                dataReceived.at(channel::Commands::CreateBlock::AnswerByte::End) == 0)
+//        {
+//            LoggingBlock loggingBlock;
+//            loggingBlock.name = name;
+//            loggingBlock.id = id;
+//            loggingBlock.frequency = frequency;
+//            _loggingBlocks.emplace_back(loggingBlock);
+//            std::cout << "Registered logging block `" << name << "'" << std::endl;
 
-            return EnableLogging(loggingBlock);
-        }
-    }
+//            return EnableLogging(loggingBlock);
+//        }
+//    }
     return false;
 }
 
@@ -50,7 +51,8 @@ bool TocLog::EnableLogging(LoggingBlock const & loggingBlock)
 
     // Use SendAndReceive to make sure the crazyflie is ready.
     bool receivedPacketIsValid = false;
-    _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
+            // TODO SF
+    //    _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
     return receivedPacketIsValid;
 }
 
@@ -73,7 +75,8 @@ bool TocLog::UnregisterLoggingBlockID(uint8_t id)
     Data data = {channel::Commands::DeleteBlock, static_cast<uint8_t>(id)};
     CRTPPacket packet(Logger::id, channel::id, std::move(data));
     bool receivedPacketIsValid = false;
-    _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
+            // TODO SF
+//    _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
     return receivedPacketIsValid;
 }
 
@@ -108,23 +111,24 @@ bool TocLog::StartLogging(std::string name, std::string blockName)
         {
             Data data = {channel::Commands::AppendBlock::id, logBlock.id, static_cast<uint8_t>(element.type), element.id};
             CRTPPacket packet(Logger::id, channel::id, std::move(data));
-            bool receivedPacketIsValid  = false;
-            auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-            auto const & dataReceived = received->GetData();
-            if(receivedPacketIsValid && dataReceived.size() > 3)
-            {
-                if( dataReceived.at(channel::Commands::AppendBlock::CmdID) == channel::Commands::AppendBlock::id &&
-                     dataReceived.at(channel::Commands::AppendBlock::BlockId) == logBlock.id &&
-                     dataReceived.at(channel::Commands::AppendBlock::End) == 0)
-                {
-                    logBlock.elements.emplace_back(&element);
-                    return true;
-                }
-                else
-                {
-                    std::cout << dataReceived.at(channel::Commands::AppendBlock::End) << std::endl;
-                }
-            }
+            _radioDongle.RegisterPacketToSend(std::move(packet));
+//            bool receivedPacketIsValid  = false;
+//            auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
+//            auto const & dataReceived = received->GetData();
+//            if(receivedPacketIsValid && dataReceived.size() > 3)
+//            {
+//                if( dataReceived.at(channel::Commands::AppendBlock::CmdID) == channel::Commands::AppendBlock::id &&
+//                     dataReceived.at(channel::Commands::AppendBlock::BlockId) == logBlock.id &&
+//                     dataReceived.at(channel::Commands::AppendBlock::End) == 0)
+//                {
+//                    logBlock.elements.emplace_back(&element);
+//                    return true;
+//                }
+//                else
+//                {
+//                    std::cout << dataReceived.at(channel::Commands::AppendBlock::End) << std::endl;
+//                }
+//            }
         }
     }
 
@@ -142,11 +146,11 @@ std::map<ElementType, int> typeToInt =
     {ElementType::FLOAT, 4}
 };
 
-void TocLog::ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets)
+void TocLog::ProcessLogPackets(std::vector<CRTPPacket> const & packets)
 {
     for(auto const & packet : packets)
     {
-        auto const & data = packet->GetData();
+        auto const & data = packet.GetData();
         if(data.size() < Logger::Data::LogMinPacketSize)
         {
             std::cout << "Data packet not large enough!\n";

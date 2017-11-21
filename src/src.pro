@@ -17,13 +17,13 @@ INCLUDEPATH += communication \
 
 
 HEADERS  += \
+    math/types.h \
     math/stl_utils.h \
     math/logic.h \
     math/functions.h \
     math/constants.h \
     math/lowpass.h \
     math/pi_controller.h \
-    math/types.h \
     error_codes.h \
     communication/toc_log.h \
     communication/toc_parameter.h \
@@ -31,7 +31,6 @@ HEADERS  += \
     communication/protocol.h \
     control/crazy_flie_commander.h \
     communication/crtp_packet.h \
-    communication/crazy_radio.h \
     communication/crazy_flie.h \
     communication/radio_dongle.h \
     control/double_buffer.h
@@ -42,7 +41,6 @@ SOURCES += \
     math/types.cpp \
     communication/toc_log.cpp \
     communication/toc_parameter.cpp \
-    communication/crazy_radio.cpp \
     communication/crazy_flie.cpp \
     communication/crtp_packet.cpp \
     control/crazy_flie_commander.cpp \

@@ -1,5 +1,5 @@
 #pragma once
-#include "crazy_radio.h"
+#include "radio_dongle.h"
 #include "math/types.h"
 #include "toc_shared.h"
 #include <QObject>
@@ -25,11 +25,11 @@ public:
             DOUBLE= 0x07,
     };
 
-    TocParameter(CrazyRadio & crazyRadio) :
-        _crazyRadio(crazyRadio),
+    TocParameter(RadioDongle & radioDongle) :
+        _radioDongle(radioDongle),
       _itemCount(0),
       _elements(),
-       _shared_impl(_itemCount, _elements, crazyRadio )
+       _shared_impl(_itemCount, _elements, radioDongle )
 
     {}
 
@@ -55,7 +55,7 @@ signals:
 public slots:
     void WriteParameter(uint8_t, float);
 private:
-    CrazyRadio & _crazyRadio;
+    RadioDongle & _radioDongle;
     unsigned int _itemCount;
     std::vector<TOCElement> _elements;
     TOCShared<Parameter::id, Parameter::Access> _shared_impl;

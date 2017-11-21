@@ -1,50 +1,49 @@
 #pragma once
-
-#include <list>
-#include <string>
+// TODO SF Clean up includes
 #include <cstdio>
-#include <cstring>
 #include "E:\Code\lib\libusb-1.0.21\include\libusb-1.0\libusb.h"
 #include <unistd.h>
 #include <iostream>
-#include <sstream>
 #include <memory>
-
 #include "crtp_packet.h"
+#include <QObject>
+#include "control/double_buffer.h"
 
-
-enum class PowerSettings {
-    // Power at -18dbm */
-    P_M18DBM = 0,
-    // Power at -12dbm */
-    P_M12DBM = 1,
-    // Power at -6dbm */
-    P_M6DBM = 2,
-    // Power at 0dbm */
-    P_0DBM = 3
-};
-enum class RadioSettings{
-    _0802M = 0,
-    _080250K = 1
-};
-
-enum class DongleConfiguration{
-    SET_RADIO_CHANNEL = 0x01,
-    SET_RADIO_ADDRESS = 0x02,
-    SET_DATA_RATE = 0x03,
-    SET_RADIO_POWER = 0x04,
-    SET_RADIO_ARD = 0x05,
-    SET_RADIO_ARC = 0x06,
-    ACK_ENABLE = 0x10,
-    SET_CONT_CARRIER = 0x20,
-    SCANN_CHANNELS = 0x21,
-    LAUCH_BOOTLOADER = 0xFF
-};
-
-class RadioDongle {
+class RadioDongle :  public QObject
+{
+    Q_OBJECT
 
 public:
-    using sptrPacket = std::shared_ptr<CRTPPacket>;
+    enum class PowerSettings
+    {
+        // Power at -18dbm
+        P_M18DBM = 0,
+        // Power at -12dbm
+        P_M12DBM = 1,
+        // Power at -6dbm
+        P_M6DBM = 2,
+        // Power at 0dbm
+        P_0DBM = 3
+    };
+    enum class RadioSettings
+    {
+        _0802M = 0,
+        _080250K = 1
+    };
+
+    enum class DongleConfiguration
+    {
+        SET_RADIO_CHANNEL = 0x01,
+        SET_RADIO_ADDRESS = 0x02,
+        SET_DATA_RATE = 0x03,
+        SET_RADIO_POWER = 0x04,
+        SET_RADIO_ARD = 0x05,
+        SET_RADIO_ARC = 0x06,
+        ACK_ENABLE = 0x10,
+        SET_CONT_CARRIER = 0x20,
+        SCANN_CHANNELS = 0x21,
+        LAUNCH_BOOTLOADER = 0xFF
+    };
 
     RadioDongle();
     ~RadioDongle();
@@ -52,7 +51,7 @@ public:
     void StartRadio();
     void StopRadio();
 
-    PowerSettings Power();
+    RadioDongle::PowerSettings Power();
     void SetPower(PowerSettings power);
 
     void  SendPingPacket();
@@ -60,19 +59,20 @@ public:
     bool AckReceived();
     bool IsUsbConnectionOk();
 
-    std::vector<sptrPacket> PopLoggingPackets();
+    std::vector<CRTPPacket> PopLoggingPackets();
 
     void SetRadioSettings(int index);
 
     bool RadioIsConnected() const;
 
-    void SendPacketsNow();// Periodically call this
     bool SendPacket(CRTPPacket && packet); // Call when a packet is requested to send
-    void RegisterPacketToSend(CRTPPacket && packet);
+    void RegisterPacketToSend(CRTPPacket &&  packet);
     void RegisterAnswerPacket();
-    void ReceivePacket(); // Periodically call this
-    void ProcessPacket(sptrPacket & packet);
+    void ProcessPacket(CRTPPacket && packet);
     void CheckAnswerPacket();
+public slots:
+    void SendPacketsNow();
+    void ReceivePacket();
 
 
 private:
@@ -90,8 +90,10 @@ private:
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
-    std::vector<sptrPacket> _loggingPackets;
+    std::vector<CRTPPacket> _loggingPackets;
     bool _radioIsConnected;
+
+    Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _buffer;
 
     void ReadRadioSettings();
     std::vector<libusb_device*> ListDevices(int vendorID, int productID);
@@ -100,8 +102,7 @@ private:
     bool ClaimInterface(int nInterface);
     void CloseDevice();
 
-    sptrPacket CreatePacketFromData( uint8_t* buffer, int totalLength);
-    sptrPacket SendPacketAndDistribute(CRTPPacket && sendPacket);
+    CRTPPacket CreatePacketFromData( uint8_t* buffer, int totalLength);
 
     bool WriteData(uint8_t * data, int length);
     bool ReadData(uint8_t* data, int maxLength, int & actualLength);

@@ -1,10 +1,11 @@
 #pragma once
 #include "math/types.h"
-#include "crazy_radio.h"
+#include "radio_dongle.h"
 #include "crtp_packet.h"
 #include "math/stl_utils.h"
 #include "protocol.h"
 #include <map>
+#include "communication/crtp_packet.h"
 
 template<uint8_t port, typename channel>
 class TOCShared
@@ -12,10 +13,10 @@ class TOCShared
 public:
     TOCShared(unsigned int & itemCount,
               std::vector<TOCElement> & elements,
-              CrazyRadio & crazyRadio) :
+              RadioDongle & radioDongle) :
         _itemCount(itemCount),
         _elements(elements),
-        _crazyRadio(crazyRadio)
+        _radioDongle(radioDongle)
     {}
 
     bool Setup()
@@ -54,22 +55,28 @@ public:
     {
         Data data = {channel::Commands::GetInfo::id};
         CRTPPacket packet(port, channel::id, std::move(data));
-        bool receivedPacketIsValid = false;
-        auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-        if(receivedPacketIsValid && received->GetData().size() > 1)
-        {
-            if(received->GetData().at(channel::Commands::GetInfo::AnswerByte::CmdID) == channel::Commands::GetInfo::id)
-            {
-                _itemCount = received->GetData().at(channel::Commands::GetInfo::AnswerByte::ItemCount);
-                return  true;
-            }
-            else
-            {
-                // TODO SF Error handling
-                return false;
-            }
-        }
-        // TODO SF Error handling
+        _radioDongle.RegisterPacketToSend(std::move(packet));
+
+//        bool receivedPacketIsValid = false;
+
+//        auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
+
+
+
+//        if(receivedPacketIsValid && received->GetData().size() > 1)
+//        {
+//            if(received->GetData().at(channel::Commands::GetInfo::AnswerByte::CmdID) == channel::Commands::GetInfo::id)
+//            {
+//                _itemCount = received->GetData().at(channel::Commands::GetInfo::AnswerByte::ItemCount);
+//                return  true;
+//            }
+//            else
+//            {
+//                // TODO SF Error handling
+//                return false;
+//            }
+//        }
+//        // TODO SF Error handling
         return false;
     }
 
@@ -89,17 +96,20 @@ public:
     {
         Data data = {channel::Commands::GetItem::id,id};
         CRTPPacket  packet(port, channel::id, std::move(data));
-        bool receivedPacketIsValid = false;
-        auto received = _crazyRadio.SendAndReceive(std::move(packet), receivedPacketIsValid);
-        if(receivedPacketIsValid)
-        {
-            return AddElement(std::move(received));
-        }
-        else
-        {
-            // TODO SF Error handling
-            return false;
-        }
+        _radioDongle.RegisterPacketToSend(std::move(packet));
+
+//        bool receivedPacketIsValid = false;
+//        auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
+//        if(receivedPacketIsValid)
+//        {
+//            return AddElement(std::move(received));
+//        }
+//        else
+//        {
+//            // TODO SF Error handling
+//            return false;
+//        }
+        return false;
     }
 
 
@@ -203,7 +213,7 @@ public:
     }
 
 private:
-    bool AddElement( CrazyRadio::sptrPacket && packet)
+    bool AddElement( sptrPacket packet)
     {
         if(packet->GetPort() == port && static_cast<uint8_t>(packet->GetChannel() )== channel::id)
         {
@@ -271,7 +281,7 @@ private:
 
     unsigned int & _itemCount;
     std::vector<TOCElement> & _elements;
-    CrazyRadio & _crazyRadio;
+    RadioDongle & _radioDongle;
 
 
 

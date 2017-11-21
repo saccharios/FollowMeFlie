@@ -194,7 +194,7 @@ void CrazyRadio::StopRadio()
 
 }
 
-CrazyRadio::sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
+sptrPacket CrazyRadio::WriteData(uint8_t * data, int length)
 {
     int actWritten;
     int retValue = libusb_bulk_transfer(_device, (0x01 | LIBUSB_ENDPOINT_OUT), data, length, &actWritten, 1000);
@@ -366,7 +366,7 @@ bool CrazyRadio::SendPacketAndCheck(CRTPPacket && sendPacket)
     return SendPacketAndDistribute(std::move(sendPacket)) != nullptr;
 }
 
-CrazyRadio::sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPacket)
+sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPacket)
 {
     auto packet = WriteData(sendPacket.SendableData(), sendPacket.GetSendableDataLength());
 
@@ -421,7 +421,7 @@ CrazyRadio::sptrPacket CrazyRadio::SendPacketAndDistribute(CRTPPacket  && sendPa
     return packet;
 }
 
-CrazyRadio::sptrPacket CrazyRadio::ReadAck()
+sptrPacket CrazyRadio::ReadAck()
 {
     sptrPacket packet = nullptr;
 
@@ -473,7 +473,7 @@ bool CrazyRadio::IsUsbConnectionOk()
     return (libusb_get_device_descriptor(_devDevice,	&descriptor) == 0);
 }
 
-CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
+sptrPacket CrazyRadio::WaitForPacket()
 {
     sptrPacket received = nullptr;
     int cntr = 0;
@@ -489,7 +489,7 @@ CrazyRadio::sptrPacket CrazyRadio::WaitForPacket()
 // 1) They should be independant of eacher other
 // 2) They should be on a timelevel and thus periodically executed
 // 3) Packets must be stored during the timelevel and processed upon signal (timed).
-CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool & valid)
+sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool & valid)
 {
     bool go_on = true;
     int resendCounter = 0;
@@ -530,9 +530,9 @@ CrazyRadio::sptrPacket CrazyRadio::SendAndReceive(CRTPPacket && sendPacket, bool
     return received;
 }
 
-std::vector<CrazyRadio::sptrPacket> CrazyRadio::PopLoggingPackets()
+std::vector<sptrPacket> CrazyRadio::PopLoggingPackets()
 {
-    std::vector<CrazyRadio::sptrPacket> packets;
+    std::vector<sptrPacket> packets;
     packets.swap(_loggingPackets);
     return packets;
 }

@@ -50,8 +50,6 @@ enum class DongleConfiguration{
 class CrazyRadio {
 
 public:
-    using sptrPacket = std::shared_ptr<CRTPPacket>;
-
     CrazyRadio();
     ~CrazyRadio();
 

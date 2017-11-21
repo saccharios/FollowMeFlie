@@ -1,7 +1,7 @@
 #pragma once
 #include "crtp_packet.h"
 #include "math/types.h"
-#include "crazy_radio.h"
+#include "radio_dongle.h"
 #include "toc_shared.h"
 #include "protocol.h"
 class TocLog
@@ -17,12 +17,12 @@ class TocLog
     };
 
 public:
-    TocLog(CrazyRadio & crazyRadio) :
-        _crazyRadio(crazyRadio),
+    TocLog(RadioDongle & radioDongle) :
+        _radioDongle(radioDongle),
       _itemCount(0),
       _elements(),
       _loggingBlocks(),
-      _shared_impl(_itemCount, _elements, crazyRadio )
+      _shared_impl(_itemCount, _elements, radioDongle )
     {}
 
 
@@ -36,7 +36,7 @@ public:
     bool RequestItems() {return _shared_impl.RequestItems();}
     bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
-    void ProcessLogPackets(std::vector<CrazyRadio::sptrPacket> packets);
+    void ProcessLogPackets(std::vector<CRTPPacket> const & packets);
 
     bool RegisterLoggingBlock(std::string name, float frequency);
     bool UnregisterLoggingBlock(std::string name);
@@ -53,12 +53,12 @@ public:
 
 private:
     std::string ExtractName(Data const & data);
-    bool AddElement( CrazyRadio::sptrPacket && packet);
+    bool AddElement( sptrPacket && packet);
     uint8_t GetFirstFreeID();
     bool EnableLogging(LoggingBlock const & loggingBlock);
     bool UnregisterLoggingBlockID(uint8_t id);
 
-    CrazyRadio & _crazyRadio;
+    RadioDongle & _radioDongle;
     unsigned int _itemCount;
     std::vector<TOCElement> _elements;
     std::vector<LoggingBlock> _loggingBlocks;

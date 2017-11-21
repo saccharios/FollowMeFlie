@@ -1,11 +1,6 @@
 #pragma once
-
-#include <cstring>
-#include <vector>
-#include <stdint.h>
 #include "math/types.h"
-
-
+using Data = std::vector<uint8_t>; // TODO SF Why is this not recognized?
 // Convert to vector<uint8_t>
 template<typename T>
 Data ConvertTouint8_tVect(T element)
@@ -47,13 +42,11 @@ template<>
 float ExtractData<float>(Data const & data, int offset);
 
 
-// Class to hold and process communication-related data for the CRTProtocol
 class CRTPPacket
 {
 public:
     CRTPPacket(uint8_t port, uint8_t channel, Data && data) ;
 
-    // Disable copy/move ctor + copy/move assignment
     CRTPPacket(const CRTPPacket&) = delete;                 // Copy constructor
     CRTPPacket(CRTPPacket &&) = default;                        // Move constructor
     CRTPPacket& operator=(const CRTPPacket&) & = delete;  // Copy assignment operator
@@ -75,9 +68,9 @@ public:
     void PrintData() const;
 
 private:
-    Data _data;
     uint8_t _port;
     uint8_t _channel;
+    Data _data;
 
 };
 

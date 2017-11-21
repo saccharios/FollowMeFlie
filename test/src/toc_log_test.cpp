@@ -3,8 +3,8 @@
 
 void TOC_Log_Test::Run_TestOk()
 {
-    CrazyRadio crazyRadio;
-    TocLog toc(crazyRadio);
+    RadioDongle radioDongle;
+    TocLog toc(radioDongle);
 
 
     TOCElement tocElement1;
@@ -50,8 +50,8 @@ void TOC_Log_Test::Run_TestOk()
 
 void TOC_Log_Test::Run_GetFirstFreeID()
 {
-    CrazyRadio crazyRadio;
-    TocLog toc(crazyRadio);
+    RadioDongle radioDongle;
+    TocLog toc(radioDongle);
 
     // Empty logginBlocks Vector
     int id = toc.GetFirstFreeID();

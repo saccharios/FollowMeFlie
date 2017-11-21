@@ -7,7 +7,7 @@
 #include "QOBJECT"
 
 #include <cmath>
-#include "crazy_radio.h"
+#include "radio_dongle.h"
 #include <memory>
 #include "math/logic.h"
 #include "math/types.h"
@@ -85,7 +85,7 @@ class Crazyflie : public QObject
 public:
 
 
-    Crazyflie(CrazyRadio & crazyRadio);
+    Crazyflie(RadioDongle & _radioDongle);
     ~Crazyflie();
 
     void SetThrust(int thrust);
@@ -140,7 +140,7 @@ signals:
     void NotConnecting();
 
 private:
-    CrazyRadio & _crazyRadio;
+    RadioDongle & _radioDongle;
 
     int _ackMissTolerance;
     int _ackMissCounter;
