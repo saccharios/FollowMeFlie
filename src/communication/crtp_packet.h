@@ -1,6 +1,10 @@
 #pragma once
 #include "math/types.h"
+#include <iostream>
+
 using Data = std::vector<uint8_t>; // TODO SF Why is this not recognized?
+
+
 // Convert to vector<uint8_t>
 template<typename T>
 Data ConvertTouint8_tVect(T element)
@@ -21,8 +25,9 @@ Data ConvertTouint8_tVect(T element)
 template<typename T>
 T ExtractData(Data const & data, int offset)
 {
+
     constexpr unsigned int typeLength = sizeof(T);
-    if(data.size() > offset +typeLength)
+    if(data.size() > offset + typeLength) // TODO SF >= or just > ?
     {
         T bits = 0;
         for(unsigned int i = 0; i < typeLength; ++i)
@@ -34,7 +39,7 @@ T ExtractData(Data const & data, int offset)
     }
     else
     {
-//        std::cout << "Packet is not large enough\n";
+        std::cout << "Packet is not large enough\n";
         return 0;
     }
 }
@@ -46,12 +51,6 @@ class CRTPPacket
 {
 public:
     CRTPPacket(uint8_t port, uint8_t channel, Data && data) ;
-
-    CRTPPacket(const CRTPPacket&) = delete;                 // Copy constructor
-    CRTPPacket(CRTPPacket &&) = default;                        // Move constructor
-    CRTPPacket& operator=(const CRTPPacket&) & = delete;  // Copy assignment operator
-    CRTPPacket& operator=(CRTPPacket&&) & = default;        // Move assignment operator
-
 
     Data const & GetData() const;
 

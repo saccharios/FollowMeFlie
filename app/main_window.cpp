@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _parameterModel(_crazyFlie.GetParameterElements(), nullptr),
     _timer_t0(),
     _timer_t1(),
+    _timer_t2(),
+    _timer_sr(),
     _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,
                        _crazyFlie.GetSensorValues().stabilizer.yaw,
                        _crazyFlie.GetSensorValues().stabilizer.pitch),
@@ -47,6 +49,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(UpdateConnectionStatus()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
+
+    // Send and Receive packets
+    _timer_sr.start(sendReceiveSamplingTime);
+    QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(SendPacketsNow()));
+    QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(ReceivePacket()));
+
 
     // Custom widgets
     ui->Layout_CameraView->addWidget(&_cameraViewPainter);

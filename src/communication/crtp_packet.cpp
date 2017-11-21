@@ -8,7 +8,7 @@ float ExtractData<float>(Data const & data, int offset)
     constexpr unsigned int typeLength = sizeof(float);
     IntFloat bits;
     bits.int_value = 0;
-    if(data.size() > offset +typeLength)
+    if(data.size() > offset +typeLength) // TODO SF >= or just > ?
     {
         for(unsigned int i = 0; i < typeLength; ++i)
         {
@@ -17,7 +17,7 @@ float ExtractData<float>(Data const & data, int offset)
     }
     else
     {
-        //std::cout << "Packet is not large enough\n";
+        std::cout << "Packet is not large enough\n";
     }
     return bits.float_value;
 }

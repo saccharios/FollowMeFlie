@@ -158,6 +158,7 @@ void TocLog::ProcessLogPackets(std::vector<CRTPPacket> const & packets)
         }
         int blockID = data.at(Logger::Data::AnswerByte::Blockid);
         const Data logdataVect(data.begin() + Logger::Data::AnswerByte::LogValues, data.end());
+
         bool found;
         // Check if the  packet is in a logging block
         LoggingBlock const & logBlock = STLUtils::ElementForID(_loggingBlocks, blockID, found);
@@ -168,10 +169,6 @@ void TocLog::ProcessLogPackets(std::vector<CRTPPacket> const & packets)
             for(TOCElement* const & element : logBlock.elements)
             {
                 _shared_impl.SetValueToElement(element, logdataVect, offset);
-                 if(element->name == "baro.asl")
-                 {
-                         std::cout << "baro asl: " << element->value << std::endl;
-                 }
                  offset += typeToInt[element->type];
             }
         }

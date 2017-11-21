@@ -39,13 +39,12 @@ void TOC_Log_Test::Run_TestOk()
     block2.elements.push_back(&toc._elements.at(3));
     toc._loggingBlocks.push_back(block2);
 
-
     // All is ok
     toc.ProcessLogPackets(_packets);
-    EXPECT_FLOAT_EQ(toc._elements.at(0).value, num1);
-    EXPECT_FLOAT_EQ(toc._elements.at(1).value, num2);
-    EXPECT_FLOAT_EQ(toc._elements.at(2).value, int1);
-    EXPECT_FLOAT_EQ(toc._elements.at(3).value, int2);
+    EXPECT_FLOAT_EQ(num1, toc._elements.at(0).value);
+    EXPECT_FLOAT_EQ(num2, toc._elements.at(1).value);
+    EXPECT_FLOAT_EQ(int1, toc._elements.at(2).value);
+    EXPECT_FLOAT_EQ(int2, toc._elements.at(3).value);
 }
 
 void TOC_Log_Test::Run_GetFirstFreeID()

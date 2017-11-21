@@ -9,7 +9,7 @@ class CRTPPacket; // Forward declaration
 
 using Acceleration = Eigen::Vector3f;
 using Velocity = Eigen::Vector3f;
-using Data = std::vector<uint8_t>;
+//using Data = std::vector<uint8_t>;
 using sptrPacket = std::shared_ptr<CRTPPacket>;
 
 union IntFloat

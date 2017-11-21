@@ -34,10 +34,10 @@ public:
          data.insert(std::end(data), std::begin(data1), std::end(data1));
          data.insert(std::end(data), std::begin(data2), std::end(data2));
          CRTPPacket packet1(_port, _channel, std::move(data));
-         _packets.emplace_back(std::move(packet1));
+         _packets.emplace_back(packet1);
          Data load =  {blockID2,0,0,0,int1, int2};
          CRTPPacket packet2(_port, _channel, std::move(load));
-         _packets.emplace_back(std::move(packet2));
+         _packets.emplace_back(packet2);
      }
 
 
