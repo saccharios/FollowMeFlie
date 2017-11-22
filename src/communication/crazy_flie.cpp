@@ -66,8 +66,13 @@ void Crazyflie::Update()
             bool success = _parameters.Setup();
             if(success)
             {
-                _state =State::READ_PARAMETERS;
+//                _state =State::READ_PARAMETERS;
             }
+//            if(!success)
+//            {
+//                _startConnecting = false;
+//                _state =State::ZERO;
+//            }
         }
         break;
     }
@@ -97,7 +102,6 @@ void Crazyflie::Update()
     {
         // TODO SF : Remove this state
         _logger.ProcessLogPackets(_radioDongle.PopLoggingPackets());
-        _radioDongle.SendPingPacket();
         // NOTE : ter;
         _state = State::NORMAL_OPERATION;
         break;
@@ -117,12 +121,6 @@ void Crazyflie::Update()
         {
             SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;
-        }
-        else
-        {
-            // Can only receive packes (also logge packets) if a packet is sent.
-            // Send a dummy packet if no command is sent.
-            _radioDongle.SendPingPacket();
         }
 
         if(_radioDongle.AckReceived())

@@ -159,3 +159,59 @@ void TocParameter::WriteParameter(uint8_t id, float value)
         WriteValue(element, value);
     }
 }
+
+void TocParameter::ReceivePacket(CRTPPacket packet)
+{
+    uint8_t port = packet.GetPort();
+    if(port != Parameter::id)
+    {
+        std::cout << "Oops, wrong packet assigned to ParameterToc\n";
+        packet.Print();
+        return;
+    }
+//    else
+//    {
+//        std::cout << "Processing parameter packet\n";
+//    }
+    uint8_t channel = packet.GetChannel();
+    if( channel == Parameter::Access::id)
+    {
+        _shared_impl.ProcessAccessData(packet.GetData());
+    }
+    else if ( channel == Parameter::Read::id )
+    {
+        ProcessReadData(packet.GetData());
+    }
+    else if ( channel == Parameter::Write::id )
+    {
+        ProcessWriteData(packet.GetData());
+    }
+    else if ( channel == Parameter::Misc::id )
+    {
+        ProcessMiscData(packet.GetData());
+    }
+    else
+    {
+        std::cout << "Oops, channel not recognized for ParameterToc\n";
+        packet.Print();
+        return;
+    }
+}
+
+
+void TocParameter::ProcessReadData(Data const & data)
+{
+
+}
+void TocParameter::ProcessWriteData(Data const & data)
+{
+
+}
+void TocParameter::ProcessMiscData(Data const & data)
+{
+
+}
+
+
+
+

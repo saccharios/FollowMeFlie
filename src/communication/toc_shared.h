@@ -16,100 +16,86 @@ public:
               RadioDongle & radioDongle) :
         _itemCount(itemCount),
         _elements(elements),
-        _radioDongle(radioDongle)
+        _radioDongle(radioDongle),
+        _setupIsDone(false)
     {}
 
+    void  ResetSetupIs()
+    {
+        _setupIsDone = false;
+    }
+
+    // TODO SF : Make a nice statemachine here
     bool Setup()
     {
-        // This function is called periodically. It may be that it takes more than one sampling period to
-        // execute it. Use this bool guards to prevent a deadlock on the crazyflie.
-        static bool is_running = false;
-        if(!is_running)
+        if(!_setupIsDone)
         {
-            is_running = true;
-            bool  info_ok = RequestInfo();
-            if(info_ok)
-            {
-                bool items_ok = RequestItems();
-                if(items_ok)
+                bool  info_ok = RequestInfo();
+                if(info_ok)
                 {
-                    is_running = false;
-                    return true;
+                    bool items_ok = RequestItems();
+                    if(items_ok)
+                    {
+                        _setupIsDone = true;
+                    }
+                    // TODO :: Assumes setup never fails !
                 }
                 else
                 {
-                    is_running = false;
-                    return false;
+                    _setupIsDone =  false;
                 }
-            }
-            else
-            {
-                is_running = false;
-                return false;
-            }
         }
-        return false;
+        else
+        {
+            std::cout << "_setupIsDone Done----\n";
+        }
+        return _setupIsDone;
     }
 
     bool RequestInfo()
     {
-        Data data = {channel::Commands::GetInfo::id};
-        CRTPPacket packet(port, channel::id, std::move(data));
-        _radioDongle.RegisterPacketToSend(std::move(packet));
-
-//        bool receivedPacketIsValid = false;
-
-//        auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-
-
-
-//        if(receivedPacketIsValid && received->GetData().size() > 1)
-//        {
-//            if(received->GetData().at(channel::Commands::GetInfo::AnswerByte::CmdID) == channel::Commands::GetInfo::id)
-//            {
-//                _itemCount = received->GetData().at(channel::Commands::GetInfo::AnswerByte::ItemCount);
-//                return  true;
-//            }
-//            else
-//            {
-//                // TODO SF Error handling
-//                return false;
-//            }
-//        }
-//        // TODO SF Error handling
-        return false;
+        if(_itemCount == 0)
+        {
+            Data data = {channel::Commands::GetInfo::id};
+            CRTPPacket packet(port, channel::id, std::move(data));
+            _radioDongle.RegisterPacketToSend(std::move(packet));
+        }
+        return (_itemCount > 0);
     }
 
     bool RequestItems()
     {
-        for(uint8_t itemNr = 0; itemNr < _itemCount; itemNr++)
+
+        if(_elements.size() == 0)
         {
-            if( ! RequestItem(itemNr)) // If any of the requested items fail, return false
-            {
-                return false;
-            }
+            RequestItem(0) ;
+            return false;
         }
-        return true;
+        else if(_elements.size() < _itemCount)
+        {
+            // Fill up _elements one bye one. The elements ids will be ordered
+            // from 0 to _itemCount-1.
+//            uint8_t lastElementID = _elements.back().id;
+//            if( _elements.size() == lastElementID +1u)
+//            {
+//                RequestItem(lastElementID + 1) ;
+//            }
+            RequestItem(_elements.size());
+
+            return false;
+
+        }
+        else
+        {
+            return true;
+        }
     }
 
-    bool RequestItem(uint8_t id)
+    void RequestItem(uint8_t id)
     {
         Data data = {channel::Commands::GetItem::id,id};
         CRTPPacket  packet(port, channel::id, std::move(data));
         _radioDongle.RegisterPacketToSend(std::move(packet));
-
-//        bool receivedPacketIsValid = false;
-//        auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-//        if(receivedPacketIsValid)
-//        {
-//            return AddElement(std::move(received));
-//        }
-//        else
-//        {
-//            // TODO SF Error handling
-//            return false;
-//        }
-        return false;
     }
 
 
@@ -212,56 +198,65 @@ public:
         }
     }
 
-private:
-    bool AddElement( sptrPacket packet)
+    void ProcessAccessData(Data const & data)
     {
-        if(packet->GetPort() == port && static_cast<uint8_t>(packet->GetChannel() )== channel::id)
+        if ( data.at(channel::Commands::GetItem::AnswerByte::CmdID) ==
+             channel::Commands::GetItem::id )
         {
-            auto const & data = packet->GetData();
-
-            if(data.at(channel::Commands::GetItem::AnswerByte::CmdID) == channel::Commands::GetItem::id)
-            {
-
-                TOCElement element;
-                int index = channel::Commands::GetItem::AnswerByte::Group;
-                // Read in group name, it is a zero terminated string
-                while(data.at(index) != '\0')
-                {
-                    element.group += data.at(index);
-                    ++index;
-                }
-                ++index;
-                // Read in name, it is a zero terminated string
-                while(data.at(index) != '\0')
-                {
-                    element.name_only += data.at(index);
-                    ++index;
-                }
-                element.name = element.group +"."+  element.name_only;
-                element.id = data.at(channel::Commands::GetItem::AnswerByte::ID);
-                if(port == Parameter::id)
-                {
-                    element.type = convertParameterElementType[data.at(channel::Commands::GetItem::AnswerByte::Type)];
-                }
-                else
-                {
-                    element.type = static_cast<ElementType>(data.at(channel::Commands::GetItem::AnswerByte::Type));
-                }
-
-                element.value = 0;
-                // Only add element if it does not exist yet
-                bool isAlreadyContained = false;
-                STLUtils::ElementForID(_elements, element.id, isAlreadyContained);
-                if(!isAlreadyContained)
-                {
-                    _elements.emplace_back(element);
-                }
-                return true;
-            }
+                AddItem(data);
         }
-        // TODO SF Error handling
-        return false;
+        else if(data.at(channel::Commands::GetInfo::AnswerByte::CmdID) ==
+                channel::Commands::GetInfo::id)
+        {
+            _itemCount = data.at(channel::Commands::GetInfo::AnswerByte::ItemCount);
+            std::cout << "New item count = " << _itemCount << std::endl;
+        }
     }
+
+    void AddItem (Data const & data)
+    {
+        TOCElement element;
+        int index = channel::Commands::GetItem::AnswerByte::Group;
+        // Read in group name, it is a zero terminated string
+        while(data.at(index) != '\0')
+        {
+            element.group += data.at(index);
+            ++index;
+        }
+        ++index;
+        // Read in name, it is a zero terminated string
+        while(data.at(index) != '\0')
+        {
+            element.name_only += data.at(index);
+            ++index;
+        }
+        element.name = element.group +"."+  element.name_only;
+        element.id = data.at(channel::Commands::GetItem::AnswerByte::ID);
+        if(port == Parameter::id)
+        {
+            element.type = convertParameterElementType[data.at(channel::Commands::GetItem::AnswerByte::Type)];
+        }
+        else
+        {
+            element.type = static_cast<ElementType>(data.at(channel::Commands::GetItem::AnswerByte::Type));
+        }
+
+        element.value = 0;
+        // Only add element if it does not exist yet
+        bool isAlreadyContained = false;
+        STLUtils::ElementForID(_elements, element.id, isAlreadyContained);
+        if(!isAlreadyContained)
+        {
+            _elements.emplace_back(element);
+            std::cout << "Adding new element " << static_cast<int>(element.id) <<std::endl;
+        }
+        else
+        {
+            std::cout << "Element is already contained " << static_cast<int>(element.id) <<std::endl;
+        }
+    }
+
+private:
         // Unfortunately the parameter toc has a different encoding for the types than the logger toc.
         // Convert here this encoding to the same encoding.
     std::map<int, ElementType> convertParameterElementType =
@@ -282,7 +277,7 @@ private:
     unsigned int & _itemCount;
     std::vector<TOCElement> & _elements;
     RadioDongle & _radioDongle;
-
+    bool _setupIsDone;
 
 
 };

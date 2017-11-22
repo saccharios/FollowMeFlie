@@ -35,9 +35,9 @@ public:
 
 
     bool Setup() {return _shared_impl.Setup();}
-    bool RequestInfo() {return _shared_impl.RequestInfo();}
-    bool RequestItems() {return _shared_impl.RequestItems();}
-    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
+//    bool RequestInfo() {return _shared_impl.RequestInfo();}
+//    bool RequestItems() {return _shared_impl.RequestItems();}
+//    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
     bool ReadAll();
     bool ReadElement(TOCElement & element);
@@ -54,10 +54,17 @@ signals:
     void ParameterRead(uint8_t const &);
 public slots:
     void WriteParameter(uint8_t, float);
+    void ReceivePacket(CRTPPacket packet);
+
 private:
     RadioDongle & _radioDongle;
     unsigned int _itemCount;
     std::vector<TOCElement> _elements;
     TOCShared<Parameter::id, Parameter::Access> _shared_impl;
+
+
+    void ProcessReadData(Data const & data);
+    void ProcessWriteData(Data const & data);
+    void ProcessMiscData(Data const & data);
 
 };

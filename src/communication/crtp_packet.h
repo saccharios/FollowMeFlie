@@ -65,6 +65,7 @@ public:
     uint8_t GetChannel() const;
 
     void PrintData() const;
+    void Print() const;
 
 private:
     uint8_t _port;

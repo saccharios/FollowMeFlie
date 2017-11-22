@@ -52,8 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Send and Receive packets
     _timer_sr.start(sendReceiveSamplingTime);
-    QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(SendPacketsNow()));
-    QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(ReceivePacket()));
+   QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(SendPacketsNow()));
+   QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(ReceivePacket()));
 
 
     // Custom widgets
@@ -74,6 +74,9 @@ MainWindow::MainWindow(QWidget *parent) :
                      &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
     QObject::connect(&_parameterModel, SIGNAL( ParameterWrite(uint8_t, float)),
                      &_crazyFlie.GetParameterTOC(), SLOT( WriteParameter(uint8_t, float)));
+
+    QObject::connect(&_radioDongle, SIGNAL(NewParameterPacket(CRTPPacket)) ,
+                    &_crazyFlie.GetParameterTOC(), SLOT(ReceivePacket(CRTPPacket)));
 }
 MainWindow::~MainWindow()
 {

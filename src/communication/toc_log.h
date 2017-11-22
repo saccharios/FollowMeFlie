@@ -4,8 +4,11 @@
 #include "radio_dongle.h"
 #include "toc_shared.h"
 #include "protocol.h"
-class TocLog
+#include <QObject>
+class TocLog : public QObject
 {
+    Q_OBJECT;
+
     friend class TOC_Log_Test; // Is friend for white-box testing.
 
     struct LoggingBlock
@@ -32,9 +35,9 @@ public:
     }
 
     bool Setup() {return _shared_impl.Setup();}
-    bool RequestInfo() {return _shared_impl.RequestInfo();}
-    bool RequestItems() {return _shared_impl.RequestItems();}
-    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
+//    bool RequestInfo() {return _shared_impl.RequestInfo();}
+//    bool RequestItems() {return _shared_impl.RequestItems();}
+//    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
     void ProcessLogPackets(std::vector<CRTPPacket> const & packets);
 
@@ -50,6 +53,8 @@ public:
     {
         return _elements;
     }
+public slots:
+    void ReceivePacket(CRTPPacket packet);
 
 private:
     std::string ExtractName(Data const & data);

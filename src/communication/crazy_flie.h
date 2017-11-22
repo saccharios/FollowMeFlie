@@ -134,6 +134,12 @@ public:
        return _parameters;
    }
 
+   TocParameter &
+   GetParameterTOC()
+   {
+       return _parameters;
+   }
+
 
 signals:
     void ConnectionTimeout();

@@ -183,5 +183,8 @@ float TocLog::Value(std::string name)
     return (found ? result.value : 0);
 }
 
+void TocLog::ReceivePacket(CRTPPacket packet)
+{
 
+}
 

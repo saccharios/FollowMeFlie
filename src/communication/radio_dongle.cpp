@@ -23,7 +23,8 @@ RadioDongle::RadioDongle() :
     _ackReceived(false),
     _loggingPackets(),
     _radioIsConnected(false),
-    _buffer()
+    _packetsToSend(),
+    _packetsSending()
 {
 //    int returnVal = libusb_init(&_context);
     // Do error checking here.
@@ -228,7 +229,6 @@ bool RadioDongle::ReadData(uint8_t* data, int maxLength, int & actualLength)
     case 0:
         actualLength = actRead;
     case LIBUSB_ERROR_TIMEOUT:
-        std::cout << "USB timeout" << std::endl;
         actualLength = maxLength;
         break;
     default:
@@ -408,11 +408,6 @@ std::vector<CRTPPacket> RadioDongle::PopLoggingPackets()
     return packets;
 }
 
-void RadioDongle::SendPingPacket()
-{
-    RegisterPacketToSend({Console::id, Console::Print::id, {static_cast<uint8_t>(0xff)}});
-}
-
 bool RadioDongle::RadioIsConnected() const
 {
     return _radioIsConnected;
@@ -427,22 +422,42 @@ float RadioDongle::ConvertToDeviceVersion(short number) const
 void RadioDongle::SendPacketsNow()
 {
     // Call function periodically
-    // Send all packets that must be send (in the vector)
-    _buffer.swap();
-    for(auto & packet: _buffer.side_a())
+    _packetsToSend.swap();
+    _packetsToSend.side_a().clear(); // TODO SF What if it is written to side_a() between swap() and clear()? -> packet loss
+    while(_packetsToSend.side_b().size() > 0)
     {
-        SendPacket(std::move(packet));
+        _packetsSending.emplace_back(_packetsToSend.side_b().back());
+        _packetsToSend.side_b().pop_back();
+    }
+
+    // If _packetsSending is empty, a ping packet is sent to keep the connection open
+    if(_packetsSending.size() == 0)
+    {
+        CRTPPacket ping_packet{Console::id, Console::Print::id, {static_cast<uint8_t>(0xff)}};
+        SendPacket(std::move(ping_packet));
+    }
+    else
+    {
+        CRTPPacket packet = _packetsSending.back();
+        _packetsSending.pop_back();
+
+    //        packet.Print();
+            SendPacket(std::move(packet));
+        //    std::cout << "Sending one packet, " << _packetsSending.size() << " left to send\n";
     }
 }
 
 bool RadioDongle::SendPacket(CRTPPacket  && packet)
 {
+    if(!_radioIsConnected)
+        return false;
+
     return WriteData(packet.SendableData(), packet.GetSendableDataLength());
 }
 
 void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
 {
-    _buffer.side_b().emplace_back(std::move(packet));
+    _packetsToSend.side_a().emplace_back(std::move(packet));
 }
 
 void RadioDongle::RegisterAnswerPacket()
@@ -452,7 +467,8 @@ void RadioDongle::RegisterAnswerPacket()
 
 void RadioDongle::ReceivePacket()
 {
-    // Call function periodically
+    if(!_radioIsConnected)
+        return;
 
     int bufferSize = 64;
     uint8_t buffer[bufferSize];
@@ -460,17 +476,21 @@ void RadioDongle::ReceivePacket()
     // Read the raw data from the dongle
     bool readDataOK = ReadData(buffer, bufferSize, bytesRead) ;
     // Check validity of packet
-    if(!readDataOK || bytesRead == 0)
+    if(!readDataOK)
     {
-        std::cout << "Radio dongle failed to read\n";
         return;
     }
-    // Convert the raw data to a packet
-    CRTPPacket packet = CreatePacketFromData(buffer, bytesRead);
-    // Process the packe and distribute to ports + channels
-    ProcessPacket(std::move(packet));
-    // Check packet is a requested answer
+    if(bytesRead > 0)
+    {
+        // Convert the raw data to a packet
+        CRTPPacket packet = CreatePacketFromData(buffer, bytesRead);
 
+        // Process the packe and distribute to ports + channels
+        ProcessPacket(std::move(packet));
+
+
+        // Check packet is a requested answer
+    }
 }
 
 void RadioDongle::ProcessPacket(CRTPPacket && packet)
@@ -478,25 +498,17 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     // Distribute the packet according to port + channel
     Data const & data = packet.GetData();
 
-    if(data.size() > 0)
-    {
         // Dispatch incoming packet according to port and channel
         switch(packet.GetPort() )
         {
         case Console::id:
-        { // Console
-            if(data.size() > 0)
-            { // Implicit assumption that the data stored in data are uint8_ts
-                std::cout << "Console text: ";
-                for(auto const & element : data)
-                {
-                    std::cout << element;
-                }
-                std::cout << std::endl;
-            }
-            else // data.size() == 1
-            { // Special case where crazy flie is turned off. For error handling, set packet to nullptr.
-            }
+        {       // Console
+//                std::cout << "Console text: ";
+//                for(auto const & element : data)
+//                {
+//                    std::cout << static_cast<char>(element);
+//                }
+//                std::cout << std::endl;
             break;
         }
 
@@ -510,14 +522,19 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
         }
 
         case Commander::id:
+            break;
         case CommanderGeneric::id:
+            break;
         case Debug::id:
+            break;
         case Link::id:
+            break;
         case Parameter::id:
+            emit NewParameterPacket(packet);
+            break;
         default:
             break;
         }
-    }
 }
 
 void RadioDongle::CheckAnswerPacket()

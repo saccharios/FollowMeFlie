@@ -8,7 +8,6 @@
 #include "crtp_packet.h"
 #include <QObject>
 #include "control/double_buffer.h"
-
 class RadioDongle :  public QObject
 {
     Q_OBJECT
@@ -54,7 +53,6 @@ public:
     RadioDongle::PowerSettings Power();
     void SetPower(PowerSettings power);
 
-    void  SendPingPacket();
 
     bool AckReceived();
     bool IsUsbConnectionOk();
@@ -73,7 +71,8 @@ public:
 public slots:
     void SendPacketsNow();
     void ReceivePacket();
-
+signals:
+    void NewParameterPacket(CRTPPacket packet);
 
 private:
     RadioSettings _radioSettings;
@@ -93,7 +92,8 @@ private:
     std::vector<CRTPPacket> _loggingPackets;
     bool _radioIsConnected;
 
-    Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _buffer;
+    Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _packetsToSend;
+    std::vector<CRTPPacket> _packetsSending;
 
     void ReadRadioSettings();
     std::vector<libusb_device*> ListDevices(int vendorID, int productID);

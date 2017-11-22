@@ -75,6 +75,11 @@ void CRTPPacket::PrintData() const
         std::cout << "i = " << i << " data = " << static_cast<int>(_data.at(i)) << std::endl;
     }
 }
+void CRTPPacket::Print() const
+{
+    std::cout << "Port = " << static_cast<int>(_port)<< " Channel = "  << static_cast<int>(_channel) << std::endl;
+    PrintData();
+}
 
 
 
