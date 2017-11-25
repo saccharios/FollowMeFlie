@@ -66,13 +66,8 @@ void Crazyflie::Update()
             bool success = _parameters.Setup();
             if(success)
             {
-//                _state =State::READ_PARAMETERS;
+                _state =State::READ_PARAMETERS;
             }
-//            if(!success)
-//            {
-//                _startConnecting = false;
-//                _state =State::ZERO;
-//            }
         }
         break;
     }
@@ -81,7 +76,7 @@ void Crazyflie::Update()
         bool success = _parameters.ReadAll();
         if(success)
         {
-            _state =State::SETUP_LOGGER;
+           // _state =State::SETUP_LOGGER;
         }
         break;
     }

@@ -25,29 +25,21 @@ public:
         _setupIsDone = false;
     }
 
-    // TODO SF : Make a nice statemachine here
     bool Setup()
     {
+        // TODO :: Assumes setup never fails !
+        // TODO SF Add a timeout checker here
         if(!_setupIsDone)
         {
                 bool  info_ok = RequestInfo();
                 if(info_ok)
                 {
-                    bool items_ok = RequestItems();
-                    if(items_ok)
-                    {
-                        _setupIsDone = true;
-                    }
-                    // TODO :: Assumes setup never fails !
+                   _setupIsDone = RequestItems();
                 }
                 else
                 {
                     _setupIsDone =  false;
                 }
-        }
-        else
-        {
-            std::cout << "_setupIsDone Done----\n";
         }
         return _setupIsDone;
     }
@@ -65,25 +57,12 @@ public:
 
     bool RequestItems()
     {
-
-        if(_elements.size() == 0)
-        {
-            RequestItem(0) ;
-            return false;
-        }
-        else if(_elements.size() < _itemCount)
+        if(_elements.size() < _itemCount)
         {
             // Fill up _elements one bye one. The elements ids will be ordered
             // from 0 to _itemCount-1.
-//            uint8_t lastElementID = _elements.back().id;
-//            if( _elements.size() == lastElementID +1u)
-//            {
-//                RequestItem(lastElementID + 1) ;
-//            }
             RequestItem(_elements.size());
-
             return false;
-
         }
         else
         {
@@ -209,7 +188,7 @@ public:
                 channel::Commands::GetInfo::id)
         {
             _itemCount = data.at(channel::Commands::GetInfo::AnswerByte::ItemCount);
-            std::cout << "New item count = " << _itemCount << std::endl;
+//            std::cout << "New item count = " << _itemCount << std::endl;
         }
     }
 
@@ -248,11 +227,11 @@ public:
         if(!isAlreadyContained)
         {
             _elements.emplace_back(element);
-            std::cout << "Adding new element " << static_cast<int>(element.id) <<std::endl;
+//            std::cout << "Adding new element " << static_cast<int>(element.id) <<std::endl;
         }
         else
         {
-            std::cout << "Element is already contained " << static_cast<int>(element.id) <<std::endl;
+//            std::cout << "Element is already contained " << static_cast<int>(element.id) <<std::endl;
         }
     }
 

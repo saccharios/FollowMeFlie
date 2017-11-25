@@ -127,7 +127,7 @@ struct Parameter
         // Note: Channel Read has no different commands
         struct AnswerByte
         {
-            static constexpr uint8_t CmdID = 0;
+            static constexpr uint8_t ParamID = 0;
             static constexpr uint8_t Value = 1; // Length and type according to TOC
         };
     };
@@ -137,7 +137,7 @@ struct Parameter
         // Note: Channel Write has no different commands
         struct AnswerByte
         {
-            static constexpr uint8_t CmdID = 0;
+            static constexpr uint8_t ParamID = 0;
             static constexpr uint8_t Value = 1; // Length and type according to TOC
         };
     };

@@ -422,6 +422,7 @@ float RadioDongle::ConvertToDeviceVersion(short number) const
 void RadioDongle::SendPacketsNow()
 {
     // Call function periodically
+    // Sends one package every call.
     _packetsToSend.swap();
     _packetsToSend.side_a().clear(); // TODO SF What if it is written to side_a() between swap() and clear()? -> packet loss
     while(_packetsToSend.side_b().size() > 0)

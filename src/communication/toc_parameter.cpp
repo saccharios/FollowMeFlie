@@ -5,37 +5,20 @@
 
 bool TocParameter::ReadAll()
 {
-    for(TOCElement & element : _elements)
+    if(_lastReadParameter < static_cast<int8_t>(_itemCount) - 1)
     {
-        bool success = ReadElement(element);
-        if(!success)
-        {
-            return false;
-        }
+        ReadElement(_lastReadParameter + 1);
     }
-    return true;
+    std::cout << "Read All done? " << (_lastReadParameter == _itemCount - 1) << std::endl;
+    return (_lastReadParameter == _itemCount - 1);
 }
 
-bool TocParameter::ReadElement(TOCElement & element)
+void TocParameter::ReadElement(uint8_t  elementId)
 {
-    Data data ={element.id};
+    std::cout << "Read Request Element ID =  " << static_cast<int>(elementId) << std::endl;
+    Data data ={elementId};
     CRTPPacket packet(Parameter::id, Parameter::Read::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
-
-//    bool receivedPacketIsValid = false;
-//    auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-//    auto & dataReceived = received->GetData();
-//    if(receivedPacketIsValid && dataReceived.size() > 1)
-//    {
-//        if(element.id == dataReceived.at(Parameter::Read::AnswerByte::CmdID))
-//        {
-//            _shared_impl.SetValueToElement(&element, dataReceived, Parameter::Read::AnswerByte::Value);
-//            emit ParameterRead(element.id);
-//            return true;
-//        }
-//        return false;
-//    }
-    return false;
 }
 bool TocParameter::WriteValue( TOCElement & element, float float_value)
 {
@@ -139,7 +122,7 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 
 //    if(receivedPacketIsValid && dataReceived.size() > 1)
 //    {
-//        if( (element.id == dataReceived.at(Parameter::Read::AnswerByte::CmdID)) )
+//        if( (element.id == dataReceived.at(Parameter::Write::AnswerByte::CmdID)) )
 //        {
 //                _shared_impl.SetValueToElement(&element, dataReceived, Parameter::Write::AnswerByte::Value);
 //                emit ParameterRead(element.id);
@@ -166,6 +149,12 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
     if(port != Parameter::id)
     {
         std::cout << "Oops, wrong packet assigned to ParameterToc\n";
+        packet.Print();
+        return;
+    }
+    if(packet.GetData().size() < 2)
+    {
+        std::cout << "Oops, packet is too small to be ParameterToc packet\n";
         packet.Print();
         return;
     }
@@ -201,11 +190,26 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
 
 void TocParameter::ProcessReadData(Data const & data)
 {
-
+    _lastReadParameter = data.at(Parameter::Read::AnswerByte::ParamID);
+    std::cout << "Process Read " << static_cast<int>(_lastReadParameter) << std::endl;
+    bool isValid = false;
+    auto & element = STLUtils::ElementForID(_elements, _lastReadParameter, isValid);
+    if(isValid)
+    {
+        _shared_impl.SetValueToElement(&element, data, Parameter::Read::AnswerByte::Value);
+        emit ParameterRead(_lastReadParameter);
+    }
 }
 void TocParameter::ProcessWriteData(Data const & data)
 {
-
+    _lastReadParameter = data.at(Parameter::Write::AnswerByte::ParamID);
+    bool isValid = false;
+    auto & element = STLUtils::ElementForID(_elements, _lastReadParameter, isValid);
+    if(isValid)
+    {
+        _shared_impl.SetValueToElement(&element, data, Parameter::Write::AnswerByte::Value);
+        emit ParameterRead(_lastReadParameter);
+    }
 }
 void TocParameter::ProcessMiscData(Data const & data)
 {

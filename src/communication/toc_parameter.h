@@ -29,8 +29,8 @@ public:
         _radioDongle(radioDongle),
       _itemCount(0),
       _elements(),
-       _shared_impl(_itemCount, _elements, radioDongle )
-
+       _shared_impl(_itemCount, _elements, radioDongle ),
+       _lastReadParameter(-1)
     {}
 
 
@@ -40,7 +40,7 @@ public:
 //    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
     bool ReadAll();
-    bool ReadElement(TOCElement & element);
+    void ReadElement(uint8_t elementId);
 
     bool WriteValue(TOCElement & element, float value);
 
@@ -61,7 +61,7 @@ private:
     unsigned int _itemCount;
     std::vector<TOCElement> _elements;
     TOCShared<Parameter::id, Parameter::Access> _shared_impl;
-
+    int8_t _lastReadParameter;
 
     void ProcessReadData(Data const & data);
     void ProcessWriteData(Data const & data);
