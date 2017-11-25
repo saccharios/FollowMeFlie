@@ -76,7 +76,7 @@ void Crazyflie::Update()
         bool success = _parameters.ReadAll();
         if(success)
         {
-           // _state =State::SETUP_LOGGER;
+            _state =State::SETUP_LOGGER;
         }
         break;
     }

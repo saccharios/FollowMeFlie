@@ -5,12 +5,12 @@
 
 bool TocParameter::ReadAll()
 {
+    // Send Read request for all parameters, one by oen (from 0 to _itemCount - 1)
     if(_lastReadParameter < static_cast<int8_t>(_itemCount) - 1)
     {
         ReadElement(_lastReadParameter + 1);
     }
-    std::cout << "Read All done? " << (_lastReadParameter == _itemCount - 1) << std::endl;
-    return (_lastReadParameter == _itemCount - 1);
+    return (_lastReadParameter == static_cast<int8_t>(_itemCount - 1));
 }
 
 void TocParameter::ReadElement(uint8_t  elementId)
@@ -116,20 +116,6 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 
     CRTPPacket packet(Parameter::id, Parameter::Write::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
-//    bool receivedPacketIsValid = false;
-//    auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-//    auto & dataReceived = received->GetData();
-
-//    if(receivedPacketIsValid && dataReceived.size() > 1)
-//    {
-//        if( (element.id == dataReceived.at(Parameter::Write::AnswerByte::CmdID)) )
-//        {
-//                _shared_impl.SetValueToElement(&element, dataReceived, Parameter::Write::AnswerByte::Value);
-//                emit ParameterRead(element.id);
-//                return true;
-//        }
-//        return false;
-//    }
     return false;
 }
 
@@ -190,30 +176,36 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
 
 void TocParameter::ProcessReadData(Data const & data)
 {
-    _lastReadParameter = data.at(Parameter::Read::AnswerByte::ParamID);
+
+    ReadData(data, Parameter::Read::AnswerByte::ParamID, Parameter::Read::AnswerByte::Value);
+}
+void TocParameter::ProcessWriteData(Data const & data)
+{
+    ReadData(data, Parameter::Write::AnswerByte::ParamID, Parameter::Write::AnswerByte::Value);
+}
+void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition)
+{
+    auto elementID = data.at(parameterIdPosition);
+    if(elementID >= _itemCount )
+    {
+        std::cout << "Oops, ParameterToc reading of invalid element id " << static_cast<int>(elementID) << std::endl;
+        return;
+    }
+    _lastReadParameter = elementID;
     std::cout << "Process Read " << static_cast<int>(_lastReadParameter) << std::endl;
     bool isValid = false;
     auto & element = STLUtils::ElementForID(_elements, _lastReadParameter, isValid);
     if(isValid)
     {
-        _shared_impl.SetValueToElement(&element, data, Parameter::Read::AnswerByte::Value);
+        _shared_impl.SetValueToElement(&element, data, valuePosition);
         emit ParameterRead(_lastReadParameter);
     }
 }
-void TocParameter::ProcessWriteData(Data const & data)
-{
-    _lastReadParameter = data.at(Parameter::Write::AnswerByte::ParamID);
-    bool isValid = false;
-    auto & element = STLUtils::ElementForID(_elements, _lastReadParameter, isValid);
-    if(isValid)
-    {
-        _shared_impl.SetValueToElement(&element, data, Parameter::Write::AnswerByte::Value);
-        emit ParameterRead(_lastReadParameter);
-    }
-}
+
 void TocParameter::ProcessMiscData(Data const & data)
 {
-
+    // TODO SF Implement
+    std::cout << "Oops, Processing ParameterToc Misc packets is no implemented\n";
 }
 
 

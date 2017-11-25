@@ -35,9 +35,6 @@ public:
 
 
     bool Setup() {return _shared_impl.Setup();}
-//    bool RequestInfo() {return _shared_impl.RequestInfo();}
-//    bool RequestItems() {return _shared_impl.RequestItems();}
-//    bool RequestItem(uint8_t id) {return _shared_impl.RequestItem(id);}
 
     bool ReadAll();
     void ReadElement(uint8_t elementId);
@@ -66,5 +63,6 @@ private:
     void ProcessReadData(Data const & data);
     void ProcessWriteData(Data const & data);
     void ProcessMiscData(Data const & data);
+    void ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition);
 
 };
