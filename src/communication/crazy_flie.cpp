@@ -85,10 +85,11 @@ void Crazyflie::Update()
         bool success = _logger.Setup();
         if(success)
         {
-            bool success2 = StartLogging();
+            bool success2 = _logger.CreateLoggingBlocks();
+
             if(success2)
             {
-                _state = State::ZERO_MEASUREMENTS;
+//                _state = State::ZERO_MEASUREMENTS;
             }
         }
         break;
@@ -287,29 +288,29 @@ bool Crazyflie::IsConnected()
     return _state == State::NORMAL_OPERATION;
 }
 
-bool Crazyflie::StartLogging()
-{
-        // Register the desired sensor readings
-        bool success = RegisterLoggingBlocks();
-        if(success )
-        {
-            EnableSensorsLogging();
-            EnableBatteryLogging();
-            EnablePIDAttitudeLogging();
-            EnablePIDRateLogging();
-            EnableControllerLogging();
-            EnableKalman1Logging();
-            EnableKalman2Logging();
-            EnablePosCtrlLogging();
-            EnableAltitudeEstimationLogging();
-            EnableMotorsLogging();
-            EnableSensorFusionLogging();
-            EnableCtrlTargetLogging();
-            EnableStateEstimateLogging();
-            return true;
-        }
-    return false;
-}
+//bool Crazyflie::StartLogging()
+//{
+//    // Register the desired sensor readings
+//    bool success = RegisterLoggingBlocks();
+//    if(success )
+//    {
+//        EnableSensorsLogging();
+//        EnableBatteryLogging();
+//        EnablePIDAttitudeLogging();
+//        EnablePIDRateLogging();
+//        EnableControllerLogging();
+//        EnableKalman1Logging();
+//        EnableKalman2Logging();
+//        EnablePosCtrlLogging();
+//        EnableAltitudeEstimationLogging();
+//        EnableMotorsLogging();
+//        EnableSensorFusionLogging();
+//        EnableCtrlTargetLogging();
+//        EnableStateEstimateLogging();
+//        return true;
+//    }
+//    return false;
+//}
 
 void Crazyflie::StopLogging()
 {
@@ -348,58 +349,8 @@ float Crazyflie::GetSensorValue(std::string strName)
 
 bool Crazyflie::RegisterLoggingBlocks()
 {
-    static bool is_running = false;
-    constexpr int max_try = 3;
-    static int cntr = 0;
-    if(!is_running)
-    {
-        is_running = true;
-        // Repeat as long as not all logging blocks are registered, at max max_try;
-        static constexpr int num_loggers = 13;
-        static std::array<bool,num_loggers> success ={false,false,false,false,false,false,
-                                           false,false,false,false,false,false,
-                                           false};
-        // TODO SF:: Logging Blocks should be classes
-        RegisterLogginBlock(success[0], "sensors", _frequency);
-        RegisterLogginBlock(success[1], "battery", _frequency/8.0f);
-        RegisterLogginBlock(success[2], "pid_attitude", _frequency);
-        RegisterLogginBlock(success[3], "pid_rate", _frequency);
-        RegisterLogginBlock(success[4], "controller", _frequency);
-        RegisterLogginBlock(success[5], "kalman_1", _frequency/2.0f);
-        RegisterLogginBlock(success[6], "kalman_2", _frequency/2.0f);
-        RegisterLogginBlock(success[7], "position_ctrl", _frequency/2.0f);
-        RegisterLogginBlock(success[8], "alt_est", _frequency/2.0f);
-        RegisterLogginBlock(success[9], "motors", _frequency/2.0f);
-        RegisterLogginBlock(success[10], "sensor_fusion", _frequency/2.0f);
-        RegisterLogginBlock(success[11], "ctrl_target", _frequency/2.0f);
-        RegisterLogginBlock(success[12], "state_estimate", _frequency/2.0f);
-        bool total = true;
-        for(int i = 0; i < num_loggers; ++i)
-        {
-            total = (total && success[i]);
-        }
 
-        if ( total || (cntr > max_try) )
-        {
-            is_running = false;
-            return true;
-        }
-        else
-        {
-            ++cntr;
-            is_running = false;
-            return false;
-        }
-    }
     return false;
-}
-
-void Crazyflie::RegisterLogginBlock(bool & success, std::string name, float frequency)
-{
-    if(!success)
-    {
-        success = _logger.RegisterLoggingBlock(name, frequency);
-    }
 }
 
 void Crazyflie::EnableSensorsLogging()

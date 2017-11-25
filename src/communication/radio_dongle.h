@@ -73,6 +73,7 @@ public slots:
     void ReceivePacket();
 signals:
     void NewParameterPacket(CRTPPacket packet);
+    void NewLoggerPacket(CRTPPacket packet);
 
 private:
     RadioSettings _radioSettings;

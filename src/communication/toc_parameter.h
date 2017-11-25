@@ -35,18 +35,15 @@ public:
 
 
     bool Setup() {return _shared_impl.Setup();}
-
     bool ReadAll();
-    void ReadElement(uint8_t elementId);
 
     bool WriteValue(TOCElement & element, float value);
 
-
-    std::vector<TOCElement> const &
-    GetElements() const
+    std::vector<TOCElement> const & GetElements() const
     {
         return _elements;
     }
+
 signals:
     void ParameterRead(uint8_t const &);
 public slots:
@@ -64,5 +61,6 @@ private:
     void ProcessWriteData(Data const & data);
     void ProcessMiscData(Data const & data);
     void ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition);
+    void ReadElement(uint8_t elementId);
 
 };

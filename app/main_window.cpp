@@ -77,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&_radioDongle, SIGNAL(NewParameterPacket(CRTPPacket)) ,
                     &_crazyFlie.GetParameterTOC(), SLOT(ReceivePacket(CRTPPacket)));
+    QObject::connect(&_radioDongle, SIGNAL(NewLoggerPacket(CRTPPacket)) ,
+                     &_crazyFlie.GetLoggerTOC(), SLOT(ReceivePacket(CRTPPacket)));
 }
 MainWindow::~MainWindow()
 {

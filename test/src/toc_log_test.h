@@ -43,7 +43,6 @@ public:
 
 
     void Run_TestOk();
-    void Run_GetFirstFreeID();
 
 };
 
@@ -52,8 +51,4 @@ public:
 TEST_F(TOC_Log_Test, ProcessLogPacketsOK)
 {
     Run_TestOk();
-}
-TEST_F(TOC_Log_Test, GetFirstFreeID)
-{
-    Run_GetFirstFreeID();
 }

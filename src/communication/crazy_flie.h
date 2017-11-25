@@ -116,26 +116,27 @@ public:
 
    Eigen::Vector3f ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body);
 
-   std::vector<TOCElement> const &
-   GetLogElements () const
+   std::vector<TOCElement> const & GetLogElements () const
    {
        return _logger.GetElements();
    }
 
-   std::vector<TOCElement> const &
-   GetParameterElements() const
+   TocLog & GetLoggerTOC()
+   {
+       return _logger;
+   }
+
+   std::vector<TOCElement> const & GetParameterElements() const
    {
        return _parameters.GetElements();
    }
 
-   TocParameter const &
-   GetParameterTOC() const
+   TocParameter const & GetParameterTOC() const
    {
        return _parameters;
    }
 
-   TocParameter &
-   GetParameterTOC()
+   TocParameter & GetParameterTOC()
    {
        return _parameters;
    }
@@ -173,8 +174,6 @@ private:
     Negative_Edge_Detector _leaveConnectingState;
 
     SensorValues _sensorValues;
-
-    static constexpr float _frequency = 1000.0f; // 1000.0
 
     bool SendSetpoint(SetPoint setPoint);
 

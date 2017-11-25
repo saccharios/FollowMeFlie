@@ -46,7 +46,6 @@ struct Logger
             {
                 static constexpr uint8_t id     = 0;
                 struct AnswerByte
-
                 {
                     static constexpr uint8_t CmdID = 0;
                     static constexpr uint8_t BlockId = 1;
@@ -58,17 +57,38 @@ struct Logger
             struct AppendBlock
             {
                 static constexpr uint8_t id = 1;
-                static constexpr uint8_t CmdID = 0;
-                static constexpr uint8_t BlockId = 1;
-                static constexpr uint8_t End    = 2;
+                struct AnswerByte
+                {
+                    static constexpr uint8_t CmdID = 0;
+                    static constexpr uint8_t BlockId = 1;
+                    static constexpr uint8_t End    = 2;
+                };
             };
 
             // TODO SF Implement
-            static constexpr uint8_t DeleteBlock   = 2;
-            static constexpr uint8_t StartBlock      = 3;
-            static constexpr uint8_t StopBlock      = 4;
-            static constexpr uint8_t Reset             = 5;
-
+            struct DeleteBlock
+            {
+                static constexpr uint8_t id = 2;
+            };
+            // TODO SF Implement
+            struct StartBlock
+            {
+                static constexpr uint8_t id = 3;
+            };
+            // TODO SF Implement
+            struct StopBlock
+            {
+                static constexpr uint8_t id = 4;
+            };
+            // TODO SF Implement
+            struct Reset
+            {
+                static constexpr uint8_t id = 5;
+            };
+        };
+        struct AnswerByte
+        {
+            static constexpr uint8_t CmdID = 0;
         };
 
     };

@@ -26,7 +26,7 @@ RadioDongle::RadioDongle() :
     _packetsToSend(),
     _packetsSending()
 {
-//    int returnVal = libusb_init(&_context);
+    //    int returnVal = libusb_init(&_context);
     // Do error checking here.
     libusb_init(&_context);
 }
@@ -163,8 +163,8 @@ void RadioDongle::StartRadio()
         if(claimIntf)
         {
             // Set power-up settings for dongle (>= v0.4)
-//            WriteDataRate("2M");
-//            WriteChannel(2);
+            //            WriteDataRate("2M");
+            //            WriteChannel(2);
 
             if(_deviceVersion >= 0.4)
             {
@@ -386,7 +386,7 @@ CRTPPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int totalLength)
     {
         data.push_back(buffer[i]);
     }
-     CRTPPacket packet(port, channel, std::move(data));
+    CRTPPacket packet(port, channel, std::move(data));
     return packet;
 }
 
@@ -442,8 +442,8 @@ void RadioDongle::SendPacketsNow()
         CRTPPacket packet = _packetsSending.back();
         _packetsSending.pop_back();
 
-    //        packet.Print();
-            SendPacket(std::move(packet));
+        //        packet.Print();
+        SendPacket(std::move(packet));
         //    std::cout << "Sending one packet, " << _packetsSending.size() << " left to send\n";
     }
 }
@@ -496,46 +496,47 @@ void RadioDongle::ReceivePacket()
 
 void RadioDongle::ProcessPacket(CRTPPacket && packet)
 {
-    // Distribute the packet according to port + channel
-    Data const & data = packet.GetData();
+    // Dispatch incoming packet according to port and channel
+    switch(packet.GetPort() )
+    {
+    case Console::id:
+    {       // Console
+        //                std::cout << "Console text: ";
+        //                for(auto const & element : data)
+        //                {
+        //                    std::cout << static_cast<char>(element);
+        //                }
+        //                std::cout << std::endl;
+        break;
+    }
 
-        // Dispatch incoming packet according to port and channel
-        switch(packet.GetPort() )
+    case Logger::id:
+    {
+        if(packet.GetChannel() == Logger::Data::id)
         {
-        case Console::id:
-        {       // Console
-//                std::cout << "Console text: ";
-//                for(auto const & element : data)
-//                {
-//                    std::cout << static_cast<char>(element);
-//                }
-//                std::cout << std::endl;
-            break;
+            _loggingPackets.emplace_back(std::move(packet));
         }
-
-        case Logger::id:
+        else
         {
-            if(packet.GetChannel() == Logger::Data::id)
-            {
-                _loggingPackets.emplace_back(std::move(packet));
-            }
-            break;
+            emit NewLoggerPacket(packet);
         }
+        break;
+    }
 
-        case Commander::id:
-            break;
-        case CommanderGeneric::id:
-            break;
-        case Debug::id:
-            break;
-        case Link::id:
-            break;
-        case Parameter::id:
-            emit NewParameterPacket(packet);
-            break;
-        default:
-            break;
-        }
+    case Commander::id:
+        break;
+    case CommanderGeneric::id:
+        break;
+    case Debug::id:
+        break;
+    case Link::id:
+        break;
+    case Parameter::id:
+        emit NewParameterPacket(packet);
+        break;
+    default:
+        break;
+    }
 }
 
 void RadioDongle::CheckAnswerPacket()

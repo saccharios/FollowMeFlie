@@ -15,7 +15,7 @@ bool TocParameter::ReadAll()
 
 void TocParameter::ReadElement(uint8_t  elementId)
 {
-    std::cout << "Read Request Element ID =  " << static_cast<int>(elementId) << std::endl;
+   // std::cout << "Read Request Element ID =  " << static_cast<int>(elementId) << std::endl;
     Data data ={elementId};
     CRTPPacket packet(Parameter::id, Parameter::Read::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
@@ -165,12 +165,12 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
     {
         ProcessMiscData(packet.GetData());
     }
-    else
-    {
-        std::cout << "Oops, channel not recognized for ParameterToc\n";
-        packet.Print();
-        return;
-    }
+//    else
+//    {
+//        std::cout << "Oops, channel not recognized for ParameterToc\n";
+//        packet.Print();
+//        return;
+//    }
 }
 
 
@@ -192,7 +192,7 @@ void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint
         return;
     }
     _lastReadParameter = elementID;
-    std::cout << "Process Read " << static_cast<int>(_lastReadParameter) << std::endl;
+    //std::cout << "Process Read " << static_cast<int>(_lastReadParameter) << std::endl;
     bool isValid = false;
     auto & element = STLUtils::ElementForID(_elements, _lastReadParameter, isValid);
     if(isValid)
