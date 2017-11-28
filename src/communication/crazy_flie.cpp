@@ -85,12 +85,36 @@ void Crazyflie::Update()
         bool success = _logger.Setup();
         if(success)
         {
-            bool success2 = _logger.CreateLoggingBlocks();
-
-            if(success2)
-            {
-//                _state = State::ZERO_MEASUREMENTS;
-            }
+            _logger.ResetLoggingBlocks(); // Prepare to create logging blocks
+            _state = State::CREATE_LOGGERS;
+        }
+        break;
+    }
+    case State::CREATE_LOGGERS:
+    {
+        bool success = _logger.CreateLoggingBlocks();
+        if(success)
+        {
+            _logger.AppendNext(); // Start the appending sequence
+            _state = State::APPEND_LOGGERS;
+        }
+        break;
+    }
+    case State::APPEND_LOGGERS:
+    {
+        // Waits until the appending sequence is done.
+//        if(AppendingBlocksIsDone())
+//        {
+//            _state = State::START_LOGGERS;
+//        }
+//        break;
+    }
+    case State::START_LOGGERS:
+    {
+        bool success = _logger.StartLoggingBlocks();
+        if(success)
+        {
+            _state = State::ZERO_MEASUREMENTS;
         }
         break;
     }
@@ -288,41 +312,6 @@ bool Crazyflie::IsConnected()
     return _state == State::NORMAL_OPERATION;
 }
 
-//bool Crazyflie::StartLogging()
-//{
-//    // Register the desired sensor readings
-//    bool success = RegisterLoggingBlocks();
-//    if(success )
-//    {
-//        EnableSensorsLogging();
-//        EnableBatteryLogging();
-//        EnablePIDAttitudeLogging();
-//        EnablePIDRateLogging();
-//        EnableControllerLogging();
-//        EnableKalman1Logging();
-//        EnableKalman2Logging();
-//        EnablePosCtrlLogging();
-//        EnableAltitudeEstimationLogging();
-//        EnableMotorsLogging();
-//        EnableSensorFusionLogging();
-//        EnableCtrlTargetLogging();
-//        EnableStateEstimateLogging();
-//        return true;
-//    }
-//    return false;
-//}
-
-void Crazyflie::StopLogging()
-{
-    DisableSensorsLogging();
-    DisableBatteryLogging();
-}
-
-void Crazyflie::DisableLogging()
-{
-    _logger.UnregisterLoggingBlock("high-speed");
-    _logger.UnregisterLoggingBlock("low-speed");
-}
 
 void Crazyflie::SetSendSetpoints(bool sendSetpoints)
 {
@@ -347,250 +336,41 @@ float Crazyflie::GetSensorValue(std::string strName)
     return _logger.Value(strName);
 }
 
-bool Crazyflie::RegisterLoggingBlocks()
-{
 
-    return false;
-}
-
-void Crazyflie::EnableSensorsLogging()
+void Crazyflie::StartLogging()
 {
-    _logger.StartLogging("stabilizer.roll", "sensors");
-    _logger.StartLogging("stabilizer.pitch", "sensors");
-    _logger.StartLogging("stabilizer.yaw", "sensors");
-    _logger.StartLogging("stabilizer.thrust", "sensors");
-    _logger.StartLogging("gyro.x", "sensors");
-    _logger.StartLogging("gyro.y", "sensors");
-    _logger.StartLogging("gyro.z", "sensors");
-    _logger.StartLogging("acc.x", "sensors");
-    _logger.StartLogging("acc.y", "sensors");
-    _logger.StartLogging("acc.z", "sensors");
-    _logger.StartLogging("acc.zw", "sensors");
-    _logger.StartLogging("mag.x", "sensors");
-    _logger.StartLogging("mag.y", "sensors");
-    _logger.StartLogging("mag.z", "sensors");
-    _logger.StartLogging("baro.asl", "sensors");
-    _logger.StartLogging("baro.aslLong", "sensors");
-    _logger.StartLogging("baro.pressure", "sensors");
-    _logger.StartLogging("baro.temperature", "sensors");
+    _logger.StartLogging("sensors");
+    _logger.StartLogging("battery");
+    _logger.StartLogging("pid_attitude");
+    _logger.StartLogging("pid_rate");
+    _logger.StartLogging("controller");
+    _logger.StartLogging("kalman_1");
+    _logger.StartLogging("kalman_2");
+    _logger.StartLogging("position_ctrl");
+    _logger.StartLogging("alt_est");
+    _logger.StartLogging("motors");
+    _logger.StartLogging("sensor_fusion");
+    _logger.StartLogging("ctrl_target");
+    _logger.StartLogging("state_estimate");
 }
 
-void Crazyflie::DisableSensorsLogging()
+void Crazyflie::StopLogging()
 {
-    _logger.UnregisterLoggingBlock("sensors");
+    _logger.StopLogging("sensors");
+    _logger.StopLogging("battery");
+    _logger.StopLogging("pid_attitude");
+    _logger.StopLogging("pid_rate");
+    _logger.StopLogging("controller");
+    _logger.StopLogging("kalman_1");
+    _logger.StopLogging("kalman_2");
+    _logger.StopLogging("position_ctrl");
+    _logger.StopLogging("alt_est");
+    _logger.StopLogging("motors");
+    _logger.StopLogging("sensor_fusion");
+    _logger.StopLogging("ctrl_target");
+    _logger.StopLogging("state_estimate");
 }
 
-void Crazyflie::EnableBatteryLogging()
-{
-    _logger.StartLogging("pm.vbat", "battery");
-    _logger.StartLogging("pm.state", "battery");
-    _logger.StartLogging("radio.rssi", "battery");
-}
-
-void Crazyflie::DisableBatteryLogging()
-{
-    _logger.UnregisterLoggingBlock("battery");
-}
-
-void Crazyflie::EnablePIDAttitudeLogging()
-{
-    _logger.StartLogging("pid_attitude.roll_outP", "pid_attitude");
-    _logger.StartLogging("pid_attitude.roll_outI", "pid_attitude");
-    _logger.StartLogging("pid_attitude.roll_outD", "pid_attitude");
-    _logger.StartLogging("pid_attitude.pitch_outP", "pid_attitude");
-    _logger.StartLogging("pid_attitude.pitch_outI", "pid_attitude");
-    _logger.StartLogging("pid_attitude.pitch_outD", "pid_attitude");
-    _logger.StartLogging("pid_attitude.yaw_outP", "pid_attitude");
-    _logger.StartLogging("pid_attitude.yaw_outI", "pid_attitude");
-    _logger.StartLogging("pid_attitude.yaw_outD", "pid_attitude");
-}
-
-void Crazyflie::DisablePIDAttitudeLogging()
-{
-    _logger.UnregisterLoggingBlock("pid_attitude");
-}
-void Crazyflie::EnablePIDRateLogging()
-{
-    _logger.StartLogging("pid_rate.roll_outP", "pid_rate");
-    _logger.StartLogging("pid_rate.roll_outI", "pid_rate");
-    _logger.StartLogging("pid_rate.roll_outD", "pid_rate");
-    _logger.StartLogging("pid_rate.pitch_outP", "pid_rate");
-    _logger.StartLogging("pid_rate.pitch_outI", "pid_rate");
-    _logger.StartLogging("pid_rate.pitch_outD", "pid_rate");
-    _logger.StartLogging("pid_rate.yaw_outP", "pid_rate");
-    _logger.StartLogging("pid_rate.yaw_outI", "pid_rate");
-    _logger.StartLogging("pid_rate.yaw_outD", "pid_rate");
-}
-
-void Crazyflie::DisablePIDRateLogging()
-{
-    _logger.UnregisterLoggingBlock("pid_rate");
-}
-
-void Crazyflie::EnableControllerLogging()
-{
-    _logger.StartLogging("controller.actuatorThrust", "controller");
-    _logger.StartLogging("controller.rol", "controller");
-    _logger.StartLogging("controller.pitch", "controller");
-    _logger.StartLogging("controller.yaw", "controller");
-    _logger.StartLogging("controller.rollRate", "controller");
-    _logger.StartLogging("controller.pitchRate", "controller");
-    _logger.StartLogging("controller.yawRate", "controller");
-    _logger.StartLogging("controller.ctr_yaw", "controller");
-}
-
-void Crazyflie::DisableControllerLogging()
-{
-    _logger.UnregisterLoggingBlock("controller");
-}
-void Crazyflie::EnableKalman1Logging()
-{
-    _logger.StartLogging("kalman_states.ox", "kalman_1");
-    _logger.StartLogging("kalman_states.oy", "kalman_1");
-    _logger.StartLogging("kalman_states.vx", "kalman_1");
-    _logger.StartLogging("kalman_states.vy", "kalman_1");
-    _logger.StartLogging("kalman_pred.predNX", "kalman_1");
-    _logger.StartLogging("kalman_pred.predNY", "kalman_1");
-    _logger.StartLogging("kalman_pred.measNX", "kalman_1");
-    _logger.StartLogging("kalman_pred.measNY", "kalman_1");
-    _logger.StartLogging("kalman.inFlight", "kalman_1");
-    _logger.StartLogging("kalman.stateX", "kalman_1");
-    _logger.StartLogging("kalman.stateY", "kalman_1");
-    _logger.StartLogging("kalman.stateZ", "kalman_1");
-    _logger.StartLogging("kalman.statePX", "kalman_1");
-    _logger.StartLogging("kalman.statePY", "kalman_1");
-    _logger.StartLogging("kalman.statePZ", "kalman_1");
-    _logger.StartLogging("kalman.stateD0", "kalman_1");
-    _logger.StartLogging("kalman.stateD1", "kalman_1");
-    _logger.StartLogging("kalman.stateD2", "kalman_1");
-    _logger.StartLogging("kalman.stateSkew", "kalman_1");
-}
-
-void Crazyflie::DisableKalman1Logging()
-{
-    _logger.UnregisterLoggingBlock("kalman_1");
-}
-
-void Crazyflie::EnableKalman2Logging()
-{
-        _logger.StartLogging("kalman.varX", "kalman_2");
-        _logger.StartLogging("kalman.varY", "kalman_2");
-        _logger.StartLogging("kalman.varZ", "kalman_2");
-        _logger.StartLogging("kalman.varPX", "kalman_2");
-        _logger.StartLogging("kalman.varPY", "kalman_2");
-        _logger.StartLogging("kalman.varPZ", "kalman_2");
-        _logger.StartLogging("kalman.varD0", "kalman_2");
-        _logger.StartLogging("kalman.varD1", "kalman_2");
-        _logger.StartLogging("kalman.varD2", "kalman_2");
-        _logger.StartLogging("kalman.varD3", "kalman_2");
-        _logger.StartLogging("kalman.varSkew", "kalman_2");
-        _logger.StartLogging("kalman.q0", "kalman_2");
-        _logger.StartLogging("kalman.q1", "kalman_2");
-        _logger.StartLogging("kalman.q2", "kalman_2");
-        _logger.StartLogging("kalman.q3", "kalman_2");
-}
-
-void Crazyflie::DisableKalman2Logging()
-{
-    _logger.UnregisterLoggingBlock("kalman_2");
-}
-
-void Crazyflie::EnablePosCtrlLogging()
-{
-    _logger.StartLogging("posCtl.targetVX", "position_ctrl");
-    _logger.StartLogging("posCtl.targetVY", "position_ctrl");
-    _logger.StartLogging("posCtl.targetVZ", "position_ctrl");
-    _logger.StartLogging("posCtl.targetX", "position_ctrl");
-    _logger.StartLogging("posCtl.targetY", "position_ctrl");
-    _logger.StartLogging("posCtl.targetZ", "position_ctrl");
-    _logger.StartLogging("posCtl.Xp", "position_ctrl");
-    _logger.StartLogging("posCtl.Xi", "position_ctrl");
-    _logger.StartLogging("posCtl.Xd", "position_ctrl");
-    _logger.StartLogging("posCtl.Yp", "position_ctrl");
-    _logger.StartLogging("posCtl.Yi", "position_ctrl");
-    _logger.StartLogging("posCtl.Yd", "position_ctrl");
-    _logger.StartLogging("posCtl.Zp", "position_ctrl");
-    _logger.StartLogging("posCtl.Zi", "position_ctrl");
-    _logger.StartLogging("posCtl.Zd", "position_ctrl");
-    _logger.StartLogging("posCtl.VXp", "position_ctrl");
-    _logger.StartLogging("posCtl.VXi", "position_ctrl");
-    _logger.StartLogging("posCtl.VXd", "position_ctrl");
-    _logger.StartLogging("posCtl.VZp", "position_ctrl");
-    _logger.StartLogging("posCtl.VZi", "position_ctrl");
-    _logger.StartLogging("posCtl.VZd", "position_ctrl");
-}
-
-void Crazyflie::DisablePosCtrlLogging()
-{
-    _logger.UnregisterLoggingBlock("position_ctrl");
-}
-void Crazyflie::EnableAltitudeEstimationLogging()
-{
-    _logger.StartLogging("posEstimatorAlt.estimatedZ", "alt_est");
-    _logger.StartLogging("posEstimatorAlt.estVZ", "alt_est");
-    _logger.StartLogging("posEstimatorAlt.velocityZ", "alt_est");
-}
-
-void Crazyflie::DisableAltitudeEstimationLogging()
-{
-    _logger.UnregisterLoggingBlock("alt_est");
-}
-void Crazyflie::EnableMotorsLogging()
-{
-    _logger.StartLogging("motor.m1", "motors");
-    _logger.StartLogging("motor.m2", "motors");
-    _logger.StartLogging("motor.m3", "motors");
-    _logger.StartLogging("motor.m4", "motors");
-    _logger.StartLogging("pwm.m1_pwm", "motors");
-    _logger.StartLogging("pwm.m2_pwm", "motors");
-    _logger.StartLogging("pwm.m3_pwm", "motors");
-    _logger.StartLogging("pwm.m4_pwm", "motors");
-}
-
-void Crazyflie::DisableMotorsLogging()
-{
-    _logger.UnregisterLoggingBlock("motors");
-}
-void Crazyflie::EnableSensorFusionLogging()
-{
-    _logger.StartLogging("sensorfusion6.qw", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.qx", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.qy", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.qz", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.gravityX", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.gravityY", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.gravityZ", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.accZbase", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.isInit", "sensor_fusion");
-    _logger.StartLogging("sensorfusion6.isCalibrated", "sensor_fusion");
-}
-
-void Crazyflie::DisableSensorFusionLogging()
-{
-    _logger.UnregisterLoggingBlock("sensor_fusion");
-}
-void Crazyflie::EnableCtrlTargetLogging()
-{
-    _logger.StartLogging("ctrltarget.roll", "ctrl_target");
-    _logger.StartLogging("ctrltarget.pitch", "ctrl_target");
-    _logger.StartLogging("ctrltarget.yaw", "ctrl_target");
-}
-
-void Crazyflie::DisableCtrlTargetLogging()
-{
-    _logger.UnregisterLoggingBlock("ctrl_target");
-}
-void Crazyflie::EnableStateEstimateLogging()
-{
-    _logger.StartLogging("stateEstimate.x", "state_estimate");
-    _logger.StartLogging("stateEstimate.y", "state_estimate");
-    _logger.StartLogging("stateEstimate.z", "state_estimate");
-}
-
-void Crazyflie::DisableStateEstimateLogging()
-{
-    _logger.UnregisterLoggingBlock("stateEstimate");
-}
 
 
 Eigen::Vector3f Crazyflie::ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body)

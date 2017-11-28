@@ -20,8 +20,11 @@ enum class State
     SETUP_PARAMETERS = 1,
     READ_PARAMETERS = 2,
     SETUP_LOGGER = 3,
-    ZERO_MEASUREMENTS = 4,
-    NORMAL_OPERATION = 5
+    CREATE_LOGGERS = 4,
+    APPEND_LOGGERS = 5,
+    START_LOGGERS = 6,
+    ZERO_MEASUREMENTS = 7,
+    NORMAL_OPERATION = 8
 };
 
 struct SetPoint
@@ -182,41 +185,11 @@ private:
     void UpateSensorValues();
     float GetSensorValue(std::string name);
 
-    bool RegisterLoggingBlocks();
-    void RegisterLogginBlock(bool & success, std::string name, float frequency);
-
-    bool StartLogging();
+    void StartLogging();
     void StopLogging();
     void DisableLogging();
 
-    void EnableSensorsLogging();
-    void DisableSensorsLogging();
 
-    void EnableBatteryLogging();
-    void DisableBatteryLogging();
-
-    void EnablePIDAttitudeLogging();
-    void DisablePIDAttitudeLogging();
-    void EnablePIDRateLogging();
-    void DisablePIDRateLogging();
-    void EnableControllerLogging();
-    void DisableControllerLogging();
-    void EnableKalman1Logging();
-    void DisableKalman1Logging();
-    void EnableKalman2Logging();
-    void DisableKalman2Logging();
-    void EnablePosCtrlLogging();
-    void DisablePosCtrlLogging();
-    void EnableAltitudeEstimationLogging();
-    void DisableAltitudeEstimationLogging();
-    void EnableMotorsLogging();
-    void DisableMotorsLogging();
-    void EnableSensorFusionLogging();
-    void DisableSensorFusionLogging();
-    void EnableCtrlTargetLogging();
-    void DisableCtrlTargetLogging();
-    void EnableStateEstimateLogging();
-    void DisableStateEstimateLogging();
 
 };
 

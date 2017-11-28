@@ -79,7 +79,7 @@ void CRTPPacket::PrintData(Data const & data)
 {
     for(std::size_t i = 0; i < data.size() ; ++i)
     {
-        std::cout << "i = " << i << " data = " << static_cast<int>(data.at(i)) << std::endl;
+        std::cout << "i = " << i << " data = " << static_cast<int>(data.at(i)) << " " << data.at(i)<< std::endl;
     }
 }
 

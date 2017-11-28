@@ -4,61 +4,379 @@
 #include "protocol.h"
 #include <map>
 #include "crtp_packet.h"
+
+
+TocLog::TocLog(RadioDongle & radioDongle) :
+    _radioDongle(radioDongle),
+    _itemCount(0),
+    _tocElements(),
+    _shared_impl(_itemCount, _tocElements, radioDongle )
+{
+    // Setup logging blocks
+    _loggingBlocks.at(0).name = "sensors";
+    _loggingBlocks.at(0).frequency = _frequency;
+    _loggingBlocks.at(0).elements_to_add =
+    {
+            "stabilizer.roll",
+            "stabilizer.pitch",
+            "stabilizer.yaw",
+            "stabilizer.thrust",
+            "acc.x",
+            "acc.y",
+            "acc.z",
+  //          "acc.zw",
+            "gyro.x",
+            "gyro.y",
+            "gyro.z",
+            "mag.x",
+            "mag.y",
+            "mag.z",
+            "baro.asl",
+            "baro.aslLong",
+            "baro.pressure",
+            "baro.temperature"
+};
+
+    _loggingBlocks.at(1).name = "battery";
+    _loggingBlocks.at(1).frequency = _frequency/8.0f;
+    _loggingBlocks.at(1).elements_to_add =
+    {
+            "pm.vbat",
+            "pm.state",
+            "radio.ssi"
+};
+
+
+    _loggingBlocks.at(2).name = "pid_attitude";
+    _loggingBlocks.at(2).frequency = _frequency;
+    _loggingBlocks.at(2).elements_to_add =
+    {
+            "pid_attitude.roll_outP",
+            "pid_attitude.roll_outI",
+            "pid_attitude.roll_outD",
+            "pid_attitude.pitch_outP",
+            "pid_attitude.pitch_outI",
+            "pid_attitude.pitch_outD",
+            "pid_attitude.yaw_outP",
+            "pid_attitude.yaw_outI",
+            "pid_attitude.yaw_outD"
+};
+
+
+    _loggingBlocks.at(3).name = "pid_rate";
+    _loggingBlocks.at(3).frequency = _frequency;
+    _loggingBlocks.at(3).elements_to_add =
+    {
+            "pid_rate.roll_outP",
+            "pid_rate.roll_outI",
+            "pid_rate.roll_outD",
+            "pid_rate.pitch_outP",
+            "pid_rate.pitch_outI",
+            "pid_rate.pitch_outD",
+            "pid_rate.yaw_outP",
+            "pid_rate.yaw_outI",
+            "pid_rate.yaw_outD"
+};
+
+    _loggingBlocks.at(4).name = "controller";
+    _loggingBlocks.at(4).frequency = _frequency;
+    _loggingBlocks.at(4).elements_to_add =
+    {
+            "controller.actuatorThrust",
+            "controller.rol",
+            "controller.pitch",
+            "controller.yaw",
+            "controller.rollRate",
+            "controller.pitchRate",
+            "controller.yawRate",
+            "controller.ctr_yaw"
+};
+
+    _loggingBlocks.at(5).name = "kalman_1";
+    _loggingBlocks.at(5).frequency = _frequency/2.0f;
+    _loggingBlocks.at(5).elements_to_add =
+    {
+            "kalman_states.ox",
+            "kalman_states.oy",
+            "kalman_states.vx",
+            "kalman_states.vy",
+            "kalman_pred.predNX",
+            "kalman_pred.predNY",
+            "kalman_pred.measNX",
+            "kalman_pred.measNY",
+            "kalman.inFlight",
+            "kalman.stateX",
+            "kalman.stateY",
+            "kalman.stateZ",
+            "kalman.statePX",
+            "kalman.statePY",
+            "kalman.statePZ",
+            "kalman.stateD0",
+            "kalman.stateD1",
+            "kalman.stateD2",
+            "kalman.stateSkew"
+};
+
+    _loggingBlocks.at(6).name = "kalman_2";
+    _loggingBlocks.at(6).frequency = _frequency/2.0f;
+    _loggingBlocks.at(6).elements_to_add =
+    {
+            "kalman.varX",
+            "kalman.varY",
+            "kalman.varZ",
+            "kalman.varPX",
+            "kalman.varPY",
+            "kalman.varPZ",
+            "kalman.varD0",
+            "kalman.varD1",
+            "kalman.varD2",
+            "kalman.varD3",
+            "kalman.varSkew",
+            "kalman.q0",
+            "kalman.q1",
+            "kalman.q2",
+            "kalman.q3"
+};
+
+
+
+    _loggingBlocks.at(7).name = "position_ctrl";
+    _loggingBlocks.at(7).frequency = _frequency/2.0f;
+    _loggingBlocks.at(7).elements_to_add =
+    {
+            "posCtl.targetVX",
+            "posCtl.targetVY",
+            "posCtl.targetVZ",
+            "posCtl.targetX",
+            "posCtl.targetY",
+            "posCtl.targetZ",
+            "posCtl.Xp",
+            "posCtl.Xi",
+            "posCtl.Xd",
+            "posCtl.Yp",
+            "posCtl.Yi",
+            "posCtl.Yd",
+            "posCtl.Zp",
+            "posCtl.Zi",
+            "posCtl.Zd",
+            "posCtl.VXp",
+            "posCtl.VXi",
+            "posCtl.VXd",
+            "posCtl.VZp",
+            "posCtl.VZi",
+            "posCtl.VZd"
+};
+
+    _loggingBlocks.at(8).name = "alt_est";
+    _loggingBlocks.at(8).frequency = _frequency/2.0f;
+    _loggingBlocks.at(8).elements_to_add =
+    {
+            "posEstimatorAlt.estimatedZ",
+            "posEstimatorAlt.estVZ",
+            "posEstimatorAlt.velocityZ"
+};
+
+    _loggingBlocks.at(9).name = "motors";
+    _loggingBlocks.at(9).frequency = _frequency/2.0f;
+    _loggingBlocks.at(9).elements_to_add =
+    {
+            "motor.m1",
+            "motor.m2",
+            "motor.m3",
+            "motor.m4",
+            "pwm.m1_pwm",
+            "pwm.m2_pwm",
+            "pwm.m3_pwm",
+            "pwm.m4_pwm"
+};
+
+    _loggingBlocks.at(10).name = "sensor_fusion";
+    _loggingBlocks.at(10).frequency = _frequency/2.0f;
+    _loggingBlocks.at(10).elements_to_add =
+    {
+            "sensorfusion6.qw",
+            "sensorfusion6.qx",
+            "sensorfusion6.qy",
+            "sensorfusion6.qz",
+            "sensorfusion6.gravityX",
+            "sensorfusion6.gravityY",
+            "sensorfusion6.gravityZ",
+            "sensorfusion6.accZbase",
+            "sensorfusion6.isInit",
+            "sensorfusion6.isCalibrated"
+};
+
+    _loggingBlocks.at(11).name = "ctrl_target";
+    _loggingBlocks.at(11).frequency = _frequency/2.0f;
+    _loggingBlocks.at(11).elements_to_add =
+    {
+            "ctrltarget.roll",
+            "ctrltarget.pitch",
+            "ctrltarget.yaw"
+};
+
+    _loggingBlocks.at(12).name = "state_estimate";
+    _loggingBlocks.at(12).frequency = _frequency/2.0f;
+    _loggingBlocks.at(12).elements_to_add =
+    {
+            "stateEstimate.x",
+            "stateEstimate.y",
+            "stateEstimate.z"
+};
+
+    for(uint8_t id = 0; id < _numLogBlocks; ++id)
+    {
+        _loggingBlocks.at(id).id = id;
+    }
+
+    QObject::connect(this, SIGNAL(RequestAppendNext()), this, SLOT(AppendNext()));
+}
+
+void TocLog::ResetLoggingBlocks()
+{
+    using channel = Logger::Control;
+    Data data =  {channel::Commands::Reset::id};
+    CRTPPacket packet(Logger::id, channel::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+    // There is no checking if all blocks are reset on the crazyflie.
+    // Assume that this command never fails.
+
+    // Check all logging blocks have stat idle
+    for(auto & block : _loggingBlocks)
+    {
+        block.state = LoggingBlock::State::idle;
+    }
+}
+
 bool TocLog::CreateLoggingBlocks()
 {
     // Register one by one logging block
-    // Find next unregistered loggin block
-    for(uint8_t id = 0; id < numLogBlocks; ++id)
+    for(auto const & block : _loggingBlocks)
     {
-        if(_loggingBlocks.at(id).state == LoggingBlock::State::idle)
+        if( block.state == LoggingBlock::State::idle)
         {
-            CreateLoggingBlock(id);
-            break;
+            CreateLoggingBlock(block);
+            return false;
         }
     }
-
-    return false;
+    // Prepare for appending blocks
+    _currentAppendinBlock = 2;
+    return true;
 }
 
-void TocLog::CreateLoggingBlock(uint8_t id)
+void TocLog::CreateLoggingBlock(LoggingBlock const & block)
 {
     using channel = Logger::Control;
 
     // Register new block
-    uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / _loggingBlocks.at(id).frequency);// The sampling rate is in 100us units
-    Data data =  {channel::Commands::CreateBlock::id, id, samplingRate};
+    uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / block.frequency);// The sampling rate is in 100us units
+    Data data =  {channel::Commands::CreateBlock::id, block.id, samplingRate};
     CRTPPacket packet(Logger::id, channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 
-    std::cout << "Request register logging Block " << static_cast<int>(id) <<  " " << _loggingBlocks.at(id).name << std::endl;
+    std::cout << "Request register logging Block " << static_cast<int>(block.id) <<  " " << block.name << std::endl;
+}
+// As the crazyflie does only acknowledge that a variable was added to a logging block, but not which one, we must make sure
+// that onyl one variable is requested to be added until the acknowledge has arrived. Then we can proceed.
+void TocLog::AppendNext()
+{
+    using channel = Logger::Control;
+    auto & block = _loggingBlocks.at(_currentAppendinBlock);
+    if(block.state == LoggingBlock::State::isCreated)
+    {
+        uint8_t nextItem = block.elements.size();
+        std::cout << "Appending Next log block nr = " << static_cast<int>(_currentAppendinBlock) << " item nr " << static_cast<int>(nextItem )<< std::endl;
+        bool isContained = false;
+        TOCElement & element = STLUtils::ElementForName(_tocElements, block.elements_to_add.at(nextItem), isContained);
+        if(isContained)
+        {
+            Data data = {channel::Commands::AppendBlock::id, block.id, static_cast<uint8_t>(element.type), element.id};
+            CRTPPacket packet(Logger::id, channel::id, std::move(data));
+            _radioDongle.RegisterPacketToSend(std::move(packet));
+            _elementToAdd = &element;
+        }
+        else
+        {
+            std::cout << "Oops, no element with this name exists: " << block.elements_to_add.at(nextItem) << std::endl;
+        }
+
+    }
+}
+
+bool TocLog::AppendLoggingBlocks()
+{
+
+//    for(LoggingBlock & block : _loggingBlocks)
+//    {
+//        if(block.state == LoggingBlock::State::isCreated)
+//        {
+//            AppendElements(block);
+//            return false;
+//        }
+//    }
+//    return true;
+}
+
+bool TocLog::AppendElements(LoggingBlock & block)
+{
+/*    using channel = Logger::Control;
+    uint8_t nextItem = block.elements.size();
+    bool isContained = false;
+    TOCElement & element = STLUtils::ElementForName(_tocElements, block.elements_to_add.at(nextItem), isContained);
+    if(isContained)
+    {
+        Data data = {channel::Commands::AppendBlock::id, block.id, static_cast<uint8_t>(element.type), element.id};
+        CRTPPacket packet(Logger::id, channel::id, std::move(data));
+        _radioDongle.RegisterPacketToSend(std::move(packet));
+        _elementToAdd = &element;
+        // Wait to receive answer packet!
+        // Must check received packet here, because in the received packet the element is lost
+        // Only send the same or no packet to Commands Channel during the wait for an answer.
+        //                if(_appendedBlockAnswer.size() > 3)
+        //                {
+        //                    if( _appendedBlockAnswer.at(channel::Commands::AppendBlock::AnswerByte::BlockId) == block.id &&
+        //                            _appendedBlockAnswer.at(channel::Commands::AppendBlock::AnswerByte::End) == 0)
+        //                    {
+        //                        block.elements.emplace_back(&element);
+        //                    }
+        //                    else
+        //                    {
+        //                        std::cout << "Oops, failed to append block" << std::endl;
+        //                    }
+    }
+    else
+    {
+        std::cout << "Oops, no element with this name exists: " << block.elements_to_add.at(nextItem) << std::endl;
+    }
+    return false*/;
 }
 
 bool TocLog::EnableLogging(LoggingBlock const & loggingBlock)
 {
-//    using channel = Logger::Control;
-//    uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / loggingBlock.frequency);// The sampling rate is in 100us units
-//    Data data =  {channel::Commands::StartBlock::id, loggingBlock.id, samplingRate};
+    //    using channel = Logger::Control;
+    //    uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / loggingBlock.frequency);// The sampling rate is in 100us units
+    //    Data data =  {channel::Commands::StartBlock::id, loggingBlock.id, samplingRate};
 
-//    CRTPPacket packet(Logger::id, channel::id, std::move(data));
+    //    CRTPPacket packet(Logger::id, channel::id, std::move(data));
 
-//    // Use SendAndReceive to make sure the crazyflie is ready.
-//    bool receivedPacketIsValid = false;
-//    // TODO SF
-//    //    _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-//    return receivedPacketIsValid;
+    //    // Use SendAndReceive to make sure the crazyflie is ready.
+    //    bool receivedPacketIsValid = false;
+    //    // TODO SF
+    //    //    _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
+    //    return receivedPacketIsValid;
 }
 
 bool TocLog::UnregisterLoggingBlock(std::string name)
 {
-//    bool isContained;
+    //    bool isContained;
 
-//    auto const & logBlock = STLUtils::ElementForName(_loggingBlocks, name, isContained);
-//    if(isContained)
-//    {
-//        return UnregisterLoggingBlockID(logBlock.id);
-//    }
+    //    auto const & logBlock = STLUtils::ElementForName(_loggingBlocks, name, isContained);
+    //    if(isContained)
+    //    {
+    //        return UnregisterLoggingBlockID(logBlock.id);
+    //    }
 
-//    return false;
+    //    return false;
 }
 
 bool TocLog::UnregisterLoggingBlockID(uint8_t id)
@@ -73,40 +391,49 @@ bool TocLog::UnregisterLoggingBlockID(uint8_t id)
 }
 
 
-bool TocLog::StartLogging(std::string name, std::string blockName)
+bool TocLog::StartLoggingBlocks()
 {
-//    using channel = Logger::Control;
-//    bool isContained;
-//    LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
-//    if(isContained)
-//    {
-//        TOCElement & element = STLUtils::ElementForName(_elements, name, isContained);
-//        if(isContained)
-//        {
-//            Data data = {channel::Commands::AppendBlock::id, logBlock.id, static_cast<uint8_t>(element.type), element.id};
-//            CRTPPacket packet(Logger::id, channel::id, std::move(data));
-//            _radioDongle.RegisterPacketToSend(std::move(packet));
-//            //            bool receivedPacketIsValid  = false;
-//            //            auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-//            //            auto const & dataReceived = received->GetData();
-//            //            if(receivedPacketIsValid && dataReceived.size() > 3)
-//            //            {
-//            //                if( dataReceived.at(channel::Commands::AppendBlock::CmdID) == channel::Commands::AppendBlock::id &&
-//            //                     dataReceived.at(channel::Commands::AppendBlock::BlockId) == logBlock.id &&
-//            //                     dataReceived.at(channel::Commands::AppendBlock::End) == 0)
-//            //                {
-//            //                    logBlock.elements.emplace_back(&element);
-//            //                    return true;
-//            //                }
-//            //                else
-//            //                {
-//            //                    std::cout << dataReceived.at(channel::Commands::AppendBlock::End) << std::endl;
-//            //                }
-//            //            }
-//        }
-//    }
+
+}
+
+bool TocLog::StartLogging(std::string name)
+{
+    //    using channel = Logger::Control;
+    //    bool isContained;
+    //    LoggingBlock & logBlock = STLUtils::ElementForName(_loggingBlocks, blockName, isContained);
+    //    if(isContained)
+    //    {
+    //        TOCElement & element = STLUtils::ElementForName(_elements, name, isContained);
+    //        if(isContained)
+    //        {
+    //            Data data = {channel::Commands::AppendBlock::id, logBlock.id, static_cast<uint8_t>(element.type), element.id};
+    //            CRTPPacket packet(Logger::id, channel::id, std::move(data));
+    //            _radioDongle.RegisterPacketToSend(std::move(packet));
+    //            //            bool receivedPacketIsValid  = false;
+    //            //            auto received = _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
+    //            //            auto const & dataReceived = received->GetData();
+    //            //            if(receivedPacketIsValid && dataReceived.size() > 3)
+    //            //            {
+    //            //                if( dataReceived.at(channel::Commands::AppendBlock::CmdID) == channel::Commands::AppendBlock::id &&
+    //            //                     dataReceived.at(channel::Commands::AppendBlock::BlockId) == logBlock.id &&
+    //            //                     dataReceived.at(channel::Commands::AppendBlock::End) == 0)
+    //            //                {
+    //            //                    logBlock.elements.emplace_back(&element);
+    //            //                    return true;
+    //            //                }
+    //            //                else
+    //            //                {
+    //            //                    std::cout << dataReceived.at(channel::Commands::AppendBlock::End) << std::endl;
+    //            //                }
+    //            //            }
+    //        }
+    //    }
 
     return false;
+}
+bool TocLog::StopLogging(std::string name)
+{
+
 }
 
 std::map<ElementType, int> typeToInt =
@@ -133,7 +460,7 @@ void TocLog::ProcessLogPackets(std::vector<CRTPPacket> const & packets)
         int blockID = data.at(Logger::Data::AnswerByte::Blockid);
         const Data logdataVect(data.begin() + Logger::Data::AnswerByte::LogValues, data.end());
 
-        if(blockID >=0 && blockID < numLogBlocks)
+        if(blockID >=0 && blockID < _numLogBlocks)
         {
             int offset = 0;
             // Distribute the content of the packet to the toc elements that are in the logging block.
@@ -150,7 +477,7 @@ void TocLog::ProcessLogPackets(std::vector<CRTPPacket> const & packets)
 float TocLog::Value(std::string name)
 {
     bool found;
-    auto & result = STLUtils::ElementForName(_elements, name, found);
+    auto & result = STLUtils::ElementForName(_tocElements, name, found);
     return (found ? result.value : 0);
 }
 
@@ -186,8 +513,8 @@ void TocLog::ReceivePacket(CRTPPacket packet)
         ProcessLoggerData(packet.GetData());
         break;
     default:
-//        std::cout << "Oops, channel not recognized for LogToc Control " << channel << std::endl;
-//        packet.Print();
+        //        std::cout << "Oops, channel not recognized for LogToc Control " << channel << std::endl;
+        //        packet.Print();
         break;
     }
 }
@@ -199,26 +526,63 @@ void TocLog::ProcessControlData(Data const & data)
     switch(commandID)
     {
     case channel::Commands::CreateBlock::id:
-         if( data.size() > 2)
-         {
-             CRTPPacket::PrintData(data);
-             if( data.at(channel::Commands::CreateBlock::AnswerByte::End) == 0)
-             {
-                 uint8_t id = data.at(channel::Commands::CreateBlock::AnswerByte::BlockId);
-                 if(id < numLogBlocks )
-                 {
-                     std::cout << "Registered logging block `" << _loggingBlocks.at(id).name << "'" << std::endl;
-                     _loggingBlocks.at(id).state = LoggingBlock::State::isCreated;
-                     //                    return EnableLogging(loggingBlock);
-                 }
-                 else
-                 {
-                     std::cout << "Oops, could not register logging block " << id << std::endl;
-                 }
-             }
-         }
+        if( data.size() > 2)
+        {
+            if( data.at(channel::Commands::CreateBlock::AnswerByte::End) == 0)
+            {
+                uint8_t id = data.at(channel::Commands::CreateBlock::AnswerByte::BlockId);
+                if(id < _numLogBlocks )
+                {
+                    std::cout << "Registered logging block `" << _loggingBlocks.at(id).name << "'" << std::endl;
+                    _loggingBlocks.at(id).state = LoggingBlock::State::isCreated;
+                    //                    return EnableLogging(loggingBlock);
+                }
+                else
+                {
+                    std::cout << "Oops, could not register logging block " << id << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "Loggin block is already registered??  "  << std::endl;
+                CRTPPacket::PrintData(data);
+            }
+        }
         break;
     case Logger::Control::Commands::AppendBlock::id:
+        if(data.size() > 3)
+        {
+            LoggingBlock & block = _loggingBlocks.at(_currentAppendinBlock);
+
+            if( data.at(channel::Commands::AppendBlock::AnswerByte::BlockId) == block.id &&
+                    data.at(channel::Commands::AppendBlock::AnswerByte::End) == 0)
+            {
+                block.elements.emplace_back(_elementToAdd);
+                 // Check all needed elements are added, then proceed to the next logging block
+                 if( block.elements.size() ==
+                         block.elements_to_add.size())
+                 {
+                     std::cout << "Block nr " << _currentAppendinBlock << "has all its elements\n";
+                     block.state = LoggingBlock::State::hasElements;
+                     ++_currentAppendinBlock;
+                 }
+                _elementToAdd = nullptr;
+                if(_currentAppendinBlock < _numLogBlocks)
+                {
+                    _appendingBlocksIsDone = false;
+                    emit RequestAppendNext();
+                }
+                else
+                {
+                    _appendingBlocksIsDone = true;
+                }
+            }
+            else
+            {
+                std::cout << "Oops, failed to append block" << std::endl;
+                emit RequestAppendNext();
+            }
+        }
         break;
     case Logger::Control::Commands::DeleteBlock::id:
         break;
@@ -227,6 +591,7 @@ void TocLog::ProcessControlData(Data const & data)
     case Logger::Control::Commands::StopBlock::id:
         break;
     case Logger::Control::Commands::Reset::id:
+        // Note: There is no answer the crazyfly sends back in this case.
         break;
     default:
         std::cout << "Oops, command not recognized for LogToc Control " << commandID << std::endl;

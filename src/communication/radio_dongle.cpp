@@ -501,12 +501,12 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     {
     case Console::id:
     {       // Console
-        //                std::cout << "Console text: ";
-        //                for(auto const & element : data)
-        //                {
-        //                    std::cout << static_cast<char>(element);
-        //                }
-        //                std::cout << std::endl;
+//        std::cout << "Console text: ";
+//        for(auto const & element : packet.GetData())
+//        {
+//            std::cout << static_cast<char>(element);
+//        }
+//        std::cout << std::endl;
         break;
     }
 
