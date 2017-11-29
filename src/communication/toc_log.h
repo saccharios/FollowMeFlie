@@ -47,36 +47,26 @@ public:
     void ProcessLogPackets(std::vector<CRTPPacket> const & packets);
     void ResetLoggingBlocks();
     bool CreateLoggingBlocks();
-    bool AppendLoggingBlocks();
-    bool StartLoggingBlocks();
+    void AppendLoggingBlocks();
 
-    bool UnregisterLoggingBlock(std::string name);
-
-
-    bool StartLogging(std::string name);
-    bool StopLogging(std::string name);
+    void EnableLogging(std::string name);
+    void DisableLogging(std::string name);
 
     float Value(std::string name);
 
     std::vector<TOCElement> const & GetElements() const {return _tocElements;}
     bool AppendingBlocksIsDone() {return (_appendingState == AppendState::DONE);}
 
-signals:
-    RequestAppendNext();
 public slots:
     void ReceivePacket(CRTPPacket packet);
-    void AppendNext();
 
 private:
-    std::string ExtractName(Data const & data);
-    bool AddElement( sptrPacket && packet);
-    bool EnableLogging(LoggingBlock const & loggingBlock);
-    bool UnregisterLoggingBlockID(uint8_t id);
+    void EnableLogging(LoggingBlock const & loggingBlock);
 
     RadioDongle & _radioDongle;
     unsigned int _itemCount;
     std::vector<TOCElement> _tocElements;
-    static constexpr unsigned int _numLogBlocks = 13u;
+    static constexpr unsigned int _numLogBlocks = 1u;
     static constexpr float _frequency = 1000.0f; // 1000.0
     std::array<LoggingBlock, _numLogBlocks> _loggingBlocks;
     TOCShared<Logger::id, Logger::Access> _shared_impl;

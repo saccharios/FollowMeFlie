@@ -23,7 +23,7 @@ Crazyflie::Crazyflie(RadioDongle & radioDongle) :
 
 Crazyflie::~Crazyflie()
 {
-    StopLogging();
+    DisableLogging();
 }
 // Runs on 10ms.
 void Crazyflie::Update()
@@ -105,17 +105,14 @@ void Crazyflie::Update()
         _logger.AppendLoggingBlocks();
         if(_logger.AppendingBlocksIsDone())
         {
-            //_state = State::START_LOGGERS;
+            _state = State::START_LOGGERS;
         }
         break;
     }
     case State::START_LOGGERS:
     {
-        bool success = _logger.StartLoggingBlocks();
-        if(success)
-        {
-            _state = State::ZERO_MEASUREMENTS;
-        }
+        EnableLogging();
+        _state = State::ZERO_MEASUREMENTS;
         break;
     }
     case State::ZERO_MEASUREMENTS:
@@ -337,38 +334,38 @@ float Crazyflie::GetSensorValue(std::string strName)
 }
 
 
-void Crazyflie::StartLogging()
+void Crazyflie::EnableLogging()
 {
-    _logger.StartLogging("sensors");
-    _logger.StartLogging("battery");
-    _logger.StartLogging("pid_attitude");
-    _logger.StartLogging("pid_rate");
-    _logger.StartLogging("controller");
-    _logger.StartLogging("kalman_1");
-    _logger.StartLogging("kalman_2");
-    _logger.StartLogging("position_ctrl");
-    _logger.StartLogging("alt_est");
-    _logger.StartLogging("motors");
-    _logger.StartLogging("sensor_fusion");
-    _logger.StartLogging("ctrl_target");
-    _logger.StartLogging("state_estimate");
+    _logger.EnableLogging("sensors");
+    _logger.EnableLogging("battery");
+    _logger.EnableLogging("pid_attitude");
+    _logger.EnableLogging("pid_rate");
+    _logger.EnableLogging("controller");
+    _logger.EnableLogging("kalman_1");
+    _logger.EnableLogging("kalman_2");
+    _logger.EnableLogging("position_ctrl");
+    _logger.EnableLogging("alt_est");
+    _logger.EnableLogging("motors");
+    _logger.EnableLogging("sensor_fusion");
+    _logger.EnableLogging("ctrl_target");
+    _logger.EnableLogging("state_estimate");
 }
 
-void Crazyflie::StopLogging()
+void Crazyflie::DisableLogging()
 {
-    _logger.StopLogging("sensors");
-    _logger.StopLogging("battery");
-    _logger.StopLogging("pid_attitude");
-    _logger.StopLogging("pid_rate");
-    _logger.StopLogging("controller");
-    _logger.StopLogging("kalman_1");
-    _logger.StopLogging("kalman_2");
-    _logger.StopLogging("position_ctrl");
-    _logger.StopLogging("alt_est");
-    _logger.StopLogging("motors");
-    _logger.StopLogging("sensor_fusion");
-    _logger.StopLogging("ctrl_target");
-    _logger.StopLogging("state_estimate");
+    _logger.DisableLogging("sensors");
+    _logger.DisableLogging("battery");
+    _logger.DisableLogging("pid_attitude");
+    _logger.DisableLogging("pid_rate");
+    _logger.DisableLogging("controller");
+    _logger.DisableLogging("kalman_1");
+    _logger.DisableLogging("kalman_2");
+    _logger.DisableLogging("position_ctrl");
+    _logger.DisableLogging("alt_est");
+    _logger.DisableLogging("motors");
+    _logger.DisableLogging("sensor_fusion");
+    _logger.DisableLogging("ctrl_target");
+    _logger.DisableLogging("state_estimate");
 }
 
 

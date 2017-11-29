@@ -185,11 +185,7 @@ private:
     void UpateSensorValues();
     float GetSensorValue(std::string name);
 
-    void StartLogging();
-    void StopLogging();
+    void EnableLogging();
     void DisableLogging();
-
-
-
 };
 
