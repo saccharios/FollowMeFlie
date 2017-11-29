@@ -95,7 +95,6 @@ void Crazyflie::Update()
         bool success = _logger.CreateLoggingBlocks();
         if(success)
         {
-            _logger.AppendNext(); // Start the appending sequence
             _state = State::APPEND_LOGGERS;
         }
         break;
@@ -103,11 +102,12 @@ void Crazyflie::Update()
     case State::APPEND_LOGGERS:
     {
         // Waits until the appending sequence is done.
-//        if(AppendingBlocksIsDone())
-//        {
-//            _state = State::START_LOGGERS;
-//        }
-//        break;
+        _logger.AppendLoggingBlocks();
+        if(_logger.AppendingBlocksIsDone())
+        {
+            //_state = State::START_LOGGERS;
+        }
+        break;
     }
     case State::START_LOGGERS:
     {

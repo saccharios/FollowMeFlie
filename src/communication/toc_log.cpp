@@ -24,7 +24,7 @@ TocLog::TocLog(RadioDongle & radioDongle) :
             "acc.x",
             "acc.y",
             "acc.z",
-  //          "acc.zw",
+            "acc.zw",
             "gyro.x",
             "gyro.y",
             "gyro.z",
@@ -229,7 +229,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
         _loggingBlocks.at(id).id = id;
     }
 
-    QObject::connect(this, SIGNAL(RequestAppendNext()), this, SLOT(AppendNext()));
 }
 
 void TocLog::ResetLoggingBlocks()
@@ -260,7 +259,7 @@ bool TocLog::CreateLoggingBlocks()
         }
     }
     // Prepare for appending blocks
-    _currentAppendinBlock = 2;
+    _currentAppendingBlock = 2;
     return true;
 }
 
@@ -281,11 +280,11 @@ void TocLog::CreateLoggingBlock(LoggingBlock const & block)
 void TocLog::AppendNext()
 {
     using channel = Logger::Control;
-    auto & block = _loggingBlocks.at(_currentAppendinBlock);
+    auto & block = _loggingBlocks.at(_currentAppendingBlock);
     if(block.state == LoggingBlock::State::isCreated)
     {
         uint8_t nextItem = block.elements.size();
-        std::cout << "Appending Next log block nr = " << static_cast<int>(_currentAppendinBlock) << " item nr " << static_cast<int>(nextItem )<< std::endl;
+        std::cout << "Appending Next log block nr = " << static_cast<int>(_currentAppendingBlock) << " item nr " << static_cast<int>(nextItem )<< std::endl;
         bool isContained = false;
         TOCElement & element = STLUtils::ElementForName(_tocElements, block.elements_to_add.at(nextItem), isContained);
         if(isContained)
@@ -305,16 +304,100 @@ void TocLog::AppendNext()
 
 bool TocLog::AppendLoggingBlocks()
 {
-
-//    for(LoggingBlock & block : _loggingBlocks)
-//    {
-//        if(block.state == LoggingBlock::State::isCreated)
-//        {
-//            AppendElements(block);
-//            return false;
-//        }
-//    }
-//    return true;
+    using channel = Logger::Control;
+    static uint32_t wait_counter = 0;
+    static uint32_t num_retries = 0;
+    switch(_appendingState)
+    {
+    case AppendState::IDLE:
+    {
+        _currentAppendingBlock = 0;
+        _currentAppendingElement = 0;
+        _appendingState = AppendState::REQUEST_ITEM;
+        break;
+    }
+    case AppendState::REQUEST_ITEM:
+    {
+        LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
+        std::cout << "Enter Request item block nr = " << _currentAppendingBlock << " item nr " << _currentAppendingElement << " of "<<block.elements_to_add.size() << std::endl;
+        if(block.state == LoggingBlock::State::isCreated)
+        {
+            bool isContained = false;
+            TOCElement & element = STLUtils::ElementForName(_tocElements, block.elements_to_add.at(_currentAppendingElement), isContained);
+            if(isContained)
+            {
+                Data data = {channel::Commands::AppendBlock::id, block.id, static_cast<uint8_t>(element.type), element.id};
+                CRTPPacket packet(Logger::id, channel::id, std::move(data));
+                _radioDongle.RegisterPacketToSend(std::move(packet));
+                _elementToAdd = &element;
+                _appendingState = AppendState::WAIT_ANSWER;
+                wait_counter = 0;
+                std::cout << "Request sent\n";
+            }
+            else
+            {
+                _appendingState = AppendState::REQUEST_ITEM;
+                std::cout << "Oops, no element with this name exists: " << block.elements_to_add.at(_currentAppendingElement) << std::endl;
+                ++_currentAppendingElement;
+                if(_currentAppendingElement >=  block.elements_to_add.size() )
+                {
+                    _currentAppendingElement = 0;
+                    ++_currentAppendingBlock;
+                    if(_currentAppendingBlock >= _numLogBlocks )
+                    {
+                        _appendingState = AppendState::DONE;
+                    }
+                }
+            }
+        }
+        break;
+    }
+    case AppendState::WAIT_ANSWER:
+    {
+        LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
+        if(_elementToAdd == nullptr)
+        {
+            _appendingState = AppendState::PREPARE_NEXT;
+        }
+        ++wait_counter;
+        if(wait_counter  == 10)
+        {
+            ++num_retries;
+            if(num_retries > 4)
+            {
+                std::cout << "Skipping item " << block.elements_to_add.at(_currentAppendingElement) << " of block " << block.name << std::endl;
+                _appendingState = AppendState::PREPARE_NEXT;
+            }
+            else
+            {
+                _appendingState = AppendState::REQUEST_ITEM;
+            }
+        }
+        break;
+    }
+    case AppendState::PREPARE_NEXT:
+    {
+         LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
+         _appendingState = AppendState::REQUEST_ITEM;
+        ++_currentAppendingElement;
+        if(_currentAppendingElement >=  block.elements_to_add.size()  )
+        {
+            std::cout << "Block nr " << _currentAppendingBlock << " has all its elements\n";
+            block.state = LoggingBlock::State::hasElements;
+            _currentAppendingElement = 0;
+            ++_currentAppendingBlock;
+            if(_currentAppendingBlock >= _numLogBlocks )
+            {
+                _appendingState = AppendState::DONE;
+            }
+        }
+        break;
+    }
+    case AppendState::DONE:
+    {
+        break;
+    }
+    }
 }
 
 bool TocLog::AppendElements(LoggingBlock & block)
@@ -535,7 +618,6 @@ void TocLog::ProcessControlData(Data const & data)
                 {
                     std::cout << "Registered logging block `" << _loggingBlocks.at(id).name << "'" << std::endl;
                     _loggingBlocks.at(id).state = LoggingBlock::State::isCreated;
-                    //                    return EnableLogging(loggingBlock);
                 }
                 else
                 {
@@ -550,37 +632,23 @@ void TocLog::ProcessControlData(Data const & data)
         }
         break;
     case Logger::Control::Commands::AppendBlock::id:
-        if(data.size() > 3)
+        if(_appendingState == AppendState::WAIT_ANSWER)
         {
-            LoggingBlock & block = _loggingBlocks.at(_currentAppendinBlock);
-
-            if( data.at(channel::Commands::AppendBlock::AnswerByte::BlockId) == block.id &&
-                    data.at(channel::Commands::AppendBlock::AnswerByte::End) == 0)
+            if((data.size() > 3) && (_elementToAdd != nullptr))
             {
-                block.elements.emplace_back(_elementToAdd);
-                 // Check all needed elements are added, then proceed to the next logging block
-                 if( block.elements.size() ==
-                         block.elements_to_add.size())
-                 {
-                     std::cout << "Block nr " << _currentAppendinBlock << "has all its elements\n";
-                     block.state = LoggingBlock::State::hasElements;
-                     ++_currentAppendinBlock;
-                 }
-                _elementToAdd = nullptr;
-                if(_currentAppendinBlock < _numLogBlocks)
+                LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
+
+                if( data.at(channel::Commands::AppendBlock::AnswerByte::BlockId) == block.id &&
+                        data.at(channel::Commands::AppendBlock::AnswerByte::End) == 0)
                 {
-                    _appendingBlocksIsDone = false;
-                    emit RequestAppendNext();
+                    std::cout << "Appending " <<_elementToAdd->name << " to block " << block.name << std::endl;
+                    block.elements.emplace_back(_elementToAdd);
+                    _elementToAdd = nullptr;
                 }
                 else
                 {
-                    _appendingBlocksIsDone = true;
+                    std::cout << "Oops, failed to append block" << std::endl;
                 }
-            }
-            else
-            {
-                std::cout << "Oops, failed to append block" << std::endl;
-                emit RequestAppendNext();
             }
         }
         break;

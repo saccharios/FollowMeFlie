@@ -28,6 +28,15 @@ class TocLog : public QObject
         std::vector<std::string> elements_to_add;
     };
 
+    enum class AppendState
+    {
+        IDLE = 0,
+        REQUEST_ITEM = 1,
+        WAIT_ANSWER = 2,
+        PREPARE_NEXT = 3,
+        DONE = 4
+    };
+
 public:
     TocLog(RadioDongle & radioDongle);
 
@@ -50,7 +59,7 @@ public:
     float Value(std::string name);
 
     std::vector<TOCElement> const & GetElements() const {return _tocElements;}
-    bool AppendingBlocksIsDone() {return _appendingBlocksIsDone;}
+    bool AppendingBlocksIsDone() {return (_appendingState == AppendState::DONE);}
 
 signals:
     RequestAppendNext();
@@ -72,9 +81,10 @@ private:
     std::array<LoggingBlock, _numLogBlocks> _loggingBlocks;
     TOCShared<Logger::id, Logger::Access> _shared_impl;
 
-    uint8_t  _currentAppendinBlock;
+    uint32_t  _currentAppendingBlock;
+    uint32_t  _currentAppendingElement;
     TOCElement* _elementToAdd;
-    bool _appendingBlocksIsDone;
+    AppendState _appendingState = AppendState::IDLE;
 
     void ProcessControlData(Data const & data);
     void ProcessLoggerData(Data const & data);
