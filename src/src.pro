@@ -33,7 +33,8 @@ HEADERS  += \
     communication/crtp_packet.h \
     communication/crazy_flie.h \
     communication/radio_dongle.h \
-    control/double_buffer.h
+    control/double_buffer.h \
+    communication/error_codes.h
 
 SOURCES += \
     math/lowpass.cpp \

@@ -49,8 +49,8 @@ public:
     bool CreateLoggingBlocks();
     void AppendLoggingBlocks();
 
-    void EnableLogging(std::string name);
-    void DisableLogging(std::string name);
+    bool EnableLogging();
+    void DisableLogging();
 
     float Value(std::string name);
 
@@ -61,12 +61,13 @@ public slots:
     void ReceivePacket(CRTPPacket packet);
 
 private:
-    void EnableLogging(LoggingBlock const & loggingBlock);
+    void EnableLogging(LoggingBlock  & block);
+    void DisableLogging(LoggingBlock const & block);
 
     RadioDongle & _radioDongle;
     unsigned int _itemCount;
     std::vector<TOCElement> _tocElements;
-    static constexpr unsigned int _numLogBlocks = 1u;
+    static constexpr unsigned int _numLogBlocks = 16u;
     static constexpr float _frequency = 1000.0f; // 1000.0
     std::array<LoggingBlock, _numLogBlocks> _loggingBlocks;
     TOCShared<Logger::id, Logger::Access> _shared_impl;

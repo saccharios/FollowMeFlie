@@ -23,7 +23,7 @@ Crazyflie::Crazyflie(RadioDongle & radioDongle) :
 
 Crazyflie::~Crazyflie()
 {
-    DisableLogging();
+    // TODO SF Stop logging and reset everything on the crazyflie.
 }
 // Runs on 10ms.
 void Crazyflie::Update()
@@ -111,8 +111,11 @@ void Crazyflie::Update()
     }
     case State::START_LOGGERS:
     {
-        EnableLogging();
-        _state = State::ZERO_MEASUREMENTS;
+        bool success = _logger.EnableLogging();
+        if(success)
+        {
+            _state = State::ZERO_MEASUREMENTS;
+        }
         break;
     }
     case State::ZERO_MEASUREMENTS:
@@ -332,42 +335,6 @@ float Crazyflie::GetSensorValue(std::string strName)
 {
     return _logger.Value(strName);
 }
-
-
-void Crazyflie::EnableLogging()
-{
-    _logger.EnableLogging("sensors");
-    _logger.EnableLogging("battery");
-    _logger.EnableLogging("pid_attitude");
-    _logger.EnableLogging("pid_rate");
-    _logger.EnableLogging("controller");
-    _logger.EnableLogging("kalman_1");
-    _logger.EnableLogging("kalman_2");
-    _logger.EnableLogging("position_ctrl");
-    _logger.EnableLogging("alt_est");
-    _logger.EnableLogging("motors");
-    _logger.EnableLogging("sensor_fusion");
-    _logger.EnableLogging("ctrl_target");
-    _logger.EnableLogging("state_estimate");
-}
-
-void Crazyflie::DisableLogging()
-{
-    _logger.DisableLogging("sensors");
-    _logger.DisableLogging("battery");
-    _logger.DisableLogging("pid_attitude");
-    _logger.DisableLogging("pid_rate");
-    _logger.DisableLogging("controller");
-    _logger.DisableLogging("kalman_1");
-    _logger.DisableLogging("kalman_2");
-    _logger.DisableLogging("position_ctrl");
-    _logger.DisableLogging("alt_est");
-    _logger.DisableLogging("motors");
-    _logger.DisableLogging("sensor_fusion");
-    _logger.DisableLogging("ctrl_target");
-    _logger.DisableLogging("state_estimate");
-}
-
 
 
 Eigen::Vector3f Crazyflie::ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body)

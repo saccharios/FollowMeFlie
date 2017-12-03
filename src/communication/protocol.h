@@ -49,7 +49,7 @@ struct Logger
                 {
                     static constexpr uint8_t CmdID = 0;
                     static constexpr uint8_t BlockId = 1;
-                    static constexpr uint8_t End    = 2;
+                    static constexpr uint8_t ErrorCode    = 2;
                 };
 
             };
@@ -61,7 +61,7 @@ struct Logger
                 {
                     static constexpr uint8_t CmdID = 0;
                     static constexpr uint8_t BlockId = 1;
-                    static constexpr uint8_t End    = 2;
+                    static constexpr uint8_t ErrorCode    = 2;
                 };
             };
 
