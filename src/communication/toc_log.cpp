@@ -14,7 +14,7 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 {
     // Setup logging blocks
     _loggingBlocks.at(0).name = "block_0";
-    _loggingBlocks.at(0).frequency = _frequency;
+
     _loggingBlocks.at(0).elements_to_add =
     {
             "stabilizer.roll",
@@ -26,7 +26,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(1).name = "block_1";
-    _loggingBlocks.at(1).frequency = _frequency/8.0f;
     _loggingBlocks.at(1).elements_to_add =
     {
             "gyro.x",
@@ -38,7 +37,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 
 
     _loggingBlocks.at(2).name = "block_2";
-    _loggingBlocks.at(2).frequency = _frequency;
     _loggingBlocks.at(2).elements_to_add =
     {
             "mag.z",
@@ -52,7 +50,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 
 
     _loggingBlocks.at(3).name = "block_3";
-    _loggingBlocks.at(3).frequency = _frequency;
     _loggingBlocks.at(3).elements_to_add =
     {
 
@@ -64,7 +61,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(4).name = "block_4";
-    _loggingBlocks.at(4).frequency = _frequency;
     _loggingBlocks.at(4).elements_to_add =
     {
             "pid_attitude.pitch_outD",
@@ -75,7 +71,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(5).name = "block_5";
-    _loggingBlocks.at(5).frequency = _frequency/2.0f;
     _loggingBlocks.at(5).elements_to_add =
     {
             "pid_rate.roll_outI",
@@ -105,7 +100,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(6).name = "block_6";
-    _loggingBlocks.at(6).frequency = _frequency/2.0f;
     _loggingBlocks.at(6).elements_to_add =
     {
             "pid_rate.yaw_outP",
@@ -133,7 +127,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 
 
     _loggingBlocks.at(7).name = "block_7";
-    _loggingBlocks.at(7).frequency = _frequency/2.0f;
     _loggingBlocks.at(7).elements_to_add =
     {
             "controller.pitch",
@@ -144,7 +137,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(8).name = "block_8";
-    _loggingBlocks.at(8).frequency = _frequency/2.0f;
     _loggingBlocks.at(8).elements_to_add =
     {
             "controller.ctr_yaw",
@@ -156,7 +148,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(9).name = "block_9";
-    _loggingBlocks.at(9).frequency = _frequency/2.0f;
     _loggingBlocks.at(9).elements_to_add =
     {
             "posCtl.targetZ",
@@ -167,7 +158,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(10).name = "block_10";
-    _loggingBlocks.at(10).frequency = _frequency/2.0f;
     _loggingBlocks.at(10).elements_to_add =
     {
             "posCtl.Yi",
@@ -178,7 +168,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(11).name = "block_11";
-    _loggingBlocks.at(11).frequency = _frequency/2.0f;
     _loggingBlocks.at(11).elements_to_add =
     {
             "posCtl.VXp",
@@ -189,7 +178,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 };
 
     _loggingBlocks.at(12).name = "block_12";
-    _loggingBlocks.at(12).frequency = _frequency/2.0f;
     _loggingBlocks.at(12).elements_to_add =
     {
             "posCtl.VZd",
@@ -201,7 +189,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 
 };
     _loggingBlocks.at(13).name = "block_13";
-    _loggingBlocks.at(13).frequency = _frequency/2.0f;
     _loggingBlocks.at(13).elements_to_add =
     {
             "motor.m2",
@@ -213,7 +200,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 
 };
     _loggingBlocks.at(14).name = "block_14";
-    _loggingBlocks.at(14).frequency = _frequency/2.0f;
     _loggingBlocks.at(14).elements_to_add =
     {
             "sensorfusion6.qy",
@@ -225,7 +211,6 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 
 };
     _loggingBlocks.at(15).name = "block_15";
-    _loggingBlocks.at(15).frequency = _frequency/2.0f;
     _loggingBlocks.at(15).elements_to_add =
     {
             "sensorfusion6.isInit",
@@ -240,6 +225,7 @@ TocLog::TocLog(RadioDongle & radioDongle) :
     for(uint8_t id = 0; id < _numLogBlocks; ++id)
     {
         _loggingBlocks.at(id).id = id;
+        _loggingBlocks.at(id).frequency = _frequency;
     }
 
 }
@@ -401,7 +387,7 @@ bool TocLog::EnableLogging()
 void TocLog::EnableLogging(LoggingBlock & block)
 {
         using channel = Logger::Control;
-        uint8_t samplingRate = static_cast<uint8_t>(1000.0 *10.0/ block.frequency);// The sampling rate is in 10ms units
+        uint8_t samplingRate = static_cast<uint8_t>(100.0/ block.frequency);// The sampling rate is in 10ms units
         Data data =  {channel::Commands::StartBlock::id, block.id, samplingRate};
 
         CRTPPacket packet(Logger::id, channel::id, std::move(data));

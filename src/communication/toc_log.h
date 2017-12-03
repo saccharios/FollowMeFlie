@@ -65,7 +65,7 @@ private:
     unsigned int _itemCount;
     std::vector<TOCElement> _tocElements;
     static constexpr unsigned int _numLogBlocks = 16u;
-    static constexpr float _frequency = 1000.0f; // Max frequency is 100.0 Hz
+    static constexpr float _frequency = 100.0f; // Max frequency is 100.0 Hz
     std::array<LoggingBlock, _numLogBlocks> _loggingBlocks;
     TOCShared<Logger::id, Logger::Access> _shared_impl;
 
