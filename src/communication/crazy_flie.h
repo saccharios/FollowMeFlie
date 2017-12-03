@@ -119,19 +119,14 @@ public:
 
    Eigen::Vector3f ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body);
 
-   std::vector<TOCElement> const & GetLogElements () const
+   TocLog const & GetLoggerTOC() const
    {
-       return _logger.GetElements();
+       return _logger;
    }
 
    TocLog & GetLoggerTOC()
    {
        return _logger;
-   }
-
-   std::vector<TOCElement> const & GetParameterElements() const
-   {
-       return _parameters.GetElements();
    }
 
    TocParameter const & GetParameterTOC() const
@@ -159,9 +154,6 @@ private:
     SetPoint _maxSetPoint;
 
     Velocity _velocity = {};
-    Acceleration _accelerationOffset = {};
-    SetPoint _setPointOffset = {};
-
 
     int _minThrust;
 
@@ -178,9 +170,8 @@ private:
 
     SensorValues _sensorValues;
 
-    bool SendSetpoint(SetPoint setPoint);
-
-    bool SendVelocityRef(Velocity velocity);
+    void SendSetpoint(SetPoint setPoint);
+    void SendVelocityRef(Velocity velocity);
 
     void UpateSensorValues();
     float GetSensorValue(std::string name);

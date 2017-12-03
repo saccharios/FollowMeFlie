@@ -512,14 +512,7 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
 
     case Logger::id:
     {
-        if(packet.GetChannel() == Logger::Data::id)
-        {
-            _loggingPackets.emplace_back(std::move(packet));
-        }
-        else
-        {
-            emit NewLoggerPacket(packet);
-        }
+        emit NewLoggerPacket(packet);
         break;
     }
 

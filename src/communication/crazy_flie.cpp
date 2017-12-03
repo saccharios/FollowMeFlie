@@ -121,16 +121,12 @@ void Crazyflie::Update()
     case State::ZERO_MEASUREMENTS:
     {
         // TODO SF : Remove this state
-        _logger.ProcessLogPackets(_radioDongle.PopLoggingPackets());
         // NOTE : ter;
         _state = State::NORMAL_OPERATION;
         break;
     }
     case State::NORMAL_OPERATION:
     {
-        // Shove over the sensor readings from the radio to the Logs TOC.
-        _logger.ProcessLogPackets(_radioDongle.PopLoggingPackets());
-
         if(_isSendingSetpoints)
         {
             // Send the current set point based on the previous calculations
@@ -167,7 +163,7 @@ void Crazyflie::Update()
     UpateSensorValues();
 }
 
-bool Crazyflie::SendSetpoint(SetPoint setPoint)
+void Crazyflie::SendSetpoint(SetPoint setPoint)
 {
     // In python client, this line implementes the x-mode
     auto roll = (setPoint.roll - setPoint.pitch) *SQRT2;
@@ -183,13 +179,10 @@ bool Crazyflie::SendSetpoint(SetPoint setPoint)
     data.insert(data.end(), thrustVect.begin(), thrustVect.end());
 
     CRTPPacket  packet(Commander::id, Commander::Setpoint::id, std::move(data));
-
-//    return _radioDongle.SendPacketAndCheck(std::move(packet));
     _radioDongle.RegisterPacketToSend(std::move(packet));
-    return false;
 }
 
-bool  Crazyflie::SendVelocityRef(Velocity velocity)
+void  Crazyflie::SendVelocityRef(Velocity velocity)
 {
     // TODO SF  also x -mode?
     Data data;
@@ -206,8 +199,6 @@ bool  Crazyflie::SendVelocityRef(Velocity velocity)
 
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::GenericSetpoint::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
-    return false;
-//    return _radioDongle.SendPacketAndCheck(std::move(packet));
 }
 
 
@@ -219,17 +210,17 @@ void Crazyflie::StartConnecting(bool enable)
 
 void Crazyflie::UpateSensorValues()
 {
-    _sensorValues.stabilizer.roll = GetSensorValue("stabilizer.roll") - _setPointOffset.roll;
-    _sensorValues.stabilizer.yaw= GetSensorValue("stabilizer.yaw") - _setPointOffset.yaw;
-    _sensorValues.stabilizer.pitch = GetSensorValue("stabilizer.pitch") - _setPointOffset.pitch;
-    _sensorValues.stabilizer.thrust = GetSensorValue("stabilizer.thrust") - _setPointOffset.thrust;
+    _sensorValues.stabilizer.roll = GetSensorValue("stabilizer.roll");
+    _sensorValues.stabilizer.yaw= GetSensorValue("stabilizer.yaw");
+    _sensorValues.stabilizer.pitch = GetSensorValue("stabilizer.pitch");
+    _sensorValues.stabilizer.thrust = GetSensorValue("stabilizer.thrust");
     _sensorValues.barometer.pressure = GetSensorValue("baro.pressure");
     _sensorValues.barometer.asl = GetSensorValue("baro.asl");
     _sensorValues.barometer.aslLong= GetSensorValue("baro.aslLong");
     _sensorValues.barometer.temperature = GetSensorValue("baro.temperature");
-    _sensorValues.acceleration.x = GetSensorValue("acc.x") - _accelerationOffset[0];
-    _sensorValues.acceleration.y = GetSensorValue("acc.y") - _accelerationOffset[1];
-    _sensorValues.acceleration.z = GetSensorValue("acc.z") - _accelerationOffset[2];
+    _sensorValues.acceleration.x = GetSensorValue("acc.x");
+    _sensorValues.acceleration.y = GetSensorValue("acc.y");
+    _sensorValues.acceleration.z = GetSensorValue("acc.z");
     _sensorValues.acceleration.zw = GetSensorValue("acc.zw");
     _sensorValues.battery.level = GetSensorValue("pm.vbat");
     _sensorValues.battery.state = GetSensorValue("pm.state");
@@ -303,15 +294,16 @@ bool Crazyflie::IsDisconnected()
 {
     return _state == State::ZERO;
 }
+
 bool Crazyflie::IsConnecting()
 {
     return !(IsDisconnected() || IsConnected());
 }
+
 bool Crazyflie::IsConnected()
 {
     return _state == State::NORMAL_OPERATION;
 }
-
 
 void Crazyflie::SetSendSetpoints(bool sendSetpoints)
 {

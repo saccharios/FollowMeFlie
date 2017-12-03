@@ -279,9 +279,7 @@ void TocLog::CreateLoggingBlock(LoggingBlock const & block)
     using channel = Logger::Control;
 
     // Register new block
-    uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / block.frequency);// The sampling rate is in 100us units
     Data data =  {channel::Commands::CreateBlock::id, block.id};
-//    Data data =  {channel::Commands::CreateBlock::id, block.id, samplingRate};
     CRTPPacket packet(Logger::id, channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
@@ -403,7 +401,7 @@ bool TocLog::EnableLogging()
 void TocLog::EnableLogging(LoggingBlock & block)
 {
         using channel = Logger::Control;
-        uint8_t samplingRate = static_cast<uint8_t>(1000.0*10.0 / block.frequency);// The sampling rate is in 100us units
+        uint8_t samplingRate = static_cast<uint8_t>(1000.0 *10.0/ block.frequency);// The sampling rate is in 10ms units
         Data data =  {channel::Commands::StartBlock::id, block.id, samplingRate};
 
         CRTPPacket packet(Logger::id, channel::id, std::move(data));
@@ -411,40 +409,15 @@ void TocLog::EnableLogging(LoggingBlock & block)
         block.state = LoggingBlock::State::isEnabled;
 }
 
-// TODO SF Add possibility to delete logging blocks
-//bool TocLog::UnregisterLoggingBlock(std::string name)
+//void TocLog::DisableLogging()
 //{
-    //    bool isContained;
-
-    //    auto const & logBlock = STLUtils::ElementForName(_loggingBlocks, name, isContained);
-    //    if(isContained)
-    //    {
-    //        return UnregisterLoggingBlockID(logBlock.id);
-    //    }
-
-    //    return false;
+//    // TODO SF, implement if required.
 //}
 
-//bool TocLog::UnregisterLoggingBlockID(uint8_t id)
+//void TocLog::DisableLogging(LoggingBlock const & loggingBlock)
 //{
-//    using channel = Logger::Control;
-//    Data data = {channel::Commands::DeleteBlock::id, static_cast<uint8_t>(id)};
-//    CRTPPacket packet(Logger::id, channel::id, std::move(data));
-//    bool receivedPacketIsValid = false;
-//    // TODO SF
-//    //    _radioDongle.SendAndReceive(std::move(packet), receivedPacketIsValid);
-//    return receivedPacketIsValid;
+//    // TODO SF, implement if required.
 //}
-
-void TocLog::DisableLogging()
-{
-    // TODO SF, implement.
-}
-
-void TocLog::DisableLogging(LoggingBlock const & loggingBlock)
-{
-
-}
 
 std::map<ElementType, int> typeToInt =
 {
@@ -456,33 +429,6 @@ std::map<ElementType, int> typeToInt =
     {ElementType::INT32, 4},
     {ElementType::FLOAT, 4}
 };
-
-void TocLog::ProcessLogPackets(std::vector<CRTPPacket> const & packets)
-{
-    for(auto const & packet : packets)
-    {
-        auto const & data = packet.GetData();
-        if(data.size() < Logger::Data::LogMinPacketSize)
-        {
-            std::cout << "Data packet not large enough!\n";
-            break;
-        }
-        uint32_t blockID = data.at(Logger::Data::AnswerByte::Blockid);
-        const Data logdataVect(data.begin() + Logger::Data::AnswerByte::LogValues, data.end());
-
-        if( (blockID < _numLogBlocks))
-        {
-            int offset = 0;
-            // Distribute the content of the packet to the toc elements that are in the logging block.
-            for(TOCElement* const & element : _loggingBlocks.at(blockID).elements)
-            {
-                _shared_impl.SetValueToElement(element, logdataVect, offset);
-                offset += typeToInt[element->type];
-            }
-        }
-
-    }
-}
 
 float TocLog::Value(std::string name)
 {
@@ -542,13 +488,8 @@ void TocLog::ProcessControlData(Data const & data)
             {
                 if(id < _numLogBlocks )
                 {
-                    std::cout << "Registered logging block `" << static_cast<int>(id) << "'" << std::endl;
+                    //std::cout << "Registered logging block `" << static_cast<int>(id) << "'" << std::endl;
                     _loggingBlocks.at(id).state = LoggingBlock::State::isCreated;
-                }
-                else
-                {
-                    // TODO SF, this case should never happen
-                    std::cout << "Oops, could not register logging block " << static_cast<int>(id) << std::endl;
                 }
                 break;
             }
@@ -605,11 +546,6 @@ void TocLog::ProcessControlData(Data const & data)
                         block.elements.emplace_back(_elementToAdd);
                         _elementToAdd = nullptr;
                     }
-                    else
-                    {
-                        // TODO SF, this case should never happen
-                        std::cout << "Oops, failed to append to block " << static_cast<int>(id) << " " << _elementToAdd->name << std::endl;
-                    }
                     break;
                 }
                 case CrazyflieErrors::BlockOrVariableNotFound:
@@ -654,7 +590,7 @@ void TocLog::ProcessControlData(Data const & data)
     case Logger::Control::Commands::StopBlock::id:
         break;
     case Logger::Control::Commands::Reset::id:
-        // Note: There is no answer the crazyfly sends back in this case.
+        // Note: There is no answer the crazyflie sends back in this case.
         break;
     default:
         std::cout << "Oops, command not recognized for LogToc Control " << commandID << std::endl;
@@ -663,8 +599,24 @@ void TocLog::ProcessControlData(Data const & data)
 
 }
 
-
 void TocLog::ProcessLoggerData(Data const & data)
 {
+    if(data.size() < Logger::Data::LogMinPacketSize)
+    {
+        std::cout << "Data packet not large enough!\n";
+        return;
+    }
+    uint32_t blockID = data.at(Logger::Data::AnswerByte::Blockid);
+    const Data logdataVect(data.begin() + Logger::Data::AnswerByte::LogValues, data.end());
 
+    if( (blockID < _numLogBlocks))
+    {
+        int offset = 0;
+        // Distribute the content of the packet to the toc elements that are in the logging block.
+        for(TOCElement* const & element : _loggingBlocks.at(blockID).elements)
+        {
+            _shared_impl.SetValueToElement(element, logdataVect, offset);
+            offset += typeToInt[element->type];
+        }
+    }
 }

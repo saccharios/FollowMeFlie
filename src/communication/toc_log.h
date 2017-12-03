@@ -40,17 +40,14 @@ class TocLog : public QObject
 public:
     TocLog(RadioDongle & radioDongle);
 
-    uint8_t GetPort() {return Logger::id;}
-
     bool Setup() {return _shared_impl.Setup();}
 
-    void ProcessLogPackets(std::vector<CRTPPacket> const & packets);
     void ResetLoggingBlocks();
     bool CreateLoggingBlocks();
     void AppendLoggingBlocks();
 
     bool EnableLogging();
-    void DisableLogging();
+//    void DisableLogging();
 
     float Value(std::string name);
 
@@ -62,13 +59,13 @@ public slots:
 
 private:
     void EnableLogging(LoggingBlock  & block);
-    void DisableLogging(LoggingBlock const & block);
+//    void DisableLogging(LoggingBlock const & block);
 
     RadioDongle & _radioDongle;
     unsigned int _itemCount;
     std::vector<TOCElement> _tocElements;
     static constexpr unsigned int _numLogBlocks = 16u;
-    static constexpr float _frequency = 1000.0f; // 1000.0
+    static constexpr float _frequency = 1000.0f; // Max frequency is 100.0 Hz
     std::array<LoggingBlock, _numLogBlocks> _loggingBlocks;
     TOCShared<Logger::id, Logger::Access> _shared_impl;
 
