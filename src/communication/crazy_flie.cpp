@@ -114,15 +114,8 @@ void Crazyflie::Update()
         bool success = _logger.EnableLogging();
         if(success)
         {
-            _state = State::ZERO_MEASUREMENTS;
+            _state = State::NORMAL_OPERATION;
         }
-        break;
-    }
-    case State::ZERO_MEASUREMENTS:
-    {
-        // TODO SF : Remove this state
-        // NOTE : ter;
-        _state = State::NORMAL_OPERATION;
         break;
     }
     case State::NORMAL_OPERATION:

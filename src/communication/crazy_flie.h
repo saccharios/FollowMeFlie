@@ -23,8 +23,7 @@ enum class State
     CREATE_LOGGERS = 4,
     APPEND_LOGGERS = 5,
     START_LOGGERS = 6,
-    ZERO_MEASUREMENTS = 7,
-    NORMAL_OPERATION = 8
+    NORMAL_OPERATION = 7
 };
 
 struct SetPoint

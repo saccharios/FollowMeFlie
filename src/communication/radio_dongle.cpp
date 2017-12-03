@@ -21,7 +21,6 @@ RadioDongle::RadioDongle() :
     _contCarrier(0),
     _deviceVersion(0.0f),
     _ackReceived(false),
-    _loggingPackets(),
     _radioIsConnected(false),
     _packetsToSend(),
     _packetsSending()
@@ -34,7 +33,6 @@ RadioDongle::~RadioDongle()
 {
     CloseDevice();
 
-    _loggingPackets.clear();
     if(_context)
     {
         libusb_exit(_context);
@@ -228,6 +226,7 @@ bool RadioDongle::ReadData(uint8_t* data, int maxLength, int & actualLength)
     {
     case 0:
         actualLength = actRead;
+        break;
     case LIBUSB_ERROR_TIMEOUT:
         actualLength = maxLength;
         break;
@@ -382,6 +381,7 @@ CRTPPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int totalLength)
 
     // Actual data starts at buffer[2]
     Data data;
+//    std::cout << "totalLength = " << totalLength << std::endl;
     for(int i = 2; i < totalLength+1; ++i)
     {
         data.push_back(buffer[i]);
@@ -399,13 +399,6 @@ bool RadioDongle::IsUsbConnectionOk()
 {
     libusb_device_descriptor descriptor;
     return (libusb_get_device_descriptor(_devDevice,	&descriptor) == 0);
-}
-
-std::vector<CRTPPacket> RadioDongle::PopLoggingPackets()
-{
-    std::vector<CRTPPacket> packets;
-    packets.swap(_loggingPackets);
-    return packets;
 }
 
 bool RadioDongle::RadioIsConnected() const
@@ -461,11 +454,6 @@ void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
     _packetsToSend.side_a().emplace_back(std::move(packet));
 }
 
-void RadioDongle::RegisterAnswerPacket()
-{
-
-}
-
 void RadioDongle::ReceivePacket()
 {
     if(!_radioIsConnected)
@@ -488,9 +476,6 @@ void RadioDongle::ReceivePacket()
 
         // Process the packe and distribute to ports + channels
         ProcessPacket(std::move(packet));
-
-
-        // Check packet is a requested answer
     }
 }
 
@@ -501,12 +486,18 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     {
     case Console::id:
     {       // Console
-//        std::cout << "Console text: ";
-//        for(auto const & element : packet.GetData())
+        std::cout << "Console text: ";
+//        for(uint8_t i = 0; i < std::min(static_cast<uint8_t>(packet.GetData().size()),static_cast<uint8_t>(31u)) ; ++i)
 //        {
-//            std::cout << static_cast<char>(element);
+//            std::cout << static_cast<char>(packet.GetData().at(i));
 //        }
-//        std::cout << std::endl;
+        for(auto const & element : packet.GetData())
+        {
+            std::cout << static_cast<char>(element);
+        }
+//        packet.Print();
+
+        std::cout << std::endl;
         break;
     }
 

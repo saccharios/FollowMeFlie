@@ -57,15 +57,12 @@ public:
     bool AckReceived();
     bool IsUsbConnectionOk();
 
-    std::vector<CRTPPacket> PopLoggingPackets();
-
     void SetRadioSettings(int index);
 
     bool RadioIsConnected() const;
 
     bool SendPacket(CRTPPacket && packet); // Call when a packet is requested to send
     void RegisterPacketToSend(CRTPPacket &&  packet);
-    void RegisterAnswerPacket();
     void ProcessPacket(CRTPPacket && packet);
     void CheckAnswerPacket();
 public slots:
@@ -90,7 +87,6 @@ private:
     int _contCarrier;
     float _deviceVersion;
     bool _ackReceived;
-    std::vector<CRTPPacket> _loggingPackets;
     bool _radioIsConnected;
 
     Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _packetsToSend;

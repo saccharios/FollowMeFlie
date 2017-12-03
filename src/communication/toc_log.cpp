@@ -579,7 +579,7 @@ void TocLog::ProcessControlData(Data const & data)
         // Note: There is no answer the crazyflie sends back in this case.
         break;
     default:
-        std::cout << "Oops, command not recognized for LogToc Control " << commandID << std::endl;
+        std::cout << "Oops, command not recognized for LogToc Control " << static_cast<int>(commandID) << std::endl;
         break;
     }
 
