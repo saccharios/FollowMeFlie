@@ -84,7 +84,8 @@ bool RadioDongle::OpenUSBDongle()
     CloseDevice();
     auto devices = ListDevices(0x1915, 0x7777);
 
-    if(devices.size() > 0) {
+    if(devices.size() > 0)
+    {
         // For now, just take the first device. Give it a second to
         // initialize the system permissions.
         sleep(1.0);
@@ -485,8 +486,8 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     switch(packet.GetPort() )
     {
     case Console::id:
-    {       // Console
-        if(packet.GetData() > 0)
+    {
+        if(packet.GetData().size() > 0)
         {
             std::cout << "Console text: ";
             for(auto const & element : packet.GetData())

@@ -2,13 +2,13 @@
 #include "math/types.h"
 #include <iostream>
 
-using Data = std::vector<uint8_t>; // TODO SF Why is this not recognized?
-
 
 // Convert to vector<uint8_t>
 template<typename T>
 Data ConvertTouint8_tVect(T element)
 {
+    Acceleration a;
+
     // Reinterpret element as array of 8-byte uint8_t
     uint8_t* uint8_t_array = reinterpret_cast<uint8_t *>(&element);
     // Create vector from the array
@@ -27,7 +27,7 @@ T ExtractData(Data const & data, int offset)
 {
 
     constexpr unsigned int typeLength = sizeof(T);
-    if(data.size() > offset + typeLength) // TODO SF >= or just > ?
+    if(data.size() >= offset + typeLength) // TODO SF >= or just > ?
     {
         T bits = 0;
         for(unsigned int i = 0; i < typeLength; ++i)

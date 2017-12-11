@@ -204,6 +204,7 @@ void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint
 
 void TocParameter::ProcessMiscData(Data const & data)
 {
+    Q_UNUSED(data);
     // TODO SF Implement
     std::cout << "Oops, Processing ParameterToc Misc packets is no implemented\n";
 }

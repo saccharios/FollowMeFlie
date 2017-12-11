@@ -1,13 +1,10 @@
 #pragma once
-// TODO SF Clean up includes
-#include <cstdio>
 #include "E:\Code\lib\libusb-1.0.21\include\libusb-1.0\libusb.h"
 #include <unistd.h>
-#include <iostream>
-#include <memory>
 #include "crtp_packet.h"
 #include <QObject>
 #include "control/double_buffer.h"
+
 class RadioDongle :  public QObject
 {
     Q_OBJECT

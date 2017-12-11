@@ -1,3 +1,4 @@
+#include "crtp_packet.h"
 #include <vector>
 #include <iostream>
 #include "math/types.h"
@@ -70,7 +71,10 @@ uint8_t CRTPPacket::GetChannel() const
 
 void CRTPPacket::Print() const
 {
-    std::cout << "Port = " << static_cast<int>(_port)<< " Channel = "  << static_cast<int>(_channel) << std::endl;
+    std::cout << "Port = " << static_cast<int>(_port)
+              << " Channel = "  << static_cast<int>(_channel)
+              << " Size = " << _data.size()
+              << std::endl;
     PrintData(_data);
 }
 
