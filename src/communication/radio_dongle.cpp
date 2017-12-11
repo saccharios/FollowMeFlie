@@ -486,18 +486,15 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     {
     case Console::id:
     {       // Console
-        std::cout << "Console text: ";
-//        for(uint8_t i = 0; i < std::min(static_cast<uint8_t>(packet.GetData().size()),static_cast<uint8_t>(31u)) ; ++i)
-//        {
-//            std::cout << static_cast<char>(packet.GetData().at(i));
-//        }
-        for(auto const & element : packet.GetData())
+        if(packet.GetData() > 0)
         {
-            std::cout << static_cast<char>(element);
+            std::cout << "Console text: ";
+            for(auto const & element : packet.GetData())
+            {
+                std::cout << static_cast<char>(element);
+            }
+            std::cout << std::endl;
         }
-//        packet.Print();
-
-        std::cout << std::endl;
         break;
     }
 
