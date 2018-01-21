@@ -11,9 +11,8 @@ CONFIG += c++14
 
 DEFINES += FollowMeFlie_LIBRARY
 
-INCLUDEPATH += communication \
-    math \
-    control
+INCLUDEPATH += crazyflie \
+    math
 
 
 HEADERS  += \
@@ -25,27 +24,27 @@ HEADERS  += \
     math/lowpass.h \
     math/pi_controller.h \
     error_codes.h \
-    communication/toc_log.h \
-    communication/toc_parameter.h \
-    communication/toc_shared.h \
-    communication/protocol.h \
-    control/crazy_flie_commander.h \
-    communication/crtp_packet.h \
-    communication/crazy_flie.h \
-    communication/radio_dongle.h \
-    control/double_buffer.h \
-    communication/error_codes.h
+    crazyflie/toc_log.h \
+    crazyflie/toc_parameter.h \
+    crazyflie/toc_shared.h \
+    crazyflie/protocol.h \
+    crazyflie/crazy_flie_commander.h \
+    crazyflie/crtp_packet.h \
+    crazyflie/crazy_flie.h \
+    crazyflie/radio_dongle.h \
+    math/double_buffer.h \
+    crazyflie/error_codes.h
 
 SOURCES += \
     math/lowpass.cpp \
     math/pi_controller.cpp \
     math/types.cpp \
-    communication/toc_log.cpp \
-    communication/toc_parameter.cpp \
-    communication/crazy_flie.cpp \
-    communication/crtp_packet.cpp \
-    control/crazy_flie_commander.cpp \
-    communication/radio_dongle.cpp
+    crazyflie/toc_log.cpp \
+    crazyflie/toc_parameter.cpp \
+    crazyflie/crazy_flie.cpp \
+    crazyflie/crtp_packet.cpp \
+    crazyflie/crazy_flie_commander.cpp \
+    crazyflie/radio_dongle.cpp
 
 
 

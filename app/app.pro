@@ -13,12 +13,12 @@ CONFIG += console # Print console output in external console
 
 SOURCES +=  main.cpp \
     imageprocess/camera.cpp \
-    actual_values_model.cpp \
-    table_model_base.cpp \
-    parameter_model.cpp \
-    main_window.cpp \
-    tracking_color.cpp \
-    camera_view_painter.cpp \
+    gui/actual_values_model.cpp \
+    gui/table_model_base.cpp \
+    gui/parameter_model.cpp \
+    gui/main_window.cpp \
+    gui/tracking_color.cpp \
+    gui/camera_view_painter.cpp \
     imageprocess/extract_color.cpp \
     qt_util.cpp
 
@@ -27,18 +27,18 @@ HEADERS  += \
     qt_util.h \
     imageprocess/camera.h \
     opencv_utils.h \
-    actual_values_model.h \
-    table_model_base.h \
-    parameter_model.h \
-    tracking_color.h \
-    camera_view_painter.h \
-    main_window.h \
+    gui/actual_values_model.h \
+    gui/table_model_base.h \
+    gui/parameter_model.h \
+    gui/tracking_color.h \
+    gui/camera_view_painter.h \
+    gui/main_window.h \
     imageprocess/extract_color.h \
     time_levels.h
 
 
 FORMS    += \
-    main_window.ui
+    gui/main_window.ui
 
 LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 

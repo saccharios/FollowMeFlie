@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "crtp_packet.h"
 #include <QObject>
-#include "control/double_buffer.h"
+#include "math/double_buffer.h"
 
 class RadioDongle :  public QObject
 {

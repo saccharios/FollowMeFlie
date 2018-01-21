@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "control/double_buffer.h"
+#include "math/double_buffer.h"
 class DoubleBufferTest : public ::testing::Test
 {
 public:

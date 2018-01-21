@@ -5,7 +5,7 @@
 #include "math/stl_utils.h"
 #include "protocol.h"
 #include <map>
-#include "communication/crtp_packet.h"
+#include "crazyflie/crtp_packet.h"
 
 template<uint8_t port, typename channel>
 class TOCShared

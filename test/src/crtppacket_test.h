@@ -2,9 +2,9 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <chrono>
-#include "communication/crtp_packet.h"
+#include "crazyflie/crtp_packet.h"
 #include "math/types.h"
-#include "communication/protocol.h"
+#include "crazyflie/protocol.h"
 
 class CRTPPacketTest : public ::testing::Test
 {

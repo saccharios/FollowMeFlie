@@ -3,7 +3,7 @@
 #undef _GLIBCXX_HAS_GTHREADS
 #include "../../../mingw_std_threads/mingw.thread.h"
 #include "math/types.h"
-#include "communication/protocol.h"
+#include "crazyflie/protocol.h"
 
 
 RadioDongle::RadioDongle() :

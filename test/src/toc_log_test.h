@@ -2,10 +2,10 @@
 
 #include "gtest/gtest.h"
 #include <iostream>
-#include "communication/toc_log.h"
-#include "communication/toc_parameter.h"
-#include "communication/crtp_packet.h"
-#include "communication/radio_dongle.h"
+#include "crazyflie/toc_log.h"
+#include "crazyflie/toc_parameter.h"
+#include "crazyflie/crtp_packet.h"
+#include "crazyflie/radio_dongle.h"
 #include <memory>
 #include "math/types.h"
 

@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <QDebug>
-#include "communication/crazy_flie.h"
+#include "crazyflie/crazy_flie.h"
 #include <QMessageBox>
 #include "opencv2/opencv.hpp"
 #include "actual_values_model.h"

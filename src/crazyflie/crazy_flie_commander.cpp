@@ -1,4 +1,4 @@
-#include "control/crazy_flie_commander.h"
+#include "crazyflie/crazy_flie_commander.h"
 #include "math/constants.h"
 #include "math/types.h"
 
