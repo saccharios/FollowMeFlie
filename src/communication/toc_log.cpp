@@ -272,6 +272,9 @@ void TocLog::CreateLoggingBlock(LoggingBlock const & block)
 
 // As the crazyflie does only acknowledge that a variable was added to a logging block, but not which one, we must make sure
 // that only one variable is requested to be added until the acknowledge has arrived. Then we can proceed.
+// This function appends variables to an existing logging blocks. The variables which a logging block should hold are
+// given by elements_to_add. It may happen (for unknown reasons) that the crazyflie cannot hold all specified variables.
+// Then the last elements of elements_to_add are missing.
 void TocLog::AppendLoggingBlocks()
 {
     using channel = Logger::Control;
@@ -304,6 +307,7 @@ void TocLog::AppendLoggingBlocks()
             }
             else
             {
+                // This clause is mainly for debugging purposes
                 _appendingState = AppendState::REQUEST_ITEM;
                 std::cout << "Oops, no element with this name exists: " << block.elements_to_add.at(_currentAppendingElement) << std::endl;
                 ++_currentAppendingElement;
@@ -434,8 +438,8 @@ void TocLog::ReceivePacket(CRTPPacket packet)
     }
     if(packet.GetData().size() < 2)
     {
-        std::cout << "Oops, packet is too small to be LogerToc packet\n";
-        packet.Print();
+//        std::cout << "Oops, packet is too small to be LogerToc packet\n";
+//        packet.Print();
         return;
     }
     uint8_t channel = packet.GetChannel();
@@ -520,9 +524,9 @@ void TocLog::ProcessControlData(Data const & data)
             {
                 LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
 
-                CrazyflieErrors error = static_cast<CrazyflieErrors>(data.at(channel::Commands::AppendBlock::AnswerByte::ErrorCode));
+                CrazyflieErrors errorCode = static_cast<CrazyflieErrors>(data.at(channel::Commands::AppendBlock::AnswerByte::ErrorCode));
                 uint8_t id = data.at(channel::Commands::AppendBlock::AnswerByte::BlockId);
-                switch(error)
+                switch(errorCode)
                 {
                 case CrazyflieErrors::NoError:
                 {
@@ -530,6 +534,7 @@ void TocLog::ProcessControlData(Data const & data)
                     {
 //                        std::cout << "Appending " <<_elementToAdd->name << " to block " << block.name << std::endl;
                         block.elements.emplace_back(_elementToAdd);
+                        _elementToAdd->isLogged = true;
                         _elementToAdd = nullptr;
                     }
                     break;

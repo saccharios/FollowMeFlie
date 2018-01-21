@@ -192,6 +192,7 @@ public:
         }
     }
 
+    // Creates a new TOCElement and adds it to the vector
     void AddItem (Data const & data)
     {
         TOCElement element;
@@ -211,6 +212,7 @@ public:
         }
         element.name = element.group +"."+  element.name_only;
         element.id = data.at(channel::Commands::GetItem::AnswerByte::ID);
+        // Unfortunatley, logger and parameter tocs do not share the dame type encoding
         if(port == Parameter::id)
         {
             element.type = convertParameterElementType[data.at(channel::Commands::GetItem::AnswerByte::Type)];
@@ -221,6 +223,7 @@ public:
         }
 
         element.value = 0;
+        element.isLogged = false;
         // Only add element if it does not exist yet
         bool isAlreadyContained = false;
         STLUtils::ElementForID(_elements, element.id, isAlreadyContained);

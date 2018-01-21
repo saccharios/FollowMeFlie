@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
      _actualValuesTable(nullptr),
      _parameterTable(nullptr),
     _actualValuesModel(_crazyFlie.GetLoggerTOC().GetElements(), nullptr),
-    _parameterModel(_crazyFlie.GetLoggerTOC().GetElements(), nullptr),
+    _parameterModel(_crazyFlie.GetParameterTOC().GetElements(), nullptr),
     _timer_t0(),
     _timer_t1(),
     _timer_t2(),

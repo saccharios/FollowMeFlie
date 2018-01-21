@@ -63,10 +63,10 @@ private:
 
     RadioDongle & _radioDongle;
     unsigned int _itemCount;
-    std::vector<TOCElement> _tocElements;
+    std::vector<TOCElement> _tocElements; // Contains all elements
     static constexpr unsigned int _numLogBlocks = 16u;
     static constexpr float _frequency = 100.0f; // Max frequency is 100.0 Hz
-    std::array<LoggingBlock, _numLogBlocks> _loggingBlocks;
+    std::array<LoggingBlock, _numLogBlocks> _loggingBlocks; // Contains logging blocks which hold pointers to elements of _tocElements.
     TOCShared<Logger::id, Logger::Access> _shared_impl;
 
     uint32_t  _currentAppendingBlock;

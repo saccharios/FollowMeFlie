@@ -140,8 +140,8 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
     }
     if(packet.GetData().size() < 2)
     {
-        std::cout << "Oops, packet is too small to be ParameterToc packet\n";
-        packet.Print();
+//        std::cout << "Oops, packet is too small to be ParameterToc packet\n";
+//        packet.Print();
         return;
     }
 //    else

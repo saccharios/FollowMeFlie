@@ -52,6 +52,19 @@ QVariant ActualValuesModel::data(const QModelIndex &index, int role) const
     {
         return QVariant( QColor( Qt::black ) );
     }
+    else if(role == Qt::BackgroundColorRole)
+    {
+        if(_tocElements.at(index.row()).isLogged )
+        {
+            // Logged elemts have a white background
+            return QVariant( QColor (Qt::white));
+        }
+        else
+        {
+            // Not logged elemts have a gray background
+            return QVariant( QColor (Qt::gray));
+        }
+    }
     return QVariant();
 }
 

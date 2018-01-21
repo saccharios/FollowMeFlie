@@ -76,6 +76,7 @@ std::vector<libusb_device*> RadioDongle::ListDevices(int vendorID, int productID
         libusb_free_device_list(pdevices, 1);
     }
 
+
     return devices;
 }
 
@@ -99,6 +100,10 @@ bool RadioDongle::OpenUSBDongle()
             devices.erase(devices.begin());
             _devDevice = devFirst;
         }
+        else
+        {
+             std::cout << "Error! No dongle found.\n";
+        }
 
         for(auto & device : devices)
         {
@@ -106,6 +111,10 @@ bool RadioDongle::OpenUSBDongle()
         }
 
         return !error;
+    }
+    else
+    {
+        std::cout << "Error! No dongle found.\n";
     }
 
     return false;
@@ -360,8 +369,29 @@ void RadioDongle::SetContCarrier(bool contCarrier)
 
 bool RadioDongle::ClaimInterface(int interface)
 {
-    int errcode = libusb_claim_interface(_device, interface);
-    return( errcode == 0);
+    int errorCode = libusb_claim_interface(_device, interface);
+    switch(errorCode)
+    {
+    case LIBUSB_SUCCESS:
+            return true;
+    case LIBUSB_ERROR_NOT_FOUND:
+        std::cout<< "Failed to claim usb interface, device not found\n";
+        break;
+    case LIBUSB_ERROR_BUSY:
+        std::cout<< "Failed to claim usb interface, device is busy\n";
+        break;
+    case LIBUSB_ERROR_NO_DEVICE:
+        std::cout<< "Failed to claim usb interface, no device\n";
+        break;
+    case LIBUSB_ERROR_OTHER:
+        std::cout<< "Failed to claim usb interface, undefined error\n";
+        break;
+    default:
+        std::cout << "Failed to claim usb interface, code = " << errorCode << std::endl;
+        break;
+    }
+
+    return false;
 }
 
 

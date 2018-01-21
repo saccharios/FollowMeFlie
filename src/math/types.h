@@ -39,6 +39,7 @@ struct TOCElement
     std::string name; // TODO SF Is combined name : group +"."+name_only
     ElementType type;
     float value;
+    bool isLogged;
     void Print()
     {
         std::cout << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << std::endl;
