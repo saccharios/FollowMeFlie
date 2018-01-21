@@ -16,11 +16,11 @@ SOURCES +=  main.cpp \
     actual_values_model.cpp \
     table_model_base.cpp \
     parameter_model.cpp \
-    qt_uitl.cpp \
     main_window.cpp \
     tracking_color.cpp \
     camera_view_painter.cpp \
-    imageprocess/extract_color.cpp
+    imageprocess/extract_color.cpp \
+    qt_util.cpp
 
 
 HEADERS  += \
