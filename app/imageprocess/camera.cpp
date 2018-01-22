@@ -16,33 +16,12 @@ QImage Mat2QImage(cv::Mat const& src)
      return dest;
 }
 
-bool EnumerateCameras(std::vector<int> & camIdx)
-{
-//    std::cout << "Searching for cameras IDs...";
-//    camIdx.clear();
-//    for(int idx=28; idx<30; idx++)
-//    {
-//        cv::VideoCapture cap(idx);       // open the camera
-//        if(cap.isOpened())           // check if we succeeded
-//        {
-//            camIdx.push_back(idx);  // ad the ID to list of available cameras
-//            std::cout << idx << " OK\n";
-//        }
-//        cap.release();
-//    }
-//    std::cout << std::endl << camIdx.size() << " cam(s) available";
 
-//    return (camIdx.size()>0); // returns success
-    Q_UNUSED(camIdx);
-    return false;
-}
 Camera::Camera () :
      _state(CameraState::DISABLED),
      _activated(false),
      _capture(new cv::VideoCapture)
 {
-    std::vector<int> camIdx;
-    EnumerateCameras(camIdx);
 }
 void Camera::Update()
 {

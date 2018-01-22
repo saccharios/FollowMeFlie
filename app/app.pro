@@ -20,7 +20,8 @@ SOURCES +=  main.cpp \
     gui/tracking_color.cpp \
     gui/camera_view_painter.cpp \
     imageprocess/extract_color.cpp \
-    qt_util.cpp
+    qt_util.cpp \
+    imageprocess/kalman_filter.cpp
 
 
 HEADERS  += \
@@ -34,7 +35,8 @@ HEADERS  += \
     gui/camera_view_painter.h \
     gui/main_window.h \
     imageprocess/extract_color.h \
-    time_levels.h
+    time_levels.h \
+    imageprocess/kalman_filter.h
 
 
 FORMS    += \

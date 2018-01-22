@@ -1,6 +1,7 @@
 #include "extract_color.h"
 #include "opencv_utils.h"
 #include "math/constants.h"
+
 cv::Scalar QColor2Scalar(QColor const & color)
 {
     int h = 0;
@@ -9,7 +10,6 @@ cv::Scalar QColor2Scalar(QColor const & color)
     color.getHsv(&h, &s, &v);
     return cv::Scalar(h/2,s,v); // In opencv, hue ranges from 0 to 179
 }
-
 
 void ExtractColor::ProcessImage(cv::Mat const & img)
 {
@@ -42,7 +42,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     auto largestKeyPoint = cv_utils::GetLargestKeyPoint(keyPoints);
 
-cv::Size cameraSize = imgThresholded.size(); // 360, 640 default resolution
+    cv::Size cameraSize = imgThresholded.size(); // 360, 640 default resolution
 
     double blob_size_to_length = 1/287.0; // Factor to convert blob size to mm, experimental value
     double focal_length = 1.92; // Focal length of camera in mm
@@ -55,6 +55,8 @@ cv::Size cameraSize = imgThresholded.size(); // 360, 640 default resolution
                                       size_ball,
                                       field_of_view);
     std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
+
+    // Run Kalman filter on the distance
 }
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
