@@ -33,7 +33,8 @@ HEADERS  += \
     crazyflie/crazy_flie.h \
     crazyflie/radio_dongle.h \
     math/double_buffer.h \
-    crazyflie/error_codes.h
+    crazyflie/error_codes.h \
+    math/kalman_filter.h
 
 SOURCES += \
     math/lowpass.cpp \
@@ -44,7 +45,8 @@ SOURCES += \
     crazyflie/crazy_flie.cpp \
     crazyflie/crtp_packet.cpp \
     crazyflie/crazy_flie_commander.cpp \
-    crazyflie/radio_dongle.cpp
+    crazyflie/radio_dongle.cpp \
+    math/kalman_filter.cpp
 
 
 

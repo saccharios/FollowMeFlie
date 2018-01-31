@@ -38,7 +38,10 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     std::vector<cv::KeyPoint> keyPoints;
     detector->detect( imgThresholded, keyPoints );
 
-    DrawBlobs(imgThresholded, keyPoints);
+    cv::Mat imgWithKeypoints;
+    // Draw detected blobs as red circles.
+    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
+    cv::drawKeypoints( img, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
     auto largestKeyPoint = cv_utils::GetLargestKeyPoint(keyPoints);
 
@@ -57,6 +60,11 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
 
     // Run Kalman filter on the distance
+    Eigen::Vector4f state_estimate = _kalman_filter.update(distance);
+
+
+//    cv::circle(imgWithKeypoints, Point center, int radius, const Scalar& color);¶
+    cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
 }
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
@@ -125,15 +133,6 @@ cv::SimpleBlobDetector::Params ExtractColor::CreateParameters()
     return params;
 }
 
-void ExtractColor::DrawBlobs(cv::Mat const & img, std::vector<cv::KeyPoint> const & keyPoints)
-{
-    // Draw detected blobs as red circles.
-    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-    cv::Mat imgWithKeypoints;
-    cv::drawKeypoints( img, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
-
-    cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
-}
 
 Distance ExtractColor::CalculateDistance(cv::KeyPoint const & largestKeyPoint,
                                                              cv::Size cameraSize,

@@ -21,7 +21,7 @@ SOURCES +=  main.cpp \
     gui/camera_view_painter.cpp \
     imageprocess/extract_color.cpp \
     qt_util.cpp \
-    imageprocess/kalman_filter.cpp
+    imageprocess/ball_kalman_filter.cpp
 
 
 HEADERS  += \
@@ -36,7 +36,7 @@ HEADERS  += \
     gui/main_window.h \
     imageprocess/extract_color.h \
     time_levels.h \
-    imageprocess/kalman_filter.h
+    imageprocess/ball_kalman_filter.h
 
 
 FORMS    += \

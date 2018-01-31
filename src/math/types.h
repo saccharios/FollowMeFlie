@@ -45,4 +45,9 @@ struct TOCElement
         std::cout << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << std::endl;
     }
 };
-
+struct Distance
+{
+   float x;
+   float y;
+   float z;
+};
