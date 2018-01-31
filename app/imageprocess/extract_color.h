@@ -13,7 +13,7 @@ class ExtractColor :  public QObject
 public:
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
-      _kalman_filter(cameraUpdateSamplingTime_seconds, 1.0,1.0,0.0)
+      _kalman_filter(cameraUpdateSamplingTime_seconds, 1.0, 1.0, 0.0)
     {}
 
 public slots:

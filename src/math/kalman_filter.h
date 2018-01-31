@@ -17,21 +17,37 @@ class KalmanFilter
     using MeasVector = Matrix<T,N_Measurement,1>;
 
 public:
-    KalmanFilter (
-            StateMatrix A,
-            StateMatrix Q,
-            State2MeasMatrix H,
-            MeasMatrix R,
-            StateMatrix P = StateMatrix::Zero(N_States,N_States)
-            ) :
-        _A(A),
-        _Q(Q),
-        _H(H),
-        _H_transpose(_H.transpose()),
-        _R(R),
-        _P(P),
+    KalmanFilter () :
+        _A(),
+        _Q(),
+        _H(),
+        _H_transpose(),
+        _R(),
+        _P(),
         _state_estimation(StateVector::Zero(N_States,1))
     {
+    }
+
+    void SetStateUpdateMatrix(StateMatrix const & A)
+    {
+        _A = A;
+    }
+    void SetProcessNoiseCovMatrix(StateMatrix const & Q)
+    {
+        _Q = Q;
+    }
+    void SetMeasurementMatrix(State2MeasMatrix const & H)
+    {
+        _H = H;
+        _H_transpose = _H.transpose();
+    }
+    void SetMeasurementNoiseCovMatrix(MeasMatrix const & R)
+    {
+        _R = R;
+    }
+    void SetCovMatrix(StateMatrix const & P)
+    {
+        _P = P;
     }
 
     StateVector update(MeasVector measurement)

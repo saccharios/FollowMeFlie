@@ -16,43 +16,50 @@ public:
         _Q(),
         _H(),
         _R(),
-        _kalman_filter(_A,_Q,_H,_R)
+        _kalman_filter()
     {
-//        // A =
-//        // 1 0 Ts 0
-//        // 0 1 0   Ts
-//        // 0 0 1   0
-//        // 0 0 0   1
-//        _A = Matrix4f::Identity(4,4),
-//        _A(0,2) = sampling_time;
-//        _A(1,3) = sampling_time;
-//        // Q =
-//        // mn 0     pn2 0
-//        // 0     mn 0     pn2
-//        // pn2 0    pn1 0
-//        // 0     pn2 0    pn1
-//        _Q = Matrix4f::Zero(4,4);
-//        _Q(0,0) = meas_noise;
-//        _Q(1,1) = meas_noise;
-//        _Q(2,2) = process_noise_1;
-//        _Q(3,3) = process_noise_1;
-//        _Q(2,0) = process_noise_2;
-//        _Q(3,1) = process_noise_2;
-//        _Q(0,2) = process_noise_2;
-//        _Q(1,3) = process_noise_2;
-//        // H =
-//        // 1 0 0 0
-//        // 0 1 0 0
-//        _H = Matrix<float,2,4>::Zero(2,4);
-//        _H(0,0) = 1;
-//        _H(1,1) = 1;
+        // A =
+        // 1 0 Ts 0
+        // 0 1 0   Ts
+        // 0 0 1   0
+        // 0 0 0   1
+        _A = Matrix4f::Identity(4,4),
+        _A(0,2) = sampling_time;
+        _A(1,3) = sampling_time;
+        // Q =
+        // mn 0     pn2 0
+        // 0     mn 0     pn2
+        // pn2 0    pn1 0
+        // 0     pn2 0    pn1
+        _Q = Matrix4f::Zero(4,4);
+        _Q(0,0) = meas_noise;
+        _Q(1,1) = meas_noise;
+        _Q(2,2) = process_noise_1;
+        _Q(3,3) = process_noise_1;
+        _Q(2,0) = process_noise_2;
+        _Q(3,1) = process_noise_2;
+        _Q(0,2) = process_noise_2;
+        _Q(1,3) = process_noise_2;
+        // H =
+        // 1 0 0 0
+        // 0 1 0 0
+        _H = Matrix<float,2,4>::Zero(2,4);
+        _H(0,0) = 1;
+        _H(1,1) = 1;
 
-//        // R =
-//        // mn 0
-//        // 0     mn
-//        _R = Matrix4f::Identity(2,2)*meas_noise;
+        // R =
+        // mn 0
+        // 0     mn
+        _R = Matrix2f::Identity(2,2)*meas_noise;
 
-//        _kalman_filter = KalmanFilter<float,4,2>(_A, _Q, _H, _R); // must be last because the matrices are copied.
+
+        _kalman_filter.SetStateUpdateMatrix(_A);
+        _kalman_filter.SetProcessNoiseCovMatrix(_Q);
+        _kalman_filter.SetMeasurementMatrix(_H);
+        _kalman_filter.SetMeasurementNoiseCovMatrix(_R);
+
+
+
 
     }
 
@@ -67,6 +74,6 @@ private:
     Matrix4f _Q;
     Matrix<float, 2, 4> _H;
     Matrix2f _R;
-//    Matrix4f _P;
+//    Matrix4f _P; // Initial estimat of covariane matrix P not used
     KalmanFilter<float,4,2> _kalman_filter;
 };
