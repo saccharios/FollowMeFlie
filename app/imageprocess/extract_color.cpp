@@ -41,7 +41,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     cv::Mat imgWithKeypoints;
     // Draw detected blobs as red circles.
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-    cv::drawKeypoints( img, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    cv::drawKeypoints( imgThresholded, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
     auto largestKeyPoint = cv_utils::GetLargestKeyPoint(keyPoints);
 
@@ -57,7 +57,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
                                       focal_length,
                                       size_ball,
                                       field_of_view);
-    std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
+    //std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
 
     // Run Kalman filter on the distance
     Eigen::Vector4f state_estimate = _kalman_filter.update(distance);
