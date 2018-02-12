@@ -5,7 +5,7 @@
 #include "ball_kalman_filter.h"
 #include "math/types.h"
 #include "time_levels.h"
-
+#include "camera.h"
 class ExtractColor :  public QObject
 {
     Q_OBJECT
@@ -30,10 +30,11 @@ private:
     cv::SimpleBlobDetector::Params CreateParameters();
     Distance CalculateDistance(cv::KeyPoint const & largestKeyPoint,
                                cv::Size cameraSize,
-                               double blob_size_to_length,
-                               double focal_length,
-                               double size_ball,
-                               double field_of_view);
+                               double blobSizeToLength,
+                               double focalLength,
+                               double sizeBall,
+                               double fieldOfView,
+                               cv::Point2f & midPoint);
 
     BallKalmanFilter _kalman_filter;
 };

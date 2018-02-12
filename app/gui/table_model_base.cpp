@@ -1,5 +1,6 @@
 #include "table_model_base.h"
-#include <iostream>
+
+
 TableModelBase::TableModelBase(std::vector<TOCElement> const & tocElements, QObject *parent)
     : QAbstractTableModel(parent),
       _tocElements(tocElements)

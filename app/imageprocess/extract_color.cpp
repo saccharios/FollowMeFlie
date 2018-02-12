@@ -47,29 +47,42 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     cv::Size cameraSize = imgThresholded.size(); // 360, 640 default resolution
 
-    double blob_size_to_length = 1/287.0; // Factor to convert blob size to mm, experimental value
-    double focal_length = 1.92; // Focal length of camera in mm
-    double size_ball = 68; // Diameter of the tennis ball in mm
-    double field_of_view = 66*pi/180.0; // 66° diagonal
+    double blobSizeToLength = 1/287.0; // Factor to convert blob size to mm, experimental value
+    double focalLength = 1.92; // Focal length of camera in mm
+    double sizeBall = 68; // Diameter of the tennis ball in mm
+    double fieldOfVview = 66*pi/180.0; // 66° diagonal
+
+    cv::Point2f estimateWorld;
     auto distance = CalculateDistance(largestKeyPoint,
                                       cameraSize,
-                                      blob_size_to_length,
-                                      focal_length,
-                                      size_ball,
-                                      field_of_view);
-    //std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
+                                      blobSizeToLength,
+                                      focalLength,
+                                      sizeBall,
+                                      fieldOfVview,
+                                      estimateWorld);
+//    std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
 
-    // Run Kalman filter on the distance
-    Eigen::Vector4f state_estimate = _kalman_filter.update(distance);
+    // Run Kalman filter on the d
+    Eigen::Vector4f state_estimate = _kalman_filter.Update(distance);
 
 
-//    cv::circle(imgWithKeypoints, Point center, int radius, const Scalar& color);¶
+
+    cv::Point estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateWorld, cameraSize);
+//    std::cout << "estimate = ( " << center.x << ", " << center.y << " ) \n";
+    cv::circle(imgWithKeypoints, estimateCamera, 30, {230,250,25},3);
+
+//    std::cout << "_state_estimation = " << center.x << " "
+//                 << center.y << " "
+//                    << state_estimate[2] << " "
+//                       << state_estimate[3] << "\n";
+//    std::cout << "---------------------------------------------\n";
+
     cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
 }
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
 {
-    // Convet input image to hsv space
+    // Convert input image to hsv space
     //Special case if we want to detect some red-ish color
     if(colorLower[0] < 0 )
     {
@@ -136,10 +149,11 @@ cv::SimpleBlobDetector::Params ExtractColor::CreateParameters()
 
 Distance ExtractColor::CalculateDistance(cv::KeyPoint const & largestKeyPoint,
                                                              cv::Size cameraSize,
-                                                             double blob_size_to_length,
-                                                             double focal_length,
-                                                             double size_ball,
-                                                             double field_of_view)
+                                                             double blobSizeToLength,
+                                                             double focalLength,
+                                                             double sizeBall,
+                                                             double fieldOfView,
+                                                            cv::Point2f & midPoint)
 {
     static Distance distance_old = {0,0,0};
     // If we don't have a valid measurement we return the previous distance measurement.
@@ -147,22 +161,23 @@ Distance ExtractColor::CalculateDistance(cv::KeyPoint const & largestKeyPoint,
     {
         return distance_old;
     }
-    double resolution_ratio = cameraSize.width / cameraSize.height;
-    auto midPtCoord = cv_utils::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
+    double resolutionRatio = cameraSize.width / cameraSize.height;
+    auto midPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
 
     // Estimate depth
-    double depth = focal_length *size_ball /(blob_size_to_length * largestKeyPoint.size);
+    double depth = focalLength *sizeBall /(blobSizeToLength * largestKeyPoint.size);
 
-
-    double total_width = 2*depth*sin(field_of_view / 2.0) / sqrt(1+1/(resolution_ratio*resolution_ratio));
-    double total_height = total_width / resolution_ratio;
-    double width_to_length = total_width / cameraSize.width;
-    double height_to_length= total_height / cameraSize.height;
+// TODO SF Can be optimized !
+    double totalWidth = 2.0*depth*sin(fieldOfView / 2.0) / sqrt(1.0+1.0/(resolutionRatio*resolutionRatio));
+    double totalHeight = totalWidth / resolutionRatio;
+    double widthToLength = totalWidth / cameraSize.width;
+    double heightToLength= totalHeight / cameraSize.height;
 
     Distance distance; // in mm
-    distance.x = midPtCoord.x * width_to_length;
-    distance.y = midPtCoord.y * height_to_length;
+    distance.x = midPtCoord.x * widthToLength;
+    distance.y = midPtCoord.y * heightToLength;
     distance.z = depth;
     distance_old = distance;
+    midPoint = midPtCoord;
     return distance;
 }

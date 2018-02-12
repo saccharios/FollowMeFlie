@@ -24,13 +24,4 @@ cv::KeyPoint GetLargestKeyPoint(std::vector<cv::KeyPoint> const & keypoints)
     return largestKeyPoint;
 }
 
-
-cv::Point2f  ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size)
-{
-    cv::Point2f midPointCoord;
-    midPointCoord.x = cameraPt.x - size.width / 2;
-    midPointCoord.y = -cameraPt.y + size.height/ 2;
-    return midPointCoord;
-}
-
 }

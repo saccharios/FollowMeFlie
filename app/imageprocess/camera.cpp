@@ -46,11 +46,40 @@ void Camera::Update()
             _state = CameraState::RUNNING;
             _resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
             _resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
+
+
+            _capture->set(CV_CAP_FFMPEG,true);
+            _capture->set(CV_CAP_PROP_FPS,30);
+
+
+            std::cout << "Camera ok. Resolution is " << _resolution.width << " x " << _resolution.height << "\n";
+            std::cout << "Settings: \n";
+            std::cout << "CV_CAP_PROP_POS_MSEC  = " << _capture->get(CV_CAP_PROP_POS_MSEC ) << std::endl;
+            std::cout << "CV_CAP_PROP_POS_FRAMES   = " << _capture->get(CV_CAP_PROP_POS_FRAMES  )<< std::endl;
+            std::cout << "CV_CAP_PROP_POS_AVI_RATIO  = " << _capture->get(CV_CAP_PROP_POS_AVI_RATIO )<< std::endl;
+            std::cout << "CV_CAP_PROP_FPS  = " << _capture->get(CV_CAP_PROP_FPS)  << std::endl;
+            std::cout << "CV_CAP_PROP_FOURCC  = " << _capture->get(CV_CAP_PROP_FOURCC)  << std::endl;
+            std::cout << "CV_CAP_PROP_FRAME_COUNT  = " << _capture->get(CV_CAP_PROP_FRAME_COUNT)  << std::endl;
+            std::cout << "CV_CAP_PROP_FORMAT  = " << _capture->get(CV_CAP_PROP_FORMAT )<< std::endl;
+            std::cout << "CV_CAP_PROP_MODE  = " << _capture->get(CV_CAP_PROP_MODE)  << std::endl;
+            std::cout << "CV_CAP_PROP_BRIGHTNESS  = " << _capture->get(CV_CAP_PROP_BRIGHTNESS ) << std::endl;
+            std::cout << "CV_CAP_PROP_CONTRAST  = " << _capture->get(CV_CAP_PROP_CONTRAST ) << std::endl;
+            std::cout << "CV_CAP_PROP_SATURATION   = " << _capture->get(CV_CAP_PROP_SATURATION  ) << std::endl;
+            std::cout << "CV_CAP_PROP_HUE   = " << _capture->get(CV_CAP_PROP_HUE  )<< std::endl;
+            std::cout << "CV_CAP_PROP_GAIN   = " << _capture->get(CV_CAP_PROP_GAIN  )<< std::endl;
+            std::cout << "CV_CAP_PROP_EXPOSURE   = " << _capture->get(CV_CAP_PROP_EXPOSURE  )<< std::endl;
+            std::cout << "CV_CAP_PROP_CONVERT_RGB   = " << _capture->get(CV_CAP_PROP_CONVERT_RGB  )<< std::endl;
+            std::cout << "CV_CAP_PROP_CONTRAST  = " << _capture->get(CV_CAP_PROP_CONTRAST)  << std::endl;
+
         }
         else if(!_activated)
         {
             _capture->release();
             _state = CameraState::DISABLED;
+        }
+        else if(_activated)
+        {
+            std::cout << "failed to open camera\n";
         }
         break;
     }
@@ -81,12 +110,32 @@ void Camera::FetchImage()
 {
 
     cv::Mat frame;
-    (*_capture) >> frame;
-    if( (frame).empty() ) return; // end of video stream
-//    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
 
+    (*_capture) >> frame;
+    if( (frame).empty() )
+    {
+        std::cout << "ERROR!! Failed to capture frame\n";
+        return;
+    }
+//    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
     auto image = Mat2QImage(frame);
     emit ImgReadyForDisplay(image);
     emit ImgReadyForProcessing(frame);
 }
 
+
+cv::Point2f  Camera::ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size)
+{
+    cv::Point2f midPointCoord;
+    midPointCoord.x = cameraPt.x - size.width / 2;
+    midPointCoord.y = -cameraPt.y + size.height/ 2;
+    return midPointCoord;
+}
+
+cv::Point2f  Camera::ConvertMidPointToCameraCoord(cv::Point2f midPt, cv::Size size)
+{
+    cv::Point2f cameraCoord;
+    cameraCoord.x = midPt.x + size.width/2;
+    cameraCoord.y = -midPt.y + size.height/2;
+    return cameraCoord;
+}

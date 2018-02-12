@@ -30,6 +30,11 @@ public:
     CameraState GetState() const {return _state; }
     CameraResolution const & GetResolution() const {return _resolution;}
 
+
+
+    static cv::Point2f  ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size);
+    static cv::Point2f  ConvertMidPointToCameraCoord(cv::Point2f midPt, cv::Size size);
+
 signals:
     void ImgReadyForDisplay(QImage const &);
     void ImgReadyForProcessing(cv::Mat const &);

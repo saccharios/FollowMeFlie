@@ -63,9 +63,9 @@ public:
 
     }
 
-    Vector4f update(Distance input){ return update(Vector2f{input.x, input.y});}
-    Vector4f update(Vector3f input){ return update(Vector2f{input[0],input[1]});}
-    Vector4f update(Vector2f input){ return _kalman_filter.update(input);}
+    Vector4f Update(Distance input){ return Update(Vector2f{input.x, input.y});}
+    Vector4f Update(Vector3f input){ return Update(Vector2f{input[0],input[1]});}
+    Vector4f Update(Vector2f input){ return _kalman_filter.Update(input);}
 
 
 

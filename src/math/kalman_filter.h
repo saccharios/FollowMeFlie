@@ -18,12 +18,12 @@ class KalmanFilter
 
 public:
     KalmanFilter () :
-        _A(),
-        _Q(),
-        _H(),
-        _H_transpose(),
-        _R(),
-        _P(),
+        _A(StateMatrix::Zero()),
+        _Q(StateMatrix::Zero()),
+        _H(State2MeasMatrix::Zero()),
+        _H_transpose(Meas2StateMatrix::Zero()),
+        _R(MeasMatrix::Zero()),
+        _P(StateMatrix::Zero()),
         _state_estimation(StateVector::Zero(N_States,1))
     {
     }
@@ -50,19 +50,50 @@ public:
         _P = P;
     }
 
-    StateVector update(MeasVector measurement)
+    void Initialize(MeasVector measurement, StateMatrix const & P = StateMatrix::Identity(N_States,N_States) )
     {
+        _state_estimation[0] = measurement[0];
+        _state_estimation[1] = measurement[1];
+        _state_estimation[2] = 0;
+        _state_estimation[3] = 0;
+        _P = P;
+    }
+
+    StateVector Update(MeasVector measurement)
+    {
+
+        std::cout << "measurement = " << measurement[0] << " "
+                  << measurement[1] << "\n";
         // Prediction
         auto state_prediction = _A * _state_estimation;
 
+//        std::cout << "prediction = " << state_prediction[0] << " "
+//                     << state_prediction[1] << " "
+//                        << state_prediction[2] << " "
+//                           << state_prediction[3] << "\n";
+
+
+//        std::cout << "_P = "  << _P << std::endl;
+//        std::cout << "_A = "  << _A << std::endl;
+//        std::cout << "_A.transpose()  = "  << _A.transpose()  << std::endl;
+//        std::cout << "_Q = "  << _Q << std::endl;
+
         // Kalman gain
         StateMatrix a_posteriori_P =  _A*_P * _A.transpose() + _Q;
+        //std::cout << "a_posteriori_P = "  << a_posteriori_P << std::endl;
         MeasMatrix S = _H*a_posteriori_P*_H_transpose + _R;
         Meas2StateMatrix Gain = a_posteriori_P*_H_transpose * (S.inverse()); // Only use for matrices up to 4x4 !
 
         // Update
         _state_estimation = state_prediction + Gain *(measurement - _H*state_prediction);
         _P = (StateMatrix::Identity(N_States,N_States) - Gain * _H )*a_posteriori_P;
+
+//        std::cout << "_state_estimation = " << _state_estimation[0] << " "
+//                     << _state_estimation[1] << " "
+//                        << _state_estimation[2] << " "
+//                           << _state_estimation[3] << "\n";
+//        std::cout << "---------------------------------------------\n";
+
         return _state_estimation;
     }
 
