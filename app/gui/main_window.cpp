@@ -68,6 +68,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // Connections
     QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
+    QObject::connect(&_camera, SIGNAL(ImgReadyForInitialization(cv::Mat const &)), &_extractColor, SLOT(Initialize(cv::Mat const &)));
+
+
+
     QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(DisplayConnectionTimeoutBox()));
     QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(DisplayNotConnectingBox()));
     QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)),

@@ -5,17 +5,16 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/opencv.hpp"
 #include <QImage>
+#include <QCameraInfo>
 
 QImage Mat2QImage(cv::Mat const& src)
 {
      cv::Mat temp; // make the same cv::Mat
-     cvtColor(src, temp,CV_BGR2RGB); // cvtColor Makes a copt, that what i need
+     cvtColor(src, temp,CV_BGR2RGB); // cvtColor Makes a copy
      QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
-     dest.bits(); // enforce deep copy, see documentation
-     // of QImage::QImage ( const uchar * data, int width, int height, Format format )
+     dest.bits(); // enforce deep copy
      return dest;
 }
-
 
 Camera::Camera () :
      _state(CameraState::DISABLED),
@@ -39,8 +38,8 @@ void Camera::Update()
     }
     case CameraState::CONNECTING:
     {
-
-        _capture->open(0);
+        std::cout << "Found Cameras: " << QCameraInfo::availableCameras().count() << std::endl;
+        _capture->open(2); // 0 for laptop camera // 1 for crazyflie camera // 2 for creative camera
         if(_activated && _capture->isOpened())
         {
             _state = CameraState::RUNNING;
@@ -70,7 +69,7 @@ void Camera::Update()
             std::cout << "CV_CAP_PROP_EXPOSURE   = " << _capture->get(CV_CAP_PROP_EXPOSURE  )<< std::endl;
             std::cout << "CV_CAP_PROP_CONVERT_RGB   = " << _capture->get(CV_CAP_PROP_CONVERT_RGB  )<< std::endl;
             std::cout << "CV_CAP_PROP_CONTRAST  = " << _capture->get(CV_CAP_PROP_CONTRAST)  << std::endl;
-
+            InitializeTracking();
         }
         else if(!_activated)
         {
@@ -85,7 +84,7 @@ void Camera::Update()
     }
     case CameraState::RUNNING:
     {
-        FetchImage();
+        FetchAndImageReady();
         if ( !_activated)
         {
             _capture->release();
@@ -106,23 +105,33 @@ void Camera::Activate(bool activate)
 
 
 
-void Camera::FetchImage()
+void Camera::FetchAndImageReady()
 {
 
     cv::Mat frame;
+    FetchImage(frame);
+    //    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
+    auto image = Mat2QImage(frame);
+    emit ImgReadyForDisplay(image);
+    emit ImgReadyForProcessing(frame);
+}
 
+void Camera::FetchImage(cv::Mat & frame)
+{
     (*_capture) >> frame;
     if( (frame).empty() )
     {
         std::cout << "ERROR!! Failed to capture frame\n";
         return;
     }
-//    cv::imshow("Original Frame", (frame)); // Show camera stream in separate window
-    auto image = Mat2QImage(frame);
-    emit ImgReadyForDisplay(image);
-    emit ImgReadyForProcessing(frame);
 }
 
+void Camera::InitializeTracking()
+{
+    cv::Mat frame;
+    FetchImage(frame);
+    emit ImgReadyForInitialization(frame);
+}
 
 cv::Point2f  Camera::ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size)
 {

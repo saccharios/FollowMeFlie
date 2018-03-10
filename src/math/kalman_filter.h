@@ -62,8 +62,7 @@ public:
     StateVector Update(MeasVector measurement)
     {
 
-        std::cout << "measurement = " << measurement[0] << " "
-                  << measurement[1] << "\n";
+//        std::cout << "measurement = " << measurement[0] << " " << measurement[1] << "\n";
         // Prediction
         auto state_prediction = _A * _state_estimation;
 
@@ -88,11 +87,11 @@ public:
         _state_estimation = state_prediction + Gain *(measurement - _H*state_prediction);
         _P = (StateMatrix::Identity(N_States,N_States) - Gain * _H )*a_posteriori_P;
 
-//        std::cout << "_state_estimation = " << _state_estimation[0] << " "
-//                     << _state_estimation[1] << " "
-//                        << _state_estimation[2] << " "
-//                           << _state_estimation[3] << "\n";
-//        std::cout << "---------------------------------------------\n";
+        std::cout << "_state_estimation = " << _state_estimation[0] << " "
+                     << _state_estimation[1] << " "
+                        << _state_estimation[2] << " "
+                           << _state_estimation[3] << "\n";
+        std::cout << "---------------------------------------------\n";
 
         return _state_estimation;
     }

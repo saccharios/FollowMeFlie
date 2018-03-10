@@ -38,6 +38,8 @@ public:
 signals:
     void ImgReadyForDisplay(QImage const &);
     void ImgReadyForProcessing(cv::Mat const &);
+    void ImgReadyForInitialization(cv::Mat const &);
+
 private:
     CameraState _state;
     bool _activated;
@@ -45,5 +47,7 @@ private:
     cv::VideoCapture* _capture;
 
     CameraResolution _resolution;
-    void FetchImage();
+    void FetchAndImageReady();
+    void FetchImage(cv::Mat & frame);
+    void InitializeTracking();
 };

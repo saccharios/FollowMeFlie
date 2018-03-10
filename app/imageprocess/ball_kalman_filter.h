@@ -3,7 +3,7 @@
 
 #include "math/types.h"
 #include "math/kalman_filter.h"
-
+#include "opencv2/opencv.hpp"
 
 using namespace Eigen;
 
@@ -24,7 +24,7 @@ public:
         // 0 0 1   0
         // 0 0 0   1
         _A = Matrix4f::Identity(4,4),
-        _A(0,2) = sampling_time;
+                _A(0,2) = sampling_time;
         _A(1,3) = sampling_time;
         // Q =
         // mn 0     pn2 0
@@ -32,8 +32,8 @@ public:
         // pn2 0    pn1 0
         // 0     pn2 0    pn1
         _Q = Matrix4f::Zero(4,4);
-        _Q(0,0) = meas_noise;
-        _Q(1,1) = meas_noise;
+        _Q(0,0) = process_noise_1;
+        _Q(1,1) = process_noise_1;
         _Q(2,2) = process_noise_1;
         _Q(3,3) = process_noise_1;
         _Q(2,0) = process_noise_2;
@@ -58,14 +58,21 @@ public:
         _kalman_filter.SetMeasurementMatrix(_H);
         _kalman_filter.SetMeasurementNoiseCovMatrix(_R);
 
+        std::cout << _A<< "\n-----\n";
+        std::cout << _Q<< "\n-----\n";
+        std::cout << _H<< "\n-----\n";
+        std::cout << _R << "\n-----\n";
 
 
 
     }
 
+    Vector4f Update(cv::Point2f input){ return Update(Vector2f{input.x, input.y});}
     Vector4f Update(Distance input){ return Update(Vector2f{input.x, input.y});}
     Vector4f Update(Vector3f input){ return Update(Vector2f{input[0],input[1]});}
-    Vector4f Update(Vector2f input){ return _kalman_filter.Update(input);}
+    Vector4f Update(Vector2f input);
+
+    void Initialize(cv::Point2f input) {_kalman_filter.Initialize(Vector2f{input.x, input.y});}
 
 
 
@@ -74,6 +81,6 @@ private:
     Matrix4f _Q;
     Matrix<float, 2, 4> _H;
     Matrix2f _R;
-//    Matrix4f _P; // Initial estimat of covariane matrix P not used
+    //    Matrix4f _P; // Initial estimat of covariane matrix P not used
     KalmanFilter<float,4,2> _kalman_filter;
 };
