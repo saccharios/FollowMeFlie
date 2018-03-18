@@ -22,6 +22,8 @@ Camera::Camera () :
      _capture(new cv::VideoCapture)
 {
 }
+cv::Size Camera::_resolution = cv::Size();
+
 void Camera::Update()
 {
     switch(_state)
@@ -133,30 +135,30 @@ void Camera::InitializeTracking()
     emit ImgReadyForInitialization(frame);
 }
 
-std::vector<cv::KeyPoint> Camera::ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints, cv::Size size)
+std::vector<cv::KeyPoint> Camera::ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints)
 {
     std::vector<cv::KeyPoint> keyPointsMidPtCoord;
     for(auto const & point : keyPoints)
     {
         cv::KeyPoint keyPt = point;
-        keyPt.pt = ConvertCameraToMidPointCoord(keyPt.pt, size);
+        keyPt.pt = ConvertCameraToMidPointCoord(keyPt.pt);
         keyPointsMidPtCoord.push_back(keyPt);
     }
     return keyPointsMidPtCoord;
 }
 
-cv::Point2f  Camera::ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size)
+cv::Point2f  Camera::ConvertCameraToMidPointCoord(cv::Point2f cameraPt)
 {
     cv::Point2f midPointCoord;
-    midPointCoord.x = cameraPt.x - size.width / 2;
-    midPointCoord.y = -cameraPt.y + size.height/ 2;
+    midPointCoord.x = cameraPt.x - _resolution.width / 2;
+    midPointCoord.y = -cameraPt.y + _resolution.height/ 2;
     return midPointCoord;
 }
 
-cv::Point2f  Camera::ConvertMidPointToCameraCoord(cv::Point2f midPt, cv::Size size)
+cv::Point2f  Camera::ConvertMidPointToCameraCoord(cv::Point2f midPt )
 {
     cv::Point2f cameraCoord;
-    cameraCoord.x = midPt.x + size.width/2;
-    cameraCoord.y = -midPt.y + size.height/2;
+    cameraCoord.x = midPt.x + _resolution.width/2;
+    cameraCoord.y = -midPt.y + _resolution.height/2;
     return cameraCoord;
 }

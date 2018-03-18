@@ -18,23 +18,18 @@ public:
         CONNECTING = 1,
         RUNNING = 2,
     };
-    struct CameraResolution
-    {
-        int width = 0;
-        int height = 0;
-    };
 
     Camera();
     void Activate(bool activate);
     void Update();
     CameraState GetState() const {return _state; }
-    CameraResolution const & GetResolution() const {return _resolution;}
+    cv::Size const & GetResolution() const {return _resolution;}
 
 
 
-    static cv::Point2f  ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size);
-    static cv::Point2f  ConvertMidPointToCameraCoord(cv::Point2f midPt, cv::Size size);
-    static std::vector<cv::KeyPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints, cv::Size size);
+    static cv::Point2f  ConvertCameraToMidPointCoord(cv::Point2f cameraPt);
+    static cv::Point2f  ConvertMidPointToCameraCoord(cv::Point2f midPt);
+    static std::vector<cv::KeyPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints);
 
 signals:
     void ImgReadyForDisplay(QImage const &);
@@ -47,7 +42,7 @@ private:
 
     cv::VideoCapture* _capture;
 
-    CameraResolution _resolution;
+    static cv::Size _resolution;
     void FetchAndImageReady();
     void FetchImage(cv::Mat & frame);
     void InitializeTracking();

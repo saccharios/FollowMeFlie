@@ -13,12 +13,10 @@ cv::Scalar QColor2Scalar(QColor const & color)
 
 void ExtractColor::ProcessImage(cv::Mat const & img)
 {
-    cv::Size cameraSize = img.size(); // 360, 640 default resolution
-
     cv::Mat imgWithKeypoints;
     std::vector<cv::KeyPoint> keyPointsCamCoord = ExtractKeyPoints(img, imgWithKeypoints);
 
-    std::vector<cv::KeyPoint> keyPointsMidPtCoord = Camera::ConvertCameraToMidPointCoord(keyPointsCamCoord, cameraSize);
+    std::vector<cv::KeyPoint> keyPointsMidPtCoord = Camera::ConvertCameraToMidPointCoord(keyPointsCamCoord);
 
     cv::Point2f estimateMidPtCoord = _kalmanFilter.Update(keyPointsMidPtCoord);
 
@@ -36,7 +34,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 //                                      fieldOfVview);
     //    std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
 
-    cv::Point estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord, cameraSize);
+    cv::Point estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord);
     cv::circle(imgWithKeypoints, estimateCamera, 30, {230,250,25},3);
 
     //    std::cout << "_state_estimation = " << center.x << " "
@@ -154,14 +152,11 @@ void ExtractColor::Initialize(cv::Mat const & img)
 
     auto largestKeyPoint = opencv_utils::GetLargestKeyPoint(keyPoints);
 
-    cv::Size cameraSize = img.size(); // 360, 640 default resolution
-
-
     // Kalman filter
 //    auto midPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
 //    std::cout << "Measurement = "<< midPtCoord.x << " " << midPtCoord.y << std::endl;
 
-    auto measurementMidPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
+    auto measurementMidPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt);
     _kalmanFilter.Initialize(measurementMidPtCoord);
 
 }
