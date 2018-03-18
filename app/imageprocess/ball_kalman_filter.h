@@ -91,4 +91,7 @@ private:
 
 
     cv::Point2f UpdateFilter(cv::Point2f pt);
+    cv::Point2f UpdateFilterNoMeas();
+    bool GetBestFit(std::vector<cv::KeyPoint> const & keyPoints, cv::Point2f prediciotn, cv::Point2f & bestFit);
+    unsigned int _validCounter = 0;
 };

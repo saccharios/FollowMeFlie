@@ -59,17 +59,37 @@ public:
         _P = P;
     }
 
-    StateVector Update(MeasVector measurement)
+    StateVector Predict()
+    {
+        _state_prediction = _A * _state_estimation;
+        return  _state_prediction;
+    }
+
+    // We have no measurement, update for covariance matrix
+    // The estimate is the prediction
+    StateVector Estimate()
+    {
+        //        std::cout << "_P = "  << _P << std::endl;
+        _P =  _A*_P * _A.transpose() + _Q;
+
+        std::cout << "No measurement! _state_estimation = " << _state_prediction[0] << " "
+                  << _state_prediction[1] << " "
+                  << _state_prediction[2] << " "
+                  << _state_prediction[3] << "\n";
+        std::cout << "---------------------------------------------\n";
+
+        return _state_prediction;
+    }
+
+    // Update with measurement
+    StateVector Estimate(MeasVector measurement)
     {
 
 //        std::cout << "measurement = " << measurement[0] << " " << measurement[1] << "\n";
-        // Prediction
-        auto state_prediction = _A * _state_estimation;
-
 //        std::cout << "prediction = " << state_prediction[0] << " "
-//                     << state_prediction[1] << " "
-//                        << state_prediction[2] << " "
-//                           << state_prediction[3] << "\n";
+//                     << _state_prediction[1] << " "
+//                        << _state_prediction[2] << " "
+//                           << _state_prediction[3] << "\n";
 
 
 //        std::cout << "_P = "  << _P << std::endl;
@@ -84,8 +104,8 @@ public:
         Meas2StateMatrix Gain = a_posteriori_P*_H_transpose * (S.inverse()); // Only use for matrices up to 4x4 !
 
         // Update
-        _state_estimation = state_prediction + Gain *(measurement - _H*state_prediction);
-        _P = (StateMatrix::Identity(N_States,N_States) - Gain * _H )*a_posteriori_P;
+        _state_estimation = _state_prediction + Gain *(measurement - _H * _state_prediction);
+        _P = (StateMatrix::Identity(N_States,N_States) - Gain * _H ) * a_posteriori_P;
 
         std::cout << "_state_estimation = " << _state_estimation[0] << " "
                      << _state_estimation[1] << " "
@@ -108,6 +128,7 @@ private:
 
 
     StateVector _state_estimation;
+    StateVector _state_prediction;
 
 };
 

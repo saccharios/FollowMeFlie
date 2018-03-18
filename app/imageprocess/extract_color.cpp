@@ -96,11 +96,8 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
     cv::threshold (imgThresholded, imgThresholded, 70, 255, CV_THRESH_BINARY_INV);
 
     // Detect blobs.
-    // TODO SF No need to always create parameters a new!
-    auto params = CreateParameters();
-    auto detector = cv::SimpleBlobDetector::create(params);
     std::vector<cv::KeyPoint> keyPoints;
-    detector->detect( imgThresholded, keyPoints );
+    _blobDetector->detect( imgThresholded, keyPoints );
 
     // Draw detected blobs as red circles.
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
@@ -120,35 +117,6 @@ void ExtractColor::FilterImage(cv::Mat & imgThresholded)
     //morphological closing (fill small holes in the foreground)
     cv::dilate( imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
     cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
-}
-
-cv::SimpleBlobDetector::Params ExtractColor::CreateParameters()
-{
-    // Set up the detector with default parameters.
-    // Setup SimpleBlobDetector parameters.
-    cv::SimpleBlobDetector::Params params;
-
-    // Change thresholds
-    params.minThreshold = 10;
-    params.maxThreshold = 255;
-    // Filter by Area.
-    params.filterByArea = true;
-    params.minArea = 200;
-    params.maxArea = 100000;
-
-    // Filter by Circularity
-    params.filterByCircularity = false;
-    params.minCircularity = 0.1;
-
-    // Filter by Convexity
-    params.filterByConvexity = false;
-    params.minConvexity = 0.87;
-
-    // Filter by Inertia
-    params.filterByInertia = false;
-    params.minInertiaRatio = 0.01;
-
-    return params;
 }
 
 Distance ExtractColor::CalculateDistance(cv::Point2f point,
