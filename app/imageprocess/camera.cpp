@@ -133,6 +133,18 @@ void Camera::InitializeTracking()
     emit ImgReadyForInitialization(frame);
 }
 
+std::vector<cv::KeyPoint> Camera::ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints, cv::Size size)
+{
+    std::vector<cv::KeyPoint> keyPointsMidPtCoord;
+    for(auto const & point : keyPoints)
+    {
+        cv::KeyPoint keyPt = point;
+        keyPt.pt = ConvertCameraToMidPointCoord(keyPt.pt, size);
+        keyPointsMidPtCoord.push_back(keyPt);
+    }
+    return keyPointsMidPtCoord;
+}
+
 cv::Point2f  Camera::ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size)
 {
     cv::Point2f midPointCoord;

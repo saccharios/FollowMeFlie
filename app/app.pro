@@ -21,7 +21,8 @@ SOURCES +=  main.cpp \
     gui/camera_view_painter.cpp \
     imageprocess/extract_color.cpp \
     qt_util.cpp \
-    imageprocess/ball_kalman_filter.cpp
+    imageprocess/ball_kalman_filter.cpp \
+    opencv_utils.cpp
 
 
 HEADERS  += \

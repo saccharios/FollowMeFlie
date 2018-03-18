@@ -34,6 +34,7 @@ public:
 
     static cv::Point2f  ConvertCameraToMidPointCoord(cv::Point2f cameraPt, cv::Size size);
     static cv::Point2f  ConvertMidPointToCameraCoord(cv::Point2f midPt, cv::Size size);
+    static std::vector<cv::KeyPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints, cv::Size size);
 
 signals:
     void ImgReadyForDisplay(QImage const &);

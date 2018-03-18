@@ -13,7 +13,7 @@ class ExtractColor :  public QObject
 public:
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
-      _kalmanFilter(cameraUpdateSamplingTime_seconds, 0.1, 10.0, 10.0)
+      _kalmanFilter(1.0, 1.0, 0.0)
     {}
 
 public slots:
@@ -28,9 +28,9 @@ private:
     BallKalmanFilter _kalmanFilter;
 
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);
+    std::vector<cv::KeyPoint> ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgWithKeypoints);
     void FilterImage(cv::Mat & imgThresholded);
     cv::SimpleBlobDetector::Params CreateParameters();
-    cv::Point2f Filter(cv::KeyPoint const & largestKeyPoint, cv::Size cameraSize);
     Distance CalculateDistance(cv::Point2f point,
                                double size,
                                cv::Size cameraSize,

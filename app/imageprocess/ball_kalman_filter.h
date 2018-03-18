@@ -10,25 +10,26 @@ using namespace Eigen;
 class BallKalmanFilter
 {
 
+    // State is defined as (x, y, dx, dy)
 public:
-    BallKalmanFilter(float sampling_time, float meas_noise, float process_noise_1, float process_noise_2):
+    BallKalmanFilter(float meas_noise, float process_noise_1, float process_noise_2):
         _A(),
         _Q(),
         _H(),
         _R(),
-        _kalman_filter()
+        _kalmanFilter()
     {
         // A =
-        // 1 0 Ts 0
-        // 0 1 0   Ts
-        // 0 0 1   0
-        // 0 0 0   1
+        // 1 0 1 0
+        // 0 1 0 1
+        // 0 0 1 0
+        // 0 0 0 1
         _A = Matrix4f::Identity(4,4),
-                _A(0,2) = sampling_time;
-        _A(1,3) = sampling_time;
+        _A(0,2) = 1;
+        _A(1,3) = 1;
         // Q =
-        // mn 0     pn2 0
-        // 0     mn 0     pn2
+        // pn1 0     pn2 0
+        // 0     pn1 0     pn2
         // pn2 0    pn1 0
         // 0     pn2 0    pn1
         _Q = Matrix4f::Zero(4,4);
@@ -53,10 +54,10 @@ public:
         _R = Matrix2f::Identity(2,2)*meas_noise;
 
 
-        _kalman_filter.SetStateUpdateMatrix(_A);
-        _kalman_filter.SetProcessNoiseCovMatrix(_Q);
-        _kalman_filter.SetMeasurementMatrix(_H);
-        _kalman_filter.SetMeasurementNoiseCovMatrix(_R);
+        _kalmanFilter.SetStateUpdateMatrix(_A);
+        _kalmanFilter.SetProcessNoiseCovMatrix(_Q);
+        _kalmanFilter.SetMeasurementMatrix(_H);
+        _kalmanFilter.SetMeasurementNoiseCovMatrix(_R);
 
         std::cout << _A<< "\n-----\n";
         std::cout << _Q<< "\n-----\n";
@@ -67,12 +68,16 @@ public:
 
     }
 
-    Vector4f Update(cv::Point2f input){ return Update(Vector2f{input.x, input.y});}
-    Vector4f Update(Distance input){ return Update(Vector2f{input.x, input.y});}
-    Vector4f Update(Vector3f input){ return Update(Vector2f{input[0],input[1]});}
-    Vector4f Update(Vector2f input);
+    cv::Point2f Update(std::vector<cv::KeyPoint> const &keyPointsMidPtCoord);
 
-    void Initialize(cv::Point2f input) {_kalman_filter.Initialize(Vector2f{input.x, input.y});}
+
+
+//    Vector4f Update(cv::Point2f input){ return Update(Vector2f{input.x, input.y});}
+//    Vector4f Update(Distance input){ return Update(Vector2f{input.x, input.y});}
+//    Vector4f Update(Vector3f input){ return Update(Vector2f{input[0],input[1]});}
+//    Vector4f Update(Vector2f input);
+
+    void Initialize(cv::Point2f input) {_kalmanFilter.Initialize(Vector2f{input.x, input.y});}
 
 
 
@@ -82,5 +87,8 @@ private:
     Matrix<float, 2, 4> _H;
     Matrix2f _R;
     //    Matrix4f _P; // Initial estimat of covariane matrix P not used
-    KalmanFilter<float,4,2> _kalman_filter;
+    KalmanFilter<float,4,2> _kalmanFilter;
+
+
+    cv::Point2f UpdateFilter(cv::Point2f pt);
 };
