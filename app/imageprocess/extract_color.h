@@ -36,8 +36,6 @@ public:
         // Filter by Inertia
         _detectorParams.filterByInertia = false;
         _detectorParams.minInertiaRatio = 0.01;
-
-       _blobDetector = cv::SimpleBlobDetector::create(_detectorParams);
     }
 
 public slots:
@@ -51,8 +49,7 @@ private:
     QColor const & _colorToFilter;
     BallKalmanFilter _kalmanFilter;
 
-    cv::SimpleBlobDetector _detectorParams;
-    cv::SimpleBlobDetector _blobDetector;
+    cv::SimpleBlobDetector::Params _detectorParams;
 
 
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);

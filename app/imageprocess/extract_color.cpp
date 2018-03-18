@@ -97,7 +97,10 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
 
     // Detect blobs.
     std::vector<cv::KeyPoint> keyPoints;
-    _blobDetector->detect( imgThresholded, keyPoints );
+
+    auto detector = cv::SimpleBlobDetector::create(_detectorParams);
+    detector->detect( imgThresholded, keyPoints );
+
 
     // Draw detected blobs as red circles.
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
@@ -146,40 +149,12 @@ Distance ExtractColor::CalculateDistance(cv::Point2f point,
 
 void ExtractColor::Initialize(cv::Mat const & img)
 {
-    // Create lower and upper color bounds
-    cv::Scalar colorToFilter= QColor2Scalar(_colorToFilter);
-    int tolerance = 20; // Arbitrary value but seems to be good.
-    cv::Scalar colorLower(colorToFilter[0] - tolerance, 80,80); // h, s, v
-    cv::Scalar colorUpper(colorToFilter[0] + tolerance, 255,255);
-
-    cv::Mat imgHSV;
-    ConvertToHSV(img, imgHSV, colorLower, colorUpper);
-
-    // Filter by color
-    cv::Mat imgThresholded;
-    cv::inRange(imgHSV, colorLower, colorUpper, imgThresholded);
-
-    // Filter holes away
-    FilterImage(imgThresholded);
-
-    // Create black/white picture
-    cv::threshold (imgThresholded, imgThresholded, 70, 255, CV_THRESH_BINARY_INV);
-
-    // Detect blobs.
-    // TODO SF No need to always create parameters a new!
-    auto params = CreateParameters();
-    auto detector = cv::SimpleBlobDetector::create(params);
-    std::vector<cv::KeyPoint> keyPoints;
-    detector->detect( imgThresholded, keyPoints );
-
     cv::Mat imgWithKeypoints;
-    // Draw detected blobs as red circles.
-    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-    cv::drawKeypoints( imgThresholded, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    auto keyPoints = ExtractKeyPoints(img, imgWithKeypoints);
 
     auto largestKeyPoint = opencv_utils::GetLargestKeyPoint(keyPoints);
 
-    cv::Size cameraSize = imgThresholded.size(); // 360, 640 default resolution
+    cv::Size cameraSize = img.size(); // 360, 640 default resolution
 
 
     // Kalman filter
