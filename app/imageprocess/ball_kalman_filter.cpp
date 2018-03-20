@@ -3,37 +3,39 @@
 #include "camera.h"
 #include <opencv2\opencv.hpp>
 
-cv::Point2f BallKalmanFilter::Update(std::vector<cv::KeyPoint> const & keyPoints)
+cv::KeyPoint BallKalmanFilter::Update(std::vector<cv::KeyPoint> const & keyPoints)
 {
     // Predict
     Eigen::Vector4f prediction = _kalmanFilter.Predict();
 
     // Get best fit measurement
     // If the ball is larger than a threshold, this is taken
-    auto largestKeyPoint = opencv_utils::GetLargestKeyPoint(keyPoints);
-    cv::Point2f validMeasurement = largestKeyPoint.pt;
+    cv::KeyPoint validMeasurement = opencv_utils::GetLargestKeyPoint(keyPoints);
     bool isValid = true;
     // Special routine to get the best fit if the ball is far away
     // If there was no measurement 20 consecutive times, the largestKeyPoint is taken.
-    if((largestKeyPoint.size < 20) && (_validCounter < 20))
+    if((validMeasurement.size < 20) && (_validCounter < 20))
     {
         isValid = GetBestFit(keyPoints, cv::Point2f{prediction[0],prediction[1]}, validMeasurement);
     }
 
     // Update the kalman filter
+    cv::KeyPoint output = validMeasurement;
     if(isValid)
     {
         _validCounter = 0;
-        return UpdateFilter(validMeasurement);
+        output.pt = UpdateFilter(validMeasurement.pt);
     }
     else
     {
         ++_validCounter;
-        return UpdateFilterNoMeas();
+        output.pt = UpdateFilterNoMeas();
+//        output.size
     }
+    return output;
 }
 
-bool BallKalmanFilter::GetBestFit(std::vector<cv::KeyPoint> const & keyPoints, cv::Point2f prediction, cv::Point2f & bestFit)
+bool BallKalmanFilter::GetBestFit(std::vector<cv::KeyPoint> const & keyPoints, cv::Point2f prediction, cv::KeyPoint & bestFit)
 {
     // TODO SF:: Discount small measurementsa close to the edges, especially the corners
 
@@ -46,7 +48,7 @@ bool BallKalmanFilter::GetBestFit(std::vector<cv::KeyPoint> const & keyPoints, c
         if(twoNorm < cost)
         {
             cost = twoNorm;
-            bestFit = keyPt.pt;
+            bestFit = keyPt;
         }
     }
     // Check if the closest is valid. We know the ball cannot travel too far in one sampling instant.

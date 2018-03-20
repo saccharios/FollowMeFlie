@@ -68,18 +68,9 @@ public:
 
     }
 
-    cv::Point2f Update(std::vector<cv::KeyPoint> const &keyPointsMidPtCoord);
-
-
-
-//    Vector4f Update(cv::Point2f input){ return Update(Vector2f{input.x, input.y});}
-//    Vector4f Update(Distance input){ return Update(Vector2f{input.x, input.y});}
-//    Vector4f Update(Vector3f input){ return Update(Vector2f{input[0],input[1]});}
-//    Vector4f Update(Vector2f input);
 
     void Initialize(cv::Point2f input) {_kalmanFilter.Initialize(Vector2f{input.x, input.y});}
-
-
+    cv::KeyPoint Update(const std::vector<cv::KeyPoint> &keyPoints);
 
 private:
     Matrix4f _A;
@@ -92,6 +83,6 @@ private:
 
     cv::Point2f UpdateFilter(cv::Point2f pt);
     cv::Point2f UpdateFilterNoMeas();
-    bool GetBestFit(std::vector<cv::KeyPoint> const & keyPoints, cv::Point2f prediciotn, cv::Point2f & bestFit);
     unsigned int _validCounter = 0;
+    bool GetBestFit(const std::vector<cv::KeyPoint> &keyPoints, cv::Point2f prediction, cv::KeyPoint &bestFit);
 };

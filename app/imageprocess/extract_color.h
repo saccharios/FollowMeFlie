@@ -55,11 +55,5 @@ private:
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);
     std::vector<cv::KeyPoint> ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgWithKeypoints);
     void FilterImage(cv::Mat & imgThresholded);
-    Distance CalculateDistance(cv::Point2f point,
-                               double size,
-                               cv::Size cameraSize,
-                               double blobSizeToLength,
-                               double focalLength,
-                               double sizeBall,
-                               double fieldOfView);
+    double CalculateDistance(const cv::KeyPoint &point);
 };

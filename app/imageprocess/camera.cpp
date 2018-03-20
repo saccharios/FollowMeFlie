@@ -41,7 +41,7 @@ void Camera::Update()
     case CameraState::CONNECTING:
     {
         std::cout << "Found Cameras: " << QCameraInfo::availableCameras().count() << std::endl;
-        _capture->open(2); // 0 for laptop camera // 1 for crazyflie camera // 2 for creative camera
+        _capture->open(1); // 0 for laptop camera // 1 for crazyflie camera // 2 for creative camera
         if(_activated && _capture->isOpened())
         {
             _state = CameraState::RUNNING;

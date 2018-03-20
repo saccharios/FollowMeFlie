@@ -18,31 +18,15 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     std::vector<cv::KeyPoint> keyPointsMidPtCoord = Camera::ConvertCameraToMidPointCoord(keyPointsCamCoord);
 
-    cv::Point2f estimateMidPtCoord = _kalmanFilter.Update(keyPointsMidPtCoord);
+    cv::KeyPoint estimateMidPtCoord = _kalmanFilter.Update(keyPointsMidPtCoord);
+    std::cout << "estimateMidPtCoord size = " << estimateMidPtCoord.size << std::endl;
 
-    // TODO SF No need to always create parameters a new! These settings depend on the camera!
-//    double blobSizeToLength = 1/287.0; // Factor to convert blob size to mm, experimental value
-//    double focalLength = 1.92; // Focal length of camera in mm
-//    double sizeBall = 68; // Diameter of the tennis ball in mm
-//    double fieldOfVview = 66*pi/180.0; // 66° diagonal
-//    auto distance = CalculateDistance(estimateMidPtCoord,
-//                                      largestKeyPoint.size,
-//                                      cameraSize,
-//                                      blobSizeToLength,
-//                                      focalLength,
-//                                      sizeBall,
-//                                      fieldOfVview);
-    //    std::cout << distance.x << " " << distance.y << " " << distance.z << std::endl;
+    double distance = CalculateDistance(estimateMidPtCoord);
+    std::cout << "distance = " << distance << std::endl;
 
-    cv::Point estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord);
+    // Draw the estimate
+    cv::Point estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
     cv::circle(imgWithKeypoints, estimateCamera, 30, {230,250,25},3);
-
-    //    std::cout << "_state_estimation = " << center.x << " "
-    //                 << center.y << " "
-    //                    << state_estimate[2] << " "
-    //                       << state_estimate[3] << "\n";
-    //    std::cout << "---------------------------------------------\n";
-
     cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
 }
 
@@ -120,29 +104,22 @@ void ExtractColor::FilterImage(cv::Mat & imgThresholded)
     cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
 }
 
-Distance ExtractColor::CalculateDistance(cv::Point2f point,
-                                         double size,
-                                         cv::Size cameraSize,
-                                         double blobSizeToLength,
-                                         double focalLength,
-                                         double sizeBall,
-                                         double fieldOfView)
+double ExtractColor::CalculateDistance(cv::KeyPoint const & point)
 {
-    double resolutionRatio = cameraSize.width / cameraSize.height;
-    // Estimate depth
-    double depth = focalLength *sizeBall /(blobSizeToLength * size);
+    // Use a primitive way of estimating the distance. This is known to be incorrect at the edges and the corners
+    // of the camera if the ball is far away (due to fish eye). But then it anyways does not matter.
+    // Formula is
+    // Distance = 1/(a * size +b)
+    // a and b are calculated with experimental values
+    // d | s
+    // 10 | 160
+    // 16 | 92
+    // 26 | 57
+    // 51 | 27
+    double a = 0.0007058662;
+    double b = -0.0008086623;
 
-    // TODO SF Can be optimized !
-    double totalWidth = 2.0*depth*sin(fieldOfView / 2.0) / sqrt(1.0+1.0/(resolutionRatio*resolutionRatio));
-    double totalHeight = totalWidth / resolutionRatio;
-    double widthToLength = totalWidth / cameraSize.width;
-    double heightToLength= totalHeight / cameraSize.height;
-
-    Distance distance; // in mm
-    distance.x = point.x * widthToLength;
-    distance.y = point.y * heightToLength;
-    distance.z = depth;
-    return distance;
+    return 1/(a*point.size + b);
 }
 
 void ExtractColor::Initialize(cv::Mat const & img)
