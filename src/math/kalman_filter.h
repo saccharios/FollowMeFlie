@@ -72,11 +72,11 @@ public:
         //        std::cout << "_P = "  << _P << std::endl;
         _P =  _A*_P * _A.transpose() + _Q;
 
-        std::cout << "No measurement! _state_estimation = " << _state_prediction[0] << " "
-                  << _state_prediction[1] << " "
-                  << _state_prediction[2] << " "
-                  << _state_prediction[3] << "\n";
-        std::cout << "---------------------------------------------\n";
+//        std::cout << "No measurement! _state_estimation = " << _state_prediction[0] << " "
+//                  << _state_prediction[1] << " "
+//                  << _state_prediction[2] << " "
+//                  << _state_prediction[3] << "\n";
+//        std::cout << "---------------------------------------------\n";
 
         return _state_prediction;
     }
@@ -107,11 +107,11 @@ public:
         _state_estimation = _state_prediction + Gain *(measurement - _H * _state_prediction);
         _P = (StateMatrix::Identity(N_States,N_States) - Gain * _H ) * a_posteriori_P;
 
-        std::cout << "_state_estimation = " << _state_estimation[0] << " "
-                     << _state_estimation[1] << " "
-                        << _state_estimation[2] << " "
-                           << _state_estimation[3] << "\n";
-        std::cout << "---------------------------------------------\n";
+//        std::cout << "_state_estimation = " << _state_estimation[0] << " "
+//                     << _state_estimation[1] << " "
+//                        << _state_estimation[2] << " "
+//                           << _state_estimation[3] << "\n";
+//        std::cout << "---------------------------------------------\n";
 
         return _state_estimation;
     }

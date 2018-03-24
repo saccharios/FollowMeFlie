@@ -23,10 +23,10 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
 
     cv::KeyPoint estimateMidPtCoord = _kalmanFilter.Update(blobs.midPoints);
-    std::cout << "estimateMidPtCoord size = " << estimateMidPtCoord.size << std::endl;
+    //std::cout << "estimateMidPtCoord size = " << estimateMidPtCoord.size << std::endl;
 
     float distance = CalculateDistance(estimateMidPtCoord);
-    std::cout << "distance = " << distance << std::endl;
+    //std::cout << "distance = " << distance << std::endl;
 
     // Draw the estimate
     cv::Point2f estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
@@ -149,11 +149,11 @@ void ExtractColor::Initialize(cv::Mat const & img)
     auto largestKeyPoint = opencv_utils::GetLargestKeyPoint(blobs.camPoints);
 
     // Kalman filter
-//    auto midPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
-//    std::cout << "Measurement = "<< midPtCoord.x << " " << midPtCoord.y << std::endl;
-
     auto measurementMidPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt);
     _kalmanFilter.Initialize(measurementMidPtCoord);
+
+    std::cout << "Measurement cam = "<< largestKeyPoint.pt.x << " " << largestKeyPoint.pt.y << std::endl;
+    std::cout << "Measurement mid = "<< measurementMidPtCoord.x << " " << measurementMidPtCoord.y << std::endl;
 
 }
 

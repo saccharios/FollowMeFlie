@@ -59,13 +59,10 @@ public:
         _kalmanFilter.SetMeasurementMatrix(_H);
         _kalmanFilter.SetMeasurementNoiseCovMatrix(_R);
 
-        std::cout << _A<< "\n-----\n";
-        std::cout << _Q<< "\n-----\n";
-        std::cout << _H<< "\n-----\n";
-        std::cout << _R << "\n-----\n";
-
-
-
+//        std::cout << _A<< "\n-----\n";
+//        std::cout << _Q<< "\n-----\n";
+//        std::cout << _H<< "\n-----\n";
+//        std::cout << _R << "\n-----\n";
     }
 
 

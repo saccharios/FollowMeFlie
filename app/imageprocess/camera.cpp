@@ -133,6 +133,7 @@ void Camera::InitializeTracking()
 {
     cv::Mat frame;
     FetchImage(frame);
+    FetchImage(frame); // Fetch twice, as the first image contains nothing
     emit ImgReadyForInitialization(frame);
 }
 
