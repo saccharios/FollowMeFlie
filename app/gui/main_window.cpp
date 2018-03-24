@@ -13,6 +13,7 @@
 
 #include "qt_util.h"
 #include "time_levels.h"
+#include "math/types.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -69,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForInitialization(cv::Mat const &)), &_extractColor, SLOT(Initialize(cv::Mat const &)));
+
+    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Distance const &)), &_commander, SLOT(ReceiveEstimate(Distance const &)));
+
 
 
 
@@ -225,7 +229,8 @@ void MainWindow::on_pushButton_Stop_clicked()
 
 void MainWindow::on_pushButton_hoverMode_clicked()
 {
-    _commander.ActivateHoverMode(true);
+    _camera.Activate(true);
+    _commander.ActivateHoverMode();
 }
 
 

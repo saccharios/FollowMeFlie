@@ -175,22 +175,59 @@ void Crazyflie::SendSetpoint(SetPoint setPoint)
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
 
+void Crazyflie::Stop()
+{
+    Data data;
+    uint8_t command = CommanderGeneric::Channel::Stop::id;
+    data.push_back(command);
+
+    CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+}
+
 void  Crazyflie::SendVelocityRef(Velocity velocity)
 {
+    // vx in meter/s in world frame.
+    // vy in meter/s in world frame.
+    // vz in meter/s in world frame.
+    // yawrate in deg/s
+
     // TODO SF  also x -mode?
     Data data;
-    uint8_t command = 1;
     auto vx_vect = ConvertTouint8_tVect(velocity[0]);
     auto vy_vect = ConvertTouint8_tVect(velocity[1]);
     auto vz_vect = ConvertTouint8_tVect(velocity[2]);
     auto yaw_vect = ConvertTouint8_tVect(0.0f);
+    uint8_t command = CommanderGeneric::Channel::VelocityWorld::id;
     data.push_back(command);
     data.insert(data.end(), vx_vect.begin(), vx_vect.end());
     data.insert(data.end(), vy_vect.begin(), vy_vect.end());
     data.insert(data.end(), vz_vect.begin(), vz_vect.end());
     data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
 
-    CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::GenericSetpoint::id, std::move(data));
+    CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+}
+void  Crazyflie::SendHover(float vx, float vy, float yawrate, float zDistance)
+{
+    // vx in meter/s in body frame.
+    // vy in meter/s in body frame.
+    // yawrate in deg/s
+    // zDistance meter/s in world frame.
+    Data data;
+    auto vx_vect = ConvertTouint8_tVect(vx);
+    auto vy_vect = ConvertTouint8_tVect(vy);
+    auto yaw_vect = ConvertTouint8_tVect(yawrate);
+    auto zdist_vect = ConvertTouint8_tVect(zDistance);
+
+    uint8_t command = CommanderGeneric::Channel::Hover::id;
+    data.push_back(command);
+    data.insert(data.end(), vx_vect.begin(), vx_vect.end());
+    data.insert(data.end(), vy_vect.begin(), vy_vect.end());
+    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
+    data.insert(data.end(), zdist_vect.begin(), zdist_vect.end());
+
+    CRTPPacket packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
 

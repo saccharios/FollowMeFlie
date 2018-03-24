@@ -43,7 +43,7 @@ public slots:
     void Initialize(cv::Mat const & img);
 
 signals:
-    void NewDistance(Distance const &);
+    void EstimateReady(Distance const &);
 
 private:
     QColor const & _colorToFilter;
@@ -55,5 +55,5 @@ private:
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);
     std::vector<cv::KeyPoint> ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgWithKeypoints);
     void FilterImage(cv::Mat & imgThresholded);
-    double CalculateDistance(const cv::KeyPoint &point);
+    float CalculateDistance(const cv::KeyPoint &point);
 };

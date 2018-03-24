@@ -23,6 +23,7 @@ Camera::Camera () :
 {
 }
 cv::Size Camera::_resolution = cv::Size();
+cv::Point2f Camera::_midPoint = cv::Point2f();
 
 void Camera::Update()
 {
@@ -47,7 +48,7 @@ void Camera::Update()
             _state = CameraState::RUNNING;
             _resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
             _resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
-
+            _midPoint = ConvertMidPointToCameraCoord({0.0, 0.0});
 
             _capture->set(CV_CAP_FFMPEG,true);
             _capture->set(CV_CAP_PROP_FPS,30);

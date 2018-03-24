@@ -183,9 +183,41 @@ struct Parameter
 struct CommanderGeneric
 {
     static constexpr uint8_t id = 7;
-    struct GenericSetpoint
+    struct Channel
     {
         static constexpr uint8_t id = 0;
+        struct Stop
+        {
+            static constexpr uint8_t id = 0;
+        };
+        struct VelocityWorld
+        {
+            static constexpr uint8_t id = 1;
+        };
+        struct ZDistance
+        {
+            static constexpr uint8_t id = 2;
+        };
+        struct CPPMEmulation
+        {
+            static constexpr uint8_t id = 3;
+        };
+        struct AltitudeHold
+        {
+            static constexpr uint8_t id = 4;
+        };
+        struct Hover
+        {
+            static constexpr uint8_t id = 5;
+        };
+        struct FullState
+        {
+            static constexpr uint8_t id = 6;
+        };
+        struct Position
+        {
+            static constexpr uint8_t id = 7;
+        };
     };
 };
 

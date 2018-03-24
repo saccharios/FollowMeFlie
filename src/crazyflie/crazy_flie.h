@@ -37,6 +37,7 @@ struct SetPoint
         std::cout << "roll = " << roll << " pitch = " << pitch << " yaw = " << yaw << " thrust = " << thrust << std::endl;
     }
 };
+
 struct Barometer
 {
     float asl;
@@ -44,6 +45,7 @@ struct Barometer
     float temperature;
     float pressure;
 };
+
 struct Accelerometer
 {
     float x;
@@ -61,7 +63,7 @@ struct Gyrometer
 struct Battery
 {
     double  level;
-    float      state;
+    float   state;
 };
 
 struct Magnetometer
@@ -70,6 +72,7 @@ struct Magnetometer
     float y;
     float z;
 };
+
 struct SensorValues
 {
     SetPoint             stabilizer;
@@ -104,6 +107,9 @@ public:
 
     void SetSendingVelocityRef(bool isSendingVelocityRef);
     bool IsSendingVelocityRef();
+
+    void Stop();
+    void SendHover(float vx, float vy, float yawrate, float zDistance);
 
     SensorValues const & GetSensorValues() const {return _sensorValues;}
 

@@ -1,7 +1,7 @@
 #include "extract_color.h"
 #include "opencv_utils.h"
 #include "math/constants.h"
-
+#include "math/types.h"
 cv::Scalar QColor2Scalar(QColor const & color)
 {
     int h = 0;
@@ -21,13 +21,20 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     cv::KeyPoint estimateMidPtCoord = _kalmanFilter.Update(keyPointsMidPtCoord);
     std::cout << "estimateMidPtCoord size = " << estimateMidPtCoord.size << std::endl;
 
-    double distance = CalculateDistance(estimateMidPtCoord);
+    float distance = CalculateDistance(estimateMidPtCoord);
     std::cout << "distance = " << distance << std::endl;
 
     // Draw the estimate
-    cv::Point estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
-    cv::circle(imgWithKeypoints, estimateCamera, 30, {230,250,25},3);
+    cv::Point2f estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
+    cv::circle(imgWithKeypoints, estimateCamera, 25, {230,250,25},3);
+    // Draw circle in the middle
+    cv::circle(imgWithKeypoints, Camera::MidPoint(), 25, {200,10,50}, 3);
+
     cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
+
+    Distance positionEstimate = {estimateMidPtCoord.pt.x, estimateMidPtCoord.pt.y, distance};
+    emit EstimateReady(positionEstimate);
+
 }
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
@@ -104,7 +111,7 @@ void ExtractColor::FilterImage(cv::Mat & imgThresholded)
     cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
 }
 
-double ExtractColor::CalculateDistance(cv::KeyPoint const & point)
+float ExtractColor::CalculateDistance(cv::KeyPoint const & point)
 {
     // Use a primitive way of estimating the distance. This is known to be incorrect at the edges and the corners
     // of the camera if the ball is far away (due to fish eye). But then it anyways does not matter.
@@ -116,8 +123,8 @@ double ExtractColor::CalculateDistance(cv::KeyPoint const & point)
     // 16 | 92
     // 26 | 57
     // 51 | 27
-    double a = 0.0007058662;
-    double b = -0.0008086623;
+    float a = 0.0007058662;
+    float b = -0.0008086623;
 
     return 1/(a*point.size + b);
 }

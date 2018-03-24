@@ -27,9 +27,10 @@ public:
 
 
 
-    static cv::Point2f  ConvertCameraToMidPointCoord(cv::Point2f cameraPt);
-    static cv::Point2f  ConvertMidPointToCameraCoord(cv::Point2f midPt);
+    static cv::Point2f ConvertCameraToMidPointCoord(cv::Point2f cameraPt);
+    static cv::Point2f ConvertMidPointToCameraCoord(cv::Point2f midPt);
     static std::vector<cv::KeyPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints);
+    static cv::Point2f MidPoint() {return _midPoint;}
 
 signals:
     void ImgReadyForDisplay(QImage const &);
@@ -43,6 +44,8 @@ private:
     cv::VideoCapture* _capture;
 
     static cv::Size _resolution;
+    static cv::Point2f _midPoint;
+
     void FetchAndImageReady();
     void FetchImage(cv::Mat & frame);
     void InitializeTracking();

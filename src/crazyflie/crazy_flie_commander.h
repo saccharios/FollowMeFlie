@@ -1,37 +1,49 @@
 #pragma once
-
+#include "QOBJECT"
 #include "math/pi_controller.h"
 #include "crazyflie/crazy_flie.h"
+#include "math/types.h"
+#include "math/double_buffer.h"
 
-
-
-
-class CrazyFlieCommander
+class CrazyFlieCommander :public QObject
 {
+    Q_OBJECT
 public:
     CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime);
 
-    void ActivateHoverMode(bool activate)
+    void ActivateHoverMode()
     {
-        _hoverModeIsActive  = activate;
+        _hoverModeIsActive  = true;
     }
 
     void Update();
 
     void Stop()
     {
+
+
         _hoverModeIsActive= false;
         _crazyflie.SetSetPoint({0,0,0,0});
         _crazyflie.SetSendSetpoints(true);
+        _crazyflie.SetVelocityRef({0,0,0});
+        _crazyflie.SetSendingVelocityRef(false);
+
+        _crazyflie.Stop();
     }
+
+public slots:
+    void ReceiveEstimate(Distance const &);
 
 private:
     Crazyflie & _crazyflie;
     bool _hoverModeIsActive;
     float _samplingTime;
 
-    PI_Controller _piYaw;
-    PI_Controller _piRoll;
-    PI_Controller _piPitch;
-    PI_Controller _zAcceleration;
+    PI_Controller _piXVelocity;
+    PI_Controller _piYVelocity;
+    PI_Controller _piZVelocity;
+    Double_Buffer<Distance> _currentEstimate;
+
+    void UpdateHoverMode();
+
 };

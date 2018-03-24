@@ -2,35 +2,48 @@
 #include "math/constants.h"
 #include "math/types.h"
 
-//    PI_Controller(double sampling_time,
-//                  double gain_proportional,
-//                  double time_constant_inverse,
-//                  double gain_correction,
-//                  double feed_fwd,
-//                  double limit_lower,
-//                  double limit_upper ):
-
+static constexpr float limit = 0.1;
 
 CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
     _hoverModeIsActive(false),
     _samplingTime(samplingTime),
-    _piYaw (_samplingTime*0.001f, 0.0f, 0.0f, 0.0f, 0.0f, -180.0f,180.0f),
-    _piRoll (_samplingTime*0.001f, 0.0f, 0.2f, 0.0f, 0.0f, -180.0f,180.0f),
-    _piPitch(_samplingTime*0.001f, 0.0f, 0.2f, 0.0f, 0.0f, -180.0,180.0f),
-    _zAcceleration(_samplingTime*0.001f, 0.0f, 0.0f, 0.0f, 0.0f, 10.0f,10.0f) // What is the unit of acc z?
+    //(sampling_time,   gain_proportional, time_constant_inverse,gain_correction,feed_fwd,limit_lower,limit_upper ):
+    _piXVelocity (samplingTime*0.001f, 0.01f, 0.01f, 1.0f, 0.0f, -limit,limit),
+    _piYVelocity (samplingTime*0.001f, 0.01f, 0.01f, 1.0f, 0.0f, -limit,limit),
+    _piZVelocity(samplingTime*0.001f, 0.01f, 0.01f, 1.0f, 0.0f, -limit,limit),
+    _currentEstimate()
 {}
 
+// Periodically called
 void CrazyFlieCommander::Update()
 {
-    static Velocity velocity;
     if(_hoverModeIsActive)
     {
-        _crazyflie.SetVelocityRef(Velocity{0.0, 0.0, 0.0});
-        _crazyflie.SetSendingVelocityRef(true);
+        UpdateHoverMode();
     }
     else
     {
-        velocity = {0.0f,0.0f,0.0f};
+        _crazyflie.SetSendingVelocityRef(false);
+        _crazyflie.SetSendSetpoints(false);
     }
+}
+// called when new estimate is ready
+void CrazyFlieCommander::ReceiveEstimate(Distance const & distance)
+{
+    _currentEstimate.write() = distance;
+    _currentEstimate.swap();
+}
+void CrazyFlieCommander::UpdateHoverMode()
+{
+    Distance const & currentEstimate = _currentEstimate.read();
+    Velocity velocity;
+    velocity[0] = 0;
+    velocity[1] = 0;
+    velocity[2] = 0;
+//    velocity[1] = -_piYVelocity.Update(-currentEstimate.y);
+//    velocity[2] = -_piZVelocity.Update(-currentEstimate.z);
+
+    _crazyflie.SetVelocityRef(velocity);
+    _crazyflie.SetSendingVelocityRef(true);
 }
