@@ -11,9 +11,16 @@ class ExtractColor :  public QObject
     Q_OBJECT
 
 public:
+
+    struct Blobs
+    {
+        std::vector<cv::KeyPoint> camPoints;
+        std::vector<cv::KeyPoint> midPoints;
+    };
+
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
-        _kalmanFilter(1.0, 0.1, 0.0),
+        _kalmanFilter(0.5, 0.05, 0.0),
         _detectorParams()
     {
 
@@ -22,7 +29,7 @@ public:
         _detectorParams.maxThreshold = 255;
         // Filter by Area.
         _detectorParams.filterByArea = true;
-        _detectorParams.minArea = 1;
+        _detectorParams.minArea = 3;
         _detectorParams.maxArea = 100000;
 
         // Filter by Circularity
@@ -53,7 +60,9 @@ private:
 
 
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);
-    std::vector<cv::KeyPoint> ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgWithKeypoints);
+    ExtractColor::Blobs ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgToShow);
     void FilterImage(cv::Mat & imgThresholded);
     float CalculateDistance(const cv::KeyPoint &point);
+    void RemoveKeyPointsAtEdges(Blobs & blobs);
+    void AddMidPtCoord(Blobs & blobs);
 };

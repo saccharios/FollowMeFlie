@@ -13,12 +13,16 @@ cv::Scalar QColor2Scalar(QColor const & color)
 
 void ExtractColor::ProcessImage(cv::Mat const & img)
 {
-    cv::Mat imgWithKeypoints;
-    std::vector<cv::KeyPoint> keyPointsCamCoord = ExtractKeyPoints(img, imgWithKeypoints);
+    cv::Mat imgToShow;
+    Blobs blobs = ExtractKeyPoints(img, imgToShow);
 
-    std::vector<cv::KeyPoint> keyPointsMidPtCoord = Camera::ConvertCameraToMidPointCoord(keyPointsCamCoord);
+    // Draw detected blobs as red circles.
+    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
+    cv::drawKeypoints( imgToShow, blobs.camPoints, imgToShow, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
-    cv::KeyPoint estimateMidPtCoord = _kalmanFilter.Update(keyPointsMidPtCoord);
+
+
+    cv::KeyPoint estimateMidPtCoord = _kalmanFilter.Update(blobs.midPoints);
     std::cout << "estimateMidPtCoord size = " << estimateMidPtCoord.size << std::endl;
 
     float distance = CalculateDistance(estimateMidPtCoord);
@@ -26,11 +30,11 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     // Draw the estimate
     cv::Point2f estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
-    cv::circle(imgWithKeypoints, estimateCamera, 25, {230,250,25},3);
+    cv::circle(imgToShow, estimateCamera, 25, {230,250,25},3);
     // Draw circle in the middle
-    cv::circle(imgWithKeypoints, Camera::MidPoint(), 25, {200,10,50}, 3);
+    cv::circle(imgToShow, Camera::GetMidPoint(), 25, {200,10,50}, 3);
 
-    cv::imshow("Thresholded Frame", imgWithKeypoints); // Show output image
+    cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
     Distance positionEstimate = {estimateMidPtCoord.pt.x, estimateMidPtCoord.pt.y, distance};
     emit EstimateReady(positionEstimate);
@@ -63,7 +67,7 @@ void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scala
     }
 }
 
-std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgWithKeypoints)
+ExtractColor::Blobs ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgToShow)
 {
     // Create lower and upper color bounds
     cv::Scalar colorToFilter= QColor2Scalar(_colorToFilter);
@@ -75,29 +79,37 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
     ConvertToHSV(img, imgHSV, colorLower, colorUpper);
 
     // Filter by color
-    cv::Mat imgThresholded;
-    cv::inRange(imgHSV, colorLower, colorUpper, imgThresholded);
+    cv::inRange(imgHSV, colorLower, colorUpper, imgToShow);
 
     // Filter holes away
-    FilterImage(imgThresholded);
+    FilterImage(imgToShow);
 
     // Create black/white picture
-    cv::threshold (imgThresholded, imgThresholded, 70, 255, CV_THRESH_BINARY_INV);
+    cv::threshold (imgToShow, imgToShow, 70, 255, CV_THRESH_BINARY_INV);
 
     // Detect blobs.
-    std::vector<cv::KeyPoint> keyPoints;
+    Blobs blobs;
 
     auto detector = cv::SimpleBlobDetector::create(_detectorParams);
-    detector->detect( imgThresholded, keyPoints );
+    detector->detect( imgToShow, blobs.camPoints );
+
+    AddMidPtCoord(blobs);
 
 
-    // Draw detected blobs as red circles.
-    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-    cv::drawKeypoints( imgThresholded, keyPoints, imgWithKeypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    // Remove keypoints close to the edge
+    RemoveKeyPointsAtEdges(blobs);
 
-    return keyPoints;
+    return blobs;
 }
 
+void ExtractColor::AddMidPtCoord(Blobs & blobs)
+{
+    blobs.midPoints = blobs.camPoints;
+    for(uint8_t idx = 0; idx < blobs.camPoints.size(); ++idx)
+    {
+        blobs.midPoints.at(idx).pt = Camera::ConvertCameraToMidPointCoord(blobs.camPoints.at(idx).pt);
+    }
+}
 
 
 void ExtractColor::FilterImage(cv::Mat & imgThresholded)
@@ -132,9 +144,9 @@ float ExtractColor::CalculateDistance(cv::KeyPoint const & point)
 void ExtractColor::Initialize(cv::Mat const & img)
 {
     cv::Mat imgWithKeypoints;
-    auto keyPoints = ExtractKeyPoints(img, imgWithKeypoints);
+    Blobs blobs = ExtractKeyPoints(img, imgWithKeypoints);
 
-    auto largestKeyPoint = opencv_utils::GetLargestKeyPoint(keyPoints);
+    auto largestKeyPoint = opencv_utils::GetLargestKeyPoint(blobs.camPoints);
 
     // Kalman filter
 //    auto midPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt, cameraSize);
@@ -143,5 +155,29 @@ void ExtractColor::Initialize(cv::Mat const & img)
     auto measurementMidPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt);
     _kalmanFilter.Initialize(measurementMidPtCoord);
 
+}
+
+void ExtractColor::RemoveKeyPointsAtEdges(Blobs & blobs)
+{
+    // Receives keyPoints in midPoint Coordinates.
+    // Removes all keyPoints that are further away from the midPoint than (x-resultion/2)*0.9;
+    float limit = (Camera::GetResolution().width/2.0 *0.9);
+    float limit_sqr = limit*limit;
+
+    for(uint8_t idx = 0; idx < blobs.midPoints.size(); )
+    {
+
+        if( (blobs.midPoints.at(idx).pt.x * blobs.midPoints.at(idx).pt.x) +
+                (blobs.midPoints.at(idx).pt.y * blobs.midPoints.at(idx).pt.y)
+                > (limit_sqr))
+        {
+            blobs.camPoints.erase(blobs.camPoints.begin() + idx);
+            blobs.midPoints.erase(blobs.midPoints.begin() + idx);
+        }
+        else
+        {
+            ++idx;
+        }
+    }
 }
 

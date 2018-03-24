@@ -7,8 +7,6 @@
 template<typename T>
 Data ConvertTouint8_tVect(T element)
 {
-    Acceleration a;
-
     // Reinterpret element as array of 8-byte uint8_t
     uint8_t* uint8_t_array = reinterpret_cast<uint8_t *>(&element);
     // Create vector from the array

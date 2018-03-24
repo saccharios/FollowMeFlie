@@ -194,6 +194,8 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
 
     // TODO SF  also x -mode?
     Data data;
+    //auto vx_vect = ConvertTouint8_tVect(SQRT2 * (velocity[0] - velocity[1]));
+    //auto vy_vect = ConvertTouint8_tVect(SQRT2 * (velocity[0] + velocity[1]));
     auto vx_vect = ConvertTouint8_tVect(velocity[0]);
     auto vy_vect = ConvertTouint8_tVect(velocity[1]);
     auto vz_vect = ConvertTouint8_tVect(velocity[2]);

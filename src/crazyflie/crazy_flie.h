@@ -158,7 +158,7 @@ private:
     SetPoint _sendSetPoint;
     SetPoint _maxSetPoint;
 
-    Velocity _velocity = {};
+    Velocity _velocity = {0.0, 0.0, 0.0};
 
     int _minThrust;
 

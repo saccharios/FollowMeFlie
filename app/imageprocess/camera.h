@@ -23,14 +23,14 @@ public:
     void Activate(bool activate);
     void Update();
     CameraState GetState() const {return _state; }
-    cv::Size const & GetResolution() const {return _resolution;}
+    static cv::Size const & GetResolution() {return _resolution;}
+    static cv::Point2f const & GetMidPoint() {return _midPoint;}
 
 
 
     static cv::Point2f ConvertCameraToMidPointCoord(cv::Point2f cameraPt);
     static cv::Point2f ConvertMidPointToCameraCoord(cv::Point2f midPt);
     static std::vector<cv::KeyPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints);
-    static cv::Point2f MidPoint() {return _midPoint;}
 
 signals:
     void ImgReadyForDisplay(QImage const &);
