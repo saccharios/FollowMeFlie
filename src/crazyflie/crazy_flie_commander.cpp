@@ -9,9 +9,9 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _hoverModeIsActive(false),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse,gain_correction,feed_fwd,limit_lower,limit_upper ):
-    _piXVelocity (samplingTime*0.001f, 0.01f, 0.1f, 1.0f, 0.0f, -limit,limit),
-    _piYVelocity (samplingTime*0.001f, 0.01f, 0.1f, 1.0f, 0.0f, -limit,limit),
-    _piZVelocity(samplingTime*0.001f, 0.01f, 0.1f, 1.0f, 0.0f, -limit,limit),
+    _piXVelocity (samplingTime*0.001f, 0.2f, 0.1f, 1.0f, 0.0f, -limit,limit),
+    _piYVelocity (samplingTime*0.001f, 0.05f, 0.1f, 1.0f, 0.0f, -limit,limit),
+    _piZVelocity(samplingTime*0.001f, 0.05f, 0.1f, 1.0f, 0.0f, -limit,limit),
     _currentEstimate()
 {}
 
@@ -36,13 +36,14 @@ void CrazyFlieCommander::ReceiveEstimate(Distance const & distance)
 }
 void CrazyFlieCommander::UpdateHoverMode()
 {
+
     Distance const & currentEstimate = _currentEstimate.read();
     Velocity velocity;
-    velocity[0] = 0;
+    velocity[0] = _piXVelocity.Update(-currentEstimate.x); // is in cm !
 //    velocity[1] = 0;
 //    velocity[2] = 0;
-    velocity[1] = -_piYVelocity.Update(-currentEstimate.y);
-    velocity[2] = -_piZVelocity.Update(-currentEstimate.z);
+    velocity[1] = _piYVelocity.Update(-currentEstimate.y);
+    velocity[2] = _piZVelocity.Update(-currentEstimate.z);
 
     _crazyflie.SetVelocityRef(velocity);
     _crazyflie.SetSendingVelocityRef(true);

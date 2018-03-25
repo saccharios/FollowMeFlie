@@ -9,7 +9,7 @@ float ExtractData<float>(Data const & data, int offset)
     constexpr unsigned int typeLength = sizeof(float);
     IntFloat bits;
     bits.int_value = 0;
-    if(data.size() > offset +typeLength) // TODO SF >= or just > ?
+    if(data.size() > offset + typeLength) // TODO SF >= or just > ?
     {
         for(unsigned int i = 0; i < typeLength; ++i)
         {

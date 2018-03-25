@@ -34,7 +34,8 @@ HEADERS  += \
     crazyflie/radio_dongle.h \
     math/double_buffer.h \
     crazyflie/error_codes.h \
-    math/kalman_filter.h
+    math/kalman_filter.h \
+    math/delay.h
 
 SOURCES += \
     math/lowpass.cpp \

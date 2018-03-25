@@ -50,7 +50,7 @@ TEST_F(CRTPPacketTest, Convert_Float_To_uint8_tVect)
     {
         EXPECT_EQ(myVect[i], buffer[i]);
     }
-    float value = ExtractData<float>(myVect, 0 );
+    float value = ExtractData<float>(myVect, 0 ); // Test fails because of different offsets?
     EXPECT_FLOAT_EQ(num, value);
 }
 TEST_F(CRTPPacketTest, Convert_Double_To_uint8_tVect)
