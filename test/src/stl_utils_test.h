@@ -1,7 +1,7 @@
 #pragma once
 #include "gtest/gtest.h"
 #include <iostream>
-#include "math/stl_utils.h"
+#include "stl_utils.h"
 #include "crazyflie/crtp_packet.h"
 
 class STLUtils_Test : public testing::Test

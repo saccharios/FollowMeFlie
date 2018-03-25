@@ -17,7 +17,7 @@ INCLUDEPATH += crazyflie \
 
 HEADERS  += \
     math/types.h \
-    math/stl_utils.h \
+    stl_utils.h \
     math/logic.h \
     math/functions.h \
     math/constants.h \

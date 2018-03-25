@@ -13,7 +13,6 @@
 #include "actual_values_model.h"
 #include "parameter_model.h"
 
-
 namespace Ui
 {
 class MainWindow;
@@ -74,7 +73,6 @@ private:
     Camera _camera;
     ExtractColor _extractColor;
     CrazyFlieCommander _commander;
-
 
     void DisplayConnectionStatus();
 };

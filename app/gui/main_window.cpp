@@ -14,6 +14,7 @@
 #include "qt_util.h"
 #include "time_levels.h"
 #include "math/types.h"
+#include "text_logger.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(UpdateConnectionStatus()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()), &textLogger, SLOT(WriteToFile()));
 
     // Send and Receive packets
     _timer_sr.start(sendReceiveSamplingTime);

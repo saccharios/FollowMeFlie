@@ -2,7 +2,7 @@
 #include "math/types.h"
 #include "radio_dongle.h"
 #include "crtp_packet.h"
-#include "math/stl_utils.h"
+#include "stl_utils.h"
 #include "protocol.h"
 #include <map>
 #include "crazyflie/crtp_packet.h"
