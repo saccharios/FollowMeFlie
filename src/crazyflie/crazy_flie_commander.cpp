@@ -20,7 +20,6 @@ void CrazyFlieCommander::Update()
 {
     if(_hoverModeIsActive.Value())
     {
-        std::cout << "yeah!\n";
         UpdateHoverMode();
     }
     else

@@ -114,9 +114,16 @@ void Crazyflie::Update()
         bool success = _logger.EnableLogging();
         if(success)
         {
-            _state = State::NORMAL_OPERATION;
+            _state = State::SET_PARAMETERS;
         }
         break;
+    }
+    case State::SET_PARAMETERS:
+    {
+        // Set Parameters that take into account the increased weight due to the camera
+        _parameters.WriteParameter(63, 39000); // idx 63 = thrustBase
+        _parameters.WriteParameter(64, 23000); // idx 64 = minThrust
+        _state = State::NORMAL_OPERATION;
     }
     case State::NORMAL_OPERATION:
     {

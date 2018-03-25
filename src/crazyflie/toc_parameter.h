@@ -44,6 +44,9 @@ public:
         return _elements;
     }
 
+    TOCElement GetElement(uint8_t idx );
+
+
 signals:
     void ParameterRead(uint8_t const &);
 public slots:

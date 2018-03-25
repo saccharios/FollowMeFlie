@@ -210,5 +210,19 @@ void TocParameter::ProcessMiscData(Data const & data)
 }
 
 
+TOCElement TocParameter::GetElement(uint8_t idx )
+{
 
+    bool isValid = false;
+    TOCElement & element = STLUtils::ElementForID(_elements, idx, isValid);
+    if(isValid)
+    {
+        return element;
+    }
+    else
+    {
+        std::cout << "Could not request parameter " << idx << std::endl;
+        return TOCElement();
+    }
+}
 
