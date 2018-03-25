@@ -4,6 +4,7 @@
 #include "crazyflie/crazy_flie.h"
 #include "math/types.h"
 #include "math/double_buffer.h"
+#include "math/delay.h"
 
 class CrazyFlieCommander :public QObject
 {
@@ -13,16 +14,14 @@ public:
 
     void ActivateHoverMode()
     {
-        _hoverModeIsActive  = true;
+        _hoverModeIsActive.Activate(true);
     }
 
     void Update();
 
     void Stop()
     {
-
-
-        _hoverModeIsActive= false;
+        _hoverModeIsActive.Activate(false);
         _crazyflie.SetSetPoint({0,0,0,0});
         _crazyflie.SetSendSetpoints(true);
         _crazyflie.SetVelocityRef({0,0,0});
@@ -36,7 +35,7 @@ public slots:
 
 private:
     Crazyflie & _crazyflie;
-    bool _hoverModeIsActive;
+    OnDelay<10> _hoverModeIsActive;
     float _samplingTime;
 
     PI_Controller _piXVelocity;

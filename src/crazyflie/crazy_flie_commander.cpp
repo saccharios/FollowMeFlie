@@ -6,7 +6,7 @@ static constexpr float limit = 0.1;
 
 CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
-    _hoverModeIsActive(false),
+    _hoverModeIsActive(),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse,gain_correction,feed_fwd,limit_lower,limit_upper ):
     _piXVelocity (samplingTime*0.001f, 0.2f, 0.1f, 1.0f, 0.0f, -limit,limit),
@@ -18,8 +18,9 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
 // Periodically called
 void CrazyFlieCommander::Update()
 {
-    if(_hoverModeIsActive)
+    if(_hoverModeIsActive.Value())
     {
+        std::cout << "yeah!\n";
         UpdateHoverMode();
     }
     else
