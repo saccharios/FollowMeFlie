@@ -1,7 +1,7 @@
 #pragma once
 #include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
 #include "E:\Code\lib\eigen-3.3.4\Eigen/LU"
-
+#include "text_logger.h"
 #include "math/types.h"
 using namespace Eigen;
 
@@ -69,14 +69,14 @@ public:
     // The estimate is the prediction
     StateVector Estimate()
     {
-        //        std::cout << "_P = "  << _P << std::endl;
+        //        textLogger << "_P = "  << _P << "\n";
         _P =  _A*_P * _A.transpose() + _Q;
 
-//        std::cout << "No measurement! _state_estimation = " << _state_prediction[0] << " "
+//        textLogger << "No measurement! _state_estimation = " << _state_prediction[0] << " "
 //                  << _state_prediction[1] << " "
 //                  << _state_prediction[2] << " "
 //                  << _state_prediction[3] << "\n";
-//        std::cout << "---------------------------------------------\n";
+//        textLogger << "---------------------------------------------\n";
 
         return _state_prediction;
     }
@@ -85,21 +85,21 @@ public:
     StateVector Estimate(MeasVector measurement)
     {
 
-//        std::cout << "measurement = " << measurement[0] << " " << measurement[1] << "\n";
-//        std::cout << "prediction = " << state_prediction[0] << " "
+//        textLogger << "measurement = " << measurement[0] << " " << measurement[1] << "\n";
+//        textLogger << "prediction = " << state_prediction[0] << " "
 //                     << _state_prediction[1] << " "
 //                        << _state_prediction[2] << " "
 //                           << _state_prediction[3] << "\n";
 
 
-//        std::cout << "_P = "  << _P << std::endl;
-//        std::cout << "_A = "  << _A << std::endl;
-//        std::cout << "_A.transpose()  = "  << _A.transpose()  << std::endl;
-//        std::cout << "_Q = "  << _Q << std::endl;
+//        textLogger << "_P = "  << _P << "\n";
+//        textLogger << "_A = "  << _A << "\n";
+//        textLogger << "_A.transpose()  = "  << _A.transpose()  << "\n";
+//        textLogger << "_Q = "  << _Q << "\n";
 
         // Kalman gain
         StateMatrix a_posteriori_P =  _A*_P * _A.transpose() + _Q;
-        //std::cout << "a_posteriori_P = "  << a_posteriori_P << std::endl;
+        //textLogger << "a_posteriori_P = "  << a_posteriori_P << "\n";
         MeasMatrix S = _H*a_posteriori_P*_H_transpose + _R;
         Meas2StateMatrix Gain = a_posteriori_P*_H_transpose * (S.inverse()); // Only use for matrices up to 4x4 !
 
@@ -107,11 +107,11 @@ public:
         _state_estimation = _state_prediction + Gain *(measurement - _H * _state_prediction);
         _P = (StateMatrix::Identity(N_States,N_States) - Gain * _H ) * a_posteriori_P;
 
-//        std::cout << "_state_estimation = " << _state_estimation[0] << " "
+//        textLogger << "_state_estimation = " << _state_estimation[0] << " "
 //                     << _state_estimation[1] << " "
 //                        << _state_estimation[2] << " "
 //                           << _state_estimation[3] << "\n";
-//        std::cout << "---------------------------------------------\n";
+//        textLogger << "---------------------------------------------\n";
 
         return _state_estimation;
     }

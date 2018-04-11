@@ -2,6 +2,7 @@
 #include "radio_dongle.h"
 #include "stl_utils.h"
 #include "protocol.h"
+#include "text_logger.h"
 
 bool TocParameter::ReadAll()
 {
@@ -15,7 +16,7 @@ bool TocParameter::ReadAll()
 
 void TocParameter::ReadElement(uint8_t  elementId)
 {
-   // std::cout << "Read Request Element ID =  " << static_cast<int>(elementId) << std::endl;
+   // textLogger << "Read Request Element ID =  " << static_cast<int>(elementId) << "\n";
     Data data ={elementId};
     CRTPPacket packet(Parameter::id, Parameter::Read::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
@@ -108,7 +109,7 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
     case ElementType::FP16:
     default:
     {
-        std::cout << "Unknown data type for writing value\n";
+        textLogger << "Unknown data type for writing value\n";
         return false;
         break;
     }
@@ -134,19 +135,19 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
     uint8_t port = packet.GetPort();
     if(port != Parameter::id)
     {
-        std::cout << "Oops, wrong packet assigned to ParameterToc\n";
+        textLogger << "Oops, wrong packet assigned to ParameterToc\n";
         packet.Print();
         return;
     }
     if(packet.GetData().size() < 2)
     {
-//        std::cout << "Oops, packet is too small to be ParameterToc packet\n";
+//        textLogger << "Oops, packet is too small to be ParameterToc packet\n";
 //        packet.Print();
         return;
     }
 //    else
 //    {
-//        std::cout << "Processing parameter packet\n";
+//        textLogger << "Processing parameter packet\n";
 //    }
     uint8_t channel = packet.GetChannel();
     if( channel == Parameter::Access::id)
@@ -167,7 +168,7 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
     }
 //    else
 //    {
-//        std::cout << "Oops, channel not recognized for ParameterToc\n";
+//        textLogger << "Oops, channel not recognized for ParameterToc\n";
 //        packet.Print();
 //        return;
 //    }
@@ -188,11 +189,11 @@ void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint
     auto elementID = data.at(parameterIdPosition);
     if(elementID >= _itemCount )
     {
-        std::cout << "Oops, ParameterToc reading of invalid element id " << static_cast<int>(elementID) << std::endl;
+        textLogger << "Oops, ParameterToc reading of invalid element id " << static_cast<int>(elementID) << "\n";
         return;
     }
     _lastReadParameter = elementID;
-    //std::cout << "Process Read " << static_cast<int>(_lastReadParameter) << std::endl;
+    //textLogger << "Process Read " << static_cast<int>(_lastReadParameter) << "\n";
     bool isValid = false;
     auto & element = STLUtils::ElementForID(_elements, _lastReadParameter, isValid);
     if(isValid)
@@ -206,7 +207,7 @@ void TocParameter::ProcessMiscData(Data const & data)
 {
     Q_UNUSED(data);
     // TODO SF Implement
-    std::cout << "Oops, Processing ParameterToc Misc packets is no implemented\n";
+    textLogger << "Oops, Processing ParameterToc Misc packets is no implemented\n";
 }
 
 
@@ -221,7 +222,7 @@ TOCElement TocParameter::GetElement(uint8_t idx )
     }
     else
     {
-        std::cout << "Could not request parameter " << idx << std::endl;
+        textLogger << "Could not request parameter " << idx << "\n";
         return TOCElement();
     }
 }

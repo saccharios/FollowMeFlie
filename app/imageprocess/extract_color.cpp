@@ -2,6 +2,9 @@
 #include "opencv_utils.h"
 #include "math/constants.h"
 #include "math/types.h"
+#include "text_logger.h"
+
+
 cv::Scalar QColor2Scalar(QColor const & color)
 {
     int h = 0;
@@ -23,10 +26,10 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
 
     cv::KeyPoint estimateMidPtCoord = _kalmanFilter.Update(blobs.midPoints);
-    //std::cout << "estimateMidPtCoord size = " << estimateMidPtCoord.size << std::endl;
+    //textLogger << "estimateMidPtCoord size = " << estimateMidPtCoord.size << "\n";
 
     float distance = CalculateDistance(estimateMidPtCoord);
-    //std::cout << "distance = " << distance << std::endl;
+    //textLogger << "distance = " << distance << "\n";
 
     // Draw the estimate
     cv::Point2f estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
@@ -152,8 +155,8 @@ void ExtractColor::Initialize(cv::Mat const & img)
     auto measurementMidPtCoord = Camera::ConvertCameraToMidPointCoord(largestKeyPoint.pt);
     _kalmanFilter.Initialize(measurementMidPtCoord);
 
-    std::cout << "Measurement cam = "<< largestKeyPoint.pt.x << " " << largestKeyPoint.pt.y << std::endl;
-    std::cout << "Measurement mid = "<< measurementMidPtCoord.x << " " << measurementMidPtCoord.y << std::endl;
+    textLogger << "Measurement cam = "<< largestKeyPoint.pt.x << " " << largestKeyPoint.pt.y << "\n";
+    textLogger << "Measurement mid = "<< measurementMidPtCoord.x << " " << measurementMidPtCoord.y << "\n";
 
 }
 

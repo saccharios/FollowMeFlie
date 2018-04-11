@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-
+#include "text_logger.h"
 
 namespace STLUtils
 {
@@ -9,14 +9,14 @@ namespace STLUtils
 template<typename T>
 static bool  VectorContains(std::vector<T> const & vect, T element)
 {
-    //        std::cout << "using const lvalue ref\n";
+    //        textLogger << "using const lvalue ref\n";
     return std::find(vect.begin(), vect.end(), element) != vect.end();
 }
 
 template<typename T>
 static bool  VectorContains(std::vector<T> && vect, T element)
 {
-    //        std::cout << "using rvalue ref\n";
+    //        textLogger << "using rvalue ref\n";
     return std::find(vect.begin(), vect.end(), element) != vect.end();
 }
 
@@ -35,7 +35,7 @@ T & IteratorToElement(std::vector<T> && vect, T element, bool & isValid)
 template<typename T>
 T  & ElementForID(std::vector<T> && vect, int id, bool & isValid)
 {
-    //        std::cout << "using rvalue ref\n";
+    //        textLogger << "using rvalue ref\n";
     typename std::vector<T>::iterator it = std::find_if(vect.begin(), vect.end(), [=](auto const & element){return element.id == id;});
     isValid =( it != vect.end());
     return  *it;
@@ -43,7 +43,7 @@ T  & ElementForID(std::vector<T> && vect, int id, bool & isValid)
 template<typename T>
 T & ElementForID(std::vector<T> & vect, int id, bool & isValid)
 {
-    //        std::cout << "using lvalue ref\n";
+    //        textLogger << "using lvalue ref\n";
     typename std::vector<T>::iterator it = std::find_if(vect.begin(), vect.end(), [=](auto const & element){return element.id == id;});
     isValid =( it != vect.end());
     return  *it;
@@ -51,7 +51,7 @@ T & ElementForID(std::vector<T> & vect, int id, bool & isValid)
 template<typename T>
 T  & ElementForName(std::vector<T> && vect, std::string name, bool & isValid)
 {
-    //        std::cout << "using rvalue ref\n";
+    //        textLogger << "using rvalue ref\n";
     typename std::vector<T>::iterator it = std::find_if(vect.begin(), vect.end(), [=](auto const & element){return element.name == name;});
     isValid =( it != vect.end());
     return  *it;
@@ -59,7 +59,7 @@ T  & ElementForName(std::vector<T> && vect, std::string name, bool & isValid)
 template<typename T>
 T & ElementForName(std::vector<T> & vect, std::string name, bool & isValid)
 {
-    //        std::cout << "using lvalue ref\n";
+    //        textLogger << "using lvalue ref\n";
     typename std::vector<T>::iterator it = std::find_if(vect.begin(), vect.end(), [=](auto const & element){return element.name == name;});
     isValid =( it != vect.end());
     return  *it;
@@ -68,10 +68,10 @@ T & ElementForName(std::vector<T> & vect, std::string name, bool & isValid)
 template<typename T>
 void PrintVect(std::vector<T> const vect)
 {
-    std::cout << "Vector contains " << vect.size() << " elements:\n";
+    textLogger << "Vector contains " << vect.size() << " elements:\n";
     for(auto const & e : vect)
     {
-        std::cout << e << std::endl;
+        textLogger << e << "\n";
     }
 }
 

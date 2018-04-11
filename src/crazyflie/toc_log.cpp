@@ -5,6 +5,7 @@
 #include <map>
 #include "crtp_packet.h"
 #include "error_codes.h"
+#include "text_logger.h"
 
 TocLog::TocLog(RadioDongle & radioDongle) :
     _radioDongle(radioDongle),
@@ -291,7 +292,7 @@ void TocLog::AppendLoggingBlocks()
     case AppendState::REQUEST_ITEM:
     {
         LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
-//        std::cout << "Enter Request item block nr = " << _currentAppendingBlock << " item nr " << _currentAppendingElement << " of "<<block.elements_to_add.size() << std::endl;
+//        textLogger << "Enter Request item block nr = " << _currentAppendingBlock << " item nr " << _currentAppendingElement << " of "<<block.elements_to_add.size() << "\n";
         if(block.state == LoggingBlock::State::isCreated)
         {
             bool isContained = false;
@@ -303,13 +304,13 @@ void TocLog::AppendLoggingBlocks()
                 _radioDongle.RegisterPacketToSend(std::move(packet));
                 _elementToAdd = &element;
                 _appendingState = AppendState::WAIT_ANSWER;
-//                std::cout << "Request sent\n";
+//                textLogger << "Request sent\n";
             }
             else
             {
                 // This clause is mainly for debugging purposes
                 _appendingState = AppendState::REQUEST_ITEM;
-                std::cout << "Oops, no element with this name exists: " << block.elements_to_add.at(_currentAppendingElement) << std::endl;
+                textLogger << "Oops, no element with this name exists: " << block.elements_to_add.at(_currentAppendingElement) << "\n";
                 ++_currentAppendingElement;
                 if(_currentAppendingElement >=  block.elements_to_add.size() )
                 {
@@ -326,7 +327,7 @@ void TocLog::AppendLoggingBlocks()
     }
     case AppendState::WAIT_ANSWER:
     {
-//        std::cout << "Waiting for answer\n";
+//        textLogger << "Waiting for answer\n";
         if(_elementToAdd == nullptr)
         {
             _appendingState = AppendState::PREPARE_NEXT;
@@ -337,7 +338,7 @@ void TocLog::AppendLoggingBlocks()
                 if(num_retries > 4)
                 {
                      LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
-                    std::cout << "Skipping item " << block.elements_to_add.at(_currentAppendingElement) << " of block " << _currentAppendingBlock << std::endl;
+                    textLogger << "Skipping item " << block.elements_to_add.at(_currentAppendingElement) << " of block " << _currentAppendingBlock << "\n";
                     _appendingState = AppendState::PREPARE_NEXT;
                     num_retries = 0;
                 }
@@ -350,13 +351,13 @@ void TocLog::AppendLoggingBlocks()
     }
     case AppendState::PREPARE_NEXT:
     {
-//        std::cout << "Prepare next request\n";
+//        textLogger << "Prepare next request\n";
          LoggingBlock & block = _loggingBlocks.at(_currentAppendingBlock);
          _appendingState = AppendState::REQUEST_ITEM;
         ++_currentAppendingElement;
         if(_currentAppendingElement >=  block.elements_to_add.size()  )
         {
-            //std::cout << "Block nr " << _currentAppendingBlock << " has all its elements\n";
+            //textLogger << "Block nr " << _currentAppendingBlock << " has all its elements\n";
             block.state = LoggingBlock::State::hasElements;
             _currentAppendingElement = 0;
             ++_currentAppendingBlock;
@@ -432,13 +433,13 @@ void TocLog::ReceivePacket(CRTPPacket packet)
     uint8_t port = packet.GetPort();
     if(port != Logger::id)
     {
-        std::cout << "Oops, wrong packet assigned to LoggerTo\n";
+        textLogger << "Oops, wrong packet assigned to LoggerTo\n";
         packet.Print();
         return;
     }
     if(packet.GetData().size() < 2)
     {
-//        std::cout << "Oops, packet is too small to be LogerToc packet\n";
+//        textLogger << "Oops, packet is too small to be LogerToc packet\n";
 //        packet.Print();
         return;
     }
@@ -455,7 +456,7 @@ void TocLog::ReceivePacket(CRTPPacket packet)
         ProcessLoggerData(packet.GetData());
         break;
     default:
-        //        std::cout << "Oops, channel not recognized for LogToc Control " << channel << std::endl;
+        //        textLogger << "Oops, channel not recognized for LogToc Control " << channel << "\n";
         //        packet.Print();
         break;
     }
@@ -478,29 +479,29 @@ void TocLog::ProcessControlData(Data const & data)
             {
                 if(id < _numLogBlocks )
                 {
-                    //std::cout << "Registered logging block `" << static_cast<int>(id) << "'" << std::endl;
+                    //textLogger << "Registered logging block `" << static_cast<int>(id) << "'" << "\n";
                     _loggingBlocks.at(id).state = LoggingBlock::State::isCreated;
                 }
                 break;
             }
             case CrazyflieErrors::BlockOrVariableNotFound:
             {
-                std::cout << "Oops, cannot create logging block, id " << static_cast<int>(id) << "not found on crazyflie\n";
+                textLogger << "Oops, cannot create logging block, id " << static_cast<int>(id) << "not found on crazyflie\n";
                 break;
             }
             case CrazyflieErrors::CrazyflieOutOfMemory:
             {
-                std::cout << "Oops, cannot create logging block, Crazyflie is out of memory.\n";
+                textLogger << "Oops, cannot create logging block, Crazyflie is out of memory.\n";
                 break;
             }
             case CrazyflieErrors::LogBlockTooLong:
             {
-                std::cout << "Oops, cannot create logging block, logging block is too long.\n";
+                textLogger << "Oops, cannot create logging block, logging block is too long.\n";
                 break;
             }
             case CrazyflieErrors::UnknownCommand:
             {
-                std::cout << "Oops, cannot create logging block, unknown command.\n";
+                textLogger << "Oops, cannot create logging block, unknown command.\n";
                 break;
             }
             case CrazyflieErrors::IsAlreadyContained:
@@ -510,7 +511,7 @@ void TocLog::ProcessControlData(Data const & data)
             }
             default:
             {
-                std::cout << "Oops, Answer to create block not recognized.\n";
+                textLogger << "Oops, Answer to create block not recognized.\n";
                 CRTPPacket::PrintData(data);
                 break;
             }
@@ -532,7 +533,7 @@ void TocLog::ProcessControlData(Data const & data)
                 {
                     if( (id < _numLogBlocks ) && (data.at(channel::Commands::AppendBlock::AnswerByte::BlockId) == block.id))
                     {
-//                        std::cout << "Appending " <<_elementToAdd->name << " to block " << block.name << std::endl;
+//                        textLogger << "Appending " <<_elementToAdd->name << " to block " << block.name << "\n";
                         block.elements.emplace_back(_elementToAdd);
                         _elementToAdd->isLogged = true;
                         _elementToAdd = nullptr;
@@ -541,22 +542,22 @@ void TocLog::ProcessControlData(Data const & data)
                 }
                 case CrazyflieErrors::BlockOrVariableNotFound:
                 {
-                    std::cout << "Oops, cannot append to logging block, id " << static_cast<int>(id) << "not found on crazyflie\n";
+                    textLogger << "Oops, cannot append to logging block, id " << static_cast<int>(id) << "not found on crazyflie\n";
                     break;
                 }
                 case CrazyflieErrors::CrazyflieOutOfMemory:
                 {
-                    std::cout << "Oops, cannot append to logging block, id " << static_cast<int>(id) << " Crazyflie is out of memory.\n";
+                    textLogger << "Oops, cannot append to logging block, id " << static_cast<int>(id) << " Crazyflie is out of memory.\n";
                     break;
                 }
                 case CrazyflieErrors::LogBlockTooLong:
                 {
-                     std::cout << "Oops, cannot append to logging block, id " << static_cast<int>(id) << ", logging block is too long.\n";
+                     textLogger << "Oops, cannot append to logging block, id " << static_cast<int>(id) << ", logging block is too long.\n";
                     break;
                 }
                 case CrazyflieErrors::UnknownCommand:
                 {
-                    std::cout << "Oops, cannot append to logging block, unknown command.\n";
+                    textLogger << "Oops, cannot append to logging block, unknown command.\n";
                     break;
                 }
                 case CrazyflieErrors::IsAlreadyContained:
@@ -566,7 +567,7 @@ void TocLog::ProcessControlData(Data const & data)
                 }
                 default:
                 {
-                    std::cout << "Oops, Answer to append to block not recognized.\n";
+                    textLogger << "Oops, Answer to append to block not recognized.\n";
                     CRTPPacket::PrintData(data);
                     break;
                 }
@@ -584,7 +585,7 @@ void TocLog::ProcessControlData(Data const & data)
         // Note: There is no answer the crazyflie sends back in this case.
         break;
     default:
-        std::cout << "Oops, command not recognized for LogToc Control " << static_cast<int>(commandID) << std::endl;
+        textLogger << "Oops, command not recognized for LogToc Control " << static_cast<int>(commandID) << "\n";
         break;
     }
 
@@ -594,7 +595,7 @@ void TocLog::ProcessLoggerData(Data const & data)
 {
     if(data.size() < Logger::Data::LogMinPacketSize)
     {
-        std::cout << "Data packet not large enough!\n";
+        textLogger << "Data packet not large enough!\n";
         return;
     }
     uint32_t blockID = data.at(Logger::Data::AnswerByte::Blockid);

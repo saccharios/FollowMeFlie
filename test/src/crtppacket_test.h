@@ -1,7 +1,5 @@
 #pragma once
 #include "gtest/gtest.h"
-#include <iostream>
-#include <chrono>
 #include "crazyflie/crtp_packet.h"
 #include "math/types.h"
 #include "crazyflie/protocol.h"
@@ -135,47 +133,5 @@ TEST_F(CRTPPacketTest, ReconstructData)
         offset += sizeof(int);
     }
 
-}
-//TEST_F(CRTPPacketTest, TimerCopyCtorVsMoveCtor)
-//{
-//    Data data;
-//    data.push_back(0);
-//    data.push_back(1);
-//    data.push_back(2);
-//    data.push_back(51);
-//    int port = 5;
-//    int channel = 2;
-
-//    CRTPPacket packet_1(port, channel, data);
-//    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-//    CRTPPacket packet_2 = packet_1; // copy ctor
-//    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-//    std::cout << "Copy Ctor"
-//              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
-//              << "ns.\n";
-//    start = std::chrono::steady_clock::now();
-//    CRTPPacket packet_3 = std::move(packet_1);
-//    end = std::chrono::steady_clock::now();
-//    std::cout << "Move Ctor"
-//              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
-//              << "ns.\n";
-//    std::cout << "packet 3 data length" << packet_3.DataLength() << std::endl;
-//}
-TEST_F(CRTPPacketTest, TimerCtorDataVectMove)
-{
-    Data data;
-    data.push_back(0);
-    data.push_back(1);
-    data.push_back(2);
-    data.push_back(51);
-    uint8_t port = Logger::id;
-    uint8_t channel = Logger::Data::id;
-
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    CRTPPacket packet_2(port, channel, std::move(data));
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::cout << "Move Data Ctor"
-              << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
-              << "ns.\n";
 }
 

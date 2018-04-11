@@ -4,7 +4,7 @@
 #include "../../../mingw_std_threads/mingw.thread.h"
 #include "math/types.h"
 #include "crazyflie/protocol.h"
-
+#include "text_logger.h"
 
 RadioDongle::RadioDongle() :
     _radioSettings(RadioSettings::_0802M),
@@ -102,7 +102,7 @@ bool RadioDongle::OpenUSBDongle()
         }
         else
         {
-             std::cout << "Error! No dongle found.\n";
+             textLogger << "Error! No dongle found.\n";
         }
 
         for(auto & device : devices)
@@ -114,7 +114,7 @@ bool RadioDongle::OpenUSBDongle()
     }
     else
     {
-        std::cout << "Error! No dongle found.\n";
+        textLogger << "Error! No dongle found.\n";
     }
 
     return false;
@@ -143,7 +143,7 @@ void RadioDongle::ReadRadioSettings()
         break;
     }
     }
-    std::cout << "Opening radio " << dongleNBR << "/" << GetChannel() << "/" << GetDataRate() << std::endl;
+    textLogger << "Opening radio " << dongleNBR << "/" << GetChannel() << "/" << GetDataRate() << "\n";
 }
 
 void RadioDongle::StartRadio()
@@ -157,10 +157,10 @@ void RadioDongle::StartRadio()
         libusb_device_descriptor descriptor;
         libusb_get_device_descriptor(_devDevice, &descriptor);
         _deviceVersion = ConvertToDeviceVersion(descriptor.bcdDevice);
-        std::cout << "Got device version " << _deviceVersion << std::endl;
+        textLogger << "Got device version " << _deviceVersion << "\n";
         if(_deviceVersion < 0.3)
         {
-            std::cout << "Device version too low. Device is not supported.\n";
+            textLogger << "Device version too low. Device is not supported.\n";
             return;
         }
 
@@ -215,9 +215,9 @@ bool RadioDongle::WriteData(uint8_t * data, int length)
     switch(retValue)
     {
     case 0:
-        std::cout << "Writing data failed partially\n";
+        textLogger << "Writing data failed partially\n";
     case LIBUSB_ERROR_TIMEOUT:
-        std::cout << "USB timeout" << std::endl;
+        textLogger << "USB timeout" << "\n";
         break;
     default:
         break;
@@ -375,19 +375,19 @@ bool RadioDongle::ClaimInterface(int interface)
     case LIBUSB_SUCCESS:
             return true;
     case LIBUSB_ERROR_NOT_FOUND:
-        std::cout<< "Failed to claim usb interface, device not found\n";
+        textLogger<< "Failed to claim usb interface, device not found\n";
         break;
     case LIBUSB_ERROR_BUSY:
-        std::cout<< "Failed to claim usb interface, device is busy\n";
+        textLogger<< "Failed to claim usb interface, device is busy\n";
         break;
     case LIBUSB_ERROR_NO_DEVICE:
-        std::cout<< "Failed to claim usb interface, no device\n";
+        textLogger<< "Failed to claim usb interface, no device\n";
         break;
     case LIBUSB_ERROR_OTHER:
-        std::cout<< "Failed to claim usb interface, undefined error\n";
+        textLogger<< "Failed to claim usb interface, undefined error\n";
         break;
     default:
-        std::cout << "Failed to claim usb interface, code = " << errorCode << std::endl;
+        textLogger << "Failed to claim usb interface, code = " << errorCode << "\n";
         break;
     }
 
@@ -412,7 +412,7 @@ CRTPPacket RadioDongle::CreatePacketFromData( uint8_t* buffer, int totalLength)
 
     // Actual data starts at buffer[2]
     Data data;
-//    std::cout << "totalLength = " << totalLength << std::endl;
+//    textLogger << "totalLength = " << totalLength << "\n";
     for(int i = 2; i < totalLength+1; ++i)
     {
         data.push_back(buffer[i]);
@@ -468,7 +468,7 @@ void RadioDongle::SendPacketsNow()
 
         //        packet.Print();
         SendPacket(std::move(packet));
-        //    std::cout << "Sending one packet, " << _packetsSending.size() << " left to send\n";
+        //    textLogger << "Sending one packet, " << _packetsSending.size() << " left to send\n";
     }
 }
 
@@ -519,12 +519,12 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     {
         if(packet.GetData().size() > 0)
         {
-            std::cout << "Console text: ";
+            textLogger << "Console text: ";
             for(auto const & element : packet.GetData())
             {
-                std::cout << static_cast<char>(element);
+                textLogger << static_cast<char>(element);
             }
-            std::cout << std::endl;
+            textLogger << "\n";
         }
         break;
     }

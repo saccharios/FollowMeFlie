@@ -13,6 +13,7 @@
 #include "math/types.h"
 #include "toc_log.h"
 #include "toc_parameter.h"
+#include "text_logger.h"
 
 enum class State
 {
@@ -35,7 +36,7 @@ struct SetPoint
     uint16_t thrust;
     void Print()
     {
-        std::cout << "roll = " << roll << " pitch = " << pitch << " yaw = " << yaw << " thrust = " << thrust << std::endl;
+        textLogger << "roll = " << roll << " pitch = " << pitch << " yaw = " << yaw << " thrust = " << thrust << "\n";
     }
 };
 

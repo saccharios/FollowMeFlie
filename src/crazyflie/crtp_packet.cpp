@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "math/types.h"
-
+#include "text_logger.h"
 template<>
 float ExtractData<float>(Data const & data, int offset)
 {
@@ -18,7 +18,7 @@ float ExtractData<float>(Data const & data, int offset)
     }
     else
     {
-        std::cout << "Packet is not large enough\n";
+        textLogger << "Packet is not large enough\n";
     }
     return bits.float_value;
 }
@@ -71,10 +71,10 @@ uint8_t CRTPPacket::GetChannel() const
 
 void CRTPPacket::Print() const
 {
-    std::cout << "Port = " << static_cast<int>(_port)
+    textLogger << "Port = " << static_cast<int>(_port)
               << " Channel = "  << static_cast<int>(_channel)
               << " Size = " << _data.size()
-              << std::endl;
+              << "\n";
     PrintData(_data);
 }
 
@@ -83,7 +83,7 @@ void CRTPPacket::PrintData(Data const & data)
 {
     for(std::size_t i = 0; i < data.size() ; ++i)
     {
-        std::cout << "i = " << i << " data = " << static_cast<int>(data.at(i)) << " " << data.at(i)<< std::endl;
+        textLogger << "i = " << i << " data = " << static_cast<int>(data.at(i)) << " " << data.at(i)<< "\n";
     }
 }
 

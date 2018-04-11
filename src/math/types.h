@@ -2,9 +2,9 @@
 #include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
 //#include "crazyflie/crtp_packet.h"
 #include <vector>
-#include <iostream>
 #include <memory>
 #include <stdint.h>
+#include "text_logger.h"
 
 using Acceleration = Eigen::Vector3f;
 using Velocity = Eigen::Vector3f;
@@ -42,7 +42,7 @@ struct TOCElement
     bool isLogged;
     void Print()
     {
-        std::cout << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << std::endl;
+        textLogger << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << "\n";
     }
 };
 struct Distance

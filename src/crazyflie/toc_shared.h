@@ -6,6 +6,7 @@
 #include "protocol.h"
 #include <map>
 #include "crazyflie/crtp_packet.h"
+#include "text_logger.h"
 
 template<uint8_t port, typename channel>
 class TOCShared
@@ -102,7 +103,7 @@ public:
         case ElementType::UINT64:
         {
             element->value  = 0;
-            std::cout << "Type UINT64 not implemented for " << element->name << std::endl;
+            textLogger << "Type UINT64 not implemented for " << element->name << "\n";
             //            TODO SF: element->value = static_cast<float>(ExtractData<uint64_t>(logdataVect, offset));
             break;
         }
@@ -126,7 +127,7 @@ public:
         }
         case ElementType::INT64:
         {
-            std::cout << "Type INT64 not implemented for " << element->name << std::endl;
+            textLogger << "Type INT64 not implemented for " << element->name << "\n";
             //            TODO SF:             element->value = static_cast<float>(ExtractData<int64_t>(logdataVect, offset));
             element->value  = 0;
             break;
@@ -139,7 +140,7 @@ public:
         }
         case ElementType::DOUBLE:
         {
-            std::cout << "Type DOUBLE not implemented for " << element->name << std::endl;
+            textLogger << "Type DOUBLE not implemented for " << element->name << "\n";
             //            TODO SF:             element->value = ExtractData<float>(ExtractData<double>(logdataVect, offset));
             element->value = 0;
             break;
@@ -147,7 +148,7 @@ public:
         case ElementType::FP16:
         {
             // TODO SF Implement FP16
-            std::cout << "Type FP16 not implemented for " << element->name << std::endl;
+            textLogger << "Type FP16 not implemented for " << element->name << "\n";
             element->value = 0;
             break;
         }
@@ -170,7 +171,7 @@ public:
 
         default:
         { // Unknown. This hopefully never happens.
-            std::cout << "Invalid type of " << element->name << std::endl;
+            textLogger << "Invalid type of " << element->name << "\n";
             element->value = 0;
             break;
         }
@@ -188,7 +189,7 @@ public:
                 channel::Commands::GetInfo::id)
         {
             _itemCount = data.at(channel::Commands::GetInfo::AnswerByte::ItemCount);
-//            std::cout << "New item count = " << _itemCount << std::endl;
+//            textLogger << "New item count = " << _itemCount << "\n";
         }
     }
 
@@ -230,11 +231,11 @@ public:
         if(!isAlreadyContained)
         {
             _elements.emplace_back(element);
-//            std::cout << "Adding new element " << static_cast<int>(element.id) <<std::endl;
+//            textLogger << "Adding new element " << static_cast<int>(element.id) <<"\n";
         }
         else
         {
-//            std::cout << "Element is already contained " << static_cast<int>(element.id) <<std::endl;
+//            textLogger << "Element is already contained " << static_cast<int>(element.id) <<"\n";
         }
     }
 

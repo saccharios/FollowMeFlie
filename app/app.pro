@@ -22,9 +22,7 @@ SOURCES +=  main.cpp \
     imageprocess/extract_color.cpp \
     qt_util.cpp \
     imageprocess/ball_kalman_filter.cpp \
-    opencv_utils.cpp \
-    text_logger.cpp
-
+    opencv_utils.cpp
 
 HEADERS  += \
     qt_util.h \
@@ -38,9 +36,7 @@ HEADERS  += \
     gui/main_window.h \
     imageprocess/extract_color.h \
     time_levels.h \
-    imageprocess/ball_kalman_filter.h \
-    text_logger.h
-
+    imageprocess/ball_kalman_filter.h
 
 FORMS    += \
     gui/main_window.ui

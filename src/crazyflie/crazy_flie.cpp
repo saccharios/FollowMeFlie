@@ -39,8 +39,6 @@ void Crazyflie::Update()
     //    }
 
 
-//        std::cout << "State = " << static_cast<int>(_state) << std::endl;
-
     switch(_state)
     {
     case State::ZERO:

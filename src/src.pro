@@ -35,7 +35,8 @@ HEADERS  += \
     math/double_buffer.h \
     crazyflie/error_codes.h \
     math/kalman_filter.h \
-    math/delay.h
+    math/delay.h \
+    text_logger.h
 
 SOURCES += \
     math/lowpass.cpp \
@@ -47,7 +48,8 @@ SOURCES += \
     crazyflie/crtp_packet.cpp \
     crazyflie/crazy_flie_commander.cpp \
     crazyflie/radio_dongle.cpp \
-    math/kalman_filter.cpp
+    math/kalman_filter.cpp \
+    text_logger.cpp
 
 
 

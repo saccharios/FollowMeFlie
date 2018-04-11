@@ -1,6 +1,6 @@
 #pragma once
 #include "math/types.h"
-#include <iostream>
+#include "text_logger.h"
 
 
 // Convert to vector<uint8_t>
@@ -37,7 +37,7 @@ T ExtractData(Data const & data, int offset)
     }
     else
     {
-        std::cout << "Packet is not large enough\n";
+        textLogger << "Packet is not large enough\n";
         return 0;
     }
 }

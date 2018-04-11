@@ -50,7 +50,7 @@ public:
 
         // R =
         // mn 0
-        // 0     mn
+        // 0  mn
         _R = Matrix2f::Identity(2,2)*meas_noise;
 
 
@@ -59,10 +59,10 @@ public:
         _kalmanFilter.SetMeasurementMatrix(_H);
         _kalmanFilter.SetMeasurementNoiseCovMatrix(_R);
 
-//        std::cout << _A<< "\n-----\n";
-//        std::cout << _Q<< "\n-----\n";
-//        std::cout << _H<< "\n-----\n";
-//        std::cout << _R << "\n-----\n";
+//        textLogger << _A<< "\n-----\n";
+//        textLogger << _Q<< "\n-----\n";
+//        textLogger << _H<< "\n-----\n";
+//        textLogger << _R << "\n-----\n";
     }
 
 
