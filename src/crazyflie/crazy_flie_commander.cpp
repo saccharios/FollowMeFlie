@@ -36,7 +36,7 @@ void CrazyFlieCommander::Update()
     previousHoverModeIsActive = _hoverModeIsActive.Value();
 }
 // called when new estimate is ready
-void CrazyFlieCommander::ReceiveEstimate(Distance const & distance)
+void CrazyFlieCommander::ReceiveEstimate(Point3f const & distance)
 {
     _currentEstimate.write() = distance;
     _currentEstimate.swap();
@@ -52,7 +52,7 @@ void CrazyFlieCommander::ResetVelocityController()
 void CrazyFlieCommander::UpdateHoverMode()
 {
 
-    Distance const & currentEstimate = _currentEstimate.read();
+    Point3f const & currentEstimate = _currentEstimate.read();
     Velocity velocity;
     velocity[0] = _piXVelocity.Update(currentEstimate.x-0.5); // is in m ! The ball should be 0.5 m away from the crazyflie
 //    velocity[1] = 0;

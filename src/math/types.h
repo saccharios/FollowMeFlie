@@ -45,9 +45,18 @@ struct TOCElement
         textLogger << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << "\n";
     }
 };
-struct Distance
+struct Point3f
 {
    float x;
    float y;
    float z;
 };
+
+struct Blob
+{
+    Point3f point;
+    float size;
+};
+
+Blob GetLargestBlob(std::vector<Blob> const & blobs);
+

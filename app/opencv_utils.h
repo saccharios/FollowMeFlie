@@ -5,6 +5,5 @@
 namespace opencv_utils
 {
 
-cv::KeyPoint GetLargestKeyPoint(std::vector<cv::KeyPoint> const & keypoints);
 
 }

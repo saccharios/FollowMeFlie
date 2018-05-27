@@ -12,11 +12,6 @@ class ExtractColor :  public QObject
 
 public:
 
-    struct Blobs
-    {
-        std::vector<cv::KeyPoint> camPoints;
-        std::vector<cv::KeyPoint> midPoints;
-    };
 
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
@@ -50,7 +45,7 @@ public slots:
     void Initialize(cv::Mat const & img);
 
 signals:
-    void EstimateReady(Distance const &);
+    void EstimateReady(Point3f const &);
 
 private:
     QColor const & _colorToFilter;
@@ -60,9 +55,8 @@ private:
 
 
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);
-    ExtractColor::Blobs ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgToShow);
+    std::vector<cv::KeyPoint> ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgToShow);
     void FilterImage(cv::Mat & imgThresholded);
-    float CalculateDistance(const cv::KeyPoint &point);
-    void RemoveKeyPointsAtEdges(Blobs & blobs);
-    void AddMidPtCoord(Blobs & blobs);
+
+    void RemoveKeyPointsAtEdges(std::vector<cv::KeyPoint> & blobs);
 };

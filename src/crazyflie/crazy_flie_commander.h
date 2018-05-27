@@ -32,7 +32,7 @@ public:
     }
 
 public slots:
-    void ReceiveEstimate(Distance const &);
+    void ReceiveEstimate(Point3f const &);
 
 private:
     Crazyflie & _crazyflie;
@@ -42,7 +42,7 @@ private:
     PI_Controller _piXVelocity;
     PI_Controller _piYVelocity;
     PI_Controller _piZVelocity;
-    Double_Buffer<Distance> _currentEstimate;
+    Double_Buffer<Point3f> _currentEstimate;
 
     void UpdateHoverMode();
 

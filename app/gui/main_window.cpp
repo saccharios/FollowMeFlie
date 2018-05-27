@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
     QObject::connect(&_camera, SIGNAL(ImgReadyForInitialization(cv::Mat const &)), &_extractColor, SLOT(Initialize(cv::Mat const &)));
 
-    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Distance const &)), &_commander, SLOT(ReceiveEstimate(Distance const &)));
+    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)), &_commander, SLOT(ReceiveEstimate(Point3f const &)));
 
 
 
