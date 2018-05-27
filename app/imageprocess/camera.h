@@ -2,7 +2,7 @@
 #include <QObject>
 #include<memory>
 #include "opencv2/opencv.hpp"
-
+#include "math/types.h"
 // Forward declaration
 namespace cv {
 class VideoCapture;
@@ -31,6 +31,7 @@ public:
     static cv::Point2f ConvertCameraToMidPointCoord(cv::Point2f cameraPt);
     static cv::Point2f ConvertMidPointToCameraCoord(cv::Point2f midPt);
     static std::vector<cv::KeyPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints);
+    static Distance ConvertMidPointToCrazyFlieCoordinates(Distance positionEstimateCamera);
 
 signals:
     void ImgReadyForDisplay(QImage const &);

@@ -29,7 +29,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     //textLogger << "estimateMidPtCoord size = " << estimateMidPtCoord.size << "\n";
 
     float distance = CalculateDistance(estimateMidPtCoord);
-    //textLogger << "distance = " << distance << "\n";
+    //textLogger << "cam z-distance = " << distance << "\n";
 
     // Draw the estimate
     cv::Point2f estimateCamera = Camera::ConvertMidPointToCameraCoord(estimateMidPtCoord.pt);
@@ -39,8 +39,15 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
-    Distance positionEstimate = {estimateMidPtCoord.pt.x, estimateMidPtCoord.pt.y, distance};
-    emit EstimateReady(positionEstimate);
+
+    Distance positionEstimateCamera = {estimateMidPtCoord.pt.x, estimateMidPtCoord.pt.y, distance};
+    Distance positionEstimateCfly = Camera::ConvertMidPointToCrazyFlieCoordinates(positionEstimateCamera);
+
+    textLogger << "Camer estimate: x (pixel) " << positionEstimateCamera.x
+               << " y (pixel) = " << positionEstimateCamera.y
+               << " z (cm) = " << positionEstimateCamera.z << "\n";
+
+    emit EstimateReady(positionEstimateCfly);
 
 }
 
@@ -133,15 +140,19 @@ float ExtractColor::CalculateDistance(cv::KeyPoint const & point)
     // Formula is
     // Distance = 1/(a * size +b)
     // a and b are calculated with experimental values
-    // d | s
-    // 10 | 160
-    // 16 | 92
-    // 26 | 57
-    // 51 | 27
+    // distance | size
+    //       10 | 160
+    //       16 | 92
+    //       26 | 57
+    //       51 | 27
     float a = 0.0007058662;
     float b = -0.0008086623;
-
-    return 1/(a*point.size + b);
+    float distance = 1.0/(a*point.size + b);
+    if(distance < 0.0)
+    {
+        distance = 0.0;
+    }
+    return distance;
 }
 
 void ExtractColor::Initialize(cv::Mat const & img)

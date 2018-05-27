@@ -18,6 +18,7 @@ public:
     }
 
     void Update();
+    void ResetVelocityController();
 
     void Stop()
     {
@@ -35,7 +36,7 @@ public slots:
 
 private:
     Crazyflie & _crazyflie;
-    OnDelay<10> _hoverModeIsActive;
+    OnDelay<50> _hoverModeIsActive;
     float _samplingTime;
 
     PI_Controller _piXVelocity;

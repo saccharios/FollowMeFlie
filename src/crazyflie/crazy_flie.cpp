@@ -119,7 +119,7 @@ void Crazyflie::Update()
     case State::SET_PARAMETERS:
     {
         // Set Parameters that take into account the increased weight due to the camera
-        _parameters.WriteParameter(63, 39000); // idx 63 = thrustBase
+        _parameters.WriteParameter(63, 40000); // idx 63 = thrustBase
         _parameters.WriteParameter(64, 23000); // idx 64 = minThrust
         _state = State::NORMAL_OPERATION;
     }
@@ -192,6 +192,7 @@ void Crazyflie::Stop()
 
 void  Crazyflie::SendVelocityRef(Velocity velocity)
 {
+    textLogger << "Sending velocity ref, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     // vx in meter/s in world frame.
     // vy in meter/s in world frame.
     // vz in meter/s in world frame.

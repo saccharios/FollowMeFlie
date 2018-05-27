@@ -3,25 +3,25 @@
 #include <iostream>
 #include <fstream>
 #include <cstdio>
-
+#include <chrono>
 TextLogger textLogger;
 std::string TextLogger::_file_name = "console_logger.txt";
 
 TextLogger::TextLogger() :
     _sstream()
 {
-    remove(_file_name.c_str());
 }
-
-//void TextLogger::Write( std::stringstream const & strm )
-//{
-//	*_ostream << strm.str();
-//}
-//void TextLogger::WriteString( std::string const & str )
-//{
-//	*_ostream << str;
-//}
-
+void TextLogger::Init()
+{
+    remove(_file_name.c_str());
+    std::ofstream myfile;
+    myfile.open (_file_name, std::ios::out | std::ios::trunc);
+    std::stringstream initMsg;
+    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    initMsg<< "Program execution started on " << std::ctime(&now) << std::endl;
+    myfile << initMsg.str();
+    myfile.close();
+}
 void TextLogger::WriteToFile()
 {
     _sstream.swap();
@@ -30,6 +30,6 @@ void TextLogger::WriteToFile()
     myfile << _sstream.side_b().str();
     myfile.close();
 
-    _sstream.side_b().str(std::string()); // Delets content
-    _sstream.side_b().clear(); // Delets errorbit
+    _sstream.side_b().str(std::string()); // Deletes content
+    _sstream.side_b().clear(); // Deletes errorbit
 }

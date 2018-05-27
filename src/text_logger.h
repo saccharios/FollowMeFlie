@@ -10,16 +10,14 @@ class TextLogger : public QObject
 public:
     TextLogger();
 
-    //void operator<< (std::ostream const & stream, TextLogger & textLogger)
-
     template<typename T> TextLogger & operator<< (T t)
     {
-        std::cout << "addr =  " << this << std::endl;
         this->Write(t);
         return *this;
     }
     void operator<< (std::stringstream const & strm){this->Write(strm);}
 
+    void Init();
 public slots:
     void WriteToFile();
 

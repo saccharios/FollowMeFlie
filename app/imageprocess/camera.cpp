@@ -7,6 +7,7 @@
 #include <QImage>
 #include <QCameraInfo>
 #include "text_logger.h"
+#include "math/types.h"
 
 QImage Mat2QImage(cv::Mat const& src)
 {
@@ -165,4 +166,28 @@ cv::Point2f  Camera::ConvertMidPointToCameraCoord(cv::Point2f midPt )
     cameraCoord.x = midPt.x + _resolution.width/2;
     cameraCoord.y = -midPt.y + _resolution.height/2;
     return cameraCoord;
+}
+float pixelToMeter()
+{
+    // TODO SF take into account depth (camera z) to calculate x,y conversion to meter
+    return 1/100.0;
+}
+
+Distance Camera::ConvertMidPointToCrazyFlieCoordinates(Distance positionEstimateCamera)
+{
+    // Camera coordinate system is looking for the camera:
+    // positive x to the right (in pixel)
+    // positive y to the top (in pixel)
+    // positive z into the image (in cm)
+
+    // Crazyflie coordinate system is:
+    // 1)The x-direction should be positive in the front direction (antenna) (in meter)
+    // 2)The y-direction is positive leftward (in meter)
+    // 3)The z-direction is positive upward (in meter)
+
+    Distance positionEstimateCfly;
+    positionEstimateCfly.x = positionEstimateCamera.z/100.0;
+    positionEstimateCfly.y = -positionEstimateCamera.x*pixelToMeter();
+    positionEstimateCfly.z = positionEstimateCamera.y*pixelToMeter();
+    return positionEstimateCfly;
 }
