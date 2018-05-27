@@ -59,4 +59,5 @@ struct Blob
 };
 
 Blob GetLargestBlob(std::vector<Blob> const & blobs);
+void PrintBlobs(std::vector<Blob> const & blobs);
 

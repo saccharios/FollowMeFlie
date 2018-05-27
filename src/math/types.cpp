@@ -20,3 +20,15 @@ Blob GetLargestBlob(std::vector<Blob> const & blobs)
     return largestBlob;
 }
 
+void PrintBlobs(std::vector<Blob> const & blobs)
+{
+    int i = 0;
+    for(auto const & blob : blobs)
+    {
+        textLogger << "Blob " << i
+                      << " x: " << blob.point.x
+                         << " y: " << blob.point.y
+                            << " z: " << blob.point.z << "\n";
+        ++i;
+    }
+}

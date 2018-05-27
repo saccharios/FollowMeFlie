@@ -15,7 +15,7 @@ public:
 
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
-        _kalmanFilter(0.5, 0.05, 0.0),
+        _kalmanFilter(0.05, 0.005, 0.0),
         _detectorParams()
     {
 

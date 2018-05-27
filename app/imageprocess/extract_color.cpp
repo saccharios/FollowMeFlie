@@ -26,10 +26,6 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     std::vector<Blob> crazyFliePoints = Camera::ConvertCameraToCrazyFlieCoord(camPoints);
 
     Blob estimateCrazyFlieCoord = _kalmanFilter.Update(crazyFliePoints);
-    //textLogger << "estimateMidPtCoord size = " << estimateMidPtCoord.size << "\n";
-
-//    float distance = CalculateDistance(estimateMidPtCoord);
-    //textLogger << "cam z-distance = " << distance << "\n";
 
     // Draw the estimate
     cv::Point2f estimateCamera = Camera::ConvertCrazyFlieToCameraCoord(estimateCrazyFlieCoord);
@@ -39,7 +35,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
-    textLogger << "Camer estimate: x (m) " << estimateCrazyFlieCoord.point.x
+    textLogger << "Camer estimatea: x (m) " << estimateCrazyFlieCoord.point.x
                << " y (m) = " << estimateCrazyFlieCoord.point.y
                << " z (m) = " << estimateCrazyFlieCoord.point.z << "\n";
 
