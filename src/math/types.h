@@ -50,14 +50,24 @@ struct Point3f
    float x;
    float y;
    float z;
+   Point3f():
+       x(0.0f),y(0.0f), z(0.0f) {}
+   Point3f(float xx, float yy, float zz):
+       x(xx),y(yy), z(zz) {}
 };
 
 struct Blob
 {
     Point3f point;
     float size;
+    Blob() :
+        point(),
+        size (0.0)
+    {}
+
 };
 
 Blob GetLargestBlob(std::vector<Blob> const & blobs);
+Blob GetLargestMostRoundBlob(std::vector<Blob> const & blobs);
 void PrintBlobs(std::vector<Blob> const & blobs);
 

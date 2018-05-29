@@ -19,7 +19,10 @@ Blob GetLargestBlob(std::vector<Blob> const & blobs)
     }
     return largestBlob;
 }
+Blob GetLargestMostRoundBlob(std::vector<Blob> const & blobs)
+{
 
+}
 void PrintBlobs(std::vector<Blob> const & blobs)
 {
     int i = 0;

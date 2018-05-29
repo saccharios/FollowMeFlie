@@ -77,9 +77,9 @@ private:
     //    Matrix4f _P; // Initial estimat of covariane matrix P not used
     KalmanFilter<float,4,2> _kalmanFilter;
 
-
-    cv::Point2f UpdateFilter(cv::Point2f pt);
-    cv::Point2f UpdateFilterNoMeas();
+    Eigen::Vector4f _state_estimate;
+    Eigen::Vector4f UpdateFilter(cv::Point2f pt);
+    Eigen::Vector4f UpdateFilterNoMeas();
     unsigned int _validCounter = 0;
     bool GetBestFit(std::vector<Blob> const & blobs, cv::Point2f prediction, Blob & bestFit);
 

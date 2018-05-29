@@ -15,7 +15,7 @@ public:
 
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
-        _kalmanFilter(0.05, 0.005, 0.0),
+        _kalmanFilter(0.5, 0.05, 0.0),
         _detectorParams()
     {
 
@@ -28,16 +28,21 @@ public:
         _detectorParams.maxArea = 100000;
 
         // Filter by Circularity
-        _detectorParams.filterByCircularity = false;
-        _detectorParams.minCircularity = 0.1;
+        _detectorParams.filterByCircularity = true;
+        _detectorParams.minCircularity = 0.4;
 
         // Filter by Convexity
-        _detectorParams.filterByConvexity = false;
-        _detectorParams.minConvexity = 0.87;
+        _detectorParams.filterByConvexity = true;
+        _detectorParams.minConvexity = 0.6;
+        _detectorParams.maxConvexity = 1.0;
 
         // Filter by Inertia
-        _detectorParams.filterByInertia = false;
-        _detectorParams.minInertiaRatio = 0.01;
+        _detectorParams.filterByInertia = true;
+        _detectorParams.minInertiaRatio = 0.6;
+        _detectorParams.maxInertiaRatio = 1.0;
+
+        _detectorParams.filterByColor = true;
+        _detectorParams.blobColor = 0;
     }
 
 public slots:

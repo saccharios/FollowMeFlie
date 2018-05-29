@@ -117,10 +117,9 @@ void ExtractColor::Initialize(cv::Mat const & img)
 {
     cv::Mat imgWithKeypoints;
     std::vector<cv::KeyPoint> camPoints = ExtractKeyPoints(img, imgWithKeypoints);
-
     std::vector<Blob> crazyFliePoints = Camera::ConvertCameraToCrazyFlieCoord(camPoints);
 
-    auto largestBlob= GetLargestBlob(crazyFliePoints);
+    auto largestBlob = GetLargestBlob(crazyFliePoints);
 
     // Kalman filter
     _kalmanFilter.Initialize(largestBlob);
