@@ -35,9 +35,10 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
-    textLogger << "Camer estimatea: x (m) " << estimateCrazyFlieCoord.point.x
-               << " y (m) = " << estimateCrazyFlieCoord.point.y
-               << " z (m) = " << estimateCrazyFlieCoord.point.z << "\n";
+//    std::cout << "Camera estimate: size = " << estimateCrazyFlieCoord.size
+//               << " y (pixel) = " << estimateCrazyFlieCoord.point.y
+//               << " z (pixel) = " << estimateCrazyFlieCoord.point.z
+//               << " estimate x (m) " << estimateCrazyFlieCoord.point.x<< "\n";
 
     emit EstimateReady(estimateCrazyFlieCoord.point);
 

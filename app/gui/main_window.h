@@ -25,7 +25,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
+signals:
+    void StartMeasurement();
 private slots:
     void on_disconnectRadio_clicked();
     void on_connectRadio_clicked();
@@ -48,6 +49,8 @@ private slots:
     void on_pushButton_SafeLandingMode_clicked();
     void on_pushButton_ActualValues_clicked();
     void on_pushButton_ParameterTable_clicked();
+
+    void on_pushButton_TakeMeasurement_clicked();
 
 private:
     RadioDongle _radioDongle;

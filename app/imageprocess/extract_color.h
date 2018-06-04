@@ -48,6 +48,7 @@ public:
 public slots:
     void ProcessImage(cv::Mat const & img);
     void Initialize(cv::Mat const & img);
+    void StartMeasurement() {_kalmanFilter.StartMeasurement(true);}
 
 signals:
     void EstimateReady(Point3f const &);

@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
+    QObject::connect(this, SIGNAL(StartMeasurement()), &_extractColor, SLOT(StartMeasurement()));
     QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(DisplayConnectionTimeoutBox()));
     QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(DisplayNotConnectingBox()));
     QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)),
@@ -280,4 +281,9 @@ void MainWindow::on_pushButton_ParameterTable_clicked()
         delete _parameterTable;
         _parameterTable = nullptr;
     }
+}
+
+void MainWindow::on_pushButton_TakeMeasurement_clicked()
+{
+    emit StartMeasurement();
 }

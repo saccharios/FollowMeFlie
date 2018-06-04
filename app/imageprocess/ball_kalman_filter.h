@@ -68,7 +68,7 @@ public:
 
     void Initialize(Blob input) {_kalmanFilter.Initialize(Vector2f{input.point.y, input.point.z});}
     Blob Update(std::vector<Blob> const & blobs);
-
+    void StartMeasurement(bool start) {_measurementInProgress = start;}
 private:
     Matrix4f _A;
     Matrix4f _Q;
@@ -82,5 +82,8 @@ private:
     Eigen::Vector4f UpdateFilterNoMeas();
     unsigned int _validCounter = 0;
     bool GetBestFit(std::vector<Blob> const & blobs, cv::Point2f prediction, Blob & bestFit);
-
+    bool _measurementInProgress = false;
+    int _measurementNum = 0;
+    static constexpr int _maxMeasurementNum = 1000;
+    Blob measurementAddition;
 };
