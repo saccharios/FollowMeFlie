@@ -17,7 +17,7 @@ cv::Scalar QColor2Scalar(QColor const & color)
 void ExtractColor::ProcessImage(cv::Mat const & img)
 {
     cv::Mat imgToShow;
-    std::vector<cv::KeyPoint> camPoints= ExtractKeyPoints(img, imgToShow);
+    std::vector<cv::KeyPoint> camPoints = ExtractKeyPoints(img, imgToShow);
 
     // Draw detected blobs as red circles.
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
@@ -74,7 +74,7 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
 {
     // Create lower and upper color bounds
     cv::Scalar colorToFilter= QColor2Scalar(_colorToFilter);
-    int tolerance = 20; // Arbitrary value but seems to be good.
+    int tolerance = 25; // Arbitrary value but seems to be good.
     cv::Scalar colorLower(colorToFilter[0] - tolerance, 80,80); // h, s, v
     cv::Scalar colorUpper(colorToFilter[0] + tolerance, 255,255);
 
@@ -88,7 +88,7 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
     FilterImage(imgToShow);
 
     // Create black/white picture
-    cv::threshold (imgToShow, imgToShow, 70, 255, CV_THRESH_BINARY_INV);
+    cv::threshold (imgToShow, imgToShow, 60, 255, CV_THRESH_BINARY_INV);
 
     // Detect blobs.
     std::vector<cv::KeyPoint> cameraKeyPoints;
@@ -105,13 +105,14 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
 
 void ExtractColor::FilterImage(cv::Mat & imgThresholded)
 {
+    int erosion_size = 2;
     //morphological opening (remove small objects from the foreground)
-    cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
-    cv::dilate( imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
+    cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),cv::Point( erosion_size, erosion_size  ) ));
+    cv::dilate(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),cv::Point( erosion_size, erosion_size  ) ));
 
     //morphological closing (fill small holes in the foreground)
-    cv::dilate( imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
-    cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)) );
+    cv::dilate(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),cv::Point( erosion_size, erosion_size  ) ));
+    cv::erode(imgThresholded, imgThresholded, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),cv::Point( erosion_size, erosion_size  ) ));
 }
 
 void ExtractColor::Initialize(cv::Mat const & img)
