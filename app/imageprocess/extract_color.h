@@ -38,7 +38,7 @@ public:
 
         // Filter by Inertia
         _detectorParams.filterByInertia = true;
-        _detectorParams.minInertiaRatio = 0.6;
+        _detectorParams.minInertiaRatio = 0.2;
         _detectorParams.maxInertiaRatio = 1.0;
 
         _detectorParams.filterByColor = true;

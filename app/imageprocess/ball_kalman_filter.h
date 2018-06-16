@@ -84,6 +84,6 @@ private:
     bool GetBestFit(std::vector<Blob> const & blobs, cv::Point2f prediction, Blob & bestFit);
     bool _measurementInProgress = false;
     int _measurementNum = 0;
-    static constexpr int _maxMeasurementNum = 1000;
+    static constexpr int _maxMeasurementNum = 500;
     Blob measurementAddition;
 };
