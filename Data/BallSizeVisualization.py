@@ -312,9 +312,23 @@ fig_2d = plt.figure()
 ax = fig_2d.gca()
 
 ax.plot(df_array,residuals)
-
-ax.legend() 
 ax.set_title('residuals over df')
 ax.set_xlabel('df (focal length)')
 ax.set_ylabel('residuals,')
 plt.show()
+
+min_idx = np.argmin(residuals)
+print('Best a = ' ,output[min_idx][0][0],', b = ' ,output[min_idx][0][1], ', df = ' , df_array[min_idx])
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+# New Ansatz, the size is a function of the distance, not x --->> BAD IDEA
+# distance_array = np.zeros(np.size(all_x_data))
+# for i in range (0, np.size(all_x_data)):
+#     distance_array[i] = np.sqrt(all_x_data[i]*all_x_data[i] + all_y_data[i]*all_y_data[i] + all_z_data[i]*all_z_data[i])
+# 
+# 
+# # Ansatz: z(d) = a/d + b
+# # Reformulate as  b*xda = z(x)*d
+# d_x = np.multiply(distance_array, all_size_measurement)
+# coeffs_dx = np.polyfit(all_size_measurement, d_x, 1)
+# print(coeffs_dx)
