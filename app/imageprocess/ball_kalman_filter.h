@@ -17,7 +17,9 @@ public:
         _Q(),
         _H(),
         _R(),
-        _kalmanFilter()
+        _kalmanFilter(),
+        _state_estimate(),
+        _previous_valid_size(0.0f)
     {
         // A =
         // 1 0 1 0
@@ -66,8 +68,8 @@ public:
     }
 
 
-    void Initialize(Blob input) {_kalmanFilter.Initialize(Vector2f{input.point.y, input.point.z});}
-    Blob Update(std::vector<Blob> const & blobs);
+    void Initialize(MidPoint input) {_kalmanFilter.Initialize(Vector2f{input.pt.x, input.pt.y});}
+    MidPoint Update(std::vector<MidPoint> const & midPoints);
     void StartMeasurement(bool start) {_measurementInProgress = start;}
 private:
     Matrix4f _A;
@@ -78,12 +80,13 @@ private:
     KalmanFilter<float,4,2> _kalmanFilter;
 
     Eigen::Vector4f _state_estimate;
+    float _previous_valid_size;
     Eigen::Vector4f UpdateFilter(cv::Point2f pt);
     Eigen::Vector4f UpdateFilterNoMeas();
     unsigned int _validCounter = 0;
-    bool GetBestFit(std::vector<Blob> const & blobs, cv::Point2f prediction, Blob & bestFit);
+    bool GetBestFit(std::vector<MidPoint> const & midPoints, cv::Point2f prediction, MidPoint & bestFit);
     bool _measurementInProgress = false;
     int _measurementNum = 0;
     static constexpr int _maxMeasurementNum = 500;
-    Blob measurementAddition;
+    MidPoint measurementAddition;
 };

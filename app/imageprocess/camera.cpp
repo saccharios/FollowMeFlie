@@ -25,7 +25,7 @@ Camera::Camera () :
 {
 }
 cv::Size Camera::_resolution = cv::Size();
-cv::Point2f Camera::_midPoint = cv::Point2f();
+cv::KeyPoint Camera::_origin = cv::KeyPoint();
 
 void Camera::Update()
 {
@@ -50,7 +50,7 @@ void Camera::Update()
             _state = CameraState::RUNNING;
             _resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
             _resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
-            _midPoint = ConvertMidPointToCameraCoord({0.0, 0.0});
+            _origin = ConvertMidPointToCameraCoord(MidPoint());
 
             _capture->set(CV_CAP_FFMPEG,true);
             _capture->set(CV_CAP_PROP_FPS,30);
@@ -138,126 +138,67 @@ void Camera::InitializeTracking()
     FetchImage(frame); // Fetch twice, as the first image contains nothing
     emit ImgReadyForInitialization(frame);
 }
-
-std::vector<Blob> Camera::ConvertCameraToCrazyFlieCoord(std::vector<cv::KeyPoint> const & keyPoints)
-{
-    std::vector<Blob> blobs;
-    for(auto const & keyPoint : keyPoints)
-    {
-        blobs.push_back(ConvertCameraToCrazyFlieCoord(keyPoint));
-    }
-    return blobs;
-}
-
-Blob Camera::ConvertCameraToCrazyFlieCoord(cv::KeyPoint cameraPt)
+MidPoint Camera::ConvertCameraToMidPointCoord(cv::KeyPoint keyPoint)
 {
     // Camera coordinate system is, (0,0) is in the top left corner
     // positive x to the right (in pixel)
     // positive y to the bottowm (in pixel)
 
-    // Crazyflie coordinate system is, (0,0,0) is at the crazyflie
+    // MidPoint cooridnate system is, (0,0) in the middle
+    // positive x to the left (in pixel)
+    // positive y to the top (in pixel)
+
+    MidPoint midPoint;
+    midPoint.pt.x = -keyPoint.pt.x + _resolution.width / 2;
+    midPoint.pt.y = -keyPoint.pt.y + _resolution.height/ 2;
+    midPoint.size = keyPoint.size;
+    return midPoint;
+}
+std::vector<MidPoint> Camera::ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints)
+{
+    std::vector<MidPoint> midPoints;
+    for(auto const & keyPoint : keyPoints)
+    {
+        midPoints.push_back(ConvertCameraToMidPointCoord(keyPoint));
+    }
+    return midPoints;
+}
+
+cv::KeyPoint  Camera::ConvertMidPointToCameraCoord(MidPoint midPoint )
+{
+    cv::KeyPoint keyPoint;
+    keyPoint.pt.x = -midPoint.pt.x + _resolution.width/2;
+    keyPoint.pt.y = -midPoint.pt.y + _resolution.height/2;
+    keyPoint.size = midPoint.size;
+    return keyPoint;
+}
+std::vector<cv::KeyPoint> Camera::ConvertMidPointToCameraCoord(std::vector<MidPoint> const & midPoints)
+{
+    std::vector<cv::KeyPoint> keyPoints;
+    for(auto const & midPoint : midPoints)
+    {
+        keyPoints.push_back(ConvertMidPointToCameraCoord(midPoint));
+    }
+    return keyPoints;
+}
+
+Point3f Camera::ConvertMidPointToCrazyFlieCoord(MidPoint midPoint)
+{
+    // Crazyflie coordinate system is: (0,0,0) is at the crazyflie
     // 1)The x-direction is positive in the front direction (antenna) (in meter)
-    // 2)The y-direction is positive leftward (in meter)
-    // 3)The z-direction is positive upward (in meter)
-
-    // TODO SF, simplify
-    cv::Point2f midPtCoord = ConvertCameraToMidPointCoord(cameraPt.pt);
-
-    cv::KeyPoint kPt = cameraPt;
-    kPt.pt = midPtCoord;
-    float distance = EstimateDistance(kPt);
+    // 2)The y-direction is positive left (in meter)
+    // 3)The z-direction is positive top (in meter)
 
     Point3f point;
-    point.x = midPtCoord.x;
-    point.y = midPtCoord.y;
-    point.z = distance;
-
-    Blob blob;
-    blob.point = ConvertMidPointToCrazyFlieCoordinates(point);
-    blob.size = cameraPt.size;
-    return blob;
-}
-cv::Point2f  Camera::ConvertCameraToMidPointCoord(cv::Point2f cameraPt)
-{
-    cv::Point2f midPointCoord;
-    midPointCoord.x = cameraPt.x - _resolution.width / 2;
-    midPointCoord.y = -cameraPt.y + _resolution.height/ 2;
-    return midPointCoord;
-}
-
-cv::Point2f  Camera::ConvertMidPointToCameraCoord(cv::Point2f midPt )
-{
-    cv::Point2f cameraCoord;
-    cameraCoord.x = midPt.x + _resolution.width/2;
-    cameraCoord.y = -midPt.y + _resolution.height/2;
-    return cameraCoord;
-}
-float pixelToMeter()
-{
-    // TODO SF take into account depth (camera z) to calculate x,y conversion to meter
-    return 1.0;
-}
-float MeterToPixel()
-{
-    // TODO SF take into account depth (camera z) to calculate x,y conversion to meter
-    return 1/pixelToMeter();
-}
-
-Point3f Camera::ConvertMidPointToCrazyFlieCoordinates(Point3f pointCamera)
-{
-    // MidPt coordinate system is looking for the camera:
-    // positive x to the right (in pixel)
-    // positive y to the top (in pixel)
-    // positive z into the image (in cm)
-
-    // Crazyflie coordinate system is:
-    // 1)The x-direction is positive in the front direction (antenna) (in meter)
-    // 2)The y-direction is positive leftward (in meter)
-    // 3)The z-direction is positive upward (in meter)
-
-    Point3f pointCFly;
-    pointCFly.x = pointCamera.z/100.0;
-    pointCFly.y = -pointCamera.x*pixelToMeter();
-    pointCFly.z = pointCamera.y*pixelToMeter();
-    return pointCFly;
-}
-
-Point3f Camera::ConvertCrazyFlieToMidPointCoord(Blob blob)
-{
-
-    Point3f midPt;
-    midPt.x = -blob.point.y*MeterToPixel();
-    midPt.y = blob.point.z*MeterToPixel();
-    midPt.z = blob.point.x * 100.0;
-    return midPt;
-}
-
-
-cv::Point2f Camera::ConvertCrazyFlieToCameraCoord(Blob blob)
-{
-    Point3f midPt = ConvertCrazyFlieToMidPointCoord(blob);
-    return ConvertMidPointToCameraCoord({midPt.x, midPt.y});
-}
-
-
-float Camera::EstimateDistance(cv::KeyPoint const & point)
-{
-    // Use a primitive way of estimating the distance. This is known to be incorrect at the edges and the corners
-    // of the camera if the ball is far away (due to fish eye). But then it anyways does not matter.
-    // Formula is
-    // Distance = 1/(a * size +b)
-    // a and b are calculated with experimental values
-    // distance | size
-    //       10 | 160
-    //       16 | 92
-    //       26 | 57
-    //       51 | 27
-    float a = 0.0007058662;
-    float b = -0.0008086623;
-    float distance = 1.0/(a*point.size + b);
-    if(distance < 0.0)
-    {
-        distance = 0.0;
-    }
-    return distance;
+    // crazyflie x component depens only on the size,
+    // x_cflie = a/y + b
+    // See Distance_Measurements_Coord.ods for the data behind these values.
+    float a = 1670.0;
+    float b =  -0.711;
+    point.x = a/midPoint.size + b;
+    // For y and z component, use simple height similarity
+    // Ähnlichkeitszeits, gegeben die focal length.
+    point.y = midPoint.pt.x * point.x / _focalLength;
+    point.z = midPoint.pt.y * point.x / _focalLength;
+    return point;
 }

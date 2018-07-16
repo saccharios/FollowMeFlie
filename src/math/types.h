@@ -45,6 +45,15 @@ struct TOCElement
         textLogger << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << "\n";
     }
 };
+struct Point2f
+{
+    float x;
+    float y;
+    Point2f():
+        x(0.0f),y(0.0f) {}
+    Point2f(float xx, float yy):
+        x(xx),y(yy){}
+};
 struct Point3f
 {
    float x;
@@ -55,19 +64,35 @@ struct Point3f
    Point3f(float xx, float yy, float zz):
        x(xx),y(yy), z(zz) {}
 };
-
-struct Blob
+struct MidPoint
 {
-    Point3f point;
+    Point2f pt; // TODO Move to app/types.h
     float size;
-    Blob() :
-        point(),
-        size (0.0)
-    {}
-
+    MidPoint():
+        pt(0.0f,0.0f), size(0.0f) {}
+    MidPoint(float xx, float yy, float zz):
+        pt(xx,yy), size(zz) {}
 };
 
-Blob GetLargestBlob(std::vector<Blob> const & blobs);
-Blob GetLargestMostRoundBlob(std::vector<Blob> const & blobs);
-void PrintBlobs(std::vector<Blob> const & blobs);
+
+template<typename T>
+T GetLargest(std::vector<T> const & elements)
+{
+    T largestElement;
+    if(elements.size() == 1)
+    {
+        largestElement =  elements.at(0);
+    }
+    else if(elements.size() > 1)
+    {
+        for(auto const & element : elements)
+        {
+            if(element.size > largestElement.size)
+            {
+                largestElement = element;
+            }
+        }
+    }
+    return largestElement;
+}
 

@@ -19,28 +19,32 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     cv::Mat imgToShow;
     std::vector<cv::KeyPoint> camPoints = ExtractKeyPoints(img, imgToShow);
 
-    // Draw detected blobs as red circles.
-    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
+    // Draw detected keyPoints as red circles.
+    // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of keyPoint
     cv::drawKeypoints( imgToShow, camPoints, imgToShow, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
-    std::vector<Blob> crazyFliePoints = Camera::ConvertCameraToCrazyFlieCoord(camPoints);
+    std::vector<MidPoint> midPointMeasurements = Camera::ConvertCameraToMidPointCoord(camPoints);
+    MidPoint estimate = _kalmanFilter.Update(midPointMeasurements);
 
-    Blob estimateCrazyFlieCoord = _kalmanFilter.Update(crazyFliePoints);
 
     // Draw the estimate
-    cv::Point2f estimateCamera = Camera::ConvertCrazyFlieToCameraCoord(estimateCrazyFlieCoord);
+    cv::Point2f estimateCamera = (Camera::ConvertMidPointToCameraCoord(estimate)).pt;
     cv::circle(imgToShow, estimateCamera, 25, {230,250,25},3);
     // Draw circle in the middle
-    cv::circle(imgToShow, Camera::GetMidPoint(), 25, {200,10,50}, 3);
+    cv::circle(imgToShow, Camera::GetOrigin().pt, 25, {200,10,50}, 3);
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
-//    std::cout << "Camera estimate: size = " << estimateCrazyFlieCoord.size
-//               << " y (pixel) = " << estimateCrazyFlieCoord.point.y
-//               << " z (pixel) = " << estimateCrazyFlieCoord.point.z
-//               << " estimate x (m) " << estimateCrazyFlieCoord.point.x<< "\n";
+    std::cout << "MidPoint estimate: size = " << estimate.size
+               << " x (pixel) = " << estimate.pt.x
+               << " y (pixel) = " << estimate.pt.y<< "\n";
 
-    emit EstimateReady(estimateCrazyFlieCoord.point);
+    Point3f estimateCrazyFlieCoord = Camera::ConvertMidPointToCrazyFlieCoord(estimate);
+    std::cout << "Point3f estimateCrazyFlieCoord: x (m) = " << estimateCrazyFlieCoord.x
+              << " y (m) = " << estimateCrazyFlieCoord.y
+              << " z (m) = " << estimateCrazyFlieCoord.z << "\n";
+
+    emit EstimateReady(estimateCrazyFlieCoord);
 
 }
 
@@ -90,9 +94,8 @@ std::vector<cv::KeyPoint> ExtractColor::ExtractKeyPoints(cv::Mat const & img, cv
     // Create black/white picture
     cv::threshold (imgToShow, imgToShow, 60, 255, CV_THRESH_BINARY_INV);
 
-    // Detect blobs.
+    // Detect keyPoints
     std::vector<cv::KeyPoint> cameraKeyPoints;
-
     auto detector = cv::SimpleBlobDetector::create(_detectorParams);
     detector->detect( imgToShow, cameraKeyPoints );
 
@@ -119,14 +122,14 @@ void ExtractColor::Initialize(cv::Mat const & img)
 {
     cv::Mat imgWithKeypoints;
     std::vector<cv::KeyPoint> camPoints = ExtractKeyPoints(img, imgWithKeypoints);
-    std::vector<Blob> crazyFliePoints = Camera::ConvertCameraToCrazyFlieCoord(camPoints);
+    std::vector<MidPoint> midPoints = Camera::ConvertCameraToMidPointCoord(camPoints);
 
-    auto largestBlob = GetLargestBlob(crazyFliePoints);
+    MidPoint largestMidPoint = GetLargest(midPoints);
 
     // Kalman filter
-    _kalmanFilter.Initialize(largestBlob);
+    _kalmanFilter.Initialize(largestMidPoint);
 
-    textLogger << "Measurement cfly = "<< largestBlob.point.x << " " << largestBlob.point.y << " " << largestBlob.point.z << "\n";
+    textLogger << "Measurement cfly = "<< largestMidPoint.pt.x << " " << largestMidPoint.pt.y << " " << largestMidPoint.size << "\n";
 }
 
 void ExtractColor::RemoveKeyPointsAtEdges(std::vector<cv::KeyPoint> & cameraKeyPoints)
@@ -138,9 +141,9 @@ void ExtractColor::RemoveKeyPointsAtEdges(std::vector<cv::KeyPoint> & cameraKeyP
 
     for(uint8_t idx = 0; idx < cameraKeyPoints.size(); )
     {
-        cv::Point2f midPoint = Camera::ConvertCameraToMidPointCoord(cameraKeyPoints.at(idx).pt);
+        MidPoint midPoint = Camera::ConvertCameraToMidPointCoord(cameraKeyPoints.at(idx));
 
-        if( (midPoint.x * midPoint.x) + (midPoint.y * midPoint.y)
+        if( (midPoint.pt.x * midPoint.pt.x) + (midPoint.pt.y * midPoint.pt.y)
                 > (limit_sqr))
         {
             cameraKeyPoints.erase(cameraKeyPoints.begin() + idx);

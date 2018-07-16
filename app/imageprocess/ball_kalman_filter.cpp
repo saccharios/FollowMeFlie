@@ -2,11 +2,11 @@
 #include "opencv_utils.h"
 #include "camera.h"
 #include <opencv2\opencv.hpp>
-
-Blob BallKalmanFilter::Update(std::vector<Blob> const & blobs)
+#include "math/types.h"
+MidPoint BallKalmanFilter::Update(std::vector<MidPoint> const & midPoints)
 {
     textLogger << "Update Kalman Filter\n";
-    //    std::cout << "Num of blobs = " << blobs.size() << std::endl;
+    //    std::cout << "Num of midPoints = " << midPoints.size() << std::endl;
     // Predict
     Eigen::Vector4f prediction = _kalmanFilter.Predict();
     textLogger << "Preditction y = " << prediction[0]
@@ -16,23 +16,24 @@ Blob BallKalmanFilter::Update(std::vector<Blob> const & blobs)
 
     // Get best fit measurement
     // If the ball is larger than a threshold, this is taken in any case
-    Blob validMeasurement = GetLargestBlob(blobs);
+    MidPoint validMeasurement = GetLargest(midPoints);
     bool isValid = true;
     if(_validCounter < 20)
     {
-        // If _validCounter >= 20, the best fit is the largest blob, and the KF is reset
+        // If _validCounter >= 20, the best fit is the largest midPoints, and the KF is reset
         //        std::cout << "validMeasurement.size = " << validMeasurement.size << std::endl;
-        isValid = GetBestFit(blobs, cv::Point2f{prediction[0],prediction[1]}, validMeasurement);
+        isValid = GetBestFit(midPoints, cv::Point2f{prediction[0],prediction[1]}, validMeasurement);
     }
 
-    textLogger << "Best measurement,  y = " << validMeasurement.point.y << " z = " << validMeasurement.point.z << "\n";
+    textLogger << "Best measurement,  x = " << validMeasurement.pt.x << " y = " << validMeasurement.pt.y << "\n";
     // Update the kalman filter
-    Blob output = validMeasurement;
+    MidPoint output = validMeasurement;
     Eigen::Vector4f estimate;
     if(isValid)
     {
         _validCounter = 0;
-        estimate = UpdateFilter({validMeasurement.point.y,validMeasurement.point.z});
+        estimate = UpdateFilter({validMeasurement.pt.x,validMeasurement.pt.y});
+        _previous_valid_size = validMeasurement.size;
         //        std::cout << "Updating with valid measurement\n";
 //        std::cout << _measurementNum << " Measurement, x =  " << output.point.y
 //                  << " z = " <<  output.point.z
@@ -40,15 +41,15 @@ Blob BallKalmanFilter::Update(std::vector<Blob> const & blobs)
 //                  << std::endl;
         if( _measurementInProgress )
         {
-            measurementAddition.point.y += output.point.y;
-            measurementAddition.point.z += output.point.z;
+            measurementAddition.pt.x += output.pt.x;
+            measurementAddition.pt.y += output.pt.y;
             measurementAddition.size += output.size;
 
             ++_measurementNum;
             if(_measurementNum%(_maxMeasurementNum/10) == 0)
             {
-                std::cout << _measurementNum << " Measurement, y =  " << output.point.y
-                          << " z = " <<  output.point.z
+                std::cout << _measurementNum << " Measurement, x =  " << output.pt.x
+                          << " y = " <<  output.pt.y
                           << " size = " <<  output.size
                           << std::endl;
             }
@@ -56,12 +57,12 @@ Blob BallKalmanFilter::Update(std::vector<Blob> const & blobs)
             {
                 _measurementNum = 0;
                 _measurementInProgress = false;
-                std::cout << "Measurement Average, y = " << measurementAddition.point.y/static_cast<float>(_maxMeasurementNum)
-                          << " z = " <<  measurementAddition.point.z/static_cast<float>(_maxMeasurementNum)
+                std::cout << "Measurement Average, x = " << measurementAddition.pt.x/static_cast<float>(_maxMeasurementNum)
+                          << " y = " <<  measurementAddition.pt.y/static_cast<float>(_maxMeasurementNum)
                           << " size = " <<  measurementAddition.size/static_cast<float>(_maxMeasurementNum)
                           << std::endl;
-                measurementAddition.point.y = 0;
-                measurementAddition.point.z = 0;
+                measurementAddition.pt.x = 0;
+                measurementAddition.pt.y = 0;
                 measurementAddition.size = 0;
             }
         }
@@ -77,51 +78,54 @@ Blob BallKalmanFilter::Update(std::vector<Blob> const & blobs)
     //            << " vy = " << estimate[2]
     //            << " vz = " << estimate[3] << std::endl;
 
-    output.point.y = estimate[0];
-    output.point.z = estimate[1];
+    output.pt.x = estimate[0];
+    output.pt.y = estimate[1];
+    output.size = _previous_valid_size;
     return output;
 }
 
-bool BallKalmanFilter::GetBestFit(std::vector<Blob> const & blobs, cv::Point2f prediction, Blob & bestFit)
+bool BallKalmanFilter::GetBestFit(std::vector<MidPoint> const & midPoints, cv::Point2f prediction, MidPoint & bestFit)
 {
 
-    if(blobs.size() == 0)
+    if(midPoints.size() == 0)
     {
         return false;
     }
 
     // TODO SF:: Discount small measurementsa close to the edges, especially the corners
 
-    bestFit = Blob();
+    bestFit = MidPoint();
     // Extract the one that is closest to the prediction
-    double cost;
+    double max_cost = 10000;
+    double cost = max_cost + 1;
     int i = 0;
-    for(auto const & blob : blobs)
+    for(auto const & midPoint : midPoints)
     {
-        cv::Point2f point{blob.point.y,blob.point.z};
+        cv::Point2f point{midPoint.pt.x,midPoint.pt.y};
         double twoNorm = cv::norm(cv::Mat(point - prediction), cv::NORM_L2SQR );
 
         // Assign cost at the start
         if(i == 0)
         {
             cost = twoNorm;
-            bestFit = blob;
+            bestFit = midPoint;
         }
 
         if(twoNorm < cost)
         {
             cost = twoNorm;
-            bestFit = blob;
+            bestFit = midPoint;
         }
-        textLogger << "Blob " << i
-                   << " x: " << blob.point.x
-                   << " y: " << blob.point.y
-                   << " z: " << blob.point.z << " cost = " << twoNorm<<"\n";
+        textLogger << "MidPoint " << i
+                   << " x: " << midPoint.pt.x
+                   << " y: " << midPoint.pt.y
+                   << " size: " << midPoint.size
+                   << " cost = " << twoNorm<<"\n";
         ++i;
     }
 
     // Check if the closest is valid. We know the ball cannot travel too far in one sampling instant.
-    if( cost > 10000 )
+    if( cost > max_cost )
     {
 //        std::cout << "Out of reach, cost = " << cost << "y_pred =  "
 //                  << prediction.x << " z_pred = "

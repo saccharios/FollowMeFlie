@@ -24,18 +24,17 @@ public:
     void Update();
     CameraState GetState() const {return _state; }
     static cv::Size const & GetResolution() {return _resolution;}
-    static cv::Point2f const & GetMidPoint() {return _midPoint;}
+    static cv::KeyPoint const & GetOrigin() {return _origin;}
 
 
-    static cv::Point2f ConvertCameraToMidPointCoord(cv::Point2f cameraPt);
-    static cv::Point2f ConvertMidPointToCameraCoord(cv::Point2f midPt);
+    static MidPoint ConvertCameraToMidPointCoord(cv::KeyPoint cameraPt);
+    static std::vector<MidPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints);
+    static cv::KeyPoint ConvertMidPointToCameraCoord(MidPoint midPt);
+    static std::vector<cv::KeyPoint> ConvertMidPointToCameraCoord(std::vector<MidPoint> const & midPoints);
 
-    static Point3f ConvertMidPointToCrazyFlieCoordinates(Point3f positionEstimateCamera);
+    static Point3f ConvertMidPointToCrazyFlieCoord(MidPoint midPoint);
+    static MidPoint ConvertCrazyFlieCoordToMidPoint(Point3f crazyFliePoint);
 
-    static std::vector<Blob> ConvertCameraToCrazyFlieCoord(std::vector<cv::KeyPoint> const & keyPoints);
-    static Blob ConvertCameraToCrazyFlieCoord(cv::KeyPoint cameraPt);
-    static Point3f ConvertCrazyFlieToMidPointCoord(Blob blob);
-    static cv::Point2f ConvertCrazyFlieToCameraCoord(Blob blob);
 signals:
     void ImgReadyForDisplay(QImage const &);
     void ImgReadyForProcessing(cv::Mat const &);
@@ -48,10 +47,10 @@ private:
     cv::VideoCapture* _capture;
 
     static cv::Size _resolution;
-    static cv::Point2f _midPoint;
+    static cv::KeyPoint _origin;
 
     void FetchAndImageReady();
     void FetchImage(cv::Mat & frame);
     void InitializeTracking();
-    static float EstimateDistance(const cv::KeyPoint & point);
+    static constexpr float _focalLength = 223.5;
 };
