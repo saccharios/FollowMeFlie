@@ -126,25 +126,15 @@ public:
 
    Eigen::Vector3f ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body);
 
-   TocLog const & GetLoggerTOC() const
-   {
-       return _logger;
-   }
+   TocLog const & GetLoggerTOC() const {return _logger;}
 
-   TocLog & GetLoggerTOC()
-   {
-       return _logger;
-   }
+   TocLog & GetLoggerTOC() {return _logger; }
 
-   TocParameter const & GetParameterTOC() const
-   {
-       return _parameters;
-   }
+   TocParameter const & GetParameterTOC() const {return _parameters; }
 
-   TocParameter & GetParameterTOC()
-   {
-       return _parameters;
-   }
+   TocParameter & GetParameterTOC() {return _parameters;}
+
+   void EnableCrazyflieKalmanFilter(bool enable);
 
 
 signals:

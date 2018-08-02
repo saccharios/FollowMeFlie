@@ -129,7 +129,7 @@ void ExtractColor::Initialize(cv::Mat const & img)
     // Kalman filter
     _kalmanFilter.Initialize(largestMidPoint);
 
-    textLogger << "Measurement cfly = "<< largestMidPoint.pt.x << " " << largestMidPoint.pt.y << " " << largestMidPoint.size << "\n";
+//    textLogger << "Measurement cfly = "<< largestMidPoint.pt.x << " " << largestMidPoint.pt.y << " " << largestMidPoint.size << "\n";
 }
 
 void ExtractColor::RemoveKeyPointsAtEdges(std::vector<cv::KeyPoint> & cameraKeyPoints)

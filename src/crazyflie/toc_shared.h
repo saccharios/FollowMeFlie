@@ -238,6 +238,27 @@ public:
 //            textLogger << "Element is already contained " << static_cast<int>(element.id) <<"\n";
         }
     }
+    void Log(uint8_t index)
+    {
+        auto const & element = _elements.at(index);
+        textLogger << "ID ="<< static_cast<int>(element.id) << ", ";
+        textLogger << element.name << " = ";
+        textLogger << element.value << "\n";
+    }
+
+    void LogAll()
+    {
+        for(auto const & element : _elements)
+        {
+            if(element.isLogged )
+            {
+                textLogger << "ID ="<< static_cast<int>(element.id) << ", ";
+                textLogger << element.name << " = ";
+                textLogger << element.value << "\n";
+            }
+
+        }
+    }
 
 private:
         // Unfortunately the parameter toc has a different encoding for the types than the logger toc.

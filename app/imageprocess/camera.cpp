@@ -195,7 +195,7 @@ Point3f Camera::ConvertMidPointToCrazyFlieCoord(MidPoint midPoint)
     // See Distance_Measurements_Coord.ods for the data behind these values.
     float a = 1670.0;
     float b =  -0.711;
-    point.x = a/midPoint.size + b;
+    point.x = (a/midPoint.size + b)/100.0f; // factor 100 to convert to meter
     // For y and z component, use simple height similarity
     // Ähnlichkeitszeits, gegeben die focal length.
     point.y = midPoint.pt.x * point.x / _focalLength;

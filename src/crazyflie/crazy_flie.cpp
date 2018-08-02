@@ -119,8 +119,10 @@ void Crazyflie::Update()
     case State::SET_PARAMETERS:
     {
         // Set Parameters that take into account the increased weight due to the camera
-        _parameters.WriteParameter(63, 40000); // idx 63 = thrustBase
-        _parameters.WriteParameter(64, 23000); // idx 64 = minThrust
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 40000);
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 23000);
+
+
         _state = State::NORMAL_OPERATION;
     }
     case State::NORMAL_OPERATION:
@@ -135,6 +137,12 @@ void Crazyflie::Update()
         {
             SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;
+            // TODO SF: for debugging
+            _logger.LogAll();
+//            for(uint8_t i = 60; i < 80; ++i)
+//            {
+//                _logger.Log(i);
+//            }
         }
 
         if(_radioDongle.AckReceived())
@@ -151,6 +159,7 @@ void Crazyflie::Update()
             emit ConnectionTimeout();
             _state = State::ZERO;
         }
+
 
         break;
     }
@@ -281,10 +290,11 @@ void Crazyflie::SetSetPoint(SetPoint setPoint)
 
 void Crazyflie::SetVelocityRef(Velocity velocity)
 {
+    // Velocity must be in meter/second
     _velocity = velocity;
 }
 
-// TODO SF: Simplifly setpoint setting
+// TODO SF: Simplify setpoint setting
 void Crazyflie::SetThrust(int thrust)
 {
     _sendSetPoint.thrust = thrust;
@@ -390,3 +400,15 @@ Eigen::Vector3f Crazyflie::ConvertBodyFrameToIntertialFrame(Eigen::Vector3f cons
     return value_in_inertial;
 }
 
+void Crazyflie::EnableCrazyflieKalmanFilter(bool enable)
+{
+
+    if(enable)
+    {
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::resetEstimation), 0);
+    }
+    else
+    {
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::resetEstimation), 1);
+    }
+}

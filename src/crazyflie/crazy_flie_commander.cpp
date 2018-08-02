@@ -2,16 +2,16 @@
 #include "math/constants.h"
 #include "math/types.h"
 
-static constexpr float limit = 0.1;
+static constexpr float limit = 2.0;
 
 CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
     _hoverModeIsActive(),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
-    _piXVelocity (samplingTime, 0.2f,  0.0f, 1.0f, 0.0f, -limit,limit), // in meter
-    _piYVelocity (samplingTime, 0.05f, 0.0f, 1.0f, 0.0f, -limit,limit), // in pixel, implicitly converted to meter
-    _piZVelocity (samplingTime, 0.05f, 0.0f, 1.0f, 0.0f, -limit,limit), // in pixel, implicitly converted to meter
+    _piXVelocity (samplingTime, 0.05f,  0.02f, 1.0f, 0.0f, -limit/4.0,limit/4.0), // in meter
+    _piYVelocity (samplingTime, 0.05f,  0.02f, 1.0f, 0.0f, -limit/4.0,limit/4.0), // in meter
+    _piZVelocity (samplingTime, 2.0f,   0.1f, 1.0f, 0.0f, -limit,limit), // in meter
     _currentEstimate()
 {}
 
@@ -25,6 +25,7 @@ void CrazyFlieCommander::Update()
         {
             // Entering hover mode new, reset the PI's.
             ResetVelocityController();
+            _crazyflie.EnableCrazyflieKalmanFilter(true);
         }
         UpdateHoverMode();
     }
@@ -32,6 +33,7 @@ void CrazyFlieCommander::Update()
     {
         _crazyflie.SetSendingVelocityRef(false);
         _crazyflie.SetSendSetpoints(false);
+        _crazyflie.EnableCrazyflieKalmanFilter(false);
     }
     previousHoverModeIsActive = _hoverModeIsActive.Value();
 }
@@ -54,13 +56,12 @@ void CrazyFlieCommander::UpdateHoverMode()
 
     Point3f const & currentEstimate = _currentEstimate.read();
     Velocity velocity;
-    velocity[0] = _piXVelocity.Update(currentEstimate.x-0.5); // is in m ! The ball should be 0.5 m away from the crazyflie
-//    velocity[1] = 0;
-//    velocity[2] = 0;
-    velocity[1] = _piYVelocity.Update(currentEstimate.y); // is in m
-    velocity[2] = _piZVelocity.Update(currentEstimate.z); // is in m
+    velocity[0] = _piXVelocity.Update(currentEstimate.x - 0.5); // is in meter ! The ball should be 0.5 m away from the crazyflie
+    velocity[1] = _piYVelocity.Update(currentEstimate.y); // is in meter
+    velocity[2] = _piZVelocity.Update(currentEstimate.z); // is in meter
 
-    textLogger << "Distance error, x = " <<  (currentEstimate.x-0.5) << " y = " << currentEstimate.y << " z = "<< currentEstimate.z << "\n";
+    textLogger << "Distance error, x = " <<  (currentEstimate.x - 0.5) << " y = " << currentEstimate.y << " z = "<< currentEstimate.z << "\n";
+//    textLogger << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     _crazyflie.SetVelocityRef(velocity);
     _crazyflie.SetSendingVelocityRef(true);
 }

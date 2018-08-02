@@ -5,14 +5,14 @@
 #include "math/types.h"
 MidPoint BallKalmanFilter::Update(std::vector<MidPoint> const & midPoints)
 {
-    textLogger << "Update Kalman Filter\n";
+//    textLogger << "Update Kalman Filter\n";
     //    std::cout << "Num of midPoints = " << midPoints.size() << std::endl;
     // Predict
     Eigen::Vector4f prediction = _kalmanFilter.Predict();
-    textLogger << "Preditction y = " << prediction[0]
-               << " z = " << prediction[1]
-               << " vx = " << prediction[2]
-               << " vz = " << prediction[3] << "\n";
+//    textLogger << "Preditction y = " << prediction[0]
+//               << " z = " << prediction[1]
+//               << " vx = " << prediction[2]
+//               << " vz = " << prediction[3] << "\n";
 
     // Get best fit measurement
     // If the ball is larger than a threshold, this is taken in any case
@@ -25,7 +25,7 @@ MidPoint BallKalmanFilter::Update(std::vector<MidPoint> const & midPoints)
         isValid = GetBestFit(midPoints, cv::Point2f{prediction[0],prediction[1]}, validMeasurement);
     }
 
-    textLogger << "Best measurement,  x = " << validMeasurement.pt.x << " y = " << validMeasurement.pt.y << "\n";
+//    textLogger << "Best measurement,  x = " << validMeasurement.pt.x << " y = " << validMeasurement.pt.y << "\n";
     // Update the kalman filter
     MidPoint output = validMeasurement;
     Eigen::Vector4f estimate;
@@ -116,11 +116,11 @@ bool BallKalmanFilter::GetBestFit(std::vector<MidPoint> const & midPoints, cv::P
             cost = twoNorm;
             bestFit = midPoint;
         }
-        textLogger << "MidPoint " << i
-                   << " x: " << midPoint.pt.x
-                   << " y: " << midPoint.pt.y
-                   << " size: " << midPoint.size
-                   << " cost = " << twoNorm<<"\n";
+//        textLogger << "MidPoint " << i
+//                   << " x: " << midPoint.pt.x
+//                   << " y: " << midPoint.pt.y
+//                   << " size: " << midPoint.size
+//                   << " cost = " << twoNorm<<"\n";
         ++i;
     }
 

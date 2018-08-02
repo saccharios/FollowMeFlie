@@ -54,6 +54,9 @@ public:
     std::vector<TOCElement> const & GetElements() const {return _tocElements;}
     bool AppendingBlocksIsDone() {return (_appendingState == AppendState::DONE);}
 
+    void LogAll() {_shared_impl.LogAll();}
+    void Log(uint8_t index) {_shared_impl.Log(index);}
+
 public slots:
     void ReceivePacket(CRTPPacket packet);
 
