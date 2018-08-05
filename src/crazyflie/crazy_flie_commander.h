@@ -50,7 +50,7 @@ private:
     int _landingCntr = 0;
     int _landingTimeTicks;
     Commands commands;
-    void UpdateHoverMode();
+    Velocity UpdateHoverMode();
     void ImmediateStop();
 
 };

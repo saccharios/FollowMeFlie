@@ -3,7 +3,7 @@
 #include "math/constants.h"
 #include "math/types.h"
 #include "protocol.h"
-
+#include "constants.h"
 Crazyflie::Crazyflie(RadioDongle & radioDongle) :
     _radioDongle(radioDongle),
     _ackMissTolerance(100),
@@ -288,10 +288,26 @@ void Crazyflie::SetSetPoint(SetPoint setPoint)
 }
 
 
-void Crazyflie::SetVelocityRef(Velocity velocity)
+void Crazyflie::SetVelocityWorldRef(Velocity velocity)
 {
+    // Set velocity in world coordinates. World coordinates are initialized at startup of the
+    // crazyflie. At startup, the x-axis is in front diretion, and yaw = 0.
     // Velocity must be in meter/second
     _velocity = velocity;
+}
+void Crazyflie::SetVelocityCrazyFlieRef(Velocity velocity)
+{
+    // Set velocity in coordinate system relative to the crazyflie.
+    // That is, x-diretion is always in front of the crazyflie.
+    // Convert crazyflie coordinates into world coordinates by rotating the xy-plane.
+    // The assumption is that the crazyflie is parallel to the ground.
+    float cos_yaw = std::cos(_sensorValues.stabilizer.yaw * pi / 180.0);
+    float sin_yaw = std::sin(_sensorValues.stabilizer.yaw * pi / 180.0);
+    Velocity velocity_world;
+    velocity_world[0] = cos_yaw * velocity[0] - sin_yaw * velocity[1];
+    velocity_world[1] = sin_yaw * velocity[0] + cos_yaw * velocity[1];
+    velocity_world[2] = velocity[2]; // z-axis is not changed
+    SetVelocityWorldRef(velocity_world);
 }
 
 // TODO SF: Simplify setpoint setting

@@ -8,9 +8,9 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
-    _piXVelocity (samplingTime, 0.1f,  0.02f, 1.0f, 0.0f, -limit/4.0,limit/4.0), // in meter
-    _piYVelocity (samplingTime, 0.1f,  0.02f, 1.0f, 0.0f, -limit/4.0,limit/4.0), // in meter
-    _piZVelocity (samplingTime, 2.0f,   0.1f, 1.0f, 0.0f, -limit,limit), // in meter
+    _piXVelocity (samplingTime, 0.2f,  0.0f, 1.0f, 0.0f, -limit/4.0,limit/4.0), // in meter
+    _piYVelocity (samplingTime, 0.2f,  0.0f, 1.0f, -0.04f, -limit/4.0,limit/4.0), // in meter
+    _piZVelocity (samplingTime, 0.2f,   0.0f, 1.0f, 0.08f, -limit,limit), // in meter
     _currentEstimate(),
     _takeOffTimeTicks(std::round(0.5/samplingTime)),
     _landingTimeTicks(std::round(1.5/samplingTime))
@@ -65,7 +65,7 @@ void CrazyFlieCommander::Update()
             velocity[0] = 0.0;
             velocity[1] = 0.0;
             velocity[2] = 0.5*(_takeOffCntr/_takeOffTimeTicks) + 0.3;
-            _crazyflie.SetVelocityRef(velocity);
+            _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
 
             ++_takeOffCntr;
@@ -89,14 +89,12 @@ void CrazyFlieCommander::Update()
         }
         else
         {
-            //            UpdateHoverMode();
-
+           // Velocity velocity = UpdateHoverMode();
             Velocity velocity;
-            velocity[0] = 0.0;
+            velocity[0] = 0.1;
             velocity[1] = 0.0;
             velocity[2] = 0.08; // Use this as feedforward for pid!
-
-            _crazyflie.SetVelocityRef(velocity);
+            _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
 
 
@@ -118,7 +116,7 @@ void CrazyFlieCommander::Update()
             velocity[0] = 0.0;
             velocity[1] = 0.0;
             velocity[2] = 0.05;
-            _crazyflie.SetVelocityRef(velocity);
+            _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
             ++_landingCntr;
         }
@@ -141,7 +139,7 @@ void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_
     _piZVelocity.Reset(z_integral_part);
 }
 
-void CrazyFlieCommander::UpdateHoverMode()
+Velocity CrazyFlieCommander::UpdateHoverMode()
 {
 
     Point3f const & currentEstimate = _currentEstimate.read();
@@ -152,14 +150,13 @@ void CrazyFlieCommander::UpdateHoverMode()
 
     textLogger << "Distance error, x = " <<  (currentEstimate.x - 0.5) << " y = " << currentEstimate.y << " z = "<< currentEstimate.z << "\n";
     //    textLogger << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
-    _crazyflie.SetVelocityRef(velocity);
-    _crazyflie.SetSendingVelocityRef(true);
+    return velocity;
 }
 void CrazyFlieCommander::ImmediateStop()
 {
     _crazyflie.SetSetPoint({0,0,0,0});
     _crazyflie.SetSendSetpoints(true);
-    _crazyflie.SetVelocityRef({0,0,0});
+    _crazyflie.SetVelocityCrazyFlieRef({0,0,0});
     _crazyflie.SetSendingVelocityRef(false);
     _crazyflie.Stop();
 }

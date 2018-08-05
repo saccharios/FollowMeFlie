@@ -77,12 +77,12 @@ struct Magnetometer
 
 struct SensorValues
 {
-    SetPoint             stabilizer;
-    Barometer          barometer;
-    Accelerometer   acceleration;
-    Gyrometer          gyrometer;
-    Battery                battery;
-    Magnetometer    magnetometer;
+    SetPoint stabilizer;
+    Barometer barometer;
+    Accelerometer acceleration;
+    Gyrometer gyrometer;
+    Battery battery;
+    Magnetometer magnetometer;
 };
 
 class Crazyflie : public QObject
@@ -104,7 +104,8 @@ public:
     void SetSendSetpoints(bool sendSetpoints);
     bool IsSendingSetpoints();
 
-    void SetVelocityRef(Velocity velocity);
+    void SetVelocityCrazyFlieRef(Velocity velocity);
+    void SetVelocityWorldRef(Velocity velocity);
     void SetSendingVelocityRef(bool isSendingVelocityRef);
     bool IsSendingVelocityRef();
 
