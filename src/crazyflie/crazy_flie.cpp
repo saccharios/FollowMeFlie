@@ -303,10 +303,6 @@ void Crazyflie::SetThrust(int thrust)
     {
         _sendSetPoint.thrust = _minThrust;
     }
-    else if(_sendSetPoint.thrust > _sendSetPoint.thrust)
-    {
-        _sendSetPoint.thrust = _sendSetPoint.thrust;
-    }
 }
 void Crazyflie::SetRoll(float roll)
 {
@@ -400,9 +396,8 @@ Eigen::Vector3f Crazyflie::ConvertBodyFrameToIntertialFrame(Eigen::Vector3f cons
     return value_in_inertial;
 }
 
-void Crazyflie::EnableCrazyflieKalmanFilter(bool enable)
+void Crazyflie::ResetCrazyflieKalmanFilter(bool enable)
 {
-
     if(enable)
     {
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::resetEstimation), 0);

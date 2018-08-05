@@ -25,7 +25,7 @@ public:
 
     float Update(float error);
 
-    void Reset();
+    void Reset(float integral_part = 0);
 
 
 private:

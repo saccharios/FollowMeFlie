@@ -227,13 +227,14 @@ void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 void MainWindow::on_pushButton_Stop_clicked()
 {
     _camera.Activate(false);
-    _commander.Stop();
+    _commander.EmergencyStop(true);
+    _commander.ActivateHoverMode(false);
 }
 
 void MainWindow::on_pushButton_hoverMode_clicked()
 {
     _camera.Activate(true);
-    _commander.ActivateHoverMode();
+    _commander.ActivateHoverMode(true);
 }
 
 
@@ -245,6 +246,9 @@ void MainWindow::UpdateCrazyFlie()
 
 void MainWindow::on_pushButton_SafeLandingMode_clicked()
 {
+    _camera.Activate(false);
+    _commander.EmergencyStop(false);
+    _commander.ActivateHoverMode(false);
 }
 
 

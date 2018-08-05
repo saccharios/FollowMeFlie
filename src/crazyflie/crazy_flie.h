@@ -101,12 +101,10 @@ public:
     void SetYaw(float yaw); // In degree, -180° to 180°
 
     void SetSetPoint(SetPoint setPoint);
-    void SetVelocityRef(Velocity velocity);
-
-
     void SetSendSetpoints(bool sendSetpoints);
     bool IsSendingSetpoints();
 
+    void SetVelocityRef(Velocity velocity);
     void SetSendingVelocityRef(bool isSendingVelocityRef);
     bool IsSendingVelocityRef();
 
@@ -116,25 +114,20 @@ public:
     SensorValues const & GetSensorValues() const {return _sensorValues;}
 
     void StartConnecting(bool enable);
-
     void Update();
 
     bool IsDisconnected();
     bool IsConnecting();
     bool IsConnected();
 
+    Eigen::Vector3f ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body);
 
-   Eigen::Vector3f ConvertBodyFrameToIntertialFrame(Eigen::Vector3f const & value_in_body);
+    TocLog const & GetLoggerTOC() const {return _logger;}
+    TocLog & GetLoggerTOC() {return _logger; }
+    TocParameter const & GetParameterTOC() const {return _parameters; }
+    TocParameter & GetParameterTOC() {return _parameters;}
 
-   TocLog const & GetLoggerTOC() const {return _logger;}
-
-   TocLog & GetLoggerTOC() {return _logger; }
-
-   TocParameter const & GetParameterTOC() const {return _parameters; }
-
-   TocParameter & GetParameterTOC() {return _parameters;}
-
-   void EnableCrazyflieKalmanFilter(bool enable);
+    void ResetCrazyflieKalmanFilter(bool enable);
 
 
 signals:

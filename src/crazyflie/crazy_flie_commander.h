@@ -4,7 +4,6 @@
 #include "crazyflie/crazy_flie.h"
 #include "math/types.h"
 #include "math/double_buffer.h"
-#include "math/delay.h"
 
 class CrazyFlieCommander :public QObject
 {
@@ -12,38 +11,46 @@ class CrazyFlieCommander :public QObject
 public:
     CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime);
 
-    void ActivateHoverMode()
+    enum class FlightState
     {
-        _hoverModeIsActive.Activate(true);
-    }
+        Off = 0,
+        WaitCameraOn = 1,
+        TakeOff = 2,
+        Follow = 3,
+        Landing = 4,
+    };
+
+    struct Commands
+    {
+            bool enableHover = false;
+            bool emergencyStop = false;
+    };
+    void ActivateHoverMode(bool enable) {commands.enableHover = enable;}
+    void EmergencyStop(bool enable) {commands.emergencyStop = enable;}
+
 
     void Update();
-    void ResetVelocityController();
-
-    void Stop()
-    {
-        _hoverModeIsActive.Activate(false);
-        _crazyflie.SetSetPoint({0,0,0,0});
-        _crazyflie.SetSendSetpoints(true);
-        _crazyflie.SetVelocityRef({0,0,0});
-        _crazyflie.SetSendingVelocityRef(false);
-
-        _crazyflie.Stop();
-    }
+    void ResetVelocityController(float z_integral_part = 0, float y_integral_part = 0, float x_integral_part = 0);
 
 public slots:
     void ReceiveEstimate(Point3f const &);
 
 private:
     Crazyflie & _crazyflie;
-    OnDelay<50> _hoverModeIsActive;
     float _samplingTime;
 
     PI_Controller _piXVelocity;
     PI_Controller _piYVelocity;
     PI_Controller _piZVelocity;
     Double_Buffer<Point3f> _currentEstimate;
-
+    FlightState _flightState = FlightState::Off;
+    int _waitCameraCntr = 0;
+    int _takeOffCntr = 0;
+    int _takeOffTimeTicks;
+    int _landingCntr = 0;
+    int _landingTimeTicks;
+    Commands commands;
     void UpdateHoverMode();
+    void ImmediateStop();
 
 };

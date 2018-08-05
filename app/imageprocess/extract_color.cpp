@@ -35,14 +35,14 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
-    std::cout << "MidPoint estimate: size = " << estimate.size
-               << " x (pixel) = " << estimate.pt.x
-               << " y (pixel) = " << estimate.pt.y<< "\n";
+//    std::cout << "MidPoint estimate: size = " << estimate.size
+//               << " x (pixel) = " << estimate.pt.x
+//               << " y (pixel) = " << estimate.pt.y<< "\n";
 
     Point3f estimateCrazyFlieCoord = Camera::ConvertMidPointToCrazyFlieCoord(estimate);
-    std::cout << "Point3f estimateCrazyFlieCoord: x (m) = " << estimateCrazyFlieCoord.x
-              << " y (m) = " << estimateCrazyFlieCoord.y
-              << " z (m) = " << estimateCrazyFlieCoord.z << "\n";
+//    std::cout << "Point3f estimateCrazyFlieCoord: x (m) = " << estimateCrazyFlieCoord.x
+//              << " y (m) = " << estimateCrazyFlieCoord.y
+//              << " z (m) = " << estimateCrazyFlieCoord.z << "\n";
 
     emit EstimateReady(estimateCrazyFlieCoord);
 

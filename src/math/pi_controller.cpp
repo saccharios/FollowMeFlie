@@ -13,8 +13,8 @@ float PI_Controller::Update(float error)
     return output_limited;
 }
 
-void PI_Controller::Reset()
+void PI_Controller::Reset(float integral_part)
 {
-    _integral_part = 0;
+    _integral_part = integral_part;
     _anti_windup = 0;
 }
