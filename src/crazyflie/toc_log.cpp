@@ -240,7 +240,7 @@ void TocLog::ResetLoggingBlocks()
     // There is no checking if all blocks are reset on the crazyflie.
     // Assume that this command never fails.
 
-    // Assign to all logging blocks state idle
+    // Reset all loggingBlocks
     for(auto & block : _loggingBlocks)
     {
         block.state = LoggingBlock::State::idle;
@@ -610,5 +610,25 @@ void TocLog::ProcessLoggerData(Data const & data)
             _shared_impl.SetValueToElement(element, logdataVect, offset);
             offset += typeToInt[element->type];
         }
+    }
+}
+
+void TocLog::Reset()
+{
+    using channel = Logger::Control;
+    Data data =  {channel::Commands::Reset::id};
+    CRTPPacket packet(Logger::id, channel::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+    _itemCount = 0;
+    _tocElements.clear();
+    _shared_impl.Reset();
+
+    _currentAppendingBlock = 0;
+    _currentAppendingElement = 0;
+    _elementToAdd = nullptr;
+    _appendingState = AppendState::IDLE;
+    for(auto & block : _loggingBlocks)
+    {
+        block.Reset();
     }
 }

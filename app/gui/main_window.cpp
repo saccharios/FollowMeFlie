@@ -119,13 +119,7 @@ void MainWindow::DisplayNotConnectingBox()
 
 void MainWindow::on_disconnectRadio_clicked()
 {
-//    _radioDongle.StopRadio();
-//    _crazyFlie.EnableStateMachine(false);
-
-    QMessageBox msgBox;
-    msgBox.setText("Feature not implemented yet.");
-    msgBox.exec();
-
+   _crazyFlie.Disconnect(true);
 }
 
 void MainWindow::on_connectRadio_clicked()

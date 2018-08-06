@@ -21,11 +21,6 @@ public:
         _setupIsDone(false)
     {}
 
-    void  ResetSetupIs()
-    {
-        _setupIsDone = false;
-    }
-
     bool Setup()
     {
         // TODO :: Assumes setup never fails !
@@ -260,6 +255,7 @@ public:
         }
     }
 
+    void Reset() {_setupIsDone = false;}
 private:
         // Unfortunately the parameter toc has a different encoding for the types than the logger toc.
         // Convert here this encoding to the same encoding.
@@ -282,6 +278,4 @@ private:
     std::vector<TOCElement> & _elements;
     RadioDongle & _radioDongle;
     bool _setupIsDone;
-
-
 };

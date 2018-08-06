@@ -25,7 +25,8 @@ enum class State
     APPEND_LOGGERS = 5,
     START_LOGGERS = 6,
     SET_PARAMETERS = 7,
-    NORMAL_OPERATION = 8
+    NORMAL_OPERATION = 8,
+    DISCONNECT = 9
 };
 
 struct SetPoint
@@ -114,6 +115,7 @@ public:
 
     SensorValues const & GetSensorValues() const {return _sensorValues;}
 
+    void Disconnect(bool enable);
     void StartConnecting(bool enable);
     void Update();
 
@@ -150,7 +152,7 @@ private:
 
     bool _isSendingSetpoints;
     bool _isSendingVelocityRef;
-
+    bool _disconnect;
     bool _startConnecting;
     State _state;
 

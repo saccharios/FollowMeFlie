@@ -37,35 +37,37 @@ void Crazyflie::Update()
     //        StopLogging();
     //        return false;
     //    }
-
-
+    std::cout << "state = " << static_cast<int>(_state)<< std::endl;
     switch(_state)
     {
     case State::ZERO:
     {
         if(_startConnecting)
         {
-            _ackMissCounter = 0;
-            _state = State::SETUP_PARAMETERS;
+            if( !_radioDongle.IsUsbConnectionOk()) // Can't connect if dongle is not ready
+            {
+                _state = State::ZERO;
+                _startConnecting = false;
+                emit NotConnecting();
+
+            }
+            else
+            {
+                _ackMissCounter = 0;
+                _logger.Reset();
+                _parameters.Reset();
+                _state = State::SETUP_PARAMETERS;
+            }
+            _disconnect = false;
         }
         break;
     }
     case State::SETUP_PARAMETERS:
     {
-        if( !_radioDongle.IsUsbConnectionOk())
+        bool success = _parameters.Setup();
+        if(success)
         {
-            _state = State::ZERO;
-            _startConnecting = false;
-            emit NotConnecting();
-
-        }
-        else
-        {
-            bool success = _parameters.Setup();
-            if(success)
-            {
-                _state =State::READ_PARAMETERS;
-            }
+            _state = State::READ_PARAMETERS;
         }
         break;
     }
@@ -74,7 +76,7 @@ void Crazyflie::Update()
         bool success = _parameters.ReadAll();
         if(success)
         {
-            _state =State::SETUP_LOGGER;
+            _state = State::SETUP_LOGGER;
         }
         break;
     }
@@ -83,7 +85,6 @@ void Crazyflie::Update()
         bool success = _logger.Setup();
         if(success)
         {
-            _logger.ResetLoggingBlocks(); // Prepare to create logging blocks
             _state = State::CREATE_LOGGERS;
         }
         break;
@@ -121,6 +122,15 @@ void Crazyflie::Update()
         // Set Parameters that take into account the increased weight due to the camera
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 40000);
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 23000);
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 25); // default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 25);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 25);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 1);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 1);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 1);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 0.1);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 0.1);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.1);// default 0
 
 
         _state = State::NORMAL_OPERATION;
@@ -157,11 +167,21 @@ void Crazyflie::Update()
         {
             _startConnecting = false;
             emit ConnectionTimeout();
-            _state = State::ZERO;
+            _state = State::DISCONNECT;
+        }
+        if(_disconnect)
+        {
+            _startConnecting = false;
+            _state = State::DISCONNECT;
         }
 
-
         break;
+    }
+    case State::DISCONNECT:
+    {
+        _logger.Reset();
+        _parameters.Reset();
+        _state = State::ZERO;
     }
     default:
         break;
@@ -252,6 +272,10 @@ void  Crazyflie::SendHover(float vx, float vy, float yawrate, float zDistance)
 void Crazyflie::StartConnecting(bool enable)
 {
     _startConnecting = enable;
+}
+void Crazyflie::Disconnect(bool enable)
+{
+    _disconnect = enable;
 }
 
 

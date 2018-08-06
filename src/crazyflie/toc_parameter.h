@@ -208,6 +208,7 @@ public:
 
     TOCElement GetElement(uint8_t idx );
     void LogAll() {_shared_impl.LogAll();}
+    void Reset();
 
 signals:
     void ParameterRead(uint8_t const &);

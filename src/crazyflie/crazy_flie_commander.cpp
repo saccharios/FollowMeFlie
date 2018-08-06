@@ -8,9 +8,9 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
-    _piXVelocity (samplingTime, 0.2f,  0.0f, 1.0f, 0.0f, -limit/4.0,limit/4.0), // in meter
-    _piYVelocity (samplingTime, 0.2f,  0.0f, 1.0f, -0.04f, -limit/4.0,limit/4.0), // in meter
-    _piZVelocity (samplingTime, 0.2f,   0.0f, 1.0f, 0.08f, -limit,limit), // in meter
+    _piXVelocity (samplingTime, 0.05f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
+    _piYVelocity (samplingTime, 0.05f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
+    _piZVelocity (samplingTime, 0.2f,   0.001f, 1.0f, 0.07f, -limit,limit), // in meter
     _currentEstimate(),
     _takeOffTimeTicks(std::round(0.5/samplingTime)),
     _landingTimeTicks(std::round(1.5/samplingTime))
@@ -89,11 +89,11 @@ void CrazyFlieCommander::Update()
         }
         else
         {
-           // Velocity velocity = UpdateHoverMode();
-            Velocity velocity;
-            velocity[0] = 0.1;
-            velocity[1] = 0.0;
-            velocity[2] = 0.08; // Use this as feedforward for pid!
+            Velocity velocity = UpdateHoverMode();
+//            Velocity velocity;
+//            velocity[0] = 0.1;
+//            velocity[1] = 0.0;
+//            velocity[2] = 0.08; // Use this as feedforward for pid!
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
 

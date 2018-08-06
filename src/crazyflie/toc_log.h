@@ -26,6 +26,13 @@ class TocLog : public QObject
         State state = State::idle;
         uint8_t id;
         std::vector<std::string> elements_to_add;
+
+        void Reset()
+        {
+            // Do not reset name, frequency, elements_to_add, id because they are assigned in the ctor
+            elements.clear();
+            state = State::idle;
+        }
     };
 
     enum class AppendState
@@ -57,6 +64,7 @@ public:
     void LogAll() {_shared_impl.LogAll();}
     void Log(uint8_t index) {_shared_impl.Log(index);}
 
+    void Reset();
 public slots:
     void ReceivePacket(CRTPPacket packet);
 
@@ -68,13 +76,13 @@ private:
     unsigned int _itemCount;
     std::vector<TOCElement> _tocElements; // Contains all elements
     static constexpr unsigned int _numLogBlocks = 16u;
-    static constexpr float _frequency = 100.0f; // Max frequency is 100.0 Hz
+    static constexpr float _frequency = 100.0f; // Max frequency is 100.0 Hz == 10 ms
     std::array<LoggingBlock, _numLogBlocks> _loggingBlocks; // Contains logging blocks which hold pointers to elements of _tocElements.
     TOCShared<Logger::id, Logger::Access> _shared_impl;
 
-    uint32_t  _currentAppendingBlock;
-    uint32_t  _currentAppendingElement;
-    TOCElement* _elementToAdd;
+    uint32_t  _currentAppendingBlock = 0;
+    uint32_t  _currentAppendingElement = 0;
+    TOCElement* _elementToAdd = nullptr;
     AppendState _appendingState = AppendState::IDLE;
 
     void ProcessControlData(Data const & data);

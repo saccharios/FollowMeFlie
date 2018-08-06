@@ -226,4 +226,10 @@ TOCElement TocParameter::GetElement(uint8_t idx )
         return TOCElement();
     }
 }
-
+void TocParameter::Reset()
+{
+    _itemCount =0 ;
+    _elements.clear();
+    _shared_impl.Reset();
+    _lastReadParameter = -1;
+}
