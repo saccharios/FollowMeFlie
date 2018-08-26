@@ -1,19 +1,19 @@
 #include "crazyflie/crazy_flie_commander.h"
 #include "math/constants.h"
 #include "math/types.h"
-
-static constexpr float limit = 2.0;
+#include <chrono>
+static constexpr float limit = 0.5;
 
 CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
-    _piXVelocity (samplingTime, 0.05f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
-    _piYVelocity (samplingTime, 0.05f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
-    _piZVelocity (samplingTime, 0.2f,   0.001f, 1.0f, 0.07f, -limit,limit), // in meter
+    _piXVelocity (samplingTime, 0.3f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
+    _piYVelocity (samplingTime, 0.3f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
+    _piZVelocity (samplingTime, 0.7f,   0.001f, 1.0f, 0.07f, -limit*2.0,limit*2.0), // in meter
     _currentEstimate(),
-    _takeOffTimeTicks(std::round(0.5/samplingTime)),
-    _landingTimeTicks(std::round(1.5/samplingTime))
+    _takeOffTimeTicks(std::round(0.5f/samplingTime)),
+    _landingTimeTicks(std::round(1.5f/samplingTime))
 {}
 
 // Periodically called
@@ -40,7 +40,7 @@ void CrazyFlieCommander::Update()
             ImmediateStop();
             _flightState = FlightState::Off;
         }
-        else if(_waitCameraCntr == std::round(0.5/_samplingTime)) // wait for 500 ms
+        else if(_waitCameraCntr == std::round(0.5f/_samplingTime)) // wait for 500 ms
         {
             // Wait for 500 ms, camera should be on
             // TODO SF: Wait until camera is actuall on, instead of waiting 50 ticks
@@ -64,17 +64,13 @@ void CrazyFlieCommander::Update()
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
-            velocity[2] = 0.5*(_takeOffCntr/_takeOffTimeTicks) + 0.3;
+            velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.3f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
-
             ++_takeOffCntr;
             if( _takeOffCntr == _takeOffTimeTicks)
             {
                 _flightState = FlightState::Follow;
-                //                ImmediateStop();
-                //                _flightState = FlightState::Off;
-                //                _enableHover = false;
             }
 
         }
@@ -90,12 +86,12 @@ void CrazyFlieCommander::Update()
         else
         {
             Velocity velocity = UpdateHoverMode();
-//            Velocity velocity;
-//            velocity[0] = 0.1;
-//            velocity[1] = 0.0;
-//            velocity[2] = 0.08; // Use this as feedforward for pid!
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
+//            Velocity position_act = UpdateHoverMode();
+//            Velocity position_ref = {0.5,0.0,0.0};
+//            _crazyflie.SetPositionSetPoint(position_ref,position_act);
+//            _crazyflie.SetSendPositionSetPoint(true);
 
 
         }
@@ -115,7 +111,7 @@ void CrazyFlieCommander::Update()
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
-            velocity[2] = 0.05;
+            velocity[2] = 0.05f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
             ++_landingCntr;
@@ -144,9 +140,15 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
 
     Point3f const & currentEstimate = _currentEstimate.read();
     Velocity velocity;
-    velocity[0] = _piXVelocity.Update(currentEstimate.x - 0.5); // is in meter ! The ball should be 0.5 m away from the crazyflie
+    velocity[0] = _piXVelocity.Update(currentEstimate.x - 0.5f); // is in meter ! The ball should be 0.5 m away from the crazyflie
     velocity[1] = _piYVelocity.Update(currentEstimate.y); // is in meter
     velocity[2] = _piZVelocity.Update(currentEstimate.z); // is in meter
+
+    // TODO SF: Returns actual estimate for position control
+//    Velocity velocity;
+//    velocity[0] = currentEstimate.x;
+//    velocity[1] = currentEstimate.y;
+//    velocity[2] = currentEstimate.z;
 
     textLogger << "Distance error, x = " <<  (currentEstimate.x - 0.5) << " y = " << currentEstimate.y << " z = "<< currentEstimate.z << "\n";
     //    textLogger << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";

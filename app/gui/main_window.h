@@ -52,6 +52,8 @@ private slots:
 
     void on_pushButton_TakeMeasurement_clicked();
 
+    void on_pushButton_Thrust_clicked();
+
 private:
     RadioDongle _radioDongle;
     Crazyflie _crazyFlie;

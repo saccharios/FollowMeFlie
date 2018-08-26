@@ -277,6 +277,19 @@
      <string>Take Measurement</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_Thrust">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>160</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Thrust</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

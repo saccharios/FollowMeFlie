@@ -248,3 +248,16 @@ struct Link
     static constexpr uint8_t id = 15;
     // TODO SF:: Implement if needed
 };
+struct Localization
+{
+    static constexpr uint8_t id = 6;
+    struct External_Position
+    {
+        static constexpr uint8_t id = 0;
+    };
+    struct General_Localization
+    {
+        static constexpr uint8_t id = 1;
+    };
+    // TODO SF:: Implement if needed
+};

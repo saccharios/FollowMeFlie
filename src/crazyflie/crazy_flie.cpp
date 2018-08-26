@@ -28,16 +28,6 @@ Crazyflie::~Crazyflie()
 // Runs on 10ms.
 void Crazyflie::Update()
 {
-    // TODO SF: Alternative way of implementing state machine
-
-    // TODO SF How to restart the state machine properly?
-    //    if(!_stateMachineIsEnabled)
-    //    {
-    //        _state = State::STATE_ZERO;
-    //        StopLogging();
-    //        return false;
-    //    }
-    std::cout << "state = " << static_cast<int>(_state)<< std::endl;
     switch(_state)
     {
     case State::ZERO:
@@ -128,12 +118,17 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 1);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 1);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 1);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 0.1);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 0.1);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.1);// default 0
+//        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 0.1);// default 0
+//        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 0.1);// default 0
+//        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.1);// default 0
 
 
         _state = State::NORMAL_OPERATION;
+
+
+//        SetSendSetpoints(true);
+//        SetPoint sp = {0.0, 0.0, 0.0, 0};
+//        SendSetpoint(sp);
     }
     case State::NORMAL_OPERATION:
     {
@@ -142,6 +137,11 @@ void Crazyflie::Update()
             // Send the current set point based on the previous calculations
             SendSetpoint(_sendSetPoint);
             _isSendingSetpoints = false;
+        }
+        else if(_isSendingSendPositionSetPoint)
+        {
+            // Send the current set point based on the previous calculations
+            SendPositionSetPoint(_position_ref,_position_act);
         }
         else if(_isSendingVelocityRef)
         {
@@ -154,6 +154,7 @@ void Crazyflie::Update()
 //                _logger.Log(i);
 //            }
         }
+
 
         if(_radioDongle.AckReceived())
         {
@@ -192,9 +193,8 @@ void Crazyflie::Update()
 
 void Crazyflie::SendSetpoint(SetPoint setPoint)
 {
-    // In python client, this line implementes the x-mode
-    auto roll = (setPoint.roll - setPoint.pitch) *SQRT2;
-    auto pitch = (setPoint.roll + setPoint.pitch) *SQRT2;
+    auto roll = setPoint.roll;
+    auto pitch = setPoint.pitch;
 
     auto data = ConvertTouint8_tVect(roll);
     auto pitchVect = ConvertTouint8_tVect( -pitch); // Warning: Is negated here.
@@ -227,10 +227,7 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
     // vz in meter/s in world frame.
     // yawrate in deg/s
 
-    // TODO SF  also x -mode?
     Data data;
-    //auto vx_vect = ConvertTouint8_tVect(SQRT2 * (velocity[0] - velocity[1]));
-    //auto vy_vect = ConvertTouint8_tVect(SQRT2 * (velocity[0] + velocity[1]));
     auto vx_vect = ConvertTouint8_tVect(velocity[0]);
     auto vy_vect = ConvertTouint8_tVect(velocity[1]);
     auto vz_vect = ConvertTouint8_tVect(velocity[2]);
@@ -245,6 +242,47 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
+void  Crazyflie::SendPositionSetPoint(Velocity position_ref, Velocity position_act)
+{
+    textLogger << "Sending position ref, x = " << position_ref[0] << " y = " << position_ref[1] << " z = " << position_ref[2] << "\n";
+    textLogger << "Sending position act, x = " << position_act[0] << " y = " << position_act[1] << " z = " << position_act[2] << "\n";
+    // x in meter in world frame.
+    // y in meter in world frame.
+    // z in meter in world frame.
+    // Actual sending
+    Data data2;
+    auto x_vect_act = ConvertTouint8_tVect(position_act[0]);
+    auto y_vect_act = ConvertTouint8_tVect(position_act[1]);
+    auto z_vect_act = ConvertTouint8_tVect(position_act[2]);
+//    uint8_t command2 = 0;
+//    data2.push_back(command2);
+    data2.insert(data2.end(), x_vect_act.begin(), x_vect_act.end());
+    data2.insert(data2.end(), y_vect_act.begin(), y_vect_act.end());
+    data2.insert(data2.end(), z_vect_act.begin(), z_vect_act.end());
+
+    CRTPPacket  packet2(Localization::id, Localization::External_Position::id, std::move(data2));
+    _radioDongle.RegisterPacketToSend(std::move(packet2));
+
+    // Reference sending
+    Data data;
+    auto x_vect_ref = ConvertTouint8_tVect(position_ref[0]);
+    auto y_vect_ref = ConvertTouint8_tVect(position_ref[1]);
+    auto z_vect_ref = ConvertTouint8_tVect(position_ref[2]);
+    auto yaw_vect = ConvertTouint8_tVect(0.0f);
+    uint8_t command = CommanderGeneric::Channel::Position::id;
+    data.push_back(command);
+    data.insert(data.end(), x_vect_ref.begin(), x_vect_ref.end());
+    data.insert(data.end(), y_vect_ref.begin(), y_vect_ref.end());
+    data.insert(data.end(), z_vect_ref.begin(), z_vect_ref.end());
+    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
+
+    CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
+
+}
+
+
+
 void  Crazyflie::SendHover(float vx, float vy, float yawrate, float zDistance)
 {
     // vx in meter/s in body frame.
@@ -396,6 +434,16 @@ void Crazyflie::SetSendSetpoints(bool sendSetpoints)
 void Crazyflie::SetSendingVelocityRef(bool isSendingVelocityRef)
 {
     _isSendingVelocityRef = isSendingVelocityRef;
+}
+
+void Crazyflie::SetPositionSetPoint(Velocity position_ref, Velocity position_act)
+{
+    _position_ref = position_ref;
+    _position_act = position_act;
+}
+void Crazyflie::SetSendPositionSetPoint(bool isSendingSendPositionSetPoint)
+{
+    _isSendingSendPositionSetPoint = isSendingSendPositionSetPoint;
 }
 
 bool Crazyflie::IsSendingSetpoints()

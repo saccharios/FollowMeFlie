@@ -110,6 +110,10 @@ public:
     void SetSendingVelocityRef(bool isSendingVelocityRef);
     bool IsSendingVelocityRef();
 
+    void SetPositionSetPoint(Velocity position_ref, Velocity position_act);
+    void SendPositionSetPoint(Velocity position_ref, Velocity position_act);
+    void SetSendPositionSetPoint(bool isSendingSendPositionSetPoint);
+
     void Stop();
     void SendHover(float vx, float vy, float yawrate, float zDistance);
 
@@ -147,11 +151,14 @@ private:
     SetPoint _maxSetPoint;
 
     Velocity _velocity = {0.0, 0.0, 0.0};
+    Velocity _position_ref = {0.0, 0.0, 0.0};
+    Velocity _position_act = {0.0, 0.0, 0.0};
 
     int _minThrust;
 
     bool _isSendingSetpoints;
     bool _isSendingVelocityRef;
+    bool _isSendingSendPositionSetPoint;
     bool _disconnect;
     bool _startConnecting;
     State _state;
