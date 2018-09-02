@@ -1,6 +1,6 @@
 
 // With the newest firmware for the crazyflie 2.0, the motor need to be unlocked by sending a "thrust = 0" command
-// Update SF: I disabled the locking-functionality in the firmware.
+
 
 #pragma once
 
@@ -110,8 +110,8 @@ public:
     void SetSendingVelocityRef(bool isSendingVelocityRef);
     bool IsSendingVelocityRef();
 
-    void SetPositionSetPoint(Velocity position_ref, Velocity position_act);
-    void SendPositionSetPoint(Velocity position_ref, Velocity position_act);
+    void SetPositionSetPoint(Point3f position_ref, Point3f position_act);
+    void SendPositionSetPoint(Point3f position_ref, Point3f position_act);
     void SetSendPositionSetPoint(bool isSendingSendPositionSetPoint);
 
     void Stop();
@@ -151,8 +151,8 @@ private:
     SetPoint _maxSetPoint;
 
     Velocity _velocity = {0.0, 0.0, 0.0};
-    Velocity _position_ref = {0.0, 0.0, 0.0};
-    Velocity _position_act = {0.0, 0.0, 0.0};
+    Point3f _position_ref = {0.0, 0.0, 0.0};
+    Point3f _position_act = {0.0, 0.0, 0.0};
 
     int _minThrust;
 

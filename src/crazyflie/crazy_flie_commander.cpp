@@ -85,13 +85,22 @@ void CrazyFlieCommander::Update()
         }
         else
         {
-            Velocity velocity = UpdateHoverMode();
-            _crazyflie.SetVelocityCrazyFlieRef(velocity);
-            _crazyflie.SetSendingVelocityRef(true);
-//            Velocity position_act = UpdateHoverMode();
-//            Velocity position_ref = {0.5,0.0,0.0};
-//            _crazyflie.SetPositionSetPoint(position_ref,position_act);
-//            _crazyflie.SetSendPositionSetPoint(true);
+            bool use_velocity = true;
+            if(use_velocity)
+            {
+                Velocity velocity = UpdateHoverMode();
+                _crazyflie.SetVelocityCrazyFlieRef(velocity);
+                _crazyflie.SetSendingVelocityRef(true);
+            }
+            else
+            //Use with external positioning method
+            {
+                Point3f position_act = UpdateHoverMode_Position();
+                Point3f position_ref = {0.5,0.0,0.0};
+                _crazyflie.SetPositionSetPoint(position_ref,position_act);
+                _crazyflie.SetSendPositionSetPoint(true);
+            }
+
 
 
         }
@@ -144,16 +153,17 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
     velocity[1] = _piYVelocity.Update(currentEstimate.y); // is in meter
     velocity[2] = _piZVelocity.Update(currentEstimate.z); // is in meter
 
-    // TODO SF: Returns actual estimate for position control
-//    Velocity velocity;
-//    velocity[0] = currentEstimate.x;
-//    velocity[1] = currentEstimate.y;
-//    velocity[2] = currentEstimate.z;
 
     textLogger << "Distance error, x = " <<  (currentEstimate.x - 0.5) << " y = " << currentEstimate.y << " z = "<< currentEstimate.z << "\n";
-    //    textLogger << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
+    textLogger << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     return velocity;
 }
+Point3f CrazyFlieCommander::UpdateHoverMode_Position()
+{
+    Point3f const & currentEstimate = _currentEstimate.read();
+    return currentEstimate;
+}
+
 void CrazyFlieCommander::ImmediateStop()
 {
     _crazyflie.SetSetPoint({0,0,0,0});

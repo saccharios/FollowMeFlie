@@ -23,7 +23,7 @@ Crazyflie::Crazyflie(RadioDongle & radioDongle) :
 
 Crazyflie::~Crazyflie()
 {
-    // TODO SF Stop logging and reset everything on the crazyflie.
+    _logger.Reset();
 }
 // Runs on 10ms.
 void Crazyflie::Update()
@@ -124,17 +124,14 @@ void Crazyflie::Update()
 
 
         _state = State::NORMAL_OPERATION;
-
-
-//        SetSendSetpoints(true);
-//        SetPoint sp = {0.0, 0.0, 0.0, 0};
-//        SendSetpoint(sp);
     }
     case State::NORMAL_OPERATION:
     {
         if(_isSendingSetpoints)
         {
-            // Send the current set point based on the previous calculations
+            // TODO SF: This must  be sent first to unlock the thrust
+            //        SetPoint sp = {0.0, 0.0, 0.0, 0};
+            //        SendSetpoint(sp);
             SendSetpoint(_sendSetPoint);
             _isSendingSetpoints = false;
         }
@@ -154,7 +151,12 @@ void Crazyflie::Update()
 //                _logger.Log(i);
 //            }
         }
-
+//        else
+//        {
+//            SendSetpoint({0.0, 0.0, 0.0, 0});
+//            SendVelocityRef({0.0,0.0,0.0});
+//            SendPositionSetPoint({0.0,0.0,0.0},{0.0,0.0,0.0});
+//        }
 
         if(_radioDongle.AckReceived())
         {
@@ -183,6 +185,7 @@ void Crazyflie::Update()
         _logger.Reset();
         _parameters.Reset();
         _state = State::ZERO;
+        break;
     }
     default:
         break;
@@ -242,18 +245,18 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
-void  Crazyflie::SendPositionSetPoint(Velocity position_ref, Velocity position_act)
+void  Crazyflie::SendPositionSetPoint(Point3f position_ref, Point3f position_act)
 {
-    textLogger << "Sending position ref, x = " << position_ref[0] << " y = " << position_ref[1] << " z = " << position_ref[2] << "\n";
-    textLogger << "Sending position act, x = " << position_act[0] << " y = " << position_act[1] << " z = " << position_act[2] << "\n";
+    textLogger << "Sending position ref, x = " << position_ref.x << " y = " << position_ref.y << " z = " << position_ref.z << "\n";
+    textLogger << "Sending position act, x = " << position_act.x << " y = " << position_act.y << " z = " << position_act.z << "\n";
     // x in meter in world frame.
     // y in meter in world frame.
     // z in meter in world frame.
     // Actual sending
     Data data2;
-    auto x_vect_act = ConvertTouint8_tVect(position_act[0]);
-    auto y_vect_act = ConvertTouint8_tVect(position_act[1]);
-    auto z_vect_act = ConvertTouint8_tVect(position_act[2]);
+    auto x_vect_act = ConvertTouint8_tVect(position_act.x);
+    auto y_vect_act = ConvertTouint8_tVect(position_act.y);
+    auto z_vect_act = ConvertTouint8_tVect(position_act.z);
 //    uint8_t command2 = 0;
 //    data2.push_back(command2);
     data2.insert(data2.end(), x_vect_act.begin(), x_vect_act.end());
@@ -265,9 +268,9 @@ void  Crazyflie::SendPositionSetPoint(Velocity position_ref, Velocity position_a
 
     // Reference sending
     Data data;
-    auto x_vect_ref = ConvertTouint8_tVect(position_ref[0]);
-    auto y_vect_ref = ConvertTouint8_tVect(position_ref[1]);
-    auto z_vect_ref = ConvertTouint8_tVect(position_ref[2]);
+    auto x_vect_ref = ConvertTouint8_tVect(position_ref.x);
+    auto y_vect_ref = ConvertTouint8_tVect(position_ref.y);
+    auto z_vect_ref = ConvertTouint8_tVect(position_ref.z);
     auto yaw_vect = ConvertTouint8_tVect(0.0f);
     uint8_t command = CommanderGeneric::Channel::Position::id;
     data.push_back(command);
@@ -363,8 +366,8 @@ void Crazyflie::SetVelocityCrazyFlieRef(Velocity velocity)
     // That is, x-diretion is always in front of the crazyflie.
     // Convert crazyflie coordinates into world coordinates by rotating the xy-plane.
     // The assumption is that the crazyflie is parallel to the ground.
-    float cos_yaw = std::cos(_sensorValues.stabilizer.yaw * pi / 180.0);
-    float sin_yaw = std::sin(_sensorValues.stabilizer.yaw * pi / 180.0);
+    float cos_yaw = std::cos(_sensorValues.stabilizer.yaw * pi / 180.0f);
+    float sin_yaw = std::sin(_sensorValues.stabilizer.yaw * pi / 180.0f);
     Velocity velocity_world;
     velocity_world[0] = cos_yaw * velocity[0] - sin_yaw * velocity[1];
     velocity_world[1] = sin_yaw * velocity[0] + cos_yaw * velocity[1];
@@ -436,7 +439,7 @@ void Crazyflie::SetSendingVelocityRef(bool isSendingVelocityRef)
     _isSendingVelocityRef = isSendingVelocityRef;
 }
 
-void Crazyflie::SetPositionSetPoint(Velocity position_ref, Velocity position_act)
+void Crazyflie::SetPositionSetPoint(Point3f position_ref, Point3f position_act)
 {
     _position_ref = position_ref;
     _position_act = position_act;

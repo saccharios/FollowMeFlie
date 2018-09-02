@@ -52,5 +52,6 @@ private:
     Commands commands;
     Velocity UpdateHoverMode();
     void ImmediateStop();
+    Point3f UpdateHoverMode_Position();
 
 };
