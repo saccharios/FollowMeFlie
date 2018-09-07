@@ -130,13 +130,16 @@ void Crazyflie::Update()
         if(_isSendingSetpoints)
         {
             // TODO SF: This must  be sent first to unlock the thrust
-            //        SetPoint sp = {0.0, 0.0, 0.0, 0};
-            //        SendSetpoint(sp);
+            // SetPoint sp = {0.0, 0.0, 0.0, 0};
+            // SendSetpoint(sp);
             SendSetpoint(_sendSetPoint);
             _isSendingSetpoints = false;
         }
         else if(_isSendingSendPositionSetPoint)
         {
+            // TODO SF: This must  be sent first to unlock the thrust
+            // SetPoint sp = {0.0, 0.0, 0.0, 0};
+            // SendSetpoint(sp);
             // Send the current set point based on the previous calculations
             SendPositionSetPoint(_position_ref,_position_act);
         }
@@ -245,28 +248,29 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
-void  Crazyflie::SendPositionSetPoint(Point3f position_ref, Point3f position_act)
+
+void  Crazyflie::SendActualPosition(Point3f position_act)
 {
-    textLogger << "Sending position ref, x = " << position_ref.x << " y = " << position_ref.y << " z = " << position_ref.z << "\n";
     textLogger << "Sending position act, x = " << position_act.x << " y = " << position_act.y << " z = " << position_act.z << "\n";
     // x in meter in world frame.
     // y in meter in world frame.
     // z in meter in world frame.
     // Actual sending
-    Data data2;
+    Data data;
     auto x_vect_act = ConvertTouint8_tVect(position_act.x);
     auto y_vect_act = ConvertTouint8_tVect(position_act.y);
     auto z_vect_act = ConvertTouint8_tVect(position_act.z);
-//    uint8_t command2 = 0;
-//    data2.push_back(command2);
-    data2.insert(data2.end(), x_vect_act.begin(), x_vect_act.end());
-    data2.insert(data2.end(), y_vect_act.begin(), y_vect_act.end());
-    data2.insert(data2.end(), z_vect_act.begin(), z_vect_act.end());
+    data.insert(data.end(), x_vect_act.begin(), x_vect_act.end());
+    data.insert(data.end(), y_vect_act.begin(), y_vect_act.end());
+    data.insert(data.end(), z_vect_act.begin(), z_vect_act.end());
 
-    CRTPPacket  packet2(Localization::id, Localization::External_Position::id, std::move(data2));
+    CRTPPacket  packet2(Localization::id, Localization::External_Position::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet2));
+}
 
-    // Reference sending
+void  Crazyflie::SendReferencPosition(Point3f position_ref)
+{
+    textLogger << "Sending position ref, x = " << position_ref.x << " y = " << position_ref.y << " z = " << position_ref.z << "\n";
     Data data;
     auto x_vect_ref = ConvertTouint8_tVect(position_ref.x);
     auto y_vect_ref = ConvertTouint8_tVect(position_ref.y);
@@ -282,6 +286,11 @@ void  Crazyflie::SendPositionSetPoint(Point3f position_ref, Point3f position_act
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 
+}
+void  Crazyflie::SendPositionSetPoint(Point3f position_ref, Point3f position_act)
+{
+    SendActualPosition(position_act);
+    SendReferencPosition(position_ref);
 }
 
 

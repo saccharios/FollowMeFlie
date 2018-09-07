@@ -113,6 +113,8 @@ public:
     void SetPositionSetPoint(Point3f position_ref, Point3f position_act);
     void SendPositionSetPoint(Point3f position_ref, Point3f position_act);
     void SetSendPositionSetPoint(bool isSendingSendPositionSetPoint);
+    void SendActualPosition(Point3f position_act);
+    void SendReferencPosition(Point3f position_ref);
 
     void Stop();
     void SendHover(float vx, float vy, float yawrate, float zDistance);
