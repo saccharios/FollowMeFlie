@@ -233,17 +233,12 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
     // vz in meter/s in world frame.
     // yawrate in deg/s
 
-    Data data;
-    auto vx_vect = ConvertTouint8_tVect(velocity[0]);
-    auto vy_vect = ConvertTouint8_tVect(velocity[1]);
-    auto vz_vect = ConvertTouint8_tVect(velocity[2]);
-    auto yaw_vect = ConvertTouint8_tVect(0.0f);
     uint8_t command = CommanderGeneric::Channel::VelocityWorld::id;
-    data.push_back(command);
-    data.insert(data.end(), vx_vect.begin(), vx_vect.end());
-    data.insert(data.end(), vy_vect.begin(), vy_vect.end());
-    data.insert(data.end(), vz_vect.begin(), vz_vect.end());
-    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
+    Data data{command};
+
+    float yaw = 0.0f;
+    std::array<float,4> data_points = {velocity[0], velocity[1], velocity[2], yaw};
+    CreatePayload(data, data_points);
 
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
@@ -255,14 +250,10 @@ void  Crazyflie::SendActualPosition(Point3f position_act)
     // x in meter in world frame.
     // y in meter in world frame.
     // z in meter in world frame.
-    // Actual sending
+
     Data data;
-    auto x_vect_act = ConvertTouint8_tVect(position_act.x);
-    auto y_vect_act = ConvertTouint8_tVect(position_act.y);
-    auto z_vect_act = ConvertTouint8_tVect(position_act.z);
-    data.insert(data.end(), x_vect_act.begin(), x_vect_act.end());
-    data.insert(data.end(), y_vect_act.begin(), y_vect_act.end());
-    data.insert(data.end(), z_vect_act.begin(), z_vect_act.end());
+    std::array<float,3> data_points{position_act.x, position_act.y, position_act.z};
+    CreatePayload(data, data_points);
 
     CRTPPacket  packet2(Localization::id, Localization::External_Position::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet2));
@@ -271,22 +262,18 @@ void  Crazyflie::SendActualPosition(Point3f position_act)
 void  Crazyflie::SendReferencPosition(Point3f position_ref)
 {
     textLogger << "Sending position ref, x = " << position_ref.x << " y = " << position_ref.y << " z = " << position_ref.z << "\n";
-    Data data;
-    auto x_vect_ref = ConvertTouint8_tVect(position_ref.x);
-    auto y_vect_ref = ConvertTouint8_tVect(position_ref.y);
-    auto z_vect_ref = ConvertTouint8_tVect(position_ref.z);
-    auto yaw_vect = ConvertTouint8_tVect(0.0f);
-    uint8_t command = CommanderGeneric::Channel::Position::id;
-    data.push_back(command);
-    data.insert(data.end(), x_vect_ref.begin(), x_vect_ref.end());
-    data.insert(data.end(), y_vect_ref.begin(), y_vect_ref.end());
-    data.insert(data.end(), z_vect_ref.begin(), z_vect_ref.end());
-    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
 
+    uint8_t command = CommanderGeneric::Channel::Position::id;
+    Data data{command};
+
+    float yaw = 0.0f;
+    std::array<float,4> data_points{position_ref.x,position_ref.y,position_ref.z,yaw};
+    CreatePayload(data, data_points);
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
-
 }
+
+
 void  Crazyflie::SendPositionSetPoint(Point3f position_ref, Point3f position_act)
 {
     SendActualPosition(position_act);
@@ -301,18 +288,12 @@ void  Crazyflie::SendHover(float vx, float vy, float yawrate, float zDistance)
     // vy in meter/s in body frame.
     // yawrate in deg/s
     // zDistance meter/s in world frame.
-    Data data;
-    auto vx_vect = ConvertTouint8_tVect(vx);
-    auto vy_vect = ConvertTouint8_tVect(vy);
-    auto yaw_vect = ConvertTouint8_tVect(yawrate);
-    auto zdist_vect = ConvertTouint8_tVect(zDistance);
 
     uint8_t command = CommanderGeneric::Channel::Hover::id;
-    data.push_back(command);
-    data.insert(data.end(), vx_vect.begin(), vx_vect.end());
-    data.insert(data.end(), vy_vect.begin(), vy_vect.end());
-    data.insert(data.end(), yaw_vect.begin(), yaw_vect.end());
-    data.insert(data.end(), zdist_vect.begin(), zdist_vect.end());
+    Data data{command};
+
+    std::array<float,4> data_points{vx, vy, yawrate, zDistance};
+    CreatePayload(data, data_points);
 
     CRTPPacket packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));

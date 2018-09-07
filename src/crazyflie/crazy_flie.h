@@ -177,5 +177,17 @@ private:
 
     void UpateSensorValues();
     float GetSensorValue(std::string name);
+
+    template<typename T, unsigned int N>
+    void CreatePayload(Data & data, std::array<T,N> pay_load)
+    {
+        for(unsigned int i = 0; i < N; ++i)
+        {
+            auto vectorized = ConvertTouint8_tVect(pay_load[i]);
+            data.insert(data.end(), vectorized.begin(), vectorized.end());
+        }
+    }
+
+
 };
 
