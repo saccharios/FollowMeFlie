@@ -55,7 +55,6 @@ SOURCES += \
 
 
 # Include library libusb-1.0.21
-libubs_path = "E:\Code\lib\libusb-1.0.21"
 INCLUDEPATH += $${libubs_path}/include/libusb-1.0
 INCLUDEPATH += $${libubs_path}/include/$$PWD/
 LIBS += -L$${libubs_path}/MinGW32/static -llibusb-1.0
@@ -64,5 +63,5 @@ LIBS += -L$${libubs_path}/MinGW32/static -llibusb-1.0
 DEPENDPATH += $${libubs_path}/MinGW32/static
 
 # Include Eigen library
-INCLUDEPATH += "E:\Code\lib\eigen-3.3.4"
+INCLUDEPATH += $${eigen_lib_path}
 

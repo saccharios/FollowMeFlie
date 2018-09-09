@@ -47,7 +47,7 @@ INCLUDEPATH += $$PWD/../build/src/lib
 DEPENDPATH += $$PWD/../build/src/lib
 
 # Include opencv 3.2.0
-opencv_path =     "E:\Code\lib\opencv-3.2.0-build"
+
 INCLUDEPATH += $${opencv_path}/install/include
 LIBS += $${opencv_path}/bin/libopencv_calib3d320.dll
 LIBS += $${opencv_path}/bin/libopencv_core320.dll

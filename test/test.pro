@@ -26,7 +26,6 @@ HEADERS  += \
     src/delay_test.h
 
 # Include Google Test
-goolgetest_path = E:/Code/GTest
 INCLUDEPATH += $${goolgetest_path}/googletest-release-1.7.0/include \
     $${goolgetest_path}/googletest-release-1.7.0 \
     $${goolgetest_path}/gtestbuild-1.7.0
