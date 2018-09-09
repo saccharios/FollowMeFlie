@@ -9,7 +9,7 @@ float ExtractData<float>(Data const & data, int offset)
     constexpr unsigned int typeLength = sizeof(float);
     IntFloat bits;
     bits.int_value = 0;
-    if(data.size() > offset + typeLength) // TODO SF >= or just > ?
+    if(data.size() >= offset + typeLength)
     {
         for(unsigned int i = 0; i < typeLength; ++i)
         {
@@ -22,7 +22,6 @@ float ExtractData<float>(Data const & data, int offset)
     }
     return bits.float_value;
 }
-
 
 CRTPPacket:: CRTPPacket(uint8_t port, uint8_t channel, Data && data) :
     _port (port),
