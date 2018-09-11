@@ -85,24 +85,9 @@ void CrazyFlieCommander::Update()
         }
         else
         {
-            bool use_velocity = true;
-            if(use_velocity)
-            {
-                Velocity velocity = UpdateHoverMode();
-                _crazyflie.SetVelocityCrazyFlieRef(velocity);
-                _crazyflie.SetSendingVelocityRef(true);
-            }
-            else
-            //Use with external positioning method
-            {
-                Point3f position_act = UpdateHoverMode_Position();
-                Point3f position_ref = {0.5,0.0,0.0};
-                _crazyflie.SetPositionSetPoint(position_ref,position_act);
-                _crazyflie.SetSendPositionSetPoint(true);
-            }
-
-
-
+            Velocity velocity = UpdateHoverMode();
+            _crazyflie.SetVelocityCrazyFlieRef(velocity);
+            _crazyflie.SetSendingVelocityRef(true);
         }
         break;
     }
@@ -133,7 +118,6 @@ void CrazyFlieCommander::Update()
 // called when new estimate is ready
 void CrazyFlieCommander::ReceiveEstimate(Point3f const & distance)
 {
-    std::cout << "new estimate is ready\n";
     _currentEstimate.write() = distance;
     _currentEstimate.swap();
 }
@@ -157,14 +141,9 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
     velocity[2] = _piZVelocity.Update(error.z);
 
 
-    std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
-    std::cout << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
+    //std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
+    //std::cout << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     return velocity;
-}
-Point3f CrazyFlieCommander::UpdateHoverMode_Position()
-{
-    Point3f const & currentEstimate = _currentEstimate.read();
-    return currentEstimate;
 }
 
 void CrazyFlieCommander::ImmediateStop()

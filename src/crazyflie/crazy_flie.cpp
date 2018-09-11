@@ -113,13 +113,13 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 40000);
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 23000);
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 25); // default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 1.0f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 10.0f);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 25);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 1.0f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 10.0f);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 25);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 0.001f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.001f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 1);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 15.0f);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 15.0f;// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 2.0);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.0f);// default 0
 
 
@@ -135,25 +135,11 @@ void Crazyflie::Update()
             SendSetpoint(_sendSetPoint);
             _isSendingSetpoints = false;
         }
-        else if(_isSendingSendPositionSetPoint)
-        {
-            // TODO SF: This must  be sent first to unlock the thrust
-            // SetPoint sp = {0.0, 0.0, 0.0, 0};
-            // SendSetpoint(sp);
-            // Send the current set point based on the previous calculations
-            SendPositionSetPoint(_position_ref,_position_act);
-        }
         else if(_isSendingVelocityRef)
         {
             SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;
         }
-//        else
-//        {
-//            SendSetpoint({0.0, 0.0, 0.0, 0});
-//            SendVelocityRef({0.0,0.0,0.0});
-//            SendPositionSetPoint({0.0,0.0,0.0},{0.0,0.0,0.0});
-//        }
 
         if(_radioDongle.AckReceived())
         {
@@ -266,15 +252,6 @@ void  Crazyflie::SendReferencPosition(Point3f position_ref)
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
     _radioDongle.RegisterPacketToSend(std::move(packet));
 }
-
-
-void  Crazyflie::SendPositionSetPoint(Point3f position_ref, Point3f position_act)
-{
-    SendActualPosition(position_act);
-    SendReferencPosition(position_ref);
-}
-
-
 
 void  Crazyflie::SendHover(float vx, float vy, float yawrate, float zDistance)
 {
@@ -421,16 +398,6 @@ void Crazyflie::SetSendSetpoints(bool sendSetpoints)
 void Crazyflie::SetSendingVelocityRef(bool isSendingVelocityRef)
 {
     _isSendingVelocityRef = isSendingVelocityRef;
-}
-
-void Crazyflie::SetPositionSetPoint(Point3f position_ref, Point3f position_act)
-{
-    _position_ref = position_ref;
-    _position_act = position_act;
-}
-void Crazyflie::SetSendPositionSetPoint(bool isSendingSendPositionSetPoint)
-{
-    _isSendingSendPositionSetPoint = isSendingSendPositionSetPoint;
 }
 
 bool Crazyflie::IsSendingSetpoints()
