@@ -31,10 +31,10 @@ enum class State
 
 struct SetPoint
 {
-    float roll;
-    float pitch;
-    float yaw;
-    uint16_t thrust;
+    float roll;// in degree 180° to 180°
+    float pitch; // in degree 180° to 180°
+    float yaw; // in degree 180° to 180°
+    uint16_t thrust; // in units
     void Print()
     {
         textLogger << "roll = " << roll << " pitch = " << pitch << " yaw = " << yaw << " thrust = " << thrust << "\n";
@@ -65,7 +65,7 @@ struct Gyrometer
 };
 struct Battery
 {
-    double  level;
+    float  level;
     float   state;
 };
 
@@ -95,11 +95,6 @@ public:
 
     Crazyflie(RadioDongle & _radioDongle);
     ~Crazyflie();
-
-    void SetThrust(int thrust);
-    void SetRoll(float roll); // In degree, -180° to 180°
-    void SetPitch(float pitch); // In degree, -180° to 180°
-    void SetYaw(float yaw); // In degree, -180° to 180°
 
     void SetSetPoint(SetPoint setPoint);
     void SetSendSetpoints(bool sendSetpoints);
@@ -151,7 +146,7 @@ private:
     Point3f _position_ref = {0.0, 0.0, 0.0};
     Point3f _position_act = {0.0, 0.0, 0.0};
 
-    int _minThrust;
+    uint16_t _minThrust;
 
     bool _isSendingSetpoints;
     bool _isSendingVelocityRef;

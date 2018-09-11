@@ -286,7 +286,7 @@ void Crazyflie::UpateSensorValues()
     _sensorValues.stabilizer.roll = GetSensorValue("stabilizer.roll");
     _sensorValues.stabilizer.yaw= GetSensorValue("stabilizer.yaw");
     _sensorValues.stabilizer.pitch = GetSensorValue("stabilizer.pitch");
-    _sensorValues.stabilizer.thrust = GetSensorValue("stabilizer.thrust");
+    _sensorValues.stabilizer.thrust = static_cast<uint16_t>(GetSensorValue("stabilizer.thrust"));
     _sensorValues.barometer.pressure = GetSensorValue("baro.pressure");
     _sensorValues.barometer.asl = GetSensorValue("baro.asl");
     _sensorValues.barometer.aslLong= GetSensorValue("baro.aslLong");
@@ -307,10 +307,11 @@ void Crazyflie::UpateSensorValues()
 
 void Crazyflie::SetSetPoint(SetPoint setPoint)
 {
-    SetThrust(setPoint.thrust);
-    SetYaw(setPoint.yaw);
-    SetRoll(setPoint.roll);
-    SetPitch(setPoint.pitch);
+    _sendSetPoint = setPoint;
+    if(_sendSetPoint.thrust < _minThrust)
+    {
+        _sendSetPoint.thrust = _minThrust;
+    }
 }
 
 
@@ -334,46 +335,6 @@ void Crazyflie::SetVelocityCrazyFlieRef(Velocity velocity)
     velocity_world[1] = sin_yaw * velocity[0] + cos_yaw * velocity[1];
     velocity_world[2] = velocity[2]; // z-axis is not changed
     SetVelocityWorldRef(velocity_world);
-}
-
-// TODO SF: Simplify setpoint setting
-void Crazyflie::SetThrust(int thrust)
-{
-    _sendSetPoint.thrust = thrust;
-
-    if(_sendSetPoint.thrust < _minThrust)
-    {
-        _sendSetPoint.thrust = _minThrust;
-    }
-}
-void Crazyflie::SetRoll(float roll)
-{
-    _sendSetPoint.roll = roll;
-
-    if(std::fabs(_sendSetPoint.roll) > _sendSetPoint.roll)
-    {
-        _sendSetPoint.roll = copysign(_sendSetPoint.roll, _sendSetPoint.roll);
-    }
-}
-
-void Crazyflie::SetPitch(float pitch)
-{
-    _sendSetPoint.pitch = pitch;
-
-    if(std::fabs(_sendSetPoint.pitch) > _sendSetPoint.pitch)
-    {
-        _sendSetPoint.pitch = copysign(_sendSetPoint.pitch, _sendSetPoint.pitch);
-    }
-}
-
-void Crazyflie::SetYaw(float yaw)
-{
-    _sendSetPoint.yaw = yaw;
-
-    if(std::fabs(_sendSetPoint.yaw) > _sendSetPoint.yaw)
-    {
-        _sendSetPoint.yaw = copysign(_sendSetPoint.yaw, _sendSetPoint.yaw);
-    }
 }
 
 bool Crazyflie::IsDisconnected()
