@@ -10,9 +10,9 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
     _piXVelocity (samplingTime, 0.3f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
     _piYVelocity (samplingTime, 0.3f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
-    _piZVelocity (samplingTime, 0.7f,   0.001f, 1.0f, 0.07f, -limit*2.0,limit*2.0), // in meter
+    _piZVelocity (samplingTime, 1.0f,   0.001f, 1.0f, 0.08f, -limit*2.0f,limit*2.0f), // in meter
     _currentEstimate(),
-    _takeOffTimeTicks(std::round(0.5f/samplingTime)),
+    _takeOffTimeTicks(std::round(0.8f/samplingTime)),
     _landingTimeTicks(std::round(1.5f/samplingTime))
 {}
 
@@ -60,11 +60,11 @@ void CrazyFlieCommander::Update()
         }
         else
         {
-            // Start with z-velocity 0.5m/s and gradually decrease to 0.3 in the time given
+            // Start with z-velocity 1.0m/s and gradually decrease to 0.3 in the time given
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
-            velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.3f;
+            velocity[2] = 0.6f*(_takeOffCntr/_takeOffTimeTicks) + 0.3f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
             ++_takeOffCntr;
@@ -133,6 +133,7 @@ void CrazyFlieCommander::Update()
 // called when new estimate is ready
 void CrazyFlieCommander::ReceiveEstimate(Point3f const & distance)
 {
+    std::cout << "new estimate is ready\n";
     _currentEstimate.write() = distance;
     _currentEstimate.swap();
 }
@@ -147,15 +148,17 @@ void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_
 Velocity CrazyFlieCommander::UpdateHoverMode()
 {
 
-    Point3f const & currentEstimate = _currentEstimate.read();
+    Point3f const & currentEstimate = _currentEstimate.read(); // is in meter
     Velocity velocity;
-    velocity[0] = _piXVelocity.Update(currentEstimate.x - 0.5f); // is in meter ! The ball should be 0.5 m away from the crazyflie
-    velocity[1] = _piYVelocity.Update(currentEstimate.y); // is in meter
-    velocity[2] = _piZVelocity.Update(currentEstimate.z); // is in meter
+    Point3f error = currentEstimate;
+    error.x -= 0.5f; // The ball should be 0.5 m away from the crazyflie
+    velocity[0] = _piXVelocity.Update(error.x);
+    velocity[1] = _piYVelocity.Update(error.y);
+    velocity[2] = _piZVelocity.Update(error.z);
 
 
-    textLogger << "Distance error, x = " <<  (currentEstimate.x - 0.5) << " y = " << currentEstimate.y << " z = "<< currentEstimate.z << "\n";
-    textLogger << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
+    std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
+    std::cout << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     return velocity;
 }
 Point3f CrazyFlieCommander::UpdateHoverMode_Position()

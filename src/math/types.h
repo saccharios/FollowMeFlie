@@ -64,6 +64,11 @@ struct Point3f
    Point3f(float xx, float yy, float zz):
        x(xx),y(yy), z(zz) {}
 };
+
+
+// (0, 0) is in the middle of the camera view
+// x is to the left
+// y is to the top
 struct MidPoint
 {
     Point2f pt; // TODO Move to app/types.h

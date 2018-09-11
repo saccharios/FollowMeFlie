@@ -247,7 +247,7 @@ public:
         {
             if(element.isLogged )
             {
-                textLogger << "ID ="<< static_cast<int>(element.id) << ", ";
+                textLogger << "ID = "<< static_cast<int>(element.id) << ", ";
                 textLogger << element.name << " = ";
                 textLogger << element.value << "\n";
             }

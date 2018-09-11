@@ -39,12 +39,12 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 //               << " x (pixel) = " << estimate.pt.x
 //               << " y (pixel) = " << estimate.pt.y<< "\n";
 
-    Point3f estimateCrazyFlieCoord = Camera::ConvertMidPointToCrazyFlieCoord(estimate);
-//    std::cout << "Point3f estimateCrazyFlieCoord: x (m) = " << estimateCrazyFlieCoord.x
-//              << " y (m) = " << estimateCrazyFlieCoord.y
-//              << " z (m) = " << estimateCrazyFlieCoord.z << "\n";
+    Point3f estimateBallCoordinatesFromCFlie = Camera::ConvertMidPointToCrazyFlieCoord(estimate);
+//    std::cout << "estimateBallCoordinatesFromCFlie: x (m) = " << estimateBallCoordinatesFromCFlie.x
+//              << " y (m) = " << estimateBallCoordinatesFromCFlie.y
+//              << " z (m) = " << estimateBallCoordinatesFromCFlie.z << "\n";
 
-    emit EstimateReady(estimateCrazyFlieCoord);
+    emit EstimateReady(estimateBallCoordinatesFromCFlie);
 
 }
 

@@ -115,12 +115,12 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 25); // default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 25);// default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 25);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 1);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 1);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 0.001f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.001f);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 1);// default 1
-//        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 0.1);// default 0
-//        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 0.1);// default 0
-//        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.1);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 15.0f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 15.0f;// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.0f);// default 0
 
 
         _state = State::NORMAL_OPERATION;
@@ -147,12 +147,6 @@ void Crazyflie::Update()
         {
             SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;
-            // TODO SF: for debugging
-            _logger.LogAll();
-//            for(uint8_t i = 60; i < 80; ++i)
-//            {
-//                _logger.Log(i);
-//            }
         }
 //        else
 //        {
@@ -227,7 +221,7 @@ void Crazyflie::Stop()
 
 void  Crazyflie::SendVelocityRef(Velocity velocity)
 {
-    textLogger << "Sending velocity ref, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
+    // textLogger << "Sending velocity ref (world coordinates), x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     // vx in meter/s in world frame.
     // vy in meter/s in world frame.
     // vz in meter/s in world frame.
