@@ -101,3 +101,5 @@ T GetLargest(std::vector<T> const & elements)
     return largestElement;
 }
 
+void PrintData(Data const & data);
+

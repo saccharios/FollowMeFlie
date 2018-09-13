@@ -3,6 +3,7 @@
 #include <iostream>
 #include "math/types.h"
 #include "text_logger.h"
+
 template<>
 float ExtractData<float>(Data const & data, int offset)
 {
@@ -77,14 +78,6 @@ void CRTPPacket::Print() const
     PrintData(_data);
 }
 
-
-void CRTPPacket::PrintData(Data const & data)
-{
-    for(std::size_t i = 0; i < data.size() ; ++i)
-    {
-        textLogger << "i = " << i << " data = " << static_cast<int>(data.at(i)) << " " << data.at(i)<< "\n";
-    }
-}
 
 
 

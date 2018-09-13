@@ -512,7 +512,7 @@ void TocLog::ProcessControlData(Data const & data)
             default:
             {
                 textLogger << "Oops, Answer to create block not recognized.\n";
-                CRTPPacket::PrintData(data);
+                PrintData(data);
                 break;
             }
             }
@@ -568,7 +568,7 @@ void TocLog::ProcessControlData(Data const & data)
                 default:
                 {
                     textLogger << "Oops, Answer to append to block not recognized.\n";
-                    CRTPPacket::PrintData(data);
+                    PrintData(data);
                     break;
                 }
                 }
