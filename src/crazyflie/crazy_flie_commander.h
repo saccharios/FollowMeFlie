@@ -30,7 +30,6 @@ public:
 
 
     void Update();
-    void ResetVelocityController(float z_integral_part = 0, float y_integral_part = 0, float x_integral_part = 0);
 
 public slots:
     void ReceiveEstimate(Point3f const &);
@@ -39,9 +38,6 @@ private:
     Crazyflie & _crazyflie;
     float _samplingTime;
 
-    PI_Controller _piXVelocity;
-    PI_Controller _piYVelocity;
-    PI_Controller _piZVelocity;
     Double_Buffer<Point3f> _currentEstimate;
     FlightState _flightState = FlightState::Off;
     int _waitCameraCntr = 0;

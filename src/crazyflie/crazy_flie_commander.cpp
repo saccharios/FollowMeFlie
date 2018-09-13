@@ -1,19 +1,14 @@
 #include "crazyflie/crazy_flie_commander.h"
 #include "math/constants.h"
 #include "math/types.h"
-#include <chrono>
-static constexpr float limit = 0.5;
 
 CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
-    _piXVelocity (samplingTime, 0.3f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
-    _piYVelocity (samplingTime, 0.3f,  0.001f, 1.0f, 0.0f, -limit,limit), // in meter
-    _piZVelocity (samplingTime, 1.0f,   0.001f, 1.0f, 0.08f, -limit*2.0f,limit*2.0f), // in meter
     _currentEstimate(),
-    _takeOffTimeTicks(std::round(0.8f/samplingTime)),
-    _landingTimeTicks(std::round(1.5f/samplingTime))
+    _takeOffTimeTicks(static_cast<int>(std::round(0.8f/samplingTime))),
+    _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
 {}
 
 // Periodically called
@@ -40,7 +35,7 @@ void CrazyFlieCommander::Update()
             ImmediateStop();
             _flightState = FlightState::Off;
         }
-        else if(_waitCameraCntr == std::round(0.5f/_samplingTime)) // wait for 500 ms
+        else if(_waitCameraCntr == static_cast<int>(std::round(0.5f/_samplingTime))) // wait for 500 ms
         {
             // Wait for 500 ms, camera should be on
             // TODO SF: Wait until camera is actuall on, instead of waiting 50 ticks
@@ -60,7 +55,7 @@ void CrazyFlieCommander::Update()
         }
         else
         {
-            // Start with z-velocity 1.0m/s and gradually decrease to 0.3 in the time given
+            // Start with z-velocity 0.9m/s and gradually decrease to 0.3 in the time given
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
@@ -105,7 +100,7 @@ void CrazyFlieCommander::Update()
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
-            velocity[2] = 0.05f;
+            velocity[2] = 0.03f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
             ++_landingCntr;
@@ -122,13 +117,6 @@ void CrazyFlieCommander::ReceiveEstimate(Point3f const & distance)
     _currentEstimate.swap();
 }
 
-void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_integral_part, float x_integral_part)
-{
-    _piXVelocity.Reset(x_integral_part);
-    _piYVelocity.Reset(y_integral_part);
-    _piZVelocity.Reset(z_integral_part);
-}
-
 Velocity CrazyFlieCommander::UpdateHoverMode()
 {
 
@@ -136,13 +124,10 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
     Velocity velocity;
     Point3f error = currentEstimate;
     error.x -= 0.5f; // The ball should be 0.5 m away from the crazyflie
-    velocity[0] = _piXVelocity.Update(error.x);
-    velocity[1] = _piYVelocity.Update(error.y);
-    velocity[2] = _piZVelocity.Update(error.z);
-
-
+    velocity[0] = error.x;
+    velocity[1] = error.y;
+    velocity[2] = error.z;
     //std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
-    //std::cout << "PI velocity outputs, x = " << velocity[0] << " y = " << velocity[1] << " z = " << velocity[2] << "\n";
     return velocity;
 }
 

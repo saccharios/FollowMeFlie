@@ -112,15 +112,15 @@ void Crazyflie::Update()
         // Set Parameters that take into account the increased weight due to the camera
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 40000);
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 23000);
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 25); // default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 1.0f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 10.0f);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 25);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 1.0f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 10.0f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 12); // default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 0.5);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 8);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 12);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.5);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 8);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 25);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 2.0);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.0f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 1);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.5);// default 0
 
 
         _state = State::NORMAL_OPERATION;
