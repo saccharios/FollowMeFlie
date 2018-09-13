@@ -32,6 +32,7 @@ CameraViewPainter::CameraViewPainter(float const & roll, float const & yaw, floa
 
 QPoint World2CameraCoord(QPointF point_world, QWidget* widget, float x_max, float y_max )
 {
+    //Converts world coordinates to camera coordinates for plotting
     QSize widgetSize = widget->size();
     QPoint point_camera;
     point_camera.setX((point_world.x() / x_max + 1) * widgetSize.width() / 2);
@@ -62,7 +63,6 @@ void CameraViewPainter::PaintHorizontalLine(QPainter & painter, float roll, floa
     painter.setPen(Qt::white);
     float length = _x_max * 0.75;
     float distance_between_lines = 10;
-//    QPointF text_offset{0,2};
     // draw above
     float y = WrapAround(pitch, 0.0f, distance_between_lines);
     y = distance_between_lines - y;
@@ -133,7 +133,7 @@ void Horizon::DrawGround(QPainter & painter, float roll, float pitch,float x_max
 {
     auto roll_r = deg2rad(roll);
     QVector<QPoint> points;
-// TODO SF What is the maximum? instead of 10?
+    // Magic number 10, so that the ground is always there
     QPoint p1 = World2CameraCoord(qt_utils::rotate(QPointF{-10.0*x_max, -pitch}, -roll_r), _widget, x_max, y_max);
     QPoint p2 = World2CameraCoord(qt_utils::rotate(QPointF{-10.0*x_max, -4.0*y_max-pitch}, -roll_r), _widget, x_max, y_max);
     QPoint p3 = World2CameraCoord(qt_utils::rotate(QPointF{10.0*x_max, -4.0*y_max-pitch}, -roll_r), _widget, x_max, y_max);

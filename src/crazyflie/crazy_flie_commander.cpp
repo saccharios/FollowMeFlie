@@ -38,8 +38,7 @@ void CrazyFlieCommander::Update()
         else if(_waitCameraCntr == static_cast<int>(std::round(0.5f/_samplingTime))) // wait for 500 ms
         {
             // Wait for 500 ms, camera should be on
-            // TODO SF: Wait until camera is actuall on, instead of waiting 50 ticks
-            ResetVelocityController();
+            // TODO SF: Wait until camera is actually on, instead of waiting 50 ticks
             _crazyflie.ResetCrazyflieKalmanFilter(false);
             _takeOffCntr = 0;
             _flightState = FlightState::TakeOff;
