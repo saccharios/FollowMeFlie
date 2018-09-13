@@ -31,16 +31,12 @@ QPointF rotate(QPointF const & p , float const & angle) // angle in radians
 
 void SetupTableViewWidget(QTableView* tableView)
 {
-    // Hide vertical header
     tableView->verticalHeader()->hide();
-    // Resize columns and rows to fit content
-//    tableView->resizeColumnsToContents();
-//    tableView->resizeRowsToContents();
     // Resize TableView Widget to match content size
     int w = 0;
     int h = 0;
     w += tableView->contentsMargins().left() + tableView->contentsMargins().right();
-    w += tableView->horizontalScrollBar()->width()/4; // TODO SF: Somehow the width of the horizontalScrollBar is way too large?
+    w += tableView->horizontalScrollBar()->width()/4; // Divide by 4, because the he width of the horizontalScrollBar is way too large?
     h +=  tableView->contentsMargins().top()+ tableView->contentsMargins().bottom();
     h +=  tableView->horizontalHeader()->height();
     for (int i=0; i<tableView->model()->columnCount(); ++i)
@@ -55,8 +51,6 @@ void SetupTableViewWidget(QTableView* tableView)
     tableView->setMinimumWidth(w);
     tableView->setMaximumWidth(w);
     tableView->setMinimumHeight(h);
-//    tableView->setMaximumHeight(h);
-
 
     tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
