@@ -125,7 +125,7 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
     error.x -= 0.5f; // The ball should be 0.5 m away from the crazyflie
     velocity[0] = error.x;
     velocity[1] = error.y;
-    velocity[2] = error.z;
+    velocity[2] = error.z + 0.1f; // 0.1 is feed forward term
     //std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
     return velocity;
 }
