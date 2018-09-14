@@ -40,9 +40,9 @@ struct TOCElement
     ElementType type;
     float value;
     bool isLogged;
-    void Print()
+    void Print(std::ostream & stream)
     {
-        textLogger << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << "\n";
+         stream << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << "\n";
     }
 };
 struct Point2f

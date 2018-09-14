@@ -4,6 +4,7 @@
 #include "protocol.h"
 #include "text_logger.h"
 
+
 bool TocParameter::ReadAll()
 {
     // Send Read request for all parameters, one by oen (from 0 to _itemCount - 1)
@@ -32,7 +33,7 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
     {
 
         auto value = static_cast<uint8_t>(float_value);
-        Data value_vector = ConvertTouint8_tVect(value);
+        Data value_vector = ConvertTouint8_tVect(value); // TODO SF Move these (common) lines to the end of switch
         data.insert( data.end(), value_vector.begin(), value_vector.end() );
         break;
     }
@@ -120,6 +121,8 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
     return false;
 }
 
+
+
 void TocParameter::WriteParameter(uint8_t id, float value)
 {
     bool isValid = false;
@@ -128,7 +131,13 @@ void TocParameter::WriteParameter(uint8_t id, float value)
     {
         WriteValue(element, value);
     }
+    else
+    {
+        std::cout << "Cannot write to invalid parameter id " << id << std::endl;
+    }
 }
+
+
 
 void TocParameter::ReceivePacket(CRTPPacket packet)
 {
@@ -178,10 +187,12 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
 void TocParameter::ProcessReadData(Data const & data)
 {
 
+    std::cout << "process read data\n";
     ReadData(data, Parameter::Read::AnswerByte::ParamID, Parameter::Read::AnswerByte::Value);
 }
 void TocParameter::ProcessWriteData(Data const & data)
 {
+    std::cout << "process write data\n";
     ReadData(data, Parameter::Write::AnswerByte::ParamID, Parameter::Write::AnswerByte::Value);
 }
 void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition)
@@ -199,6 +210,7 @@ void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint
     if(isValid)
     {
         _shared_impl.SetValueToElement(&element, data, valuePosition);
+        element.Print(std::cout);
         emit ParameterRead(_lastReadParameter);
     }
 }
