@@ -125,7 +125,7 @@ public:
 
     void ResetCrazyflieKalmanFilter(bool enable);
 
-
+    bool IsGoneCrazy() const;
 signals:
     void ConnectionTimeout();
     void NotConnecting();
@@ -177,8 +177,5 @@ private:
     void SendSetpoint(SetPoint setPoint); // Available but not used
     void SendActualPosition(Point3f position_act); // Available but not used
     void SendReferencePosition(Point3f position_ref); // Available but not used
-
-    bool IsGoneCrazy() const;
-
 };
 

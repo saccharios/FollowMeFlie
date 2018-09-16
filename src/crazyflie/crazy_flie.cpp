@@ -132,8 +132,7 @@ void Crazyflie::Update()
             _isSendingVelocityRef = false;
             Stop();
         }
-
-        if(_isSendingVelocityRef)
+        else if(_isSendingVelocityRef)
         {
             SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;

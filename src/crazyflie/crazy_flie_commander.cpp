@@ -15,6 +15,8 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
 void CrazyFlieCommander::Update()
 {
     //    std::cout << "flight state = " << static_cast<int>(_flightState) << std::endl;
+    bool emergencyStopInternal = commands.emergencyStop || _crazyflie.IsGoneCrazy();
+
     switch(_flightState)
     {
     case FlightState::Off:
@@ -31,7 +33,6 @@ void CrazyFlieCommander::Update()
         if(!commands.enableHover)
         {
             ImmediateStop();
-            _flightState = FlightState::Off;
         }
         else if(_cameraIsRunning)
         {
@@ -46,6 +47,10 @@ void CrazyFlieCommander::Update()
         {
             _landingCntr = 0;
             _flightState = FlightState::Landing;
+        }
+        else if(emergencyStopInternal)
+        {
+            ImmediateStop();
         }
         else
         {
@@ -72,6 +77,10 @@ void CrazyFlieCommander::Update()
             _landingCntr = 0;
             _flightState = FlightState::Landing;
         }
+        else if(emergencyStopInternal)
+        {
+            ImmediateStop();
+        }
         else
         {
             Velocity velocity = UpdateHoverMode();
@@ -82,12 +91,9 @@ void CrazyFlieCommander::Update()
     }
     case FlightState::Landing:
     {
-        if(commands.emergencyStop || _landingCntr == _landingTimeTicks)
+        if(emergencyStopInternal || _landingCntr == _landingTimeTicks)
         {
             ImmediateStop();
-            _flightState = FlightState::Off;
-            commands.enableHover = false;
-            commands.emergencyStop = false;
         }
         else
         {
@@ -130,6 +136,9 @@ void CrazyFlieCommander::ImmediateStop()
     _crazyflie.SetVelocityCrazyFlieRef({0,0,0});
     _crazyflie.SetSendingVelocityRef(false);
     _crazyflie.Stop();
+    _flightState = FlightState::Off;
+    commands.enableHover = false;
+    commands.emergencyStop = false;
 }
 
 void CrazyFlieCommander::SetCameraIsRunning(bool const & running)
