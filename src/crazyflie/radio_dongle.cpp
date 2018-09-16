@@ -22,9 +22,9 @@ RadioDongle::RadioDongle() :
     _deviceVersion(0.0f),
     _ackReceived(false),
     _radioIsConnected(false),
-    _packetsToSend(),
-    _packetsSending()
+    _packetsToSend()
 {
+    // TODO SF
     //    int returnVal = libusb_init(&_context);
     // Do error checking here.
     libusb_init(&_context);
@@ -447,25 +447,16 @@ void RadioDongle::SendPacketsNow()
 {
     // Call function periodically
     // Sends one package every call.
-    _packetsToSend.swap();
-    _packetsToSend.side_a().clear(); // TODO SF What if it is written to side_a() between swap() and clear()? -> packet loss
-    while(_packetsToSend.side_b().size() > 0)
-    {
-        _packetsSending.emplace_back(_packetsToSend.side_b().back());
-        _packetsToSend.side_b().pop_back();
-    }
-
     // If _packetsSending is empty, a ping packet is sent to keep the connection open
-    if(_packetsSending.size() == 0)
+    if(_packetsToSend.empty())
     {
         CRTPPacket ping_packet{Console::id, Console::Print::id, {static_cast<uint8_t>(0xff)}};
         SendPacket(std::move(ping_packet));
     }
     else
     {
-        CRTPPacket packet = _packetsSending.back();
-        _packetsSending.pop_back();
-
+        CRTPPacket packet = _packetsToSend.front();
+        _packetsToSend.pop();
         //        packet.Print();
         SendPacket(std::move(packet));
         //    textLogger << "Sending one packet, " << _packetsSending.size() << " left to send\n";
@@ -482,7 +473,7 @@ bool RadioDongle::SendPacket(CRTPPacket  && packet)
 
 void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
 {
-    _packetsToSend.side_a().emplace_back(std::move(packet));
+    _packetsToSend.push(packet);
 }
 
 void RadioDongle::ReceivePacket()

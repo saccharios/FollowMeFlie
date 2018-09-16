@@ -4,6 +4,7 @@
 #include "crtp_packet.h"
 #include <QObject>
 #include "math/double_buffer.h"
+#include <queue>
 
 class RadioDongle :  public QObject
 {
@@ -86,8 +87,8 @@ private:
     bool _ackReceived;
     bool _radioIsConnected;
 
-    Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _packetsToSend;
-    std::vector<CRTPPacket> _packetsSending;
+//    Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _packetsToSend;
+    std::queue<CRTPPacket> _packetsToSend;
 
     void ReadRadioSettings();
     std::vector<libusb_device*> ListDevices(int vendorID, int productID);
