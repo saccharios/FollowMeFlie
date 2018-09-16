@@ -33,6 +33,7 @@ public:
 
 public slots:
     void ReceiveEstimate(Point3f const &);
+    void SetCameraIsRunning(bool const &);
 
 private:
     Crazyflie & _crazyflie;
@@ -40,12 +41,14 @@ private:
 
     Double_Buffer<Point3f> _currentEstimate;
     FlightState _flightState = FlightState::Off;
-    int _waitCameraCntr = 0;
     int _takeOffCntr = 0;
     int _takeOffTimeTicks;
     int _landingCntr = 0;
     int _landingTimeTicks;
     Commands commands;
+    bool _cameraIsRunning = false;
+
+
     Velocity UpdateHoverMode();
     void ImmediateStop();
 };

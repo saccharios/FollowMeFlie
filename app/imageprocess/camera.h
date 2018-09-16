@@ -22,7 +22,8 @@ public:
     Camera();
     void Activate(bool activate);
     void Update();
-    CameraState GetState() const {return _state; }
+    bool IsDisabled() const;
+    bool IsActive() const;
     static cv::Size const & GetResolution() {return _resolution;}
     static cv::KeyPoint const & GetOrigin() {return _origin;}
 
@@ -39,6 +40,8 @@ signals:
     void ImgReadyForDisplay(QImage const &);
     void ImgReadyForProcessing(cv::Mat const &);
     void ImgReadyForInitialization(cv::Mat const &);
+
+    void CameraIsRunning(bool const &);
 
 private:
     CameraState _state;

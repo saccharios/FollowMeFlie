@@ -22,24 +22,19 @@ void CrazyFlieCommander::Update()
         if(commands.enableHover)
         {
             _flightState = FlightState::WaitCameraOn;
-            _waitCameraCntr = 0;
             _crazyflie.ResetCrazyflieKalmanFilter(true);
         }
         break;
     }
     case FlightState::WaitCameraOn:
     {
-        ++_waitCameraCntr;
         if(!commands.enableHover)
         {
             ImmediateStop();
             _flightState = FlightState::Off;
         }
-        else if(_waitCameraCntr == static_cast<int>(std::round(0.5f/_samplingTime))) // wait for 500 ms
+        else if(_cameraIsRunning)
         {
-            // Wait for 500 ms, camera should be on
-            // TODO SF: Wait until camera is actually on, instead of waiting 50 ticks
-            _crazyflie.ResetCrazyflieKalmanFilter(false);
             _takeOffCntr = 0;
             _flightState = FlightState::TakeOff;
         }
@@ -135,4 +130,9 @@ void CrazyFlieCommander::ImmediateStop()
     _crazyflie.SetVelocityCrazyFlieRef({0,0,0});
     _crazyflie.SetSendingVelocityRef(false);
     _crazyflie.Stop();
+}
+
+void CrazyFlieCommander::SetCameraIsRunning(bool const & running)
+{
+    _cameraIsRunning = running;
 }

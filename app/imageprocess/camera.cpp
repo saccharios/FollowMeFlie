@@ -34,6 +34,7 @@ void Camera::Update()
     default:
     case CameraState::DISABLED:
     {
+        emit CameraIsRunning(false);
         if(_activated)
         {
             _state = CameraState::CONNECTING;
@@ -43,11 +44,11 @@ void Camera::Update()
     }
     case CameraState::CONNECTING:
     {
+        emit CameraIsRunning(false);
         textLogger << "Found Cameras: " << QCameraInfo::availableCameras().count() << "\n";
         _capture->open(1); // 0 for laptop camera // 1 for crazyflie camera // 2 for creative camera
         if(_activated && _capture->isOpened())
         {
-            _state = CameraState::RUNNING;
             _resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
             _resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
             _origin = ConvertMidPointToCameraCoord(MidPoint());
@@ -75,6 +76,7 @@ void Camera::Update()
             textLogger << "CV_CAP_PROP_CONVERT_RGB   = " << _capture->get(CV_CAP_PROP_CONVERT_RGB  )<< "\n";
             textLogger << "CV_CAP_PROP_CONTRAST  = " << _capture->get(CV_CAP_PROP_CONTRAST)  << "\n";
             InitializeTracking();
+            _state = CameraState::RUNNING;
         }
         else if(!_activated)
         {
@@ -90,6 +92,7 @@ void Camera::Update()
     }
     case CameraState::RUNNING:
     {
+        emit CameraIsRunning(true);
         FetchAndImageReady();
         if ( !_activated)
         {
@@ -101,15 +104,10 @@ void Camera::Update()
     }
 }
 
-
-
 void Camera::Activate(bool activate)
 {
     _activated = activate;
 }
-
-
-
 
 void Camera::FetchAndImageReady()
 {
@@ -201,4 +199,12 @@ Point3f Camera::ConvertMidPointToCrazyFlieCoord(MidPoint midPoint)
     point.y = midPoint.pt.x * point.x / _focalLength;
     point.z = midPoint.pt.y * point.x / _focalLength;
     return point;
+}
+bool Camera::IsDisabled() const
+{
+    return _state == CameraState::DISABLED;
+}
+bool Camera::IsActive() const
+{
+    return _state == CameraState::RUNNING;
 }

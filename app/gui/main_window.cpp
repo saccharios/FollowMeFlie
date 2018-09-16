@@ -117,6 +117,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&_radioDongle, SIGNAL(NewLoggerPacket(CRTPPacket)) ,
                      &_crazyFlie.GetLoggerTOC(), SLOT(ReceivePacket(CRTPPacket)));
+
+    QObject::connect(&_camera, SIGNAL(CameraIsRunning(bool)) ,
+                     &_commander, SLOT(SetCameraIsRunning(bool)));
+
 }
 MainWindow::~MainWindow()
 {
@@ -244,7 +248,7 @@ void MainWindow::UpdateCamera()
 
 void MainWindow::on_pushButton_CameraOnlyMode_clicked()
 {
-    bool activate = (_camera.GetState() == Camera::CameraState::DISABLED);
+    bool activate = _camera.IsDisabled();
     if(activate)
     {
         _cameraViewPainter.SetCameraBackGround();
