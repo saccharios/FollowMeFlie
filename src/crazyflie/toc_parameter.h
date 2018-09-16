@@ -4,6 +4,8 @@
 #include "toc_shared.h"
 #include <QObject>
 #include "protocol.h"
+#include <queue>
+
 class TocParameter : public QObject
 {
     Q_OBJECT
@@ -215,6 +217,7 @@ signals:
 public slots:
     void WriteParameter(uint8_t, float);
     void ReceivePacket(CRTPPacket packet);
+    void WriteParametersPeriodically();
 
 private:
     RadioDongle & _radioDongle;
@@ -223,10 +226,20 @@ private:
     TOCShared<Parameter::id, Parameter::Access> _shared_impl;
     int8_t _lastReadParameter;
 
+    struct ParameterSend
+    {
+        uint8_t id;
+        float value;
+        int cntr;
+    };
+
+    std::queue<ParameterSend> _requestWritingParameter;
+
     void ProcessReadData(Data const & data);
     void ProcessWriteData(Data const & data);
     void ProcessMiscData(Data const & data);
     void ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition);
     void ReadElement(uint8_t elementId);
+    void AddToRequestWritingParamteter(uint8_t id, float value);
 
 };

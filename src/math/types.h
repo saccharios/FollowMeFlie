@@ -40,11 +40,11 @@ struct TOCElement
     ElementType type;
     float value;
     bool isLogged;
-    void Print(std::ostream & stream)
-    {
-         stream << "id = " << static_cast<int>(id )<< " name = " << name << " type = " << static_cast<int>(type )<< " value = "<< value << "\n";
-    }
 };
+
+std::ostream & operator << (std::ostream& stream, TOCElement const & element);
+
+
 struct Point2f
 {
     float x;

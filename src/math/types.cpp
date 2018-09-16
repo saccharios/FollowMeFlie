@@ -9,3 +9,9 @@ void PrintData(Data const & data)
     }
 }
 
+
+std::ostream & operator << (std::ostream& stream, TOCElement const & element)
+{
+    stream << "id = " << static_cast<int>(element.id)<< " name = " << element.name << " type = " << static_cast<int>(element.type)<< " value = "<< element.value << "\n";
+    return stream;
+}

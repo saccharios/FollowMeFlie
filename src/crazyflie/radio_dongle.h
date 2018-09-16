@@ -87,7 +87,7 @@ private:
     bool _ackReceived;
     bool _radioIsConnected;
 
-//    Double_Buffer_Bidirectional<std::vector<CRTPPacket>> _packetsToSend;
+
     std::queue<CRTPPacket> _packetsToSend;
 
     void ReadRadioSettings();

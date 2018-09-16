@@ -13,3 +13,4 @@ static constexpr float cameraUpdateSamplingTime_seconds = cameraUpdateSamplingTi
 static constexpr unsigned int guiUpdateSamplingTime = 100; // in ms
 static constexpr float guiUpdateSamplingTime_seconds = guiUpdateSamplingTime *0.001f; // in seconds
 
+static constexpr unsigned int update200msSamplingtime = 200; // in ms

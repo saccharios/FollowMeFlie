@@ -70,6 +70,7 @@ private:
     QTimer _timer_t0;
     QTimer _timer_t1;
     QTimer _timer_t2;
+    QTimer _timer_t3;
     QTimer _timer_sr;
 
     // Function related

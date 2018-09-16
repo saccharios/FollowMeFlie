@@ -123,13 +123,40 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 
 
 
+void TocParameter::AddToRequestWritingParamteter(uint8_t id, float value)
+{
+    _requestWritingParameter.push({id, value, 5});
+}
+
+void TocParameter::WriteParametersPeriodically()
+{
+    if(!_requestWritingParameter.empty())
+    {
+        ParameterSend & first = _requestWritingParameter.front();
+        bool isValid = false;
+        TOCElement & element = STLUtils::ElementForID(_elements, first.id, isValid);
+        WriteValue(element, first.value);
+        --first.cntr;
+        if(first.cntr == 0)
+        {
+            std::cout<< "Failed to write Parameter " << element << std::endl;
+            _requestWritingParameter.pop();
+        }
+        else if(std::abs(element.value - first.value ) < 0.001f)
+        {
+            _requestWritingParameter.pop();
+        }
+    }
+}
+
+
 void TocParameter::WriteParameter(uint8_t id, float value)
 {
     bool isValid = false;
-    TOCElement & element = STLUtils::ElementForID(_elements, id, isValid);
+    STLUtils::ElementForID(_elements, id, isValid);
     if(isValid)
     {
-        WriteValue(element, value);
+        AddToRequestWritingParamteter(id, value);
     }
     else
     {
@@ -186,13 +213,11 @@ void TocParameter::ReceivePacket(CRTPPacket packet)
 
 void TocParameter::ProcessReadData(Data const & data)
 {
-
-    std::cout << "process read data\n";
     ReadData(data, Parameter::Read::AnswerByte::ParamID, Parameter::Read::AnswerByte::Value);
 }
 void TocParameter::ProcessWriteData(Data const & data)
 {
-    std::cout << "process write data\n";
+   // Writing a parameter triggers re-sending of the paramter by the crazyflie
     ReadData(data, Parameter::Write::AnswerByte::ParamID, Parameter::Write::AnswerByte::Value);
 }
 void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition)
@@ -210,7 +235,6 @@ void TocParameter::ReadData(Data const & data, uint8_t parameterIdPosition, uint
     if(isValid)
     {
         _shared_impl.SetValueToElement(&element, data, valuePosition);
-        element.Print(std::cout);
         emit ParameterRead(_lastReadParameter);
     }
 }

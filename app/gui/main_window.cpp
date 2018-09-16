@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _timer_t0(),
     _timer_t1(),
     _timer_t2(),
+    _timer_t3(),
     _timer_sr(),
     _cameraViewPainter(_crazyFlie.GetSensorValues().stabilizer.roll,
                        _crazyFlie.GetSensorValues().stabilizer.yaw,
@@ -42,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // T0
     _timer_t0.start(crazyflieUpdateSamplingTime); // time in ms
     QObject::connect(&_timer_t0, SIGNAL(timeout()), this, SLOT(UpdateCrazyFlie()));
+
+
     // T1
     _timer_t1.start(cameraUpdateSamplingTime); // time in ms
     QObject::connect(&_timer_t1, SIGNAL(timeout()), this, SLOT(UpdateCamera()));
@@ -52,6 +55,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
     QObject::connect(&_timer_t2, SIGNAL(timeout()), &textLogger, SLOT(WriteToFile()));
+
+    // T3
+    _timer_t3.start(update200msSamplingtime); // time in ms
+    QObject::connect(&_timer_t3, SIGNAL(timeout()),
+                     &_crazyFlie.GetParameterTOC(), SLOT(WriteParametersPeriodically()));
 
     // Send and Receive packets
     _timer_sr.start(sendReceiveSamplingTime);
