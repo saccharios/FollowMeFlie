@@ -31,9 +31,9 @@ enum class State
 
 struct SetPoint
 {
-    float roll;// in degree 180° to 180°
-    float pitch; // in degree 180° to 180°
-    float yaw; // in degree 180° to 180°
+    float roll;// in degree -180° to 180°
+    float pitch; // in degree -180° to 180°
+    float yaw; // in degree -180° to 180°
     uint16_t thrust; // in units
     void Print()
     {
@@ -174,10 +174,11 @@ private:
         }
     }
 
-
     void SendSetpoint(SetPoint setPoint); // Available but not used
     void SendActualPosition(Point3f position_act); // Available but not used
     void SendReferencePosition(Point3f position_ref); // Available but not used
+
+    bool IsGoneCrazy() const;
 
 };
 

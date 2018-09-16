@@ -121,11 +121,18 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 2);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.4f);// default 0
 
-
         _state = State::NORMAL_OPERATION;
     }
     case State::NORMAL_OPERATION:
     {
+        // Safety precaution, if the cflie is tilted/upside down/doing crazy shit, no velocity command can be sent
+        if(IsGoneCrazy())
+        {
+            _velocity = {0.0, 0.0, 0.0};
+            _isSendingVelocityRef = false;
+            Stop();
+        }
+
         if(_isSendingVelocityRef)
         {
             SendVelocityRef(_velocity);
@@ -395,4 +402,10 @@ void Crazyflie::ResetCrazyflieKalmanFilter(bool enable)
     {
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::resetEstimation), 1);
     }
+}
+
+bool Crazyflie::IsGoneCrazy() const
+{
+    auto const & sensorValues = GetSensorValues();
+    return std::abs(sensorValues.stabilizer.roll)> 60 || std::abs(sensorValues.stabilizer.pitch) > 60;
 }
