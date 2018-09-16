@@ -15,7 +15,6 @@
 #include "time_levels.h"
 #include "math/types.h"
 #include "text_logger.h"
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _radioDongle(),
@@ -51,10 +50,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // T2
     _timer_t2.start(guiUpdateSamplingTime); // time in ms
-    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(UpdateConnectionStatus()));
-    QObject::connect(&_timer_t2, SIGNAL(timeout()), &_actualValuesModel, SLOT(UpdateActualValues()));
-    QObject::connect(&_timer_t2, SIGNAL(timeout()), this, SLOT(RePaintCameraViewPainter()));
-    QObject::connect(&_timer_t2, SIGNAL(timeout()), &textLogger, SLOT(WriteToFile()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()),
+                     this, SLOT(UpdateConnectionStatus()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()),
+                     &_actualValuesModel, SLOT(UpdateActualValues()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()),
+                     this, SLOT(RePaintCameraViewPainter()));
+    QObject::connect(&_timer_t2, SIGNAL(timeout()),
+                     &textLogger, SLOT(WriteToFile()));
 
     // T3
     _timer_t3.start(update200msSamplingtime); // time in ms
@@ -63,8 +66,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Send and Receive packets
     _timer_sr.start(sendReceiveSamplingTime);
-   QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(SendPacketsNow()));
-   QObject::connect(&_timer_sr, SIGNAL(timeout()), &_radioDongle, SLOT(ReceivePacket()));
+   QObject::connect(&_timer_sr, SIGNAL(timeout()),
+                    &_radioDongle, SLOT(SendPacketsNow()));
+   QObject::connect(&_timer_sr, SIGNAL(timeout()),
+                    &_radioDongle, SLOT(ReceivePacket()));
 
 
     // Custom widgets
@@ -77,25 +82,39 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->verticalSlider_hue->setValue(_trackingColor.GetHue()); // Default value is the same as defined in trackingColor
 
     // Connections
-    QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)), &_cameraViewPainter, SLOT(SetImage(QImage const &)));
-    QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)), &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
-    QObject::connect(&_camera, SIGNAL(ImgReadyForInitialization(cv::Mat const &)), &_extractColor, SLOT(Initialize(cv::Mat const &)));
+    QObject::connect(&_camera, SIGNAL(ImgReadyForDisplay(QImage const &)),
+                     &_cameraViewPainter, SLOT(SetImage(QImage const &)));
 
-    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)), &_commander, SLOT(ReceiveEstimate(Point3f const &)));
+    QObject::connect(&_camera, SIGNAL(ImgReadyForProcessing(cv::Mat const &)),
+                     &_extractColor, SLOT(ProcessImage(cv::Mat const &)));
 
+    QObject::connect(&_camera, SIGNAL(ImgReadyForInitialization(cv::Mat const &)),
+                     &_extractColor, SLOT(Initialize(cv::Mat const &)));
 
+    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)),
+                     &_commander, SLOT(ReceiveEstimate(Point3f const &)));
 
+    QObject::connect(this, SIGNAL(StartMeasurement()),
+                     &_extractColor, SLOT(StartMeasurement()));
 
-    QObject::connect(this, SIGNAL(StartMeasurement()), &_extractColor, SLOT(StartMeasurement()));
-    QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()), this, SLOT(DisplayConnectionTimeoutBox()));
-    QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()), this, SLOT(DisplayNotConnectingBox()));
+    QObject::connect(&_crazyFlie, SIGNAL(ConnectionTimeout()),
+                     this, SLOT(DisplayConnectionTimeoutBox()));
+
+    QObject::connect(&_crazyFlie, SIGNAL(NotConnecting()),
+                     this, SLOT(DisplayNotConnectingBox()));
+
+    QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterWriteFailed(TOCElement const &)),
+                     this, SLOT(DisplayParameterWriteFailedBox(TOCElement const &)));
+
     QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)),
                      &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
+
     QObject::connect(&_parameterModel, SIGNAL( ParameterWrite(uint8_t, float)),
                      &_crazyFlie.GetParameterTOC(), SLOT( WriteParameter(uint8_t, float)));
 
     QObject::connect(&_radioDongle, SIGNAL(NewParameterPacket(CRTPPacket)) ,
                     &_crazyFlie.GetParameterTOC(), SLOT(ReceivePacket(CRTPPacket)));
+
     QObject::connect(&_radioDongle, SIGNAL(NewLoggerPacket(CRTPPacket)) ,
                      &_crazyFlie.GetLoggerTOC(), SLOT(ReceivePacket(CRTPPacket)));
 }
@@ -114,12 +133,23 @@ void MainWindow::DisplayConnectionTimeoutBox()
     msgBox.setText("Connection Time out.");
     msgBox.exec();
 }
+
 void MainWindow::DisplayNotConnectingBox()
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle("Connection Error");
     msgBox.setText("Could not connect to CrazyFlie.");
     msgBox.setInformativeText("Have you turned it on?");
+    msgBox.exec();
+}
+
+void MainWindow::DisplayParameterWriteFailedBox(TOCElement const & element)
+{
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Parameter Write Fail");
+    std::stringstream s;
+    s << "Failed to write parameter " << element;
+    msgBox.setText(QString::fromStdString(s.str()));
     msgBox.exec();
 }
 

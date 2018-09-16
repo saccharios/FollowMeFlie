@@ -214,6 +214,8 @@ public:
 
 signals:
     void ParameterRead(uint8_t const &);
+    void ParameterWriteFailed (TOCElement const &);
+
 public slots:
     void WriteParameter(uint8_t, float);
     void ReceivePacket(CRTPPacket packet);

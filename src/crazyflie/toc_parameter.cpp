@@ -139,7 +139,7 @@ void TocParameter::WriteParametersPeriodically()
         --first.cntr;
         if(first.cntr == 0)
         {
-            std::cout<< "Failed to write Parameter " << element << std::endl;
+            emit ParameterWriteFailed(element);
             _requestWritingParameter.pop();
         }
         else if(std::abs(element.value - first.value ) < 0.001f)

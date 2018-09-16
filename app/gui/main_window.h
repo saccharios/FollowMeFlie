@@ -35,6 +35,7 @@ private slots:
     void UpdateConnectionStatus();
     void DisplayConnectionTimeoutBox();
     void DisplayNotConnectingBox();
+    void DisplayParameterWriteFailedBox(TOCElement const & element);
     void on_actionExit_triggered();
     void on_verticalSlider_hue_valueChanged(int value);
     void on_pushButton_CameraOnlyMode_clicked();
