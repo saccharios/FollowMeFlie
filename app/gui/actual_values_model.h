@@ -9,7 +9,7 @@ class ActualValuesModel : public TableModelBase
     using Base = TableModelBase;
     static constexpr int cols = 4;
 public:
-    explicit ActualValuesModel(std::vector<TOCElement> const & tocElements, QObject *parent = 0);
+    explicit ActualValuesModel(std::vector<TOCElement> const & tocElements, QObject *parent = nullptr);
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
