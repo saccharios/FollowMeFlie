@@ -97,11 +97,8 @@ public:
     ~Crazyflie();
 
     void SetSetPoint(SetPoint setPoint);
-    void SetSendSetpoints(bool sendSetpoints);
-    bool IsSendingSetpoints();
 
     void SetVelocityCrazyFlieRef(Velocity velocity);
-    void SetVelocityWorldRef(Velocity velocity);
     void SetSendingVelocityRef(bool isSendingVelocityRef);
     bool IsSendingVelocityRef();
 
@@ -148,9 +145,7 @@ private:
 
     uint16_t _minThrust;
 
-    bool _isSendingSetpoints;
     bool _isSendingVelocityRef;
-    bool _isSendingSendPositionSetPoint;
     bool _disconnect;
     bool _startConnecting;
     State _state;
@@ -162,7 +157,8 @@ private:
 
     SensorValues _sensorValues;
 
-    void SendSetpoint(SetPoint setPoint);
+
+    void SetVelocityWorldRef(Velocity velocity);
     void SendVelocityRef(Velocity velocity);
 
     void UpateSensorValues();
@@ -178,8 +174,10 @@ private:
         }
     }
 
-    void SendActualPosition(Point3f position_act);
-    void SendReferencPosition(Point3f position_ref);
+
+    void SendSetpoint(SetPoint setPoint); // Available but not used
+    void SendActualPosition(Point3f position_act); // Available but not used
+    void SendReferencePosition(Point3f position_ref); // Available but not used
 
 };
 

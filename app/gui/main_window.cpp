@@ -324,9 +324,4 @@ void MainWindow::on_pushButton_TakeMeasurement_clicked()
     emit StartMeasurement();
 }
 
-void MainWindow::on_pushButton_Thrust_clicked()
-{
-    _crazyFlie.SetSendSetpoints(true);
-    SetPoint sp = {0.0, 0.0, 0.0, 40000};
-    _crazyFlie.SetSetPoint(sp);
-}
+

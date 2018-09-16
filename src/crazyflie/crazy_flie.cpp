@@ -11,7 +11,6 @@ Crazyflie::Crazyflie(RadioDongle & radioDongle) :
     _sendSetPoint(),
     _maxSetPoint({45.0,45.0,180.0,60000}),
     _minThrust(0),
-    _isSendingSetpoints(false),
     _isSendingVelocityRef(false),
     _startConnecting(false),
     _state (State::ZERO),
@@ -127,15 +126,7 @@ void Crazyflie::Update()
     }
     case State::NORMAL_OPERATION:
     {
-        if(_isSendingSetpoints)
-        {
-            // TODO SF: This must  be sent first to unlock the thrust
-            // SetPoint sp = {0.0, 0.0, 0.0, 0};
-            // SendSetpoint(sp);
-            SendSetpoint(_sendSetPoint);
-            _isSendingSetpoints = false;
-        }
-        else if(_isSendingVelocityRef)
+        if(_isSendingVelocityRef)
         {
             SendVelocityRef(_velocity);
             _isSendingVelocityRef = false;
@@ -155,6 +146,7 @@ void Crazyflie::Update()
             emit ConnectionTimeout();
             _state = State::DISCONNECT;
         }
+
         if(_disconnect)
         {
             _startConnecting = false;
@@ -177,6 +169,8 @@ void Crazyflie::Update()
     UpateSensorValues();
 }
 
+// Note: To send a setPoint the thrust must be unlocked first.
+// I.e. A SetPoint of SetPoint sp = {0.0, 0.0, 0.0, 0}; must be sent before sendind an actual setpoint
 void Crazyflie::SendSetpoint(SetPoint setPoint)
 {
     auto roll = setPoint.roll;
@@ -239,7 +233,7 @@ void  Crazyflie::SendActualPosition(Point3f position_act)
     _radioDongle.RegisterPacketToSend(std::move(packet2));
 }
 
-void  Crazyflie::SendReferencPosition(Point3f position_ref)
+void  Crazyflie::SendReferencePosition(Point3f position_ref)
 {
     textLogger << "Sending position ref, x = " << position_ref.x << " y = " << position_ref.y << " z = " << position_ref.z << "\n";
 
@@ -352,19 +346,11 @@ bool Crazyflie::IsConnected()
     return _state == State::NORMAL_OPERATION;
 }
 
-void Crazyflie::SetSendSetpoints(bool sendSetpoints)
-{
-    _isSendingSetpoints = sendSetpoints;
-}
 void Crazyflie::SetSendingVelocityRef(bool isSendingVelocityRef)
 {
     _isSendingVelocityRef = isSendingVelocityRef;
 }
 
-bool Crazyflie::IsSendingSetpoints()
-{
-    return _isSendingSetpoints;
-}
 bool Crazyflie::IsSendingVelocityRef()
 {
     return _isSendingVelocityRef;

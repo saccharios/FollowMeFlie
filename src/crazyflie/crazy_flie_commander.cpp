@@ -132,8 +132,6 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
 
 void CrazyFlieCommander::ImmediateStop()
 {
-    _crazyflie.SetSetPoint({0,0,0,0});
-    _crazyflie.SetSendSetpoints(true);
     _crazyflie.SetVelocityCrazyFlieRef({0,0,0});
     _crazyflie.SetSendingVelocityRef(false);
     _crazyflie.Stop();
