@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="exitApp">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>70</y>
+      <x>590</x>
+      <y>20</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -119,8 +119,8 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>110</y>
+      <x>200</x>
+      <y>90</y>
       <width>131</width>
       <height>135</height>
      </rect>
@@ -129,21 +129,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_hoverMode">
        <property name="text">
-        <string>Hover</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_FollowMeMode">
-       <property name="text">
-        <string>FollowMe</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_SafeLandingMode">
-       <property name="text">
-        <string>Safe Landing</string>
+        <string>Follow</string>
        </property>
       </widget>
      </item>
@@ -225,25 +211,12 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_Stop">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>210</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stop</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButton_ActualValues">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>110</y>
-      <width>101</width>
+      <x>370</x>
+      <y>90</y>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -254,9 +227,9 @@
    <widget class="QPushButton" name="pushButton_ParameterTable">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>140</y>
-      <width>101</width>
+      <x>370</x>
+      <y>120</y>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -267,14 +240,40 @@
    <widget class="QPushButton" name="pushButton_TakeMeasurement">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>110</y>
-      <width>93</width>
-      <height>28</height>
+      <x>30</x>
+      <y>90</y>
+      <width>111</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string>Take Measurement</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_SafeLandingMode">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>100</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Safe Landing</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_Stop">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>150</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Emergency Stop</string>
     </property>
    </widget>
   </widget>
