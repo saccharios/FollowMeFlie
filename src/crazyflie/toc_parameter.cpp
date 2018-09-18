@@ -125,7 +125,7 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 
 void TocParameter::AddToRequestWritingParamteter(uint8_t id, float value)
 {
-    _requestWritingParameter.push({id, value, 5});
+    _requestWritingParameter.push({id, value, 10});
 }
 
 void TocParameter::WriteParametersPeriodically()

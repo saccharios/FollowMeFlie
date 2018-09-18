@@ -111,15 +111,16 @@ void Crazyflie::Update()
         // Set Parameters that take into account the increased weight due to the camera
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 40000);
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 23000);
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 12); // default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 8); // default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 0.1f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 8);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 12);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 6);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 8);// default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.1f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 8);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 12);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 2);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 0.4f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 6);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 50.0f);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 7.0f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 4.0f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::controller::tiltComp), 1);// default 0
 
         _state = State::NORMAL_OPERATION;
     }
@@ -128,6 +129,10 @@ void Crazyflie::Update()
         // Safety precaution, if the cflie is tilted/upside down/doing crazy shit, no velocity command can be sent
         if(IsGoneCrazy())
         {
+            if(_isSendingVelocityRef)
+            {
+                std::cout << "Flying prevented!!\n";
+            }
             _velocity = {0.0, 0.0, 0.0};
             _isSendingVelocityRef = false;
             Stop();

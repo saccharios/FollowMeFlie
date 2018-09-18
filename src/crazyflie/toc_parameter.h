@@ -131,7 +131,7 @@ public:
     };
     enum class controller : uint8_t
     {
-        tiltCop = 68
+        tiltComp = 68
     };
     enum class motorPowerSet : uint8_t
     {

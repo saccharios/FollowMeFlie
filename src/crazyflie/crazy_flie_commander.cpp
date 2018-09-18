@@ -6,8 +6,9 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper ):
+    _piZVelocity (samplingTime, 1.0f,   0.001f, 1.0f, 0.08f, -limit*2.0f,limit*2.0f), // in meter
     _currentEstimate(),
-    _takeOffTimeTicks(static_cast<int>(std::round(0.8f/samplingTime))),
+    _takeOffTimeTicks(static_cast<int>(std::round(0.7f/samplingTime))),
     _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
 {}
 
@@ -36,6 +37,7 @@ void CrazyFlieCommander::Update()
         }
         else if(_cameraIsRunning)
         {
+            ResetVelocityController();
             _takeOffCntr = 0;
             _flightState = FlightState::TakeOff;
         }
@@ -58,7 +60,7 @@ void CrazyFlieCommander::Update()
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
-            velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.5f;
+            velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.3f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
             ++_takeOffCntr;
@@ -117,6 +119,10 @@ void CrazyFlieCommander::ReceiveEstimate(Point3f const & distance)
     _currentEstimate.swap();
 }
 
+void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_integral_part, float x_integral_part)
+{
+    _piZVelocity.Reset(z_integral_part);
+}
 Velocity CrazyFlieCommander::UpdateHoverMode()
 {
 
@@ -126,7 +132,7 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
     error.x -= 0.5f; // The ball should be 0.5 m away from the crazyflie
     velocity[0] = error.x;
     velocity[1] = error.y;
-    velocity[2] = error.z + 0.1f; // 0.1 is feed forward term
+    velocity[2] = _piZVelocity.Update(error.z);
     //std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
     return velocity;
 }
