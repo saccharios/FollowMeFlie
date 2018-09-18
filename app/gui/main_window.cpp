@@ -149,12 +149,13 @@ void MainWindow::DisplayNotConnectingBox()
 
 void MainWindow::DisplayParameterWriteFailedBox(TOCElement const & element)
 {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Parameter Write Fail");
-    std::stringstream s;
-    s << "Failed to write parameter " << element;
-    msgBox.setText(QString::fromStdString(s.str()));
-    msgBox.exec();
+    Q_UNUSED(element);
+//    QMessageBox msgBox;
+//    msgBox.setWindowTitle("Parameter Write Fail");
+//    std::stringstream s;
+//    s << "Failed to write parameter " << element;
+//    msgBox.setText(QString::fromStdString(s.str()));
+//    msgBox.exec();
 }
 
 

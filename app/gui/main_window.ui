@@ -109,9 +109,9 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>269</y>
-      <width>551</width>
-      <height>281</height>
+      <y>239</y>
+      <width>671</width>
+      <height>331</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="Layout_CameraView"/>
@@ -119,8 +119,8 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>90</y>
+      <x>20</x>
+      <y>80</y>
       <width>131</width>
       <height>135</height>
      </rect>
@@ -130,6 +130,13 @@
       <widget class="QPushButton" name="pushButton_hoverMode">
        <property name="text">
         <string>Follow</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_TakeMeasurement">
+       <property name="text">
+        <string>Take Measurement</string>
        </property>
       </widget>
      </item>
@@ -145,10 +152,10 @@
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>320</y>
-      <width>31</width>
-      <height>181</height>
+      <x>580</x>
+      <y>80</y>
+      <width>41</width>
+      <height>131</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="LayoutColorBars">
@@ -164,8 +171,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>350</y>
+      <x>620</x>
+      <y>110</y>
       <width>41</width>
       <height>31</height>
      </rect>
@@ -175,8 +182,8 @@
    <widget class="QLabel" name="setColor">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>300</y>
+      <x>580</x>
+      <y>60</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -188,8 +195,8 @@
    <widget class="QLabel" name="Hue_Num">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>320</y>
+      <x>620</x>
+      <y>80</y>
       <width>41</width>
       <height>29</height>
      </rect>
@@ -214,8 +221,8 @@
    <widget class="QPushButton" name="pushButton_ActualValues">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>90</y>
+      <x>180</x>
+      <y>80</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -227,8 +234,8 @@
    <widget class="QPushButton" name="pushButton_ParameterTable">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>120</y>
+      <x>180</x>
+      <y>130</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -237,24 +244,11 @@
      <string>Parameter Table</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_TakeMeasurement">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>90</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Take Measurement</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButton_SafeLandingMode">
     <property name="geometry">
      <rect>
-      <x>520</x>
-      <y>100</y>
+      <x>320</x>
+      <y>80</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -266,8 +260,8 @@
    <widget class="QPushButton" name="pushButton_Stop">
     <property name="geometry">
      <rect>
-      <x>520</x>
-      <y>150</y>
+      <x>180</x>
+      <y>160</y>
       <width>121</width>
       <height>51</height>
      </rect>
