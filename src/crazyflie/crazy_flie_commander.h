@@ -1,6 +1,6 @@
 #pragma once
 #include "QOBJECT"
-#include "math/pi_controller.h"
+#include "math/pid_controller.h"
 #include "crazyflie/crazy_flie.h"
 #include "math/types.h"
 #include "math/double_buffer.h"
@@ -40,7 +40,7 @@ private:
     Crazyflie & _crazyflie;
     float _samplingTime;
 
-    PI_Controller _piZVelocity;
+    PID_Controller _pid_ZVelocity;
     Double_Buffer<Point3f> _currentEstimate;
     FlightState _flightState = FlightState::Off;
     int _takeOffCntr = 0;
