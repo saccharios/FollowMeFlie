@@ -15,7 +15,8 @@ SOURCES += src/test_main.cpp \
     src/toc_log_test.cpp \
     src/stl_utils_test.cpp \
     src/double_buffer_test.cpp \
-    src/delay_test.cpp
+    src/delay_test.cpp \
+    src/pid_controller_test.cpp
 
 HEADERS  += \
     src/crtppacket_test.h \
@@ -23,7 +24,8 @@ HEADERS  += \
     src/math_function_test.h \
     src/toc_log_test.h \
     src/stl_utils_test.h \
-    src/delay_test.h
+    src/delay_test.h \
+    src/pid_controller_test.h
 
 # Include Google Test
 INCLUDEPATH += $${goolgetest_path}/googletest-release-1.7.0/include \

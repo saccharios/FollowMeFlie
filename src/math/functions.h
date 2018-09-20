@@ -20,10 +20,7 @@ T WrapAround(T value, T min, T max)
 }
 
 
-float deg2rad(float deg)
-{
-    return WrapAround(deg/180.0f*pi, -pi, pi);
-}
+float deg2rad(float deg);
 
 
 template <typename T>

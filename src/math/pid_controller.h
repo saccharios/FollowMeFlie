@@ -21,7 +21,9 @@ public:
                        limit_upper),
         _gain_derivative(gain_derivative),
         _previous_error(),
-        _sampling_time(sampling_time)
+        _sampling_time(sampling_time),
+        _limit_lower(limit_lower),
+        _limit_upper(limit_upper)
     {}
     float Update(float error);
     void Reset(float integral_part = 0);
@@ -31,4 +33,6 @@ private:
     float _gain_derivative;
     float _previous_error;
     float _sampling_time;
+    float _limit_lower;
+    float _limit_upper;
 };

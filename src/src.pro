@@ -52,7 +52,8 @@ SOURCES += \
     crazyflie/radio_dongle.cpp \
     math/kalman_filter.cpp \
     text_logger.cpp \
-    math/pid_controller.cpp
+    math/pid_controller.cpp \
+    math/functions.cpp
 
 
 
