@@ -117,9 +117,9 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 8);// default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.1f);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 6);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 50.0f);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 7.0f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 4.0f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 20.0f);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 3.0f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 2.0f);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::controller::tiltComp), 1);// default 0
 
         _state = State::NORMAL_OPERATION;
@@ -330,7 +330,7 @@ void Crazyflie::SetVelocityWorldRef(Velocity velocity)
 void Crazyflie::SetVelocityCrazyFlieRef(Velocity velocity)
 {
     // Set velocity in coordinate system relative to the crazyflie.
-    // That is, x-diretion is always in front of the crazyflie.
+    // This coordinate system (the world) is initialized at startup of the crazyflie.
     // Convert crazyflie coordinates into world coordinates by rotating the xy-plane.
     // The assumption is that the crazyflie is parallel to the ground.
     float cos_yaw = std::cos(_sensorValues.stabilizer.yaw * pi / 180.0f);
