@@ -20,65 +20,68 @@ TocLog::TocLog(RadioDongle & radioDongle) :
     {
             "stabilizer.roll",
             "stabilizer.pitch",
-            "stabilizer.yaw",
-            "stabilizer.thrust",
-            "acc.x",
-            "acc.y",
-};
+//            "acc.x",
+//            "acc.y",
+//            "acc.z",
+    };
 
     _loggingBlocks.at(1).name = "block_1";
     _loggingBlocks.at(1).elements_to_add =
     {
-            "gyro.x",
-            "gyro.y",
-            "gyro.z",
-            "mag.x",
-            "mag.y",
-};
+            "stabilizer.yaw",
+            "stabilizer.thrust",
+//            "gyro.x",
+//            "gyro.y",
+//            "gyro.z",
+//            "mag.x",
+//            "mag.y",
+//            "mag.z",
+    };
 
 
     _loggingBlocks.at(2).name = "block_2";
     _loggingBlocks.at(2).elements_to_add =
     {
-            "mag.z",
-            "acc.z",
+
             "baro.asl",
             "baro.pressure",
             "baro.temp",
-            "pm.vbat",
-            "pm.state",
-};
+    };
 
 
     _loggingBlocks.at(3).name = "block_3";
     _loggingBlocks.at(3).elements_to_add =
     {
-
-            "pid_attitude.roll_outP",
-            "pid_attitude.roll_outI",
-            "pid_attitude.roll_outD",
-            "pid_attitude.pitch_outP",
-            "pid_attitude.pitch_outI",
-};
+            "pm.vbat",
+            "pm.state",
+//            "pid_attitude.roll_outP",
+//            "pid_attitude.roll_outI",
+//            "pid_attitude.roll_outD",
+//            "pid_attitude.pitch_outP",
+//            "pid_attitude.pitch_outI",
+    };
 
     _loggingBlocks.at(4).name = "block_4";
     _loggingBlocks.at(4).elements_to_add =
     {
-            "pid_attitude.pitch_outD",
-            "pid_attitude.yaw_outP",
-            "pid_attitude.yaw_outI",
-            "pid_attitude.yaw_outD",
-            "pid_rate.roll_outP",
-};
+//            "pid_attitude.pitch_outD",
+//            "pid_attitude.yaw_outP",
+//            "pid_attitude.yaw_outI",
+//            "pid_attitude.yaw_outD",
+//            "pid_rate.roll_outP",
+            "posCtl.targetVX",
+            "posCtl.targetVY",
+            "posCtl.targetVZ",
+    };
 
     _loggingBlocks.at(5).name = "block_5";
     _loggingBlocks.at(5).elements_to_add =
     {
-            "pid_rate.roll_outI",
-            "pid_rate.roll_outD",
-            "pid_rate.pitch_outP",
-            "pid_rate.pitch_outI",
-            "pid_rate.pitch_outD",
+//            "pid_rate.roll_outI",
+//            "pid_rate.roll_outD",
+//            "pid_rate.pitch_outP",
+//            "pid_rate.pitch_outI",
+//            "pid_rate.pitch_outD",
 //            "kalman_states.ox",
 //            "kalman_states.oy",
 //            "kalman_states.vx",
@@ -98,16 +101,19 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 //            "kalman.stateD1",
 //            "kalman.stateD2",
 //            "kalman.stateSkew"
-};
+            "posCtl.Xp",
+            "posCtl.Xi",
+            "posCtl.Xd",
+    };
 
     _loggingBlocks.at(6).name = "block_6";
     _loggingBlocks.at(6).elements_to_add =
     {
-            "pid_rate.yaw_outP",
-            "pid_rate.yaw_outI",
-            "pid_rate.yaw_outD",
-            "controller.actuatorThrust",
-            "controller.roll",
+//            "pid_rate.yaw_outP",
+//            "pid_rate.yaw_outI",
+//            "pid_rate.yaw_outD",
+//            "controller.actuatorThrust",
+//            "controller.roll",
 //            "kalman.varX",
 //            "kalman.varY",
 //            "kalman.varZ",
@@ -123,106 +129,102 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 //            "kalman.q1",
 //            "kalman.q2",
 //            "kalman.q3"
-};
+            "posCtl.VXp",
+            "posCtl.VXi",
+            "posCtl.VXd",
+    };
 
 
 
     _loggingBlocks.at(7).name = "block_7";
     _loggingBlocks.at(7).elements_to_add =
     {
-            "controller.pitch",
-            "controller.yaw",
-            "controller.rollRate",
-            "controller.pitchRate",
-            "controller.yawRate",
-};
+//            "controller.pitch",
+//            "controller.yaw",
+//            "controller.rollRate",
+//            "controller.pitchRate",
+//            "controller.yawRate",
+
+            "posCtl.targetX",
+            "posCtl.targetY",
+
+    };
 
     _loggingBlocks.at(8).name = "block_8";
     _loggingBlocks.at(8).elements_to_add =
     {
-            "controller.ctr_yaw",
-            "posCtl.targetVX",
-            "posCtl.targetVY",
-            "posCtl.targetVZ",
-            "posCtl.targetX",
-            "posCtl.targetY",
-};
+//            "controller.ctr_yaw",
+
+            "posCtl.targetZ",
+            "posCtl.Yp",
+    };
 
     _loggingBlocks.at(9).name = "block_9";
     _loggingBlocks.at(9).elements_to_add =
     {
-            "posCtl.targetZ",
-            "posCtl.Xp",
-            "posCtl.Xi",
-            "posCtl.Xd",
-            "posCtl.Yp",
-};
+
+            "posCtl.Yi",
+            "posCtl.Yd",
+    };
 
     _loggingBlocks.at(10).name = "block_10";
     _loggingBlocks.at(10).elements_to_add =
     {
-            "posCtl.Yi",
-            "posCtl.Yd",
             "posCtl.Zp",
             "posCtl.Zi",
             "posCtl.Zd",
-};
+    };
 
     _loggingBlocks.at(11).name = "block_11";
     _loggingBlocks.at(11).elements_to_add =
     {
-            "posCtl.VXp",
-            "posCtl.VXi",
-            "posCtl.VXd",
             "posCtl.VZp",
             "posCtl.VZi",
-};
+            "posCtl.VZd",
+    };
 
     _loggingBlocks.at(12).name = "block_12";
     _loggingBlocks.at(12).elements_to_add =
     {
-            "posCtl.VZd",
-            "posEstimatorAlt.estimatedZ",
-            "posEstimatorAlt.estVZ",
-            "posEstimatorAlt.velocityZ",
+//            "posEstimatorAlt.estimatedZ",
+//            "posEstimatorAlt.estVZ",
+//            "posEstimatorAlt.velocityZ",
             "motor.m1",
-
-
-};
+            "motor.m2"
+    };
     _loggingBlocks.at(13).name = "block_13";
     _loggingBlocks.at(13).elements_to_add =
     {
-            "motor.m2",
             "motor.m3",
             "motor.m4",
-            "sensorfusion6.qw",
-            "sensorfusion6.qx",
-            "stateEstimate.z",
+//            "sensorfusion6.qw",
+//            "sensorfusion6.qx",
 
-};
+    };
     _loggingBlocks.at(14).name = "block_14";
     _loggingBlocks.at(14).elements_to_add =
     {
-            "sensorfusion6.qy",
-            "sensorfusion6.qz",
-            "sensorfusion6.gravityX",
-            "sensorfusion6.gravityY",
-            "sensorfusion6.gravityZ",
-            "sensorfusion6.accZbase",
+//            "sensorfusion6.qy",
+//            "sensorfusion6.qz",
+//            "sensorfusion6.gravityX",
+//            "sensorfusion6.gravityY",
+//            "sensorfusion6.gravityZ",
+//            "sensorfusion6.accZbase",
+            "stateEstimate.x",
 
-};
+    };
     _loggingBlocks.at(15).name = "block_15";
     _loggingBlocks.at(15).elements_to_add =
     {
-            "sensorfusion6.isInit",
-            "sensorfusion6.isCalibrated",
-            "ctrltarget.roll",
-            "ctrltarget.pitch",
-            "ctrltarget.yaw",
-            "stateEstimate.x",
+//            "sensorfusion6.isInit",
+//            "sensorfusion6.isCalibrated",
+//            "ctrltarget.roll",
+//            "ctrltarget.pitch",
+//            "ctrltarget.yaw",
             "stateEstimate.y",
+            "stateEstimate.z",
 
-};
+    };
     for(uint8_t id = 0; id < _numLogBlocks; ++id)
     {
         _loggingBlocks.at(id).id = id;

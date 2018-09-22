@@ -6,7 +6,7 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper, gain_derivative ):
-    _pid_ZVelocity (samplingTime, 2.0f,   1.0f, 1.0f, 0.08f, -0.5f,0.5f, 0.005f), // in meter
+    _pid_ZVelocity (samplingTime, 2.0f,   2.0f, 1.0f, 0.00f, -0.5f,1.0f, 0.01f), // in meter
     _currentEstimate(),
     _takeOffTimeTicks(static_cast<int>(std::round(0.7f/samplingTime))),
     _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
@@ -137,7 +137,7 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
    // velocity[2] = error.z + 0.1f;
     velocity[2] = _pid_ZVelocity.Update(error.z);
     //std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
-    textLogger << " Velocity z output = " << velocity[2]<< "\n";
+//    textLogger << " Velocity z output = " << velocity[2]<< "\n";
     return velocity;
 }
 
