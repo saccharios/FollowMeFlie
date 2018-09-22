@@ -109,7 +109,7 @@ void Crazyflie::Update()
     case State::SET_PARAMETERS:
     {
         // Set Parameters that take into account the increased weight due to the camera
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 43000); //40000
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 44000); //40000
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 25000); //23000
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 8); // default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 0.1f);// default 1
@@ -117,9 +117,9 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKp), 8);// default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.1f);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 6);// default 0
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 40.0f);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 7.0f);// default 1
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 4.1f);// default 0
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 10.0f);// default 25
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 1.0f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 2.0f);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::controller::tiltComp), 1);// default 0
 
         _state = State::NORMAL_OPERATION;
@@ -160,11 +160,11 @@ void Crazyflie::Update()
 
 
         // Log velocity ref and crazyflie target v ref
-        textLogger << _logger.Value("posCtl.targetVZ") << ", "
-                   << _logger.Value("posCtl.VZp") << ", "
-                   << _logger.Value("posCtl.VZi") << ", "
-                   << _logger.Value("posCtl.VZd") << ", "
-                   << _velocity[2]<< ", \n";
+//        textLogger << _logger.Value("posCtl.targetVZ") << ", "
+//                   << _logger.Value("posCtl.VZp") << ", "
+//                   << _logger.Value("posCtl.VZi") << ", "
+//                   << _logger.Value("posCtl.VZd") << ", "
+//                   << _velocity[2]<< ", \n";
 
 
         if(_disconnect)

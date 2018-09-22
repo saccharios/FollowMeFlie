@@ -6,7 +6,7 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper, gain_derivative ):
-    _pid_ZVelocity (samplingTime, 2.0f,   2.0f, 1.0f, 0.00f, -0.5f,1.0f, 0.01f), // in meter
+    _pid_ZVelocity (samplingTime, 2.0f,   1.0f, 1.0f, 0.00f, -0.5f, 1.0f, 0.01f), // in meter
     _currentEstimate(),
     _takeOffTimeTicks(static_cast<int>(std::round(0.7f/samplingTime))),
     _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
@@ -60,7 +60,7 @@ void CrazyFlieCommander::Update()
             Velocity velocity;
             velocity[0] = 0.0;
             velocity[1] = 0.0;
-            velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.3f;
+            velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.1f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
             ++_takeOffCntr;

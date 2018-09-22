@@ -270,6 +270,7 @@ void MainWindow::on_pushButton_Stop_clicked()
 
 void MainWindow::on_pushButton_hoverMode_clicked()
 {
+    _cameraViewPainter.SetCameraBackGround();
     _camera.Activate(true);
     _commander.ActivateHoverMode(true);
 }
