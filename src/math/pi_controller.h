@@ -24,6 +24,7 @@ public:
     {}
 
     float Update(float error);
+    float Update(float error, float feed_fwd);
 
     void Reset(float integral_part = 0);
 
