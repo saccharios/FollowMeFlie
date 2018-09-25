@@ -43,7 +43,7 @@ struct TOCElement
 };
 
 std::ostream & operator << (std::ostream& stream, TOCElement const & element);
-
+std::ostream & operator << (std::ostream& stream, Data const & data);
 
 struct Point2f
 {

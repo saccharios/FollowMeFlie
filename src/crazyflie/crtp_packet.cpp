@@ -27,7 +27,7 @@ float ExtractData<float>(Data const & data, int offset)
 CRTPPacket:: CRTPPacket(uint8_t port, uint8_t channel, Data && data) :
     _port (port),
     _channel(channel),
-  _data (data)
+    _data (data)
 {}
 
 

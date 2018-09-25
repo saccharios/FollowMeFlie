@@ -253,7 +253,8 @@ bool RadioDongle::WriteRadioControl(uint8_t* data, int length, DongleConfigurati
     int timeout = 1000;
 
     /*int nReturn = */libusb_control_transfer(_device,
-                                              LIBUSB_REQUEST_TYPE_VENDOR, static_cast<uint8_t>(request),
+                                              LIBUSB_REQUEST_TYPE_VENDOR,
+                                              static_cast<uint8_t>(request),
                                               value,
                                               index,
                                               data,
@@ -476,7 +477,7 @@ void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
     _packetsToSend.push(packet);
 }
 
-void RadioDongle::ReceivePacket()
+void RadioDongle::ReceivePacket() // executed every 1ms
 {
     if(!_radioIsConnected)
         return;
@@ -527,22 +528,31 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     }
 
     case Commander::id:
+//        std::cout << "Receiving from Commander not implemented\n";
         break;
     case CommanderGeneric::id:
+//        std::cout << "Receiving from CommanderGeneric not implemented\n";
         break;
     case Debug::id:
+//        std::cout << "Receiving from Debug not implemented\n";
         break;
     case Link::id:
+//        std::cout << "Receiving from Link not implemented\n";
         break;
     case Parameter::id:
         emit NewParameterPacket(packet);
         break;
     default:
+//        std::cout << "Receiving random bullshit: " << packet << std::endl;
         break;
     }
 }
 
-void RadioDongle::CheckAnswerPacket()
-{
 
+std::ostream & operator<<(std::ostream& stream, CRTPPacket const & packet)
+{
+    stream << "Port = " << static_cast<int>(packet.GetPort())
+           << " Channel = " <<  static_cast<int>(packet.GetChannel())
+           << " Data = " << packet.GetData();
+    return stream;
 }

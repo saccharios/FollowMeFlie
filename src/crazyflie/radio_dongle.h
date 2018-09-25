@@ -62,7 +62,7 @@ public:
     bool SendPacket(CRTPPacket && packet); // Call when a packet is requested to send
     void RegisterPacketToSend(CRTPPacket &&  packet);
     void ProcessPacket(CRTPPacket && packet);
-    void CheckAnswerPacket();
+
 public slots:
     void SendPacketsNow();
     void ReceivePacket();
