@@ -63,6 +63,9 @@ public:
     void RegisterPacketToSend(CRTPPacket &&  packet);
     void ProcessPacket(CRTPPacket && packet);
 
+    CRTPPacket CreatePacketFromData( uint8_t* buffer, int totalLength);
+    bool ReadData(uint8_t* data, int maxLength, int & actualLength);
+    void ReceivePackets();
 public slots:
     void SendPacketsNow();
     void ReceivePacket();
@@ -97,10 +100,8 @@ private:
     bool ClaimInterface(int nInterface);
     void CloseDevice();
 
-    CRTPPacket CreatePacketFromData( uint8_t* buffer, int totalLength);
 
     bool WriteData(uint8_t * data, int length);
-    bool ReadData(uint8_t* data, int maxLength, int & actualLength);
 
     void SetARC(int ARC);
     void setChannel(int channel);
@@ -114,9 +115,6 @@ private:
     void SetAddress(uint8_t* address);
     void SetContCarrier(bool contCarrier);
     bool WriteRadioControl(uint8_t* data, int length, DongleConfiguration request, uint16_t value, uint16_t index);
-
-
-
 
 };
 

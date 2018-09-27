@@ -15,6 +15,7 @@
 #include "time_levels.h"
 #include "math/types.h"
 #include "text_logger.h"
+#include <QThread>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _radioDongle(),
@@ -69,8 +70,10 @@ MainWindow::MainWindow(QWidget *parent) :
    QObject::connect(&_timer_sr, SIGNAL(timeout()),
                     &_radioDongle, SLOT(SendPacketsNow()));
    QObject::connect(&_timer_sr, SIGNAL(timeout()),
-                    &_radioDongle, SLOT(ReceivePacket()));
+                    this, SLOT(StartReceiveThread()));
 
+//   QObject::connect(&_timer_sr, SIGNAL(timeout()),
+//                    &_radioDongle, SLOT(ReceivePacket()));
 
     // Custom widgets
     ui->Layout_CameraView->addWidget(&_cameraViewPainter);
@@ -107,16 +110,20 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(DisplayParameterWriteFailedBox(TOCElement const &)));
 
     QObject::connect(&_crazyFlie.GetParameterTOC(), SIGNAL(ParameterRead(uint8_t const &)),
-                     &_parameterModel, SLOT(UpdateParameter(uint8_t const &)));
+                     &_parameterModel, SLOT(UpdateParameter(uint8_t const &)),
+                     Qt::DirectConnection);
 
     QObject::connect(&_parameterModel, SIGNAL( ParameterWrite(uint8_t, float)),
-                     &_crazyFlie.GetParameterTOC(), SLOT( WriteParameter(uint8_t, float)));
+                     &_crazyFlie.GetParameterTOC(), SLOT( WriteParameter(uint8_t, float)),
+                     Qt::DirectConnection);
 
     QObject::connect(&_radioDongle, SIGNAL(NewParameterPacket(CRTPPacket)) ,
-                    &_crazyFlie.GetParameterTOC(), SLOT(ReceivePacket(CRTPPacket)));
+                    &_crazyFlie.GetParameterTOC(), SLOT(ReceivePacket(CRTPPacket)),
+                     Qt::DirectConnection);
 
     QObject::connect(&_radioDongle, SIGNAL(NewLoggerPacket(CRTPPacket)) ,
-                     &_crazyFlie.GetLoggerTOC(), SLOT(ReceivePacket(CRTPPacket)));
+                     &_crazyFlie.GetLoggerTOC(), SLOT(ReceivePacket(CRTPPacket)),
+                     Qt::DirectConnection);
 
     QObject::connect(&_camera, SIGNAL(CameraIsRunning(bool)) ,
                      &_commander, SLOT(SetCameraIsRunning(bool)));
@@ -330,4 +337,31 @@ void MainWindow::on_pushButton_TakeMeasurement_clicked()
     emit StartMeasurement();
 }
 
+class StartReceiveThread : public QThread
+{
+public:
+    StartReceiveThread(RadioDongle & radioDongle) : _radioDongle(radioDongle){}
+//    virtual ~StartReceiveThread();
+    void run() override
+    {
+        _radioDongle.ReceivePackets();
+    }
+private:
+    RadioDongle & _radioDongle;
+};
+
+
+void MainWindow::StartReceiveThread()
+{
+//    std::thread t(&RadioDongle::ReceivePackets,&_radioDongle);
+
+    class StartReceiveThread *workerThread = new class StartReceiveThread(_radioDongle);
+        connect(workerThread, SIGNAL(finished()),
+                workerThread, SLOT(deleteLater()));
+        workerThread->start();
+//        workerThread->wait();
+//    delete workerThread;
+//        _radioDongle.ReceivePackets();
+
+}
 

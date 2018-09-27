@@ -5,6 +5,7 @@
 #include "math/types.h"
 #include "crazyflie/protocol.h"
 #include "text_logger.h"
+#include <QThread>
 
 RadioDongle::RadioDongle() :
     _radioSettings(RadioSettings::_0802M),
@@ -477,7 +478,13 @@ void RadioDongle::RegisterPacketToSend(CRTPPacket && packet)
     _packetsToSend.push(packet);
 }
 
-void RadioDongle::ReceivePacket() // executed every 1ms
+void RadioDongle::ReceivePackets() // executed every 1ms
+{
+    ReceivePacket();
+}
+
+
+void RadioDongle::ReceivePacket()
 {
     if(!_radioIsConnected)
         return;
@@ -497,7 +504,7 @@ void RadioDongle::ReceivePacket() // executed every 1ms
         // Convert the raw data to a packet
         CRTPPacket packet = CreatePacketFromData(buffer, bytesRead);
 
-        // Process the packe and distribute to ports + channels
+        // Process the packet and distribute to ports + channels
         ProcessPacket(std::move(packet));
     }
 }
@@ -528,22 +535,22 @@ void RadioDongle::ProcessPacket(CRTPPacket && packet)
     }
 
     case Commander::id:
-//        std::cout << "Receiving from Commander not implemented\n";
+        std::cout << "Receiving from Commander not implemented\n";
         break;
     case CommanderGeneric::id:
-//        std::cout << "Receiving from CommanderGeneric not implemented\n";
+        std::cout << "Receiving from CommanderGeneric not implemented\n";
         break;
     case Debug::id:
-//        std::cout << "Receiving from Debug not implemented\n";
+        std::cout << "Receiving from Debug not implemented\n";
         break;
     case Link::id:
-//        std::cout << "Receiving from Link not implemented\n";
+        std::cout << "Receiving from Link not implemented\n";
         break;
     case Parameter::id:
         emit NewParameterPacket(packet);
         break;
     default:
-//        std::cout << "Receiving random bullshit: " << packet << std::endl;
+        std::cout << "Receiving random bullshit: " << packet << std::endl;
         break;
     }
 }

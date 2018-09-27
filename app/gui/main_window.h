@@ -45,7 +45,7 @@ private slots:
     void RePaintCameraViewPainter() {_cameraViewPainter.repaint();}
     void UpdateCamera();
     void UpdateCrazyFlie();
-
+    void StartReceiveThread();
 
     void on_pushButton_SafeLandingMode_clicked();
     void on_pushButton_ActualValues_clicked();
