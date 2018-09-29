@@ -147,23 +147,6 @@ public:
             element->value = 0;
             break;
         }
-            //                    case 8:
-            //                    { // FP16
-            // NOTE(winkler): This is untested code (as no FP16
-            // variable gets advertised yet). This has to be tested
-            // and is to be used carefully. I will do that as soon
-            // as I find time for it.
-            //                        byteLength = 2;
-            //                        uint8_t cBuffer1[byteLength];
-            //                        uint8_t cBuffer2[4];
-            //                        memcpy(cBuffer1, &logdata[offset], byteLength);
-            //                        cBuffer2[0] = cBuffer1[0] & 0b10000000; // Get the sign bit
-            //                        cBuffer2[1] = 0;
-            //                        cBuffer2[2] = cBuffer1[0] & 0b01111111; // Get the magnitude
-            //                        cBuffer2[3] = cBuffer1[1];
-            //                        memcpy(&value, cBuffer2, 4); // Put it into the float variable
-            //                    } break;
-
         default:
         { // Unknown. This hopefully never happens.
             textLogger << "Invalid type of " << element->name << "\n";
