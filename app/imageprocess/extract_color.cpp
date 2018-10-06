@@ -27,13 +27,6 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     MidPoint estimate = _kalmanFilter.Update(midPointMeasurements);
 
 
-    // Draw the estimate
-    cv::Point2f estimateCamera = (Camera::ConvertMidPointToCameraCoord(estimate)).pt;
-    cv::circle(imgToShow, estimateCamera, 25, {230,250,25},3);
-    // Draw circle in the middle
-    cv::circle(imgToShow, Camera::GetOrigin().pt, 25, {200,10,50}, 3);
-
-    cv::imshow("Thresholded Frame", imgToShow); // Show output image
 
 //    std::cout << "MidPoint estimate: size = " << estimate.size
 //               << " x (pixel) = " << estimate.pt.x
@@ -46,6 +39,15 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     emit EstimateReady(estimateBallCoordinatesFromCFlie);
 
+    // Draw the estimate
+    cv::Point2f estimateCamera = (Camera::ConvertMidPointToCameraCoord(estimate)).pt;
+    int fifty_cm_in_radius = 18; // TODO SF: Heuristisc, add button to set the setpoint
+    int radius = estimate.size /33.88* fifty_cm_in_radius;
+    cv::circle(imgToShow, estimateCamera, radius, {230,250,25},2);
+    // Draw circle in the middle
+    cv::circle(imgToShow, Camera::GetOrigin().pt, fifty_cm_in_radius, {200,10,50}, 2);
+
+    cv::imshow("Thresholded Frame", imgToShow); // Show output image
 }
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
