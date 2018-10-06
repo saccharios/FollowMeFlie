@@ -23,21 +23,29 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of keyPoint
     cv::drawKeypoints( imgToShow, camPoints, imgToShow, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
-    Point3f estimateBallCoordinatesFromCFlie = ProcessWithKalman2d(camPoints);
+    Point3f estimateBallCoordinatesFromCFlie_2d = ProcessWithKalman2d(camPoints);
     Point3f estimateBallCoordinatesFromCFlie_3d = ProcessWithKalman3d(camPoints);
 
-    emit EstimateReady(estimateBallCoordinatesFromCFlie);
+    emit EstimateReady(estimateBallCoordinatesFromCFlie_2d);
+
+    DrawEstimate(imgToShow, estimateBallCoordinatesFromCFlie_2d, {255,255,0}); // Cyan
+    DrawEstimate(imgToShow, estimateBallCoordinatesFromCFlie_3d, {0,255,255} ); // Yellow
+
+    cv::imshow("Thresholded Frame", imgToShow); // Show output image
+}
+
+void ExtractColor::DrawEstimate(cv::Mat & imgToShow, Point3f estimateCrazyFlieCoord, cv::Scalar color)
+{
 
     // Draw the estimate
-    cv::KeyPoint estimate = Camera::ConvertCrazyFlieCoordToCameraCoord(estimateBallCoordinatesFromCFlie);
+    cv::KeyPoint estimate = Camera::ConvertCrazyFlieCoordToCameraCoord(estimateCrazyFlieCoord);
     int fiftyCmInRadius = 18;
 
     int radius = estimate.size /33.88* fiftyCmInRadius;
-    cv::circle(imgToShow, estimate.pt, radius, {230,250,25},2);
+    cv::circle(imgToShow, estimate.pt, radius, color, 2);
     // Draw circle in the middle
-    cv::circle(imgToShow, Camera::GetOrigin().pt, fiftyCmInRadius, {200,10,50}, 2);
+    cv::circle(imgToShow, Camera::GetOrigin().pt, fiftyCmInRadius, {255,0,0}, 2); // Blue
 
-    cv::imshow("Thresholded Frame", imgToShow); // Show output image
 }
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
@@ -120,6 +128,8 @@ void ExtractColor::Initialize(cv::Mat const & img)
 
     // Kalman filter
     _kalmanFilter_2d.Initialize(largestMidPoint);
+
+    _kalmanFilter_3d.Initialize(Camera::ConvertMidPointToCrazyFlieCoord(largestMidPoint));
 
 //    textLogger << "Measurement cfly = "<< largestMidPoint.pt.x << " " << largestMidPoint.pt.y << " " << largestMidPoint.size << "\n";
 }

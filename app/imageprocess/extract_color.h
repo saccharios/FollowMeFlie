@@ -70,4 +70,5 @@ private:
     void RemoveKeyPointsAtEdges(std::vector<cv::KeyPoint> & blobs);
     Point3f ProcessWithKalman2d(std::vector<cv::KeyPoint> const & camPoints);
     Point3f ProcessWithKalman3d(std::vector<cv::KeyPoint> const & camPoints);
+    void DrawEstimate(cv::Mat & imgToShow, Point3f estimateCrazyFlieCoord, cv::Scalar color);
 };
