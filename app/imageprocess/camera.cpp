@@ -24,7 +24,7 @@ Camera::Camera () :
      _capture(new cv::VideoCapture)
 {
 }
-cv::Size Camera::_resolution = cv::Size();
+
 cv::KeyPoint Camera::_origin = cv::KeyPoint();
 
 void Camera::Update()
@@ -49,15 +49,18 @@ void Camera::Update()
         _capture->open(1); // 0 for laptop camera // 1 for crazyflie camera // 2 for creative camera
         if(_activated && _capture->isOpened())
         {
-            _resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
-            _resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
+            cv::Size resolution;
+            resolution.width = _capture->get(CV_CAP_PROP_FRAME_WIDTH);
+            resolution.height = _capture->get(CV_CAP_PROP_FRAME_HEIGHT);
+
+            SetResolution(resolution);
             _origin = ConvertMidPointToCameraCoord(MidPoint());
 
             _capture->set(CV_CAP_FFMPEG,true);
             _capture->set(CV_CAP_PROP_FPS,30);
 
 
-            textLogger << "Camera ok. Resolution is " << _resolution.width << " x " << _resolution.height << "\n";
+//            textLogger << "Camera ok. Resolution is " << _resolution.width << " x " << _resolution.height << "\n";
             textLogger << "Settings: \n";
             textLogger << "CV_CAP_PROP_POS_MSEC  = " << _capture->get(CV_CAP_PROP_POS_MSEC ) << "\n";
             textLogger << "CV_CAP_PROP_POS_FRAMES   = " << _capture->get(CV_CAP_PROP_POS_FRAMES  )<< "\n";
@@ -136,70 +139,8 @@ void Camera::InitializeTracking()
     FetchImage(frame); // Fetch twice, as the first image contains nothing
     emit ImgReadyForInitialization(frame);
 }
-MidPoint Camera::ConvertCameraToMidPointCoord(cv::KeyPoint keyPoint)
-{
-    // Camera coordinate system is, (0,0) is in the top left corner
-    // positive x to the right (in pixel)
-    // positive y to the bottowm (in pixel)
 
-    // MidPoint cooridnate system is, (0,0) in the middle
-    // positive x to the left (in pixel)
-    // positive y to the top (in pixel)
 
-    MidPoint midPoint;
-    midPoint.pt.x = -keyPoint.pt.x + _resolution.width / 2;
-    midPoint.pt.y = -keyPoint.pt.y + _resolution.height/ 2;
-    midPoint.size = keyPoint.size;
-    return midPoint;
-}
-std::vector<MidPoint> Camera::ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints)
-{
-    std::vector<MidPoint> midPoints;
-    for(auto const & keyPoint : keyPoints)
-    {
-        midPoints.push_back(ConvertCameraToMidPointCoord(keyPoint));
-    }
-    return midPoints;
-}
-
-cv::KeyPoint  Camera::ConvertMidPointToCameraCoord(MidPoint midPoint )
-{
-    cv::KeyPoint keyPoint;
-    keyPoint.pt.x = -midPoint.pt.x + _resolution.width/2;
-    keyPoint.pt.y = -midPoint.pt.y + _resolution.height/2;
-    keyPoint.size = midPoint.size;
-    return keyPoint;
-}
-std::vector<cv::KeyPoint> Camera::ConvertMidPointToCameraCoord(std::vector<MidPoint> const & midPoints)
-{
-    std::vector<cv::KeyPoint> keyPoints;
-    for(auto const & midPoint : midPoints)
-    {
-        keyPoints.push_back(ConvertMidPointToCameraCoord(midPoint));
-    }
-    return keyPoints;
-}
-
-Point3f Camera::ConvertMidPointToCrazyFlieCoord(MidPoint midPoint)
-{
-    // Crazyflie coordinate system is: (0,0,0) is at the crazyflie
-    // 1)The x-direction is positive in the front direction (antenna) (in meter)
-    // 2)The y-direction is positive left (in meter)
-    // 3)The z-direction is positive top (in meter)
-
-    Point3f point;
-    // crazyflie x component depens only on the size,
-    // x_cflie = a/y + b
-    // See Distance_Measurements_Coord.ods for the data behind these values.
-    float a = 1670.0f;
-    float b =  -0.711f;
-    point.x = (a/midPoint.size + b)/100.0f; // factor 100 to convert to meter
-    // For y and z component, use simple height similarity
-    // Ähnlichkeitszeits, gegeben die focal length.
-    point.y = midPoint.pt.x * point.x / _focalLength;
-    point.z = midPoint.pt.y * point.x / _focalLength;
-    return point;
-}
 bool Camera::IsDisabled() const
 {
     return _state == CameraState::DISABLED;

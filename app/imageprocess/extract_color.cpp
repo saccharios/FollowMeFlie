@@ -23,25 +23,16 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of keyPoint
     cv::drawKeypoints( imgToShow, camPoints, imgToShow, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
-    std::vector<MidPoint> midPointMeasurements = Camera::ConvertCameraToMidPointCoord(camPoints);
-    MidPoint estimate = _kalmanFilter.Update(midPointMeasurements);
-
-
-
-//    std::cout << "MidPoint estimate: size = " << estimate.size
-//               << " x (pixel) = " << estimate.pt.x
-//               << " y (pixel) = " << estimate.pt.y<< "\n";
-
-    Point3f estimateBallCoordinatesFromCFlie = Camera::ConvertMidPointToCrazyFlieCoord(estimate);
-//    std::cout << "estimateBallCoordinatesFromCFlie: x (m) = " << estimateBallCoordinatesFromCFlie.x
-//              << " y (m) = " << estimateBallCoordinatesFromCFlie.y
-//              << " z (m) = " << estimateBallCoordinatesFromCFlie.z << "\n";
+    Point3f estimateBallCoordinatesFromCFlie = ProcessWithKalman2d(camPoints);
+    Point3f estimateBallCoordinatesFromCFlie_3d = ProcessWithKalman3d(camPoints);
 
     emit EstimateReady(estimateBallCoordinatesFromCFlie);
 
+    MidPoint estimate = Camera::ConvertCrazyFlieCoordToMidPoint(estimateBallCoordinatesFromCFlie);
     // Draw the estimate
     cv::Point2f estimateCamera = (Camera::ConvertMidPointToCameraCoord(estimate)).pt;
     int fifty_cm_in_radius = 18; // TODO SF: Heuristisc, add button to set the setpoint
+
     int radius = estimate.size /33.88* fifty_cm_in_radius;
     cv::circle(imgToShow, estimateCamera, radius, {230,250,25},2);
     // Draw circle in the middle
@@ -129,7 +120,7 @@ void ExtractColor::Initialize(cv::Mat const & img)
     MidPoint largestMidPoint = GetLargest(midPoints);
 
     // Kalman filter
-    _kalmanFilter.Initialize(largestMidPoint);
+    _kalmanFilter_2d.Initialize(largestMidPoint);
 
 //    textLogger << "Measurement cfly = "<< largestMidPoint.pt.x << " " << largestMidPoint.pt.y << " " << largestMidPoint.size << "\n";
 }
@@ -157,3 +148,28 @@ void ExtractColor::RemoveKeyPointsAtEdges(std::vector<cv::KeyPoint> & cameraKeyP
     }
 }
 
+Point3f ExtractColor::ProcessWithKalman2d(std::vector<cv::KeyPoint> const & camPoints)
+{
+    std::vector<MidPoint> midPointMeasurements = Camera::ConvertCameraToMidPointCoord(camPoints);
+    MidPoint estimate = _kalmanFilter_2d.Update(midPointMeasurements);
+
+//    std::cout << "MidPoint estimate: size = " << estimate.size
+//               << " x (pixel) = " << estimate.pt.x
+//               << " y (pixel) = " << estimate.pt.y<< "\n";
+
+    Point3f estimateBallCoordinatesFromCFlie = Camera::ConvertMidPointToCrazyFlieCoord(estimate);
+//    std::cout << "estimateBallCoordinatesFromCFlie: x (m) = " << estimateBallCoordinatesFromCFlie.x
+//              << " y (m) = " << estimateBallCoordinatesFromCFlie.y
+//              << " z (m) = " << estimateBallCoordinatesFromCFlie.z << "\n";
+    return estimateBallCoordinatesFromCFlie;
+}
+Point3f ExtractColor::ProcessWithKalman3d(std::vector<cv::KeyPoint> const & camPoints)
+{
+    std::vector<Point3f> crazyFliePointMeasurements = Camera::ConvertCameraToCrazyFlieCoord(camPoints);
+
+    Point3f estimateBallCoordinatesFromCFlie = _kalmanFilter_3d.Update(crazyFliePointMeasurements);
+    //    std::cout << "estimateBallCoordinatesFromCFlie: x (m) = " << estimateBallCoordinatesFromCFlie.x
+    //              << " y (m) = " << estimateBallCoordinatesFromCFlie.y
+    //              << " z (m) = " << estimateBallCoordinatesFromCFlie.z << "\n";
+    return estimateBallCoordinatesFromCFlie;
+}

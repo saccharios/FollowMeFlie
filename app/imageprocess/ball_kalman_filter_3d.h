@@ -12,7 +12,8 @@ class BallKalmanFilter_3d
     static constexpr unsigned int num_states = 6;
     static constexpr unsigned int num_measurements = 3;
     using Vector6f = Matrix<float,num_states,1>;
-    // State is defined as (x, y, dx, dy)
+    using Matrix6f = Matrix<float,num_states,num_states>;
+    // State is defined as (x, y, z, vx, vy, vz)
 public:
     BallKalmanFilter_3d(float meas_noise, float process_noise_1, float process_noise_2):
         _A(),
@@ -20,8 +21,7 @@ public:
         _H(),
         _R(),
         _kalmanFilter(),
-        _state_estimate(),
-        _previous_valid_size(0.0f)
+        _state_estimate()
     {
         // A =
         // 1 0 0 1 0 0
@@ -30,7 +30,7 @@ public:
         // 0 0 0 1 0 0
         // 0 0 0 0 1 0
         // 0 0 0 0 0 1
-        _A = Matrix4f::Identity(num_states,num_states);
+        _A = Matrix<float,num_states,num_states>::Identity(num_states,num_states);
         _A(0,3) = 1;
         _A(1,4) = 1;
         _A(2,5) = 1;
@@ -41,20 +41,18 @@ public:
         // pn2 0   0   pn1 0   0
         // 0   pn2 0   0   pn1 0
         // 0   0   pn2 0   0   pn1
-        _Q = Matrix4f::Zero(num_states,num_states);
-        _Q(0,0) = process_noise_1;
-        _Q(1,1) = process_noise_1;
-        _Q(2,2) = process_noise_1;
-        _Q(3,3) = process_noise_1;
-        _Q(2,0) = process_noise_2;
-        _Q(3,1) = process_noise_2;
-        _Q(0,2) = process_noise_2;
-        _Q(1,3) = process_noise_2;
+        _Q = Matrix<float,num_states,num_states>::Identity(num_states,num_states)*process_noise_1;
+        _Q(3,0) = process_noise_2;
+        _Q(4,1) = process_noise_2;
+        _Q(5,2) = process_noise_2;
+        _Q(0,3) = process_noise_2;
+        _Q(1,4) = process_noise_2;
+        _Q(2,5) = process_noise_2;
         // H =
-        // 1 0 0 0 0
-        // 0 1 0 0 0
-        // 0 0 1 0 0
-        _H = Matrix<float,num_measurements,num_states>::Zero(2,num_states);
+        // 1 0 0 0 0 0
+        // 0 1 0 0 0 0
+        // 0 0 1 0 0 0
+        _H = Matrix<float,num_measurements,num_states>::Zero(num_measurements,num_states);
         _H(0,0) = 1;
         _H(1,1) = 1;
         _H(2,2) = 1;
@@ -63,7 +61,7 @@ public:
         // mn 0  0
         // 0  mn 0
         // 0  0  mn
-        _R = Matrix2f::Identity(num_measurements,num_measurements)*meas_noise;
+        _R = Matrix3f::Identity(num_measurements,num_measurements)*meas_noise;
 
 
         _kalmanFilter.SetStateUpdateMatrix(_A);
@@ -81,12 +79,12 @@ public:
     void Initialize(Point3f input) {_kalmanFilter.Initialize(Vector3f{input.x, input.y, input.z});}
     Point3f Update(std::vector<Point3f> const & crazyFliePoints);
 private:
-    Matrix4f _A;
-    Matrix4f _Q;
+    Matrix6f _A;
+    Matrix6f _Q;
     Matrix<float, num_measurements, num_states> _H;
-    Matrix2f _R;
-    //    Matrix4f _P; // Initial estimat of covariane matrix P not used
-    KalmanFilter<float,num_states,2> _kalmanFilter;
+    Matrix3f _R;
+    //    Matrix6f _P; // Initial estimat of covariane matrix P not used
+    KalmanFilter<float,num_states,num_measurements> _kalmanFilter;
 
     Vector6f _state_estimate;
     Vector6f UpdateFilter(Point3f pt);

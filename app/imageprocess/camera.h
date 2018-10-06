@@ -28,13 +28,18 @@ public:
     static cv::KeyPoint const & GetOrigin() {return _origin;}
 
 
-    static MidPoint ConvertCameraToMidPointCoord(cv::KeyPoint cameraPt);
+    static MidPoint ConvertCameraToMidPointCoord(cv::KeyPoint keyPoint);
     static std::vector<MidPoint> ConvertCameraToMidPointCoord(std::vector<cv::KeyPoint> const & keyPoints);
-    static cv::KeyPoint ConvertMidPointToCameraCoord(MidPoint midPt);
+
+    static cv::KeyPoint ConvertMidPointToCameraCoord(MidPoint midPoint);
     static std::vector<cv::KeyPoint> ConvertMidPointToCameraCoord(std::vector<MidPoint> const & midPoints);
 
     static Point3f ConvertMidPointToCrazyFlieCoord(MidPoint midPoint);
+
     static MidPoint ConvertCrazyFlieCoordToMidPoint(Point3f crazyFliePoint);
+
+    static Point3f ConvertCameraToCrazyFlieCoord(cv::KeyPoint keyPoint);
+    static std::vector<Point3f> ConvertCameraToCrazyFlieCoord(std::vector<cv::KeyPoint> const & keyPoints);
 
 signals:
     void ImgReadyForDisplay(QImage const &);
@@ -55,5 +60,8 @@ private:
     void FetchAndImageReady();
     void FetchImage(cv::Mat & frame);
     void InitializeTracking();
+    void SetResolution(cv::Size resolution);
     static constexpr float _focalLength = 223.5;
+    static constexpr float _a = 1670.0f;
+    static constexpr float _b =  -0.711f;
 };

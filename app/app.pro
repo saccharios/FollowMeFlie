@@ -23,7 +23,8 @@ SOURCES +=  main.cpp \
     qt_util.cpp \
     opencv_utils.cpp \
     imageprocess/ball_kalman_filter_2d.cpp \
-    imageprocess/ball_kalman_filter_3d.cpp
+    imageprocess/ball_kalman_filter_3d.cpp \
+    imageprocess/coordinate_conversions.cpp
 
 HEADERS  += \
     qt_util.h \
