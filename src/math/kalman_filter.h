@@ -52,10 +52,11 @@ public:
 
     void Initialize(MeasVector measurement, StateMatrix const & P = StateMatrix::Identity(N_States,N_States) )
     {
-        _state_estimation[0] = measurement[0];
-        _state_estimation[1] = measurement[1];
-        _state_estimation[2] = 0;
-        _state_estimation[3] = 0;
+        _state_estimation.setZero();
+        for(unsigned int i = 0; i < N_Measurement; ++i)
+        {
+            _state_estimation[i] = measurement[i];
+        }
         _P = P;
     }
 
