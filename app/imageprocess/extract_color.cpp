@@ -28,15 +28,14 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     emit EstimateReady(estimateBallCoordinatesFromCFlie);
 
-    MidPoint estimate = Camera::ConvertCrazyFlieCoordToMidPoint(estimateBallCoordinatesFromCFlie);
     // Draw the estimate
-    cv::Point2f estimateCamera = (Camera::ConvertMidPointToCameraCoord(estimate)).pt;
-    int fifty_cm_in_radius = 18; // TODO SF: Heuristisc, add button to set the setpoint
+    cv::KeyPoint estimate = Camera::ConvertCrazyFlieCoordToCameraCoord(estimateBallCoordinatesFromCFlie);
+    int fiftyCmInRadius = 18;
 
-    int radius = estimate.size /33.88* fifty_cm_in_radius;
-    cv::circle(imgToShow, estimateCamera, radius, {230,250,25},2);
+    int radius = estimate.size /33.88* fiftyCmInRadius;
+    cv::circle(imgToShow, estimate.pt, radius, {230,250,25},2);
     // Draw circle in the middle
-    cv::circle(imgToShow, Camera::GetOrigin().pt, fifty_cm_in_radius, {200,10,50}, 2);
+    cv::circle(imgToShow, Camera::GetOrigin().pt, fiftyCmInRadius, {200,10,50}, 2);
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 }

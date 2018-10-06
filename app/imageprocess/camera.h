@@ -41,6 +41,7 @@ public:
     static Point3f ConvertCameraToCrazyFlieCoord(cv::KeyPoint keyPoint);
     static std::vector<Point3f> ConvertCameraToCrazyFlieCoord(std::vector<cv::KeyPoint> const & keyPoints);
 
+    static cv::KeyPoint ConvertCrazyFlieCoordToCameraCoord(Point3f crazyFliePoint);
 signals:
     void ImgReadyForDisplay(QImage const &);
     void ImgReadyForProcessing(cv::Mat const &);

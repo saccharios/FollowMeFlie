@@ -16,7 +16,7 @@ Point3f BallKalmanFilter_3d::Update(std::vector<Point3f> const & crazyFliePoints
 
     // Get best fit measurement
     // If the ball is larger than a threshold, this is taken in any case
-    Point3f validMeasurement = GetLargest(crazyFliePoints); // TODO SF
+    Point3f validMeasurement;// = GetLargest(crazyFliePoints); // TODO SF
     bool isValid = true;
     if(_validCounter < 20)
     {

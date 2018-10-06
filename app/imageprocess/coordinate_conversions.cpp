@@ -99,3 +99,7 @@ std::vector<Point3f> Camera::ConvertCameraToCrazyFlieCoord(std::vector<cv::KeyPo
     }
     return crazyFliePoints;
 }
+cv::KeyPoint Camera::ConvertCrazyFlieCoordToCameraCoord(Point3f crazyFliePoint)
+{
+    return ConvertMidPointToCameraCoord(ConvertCrazyFlieCoordToMidPoint(crazyFliePoint));
+}
