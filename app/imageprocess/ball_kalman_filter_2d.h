@@ -7,12 +7,12 @@
 
 using namespace Eigen;
 
-class BallKalmanFilter
+class BallKalmanFilter_2d
 {
 
     // State is defined as (x, y, dx, dy)
 public:
-    BallKalmanFilter(float meas_noise, float process_noise_1, float process_noise_2):
+    BallKalmanFilter_2d(float meas_noise, float process_noise_1, float process_noise_2):
         _A(),
         _Q(),
         _H(),

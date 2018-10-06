@@ -1,9 +1,9 @@
-#include "ball_kalman_filter.h"
+#include "ball_kalman_filter_2d.h"
 #include "opencv_utils.h"
 #include "camera.h"
 #include <opencv2\opencv.hpp>
 #include "math/types.h"
-MidPoint BallKalmanFilter::Update(std::vector<MidPoint> const & midPoints)
+MidPoint BallKalmanFilter_2d::Update(std::vector<MidPoint> const & midPoints)
 {
 //    textLogger << "Update Kalman Filter\n";
     //    std::cout << "Num of midPoints = " << midPoints.size() << std::endl;
@@ -84,7 +84,7 @@ MidPoint BallKalmanFilter::Update(std::vector<MidPoint> const & midPoints)
     return output;
 }
 
-bool BallKalmanFilter::GetBestFit(std::vector<MidPoint> const & midPoints, cv::Point2f prediction, MidPoint & bestFit)
+bool BallKalmanFilter_2d::GetBestFit(std::vector<MidPoint> const & midPoints, cv::Point2f prediction, MidPoint & bestFit)
 {
 
     if(midPoints.size() == 0)
@@ -137,14 +137,14 @@ bool BallKalmanFilter::GetBestFit(std::vector<MidPoint> const & midPoints, cv::P
     return true;
 }
 
-Eigen::Vector4f BallKalmanFilter::UpdateFilter(cv::Point2f pt)
+Eigen::Vector4f BallKalmanFilter_2d::UpdateFilter(cv::Point2f pt)
 {
     Eigen::Vector2f input = Eigen::Vector2f{pt.x, pt.y};
     _state_estimate  = _kalmanFilter.Estimate(input);
     return _state_estimate;
 }
 
-Eigen::Vector4f BallKalmanFilter::UpdateFilterNoMeas()
+Eigen::Vector4f BallKalmanFilter_2d::UpdateFilterNoMeas()
 {
     _state_estimate  = _kalmanFilter.Estimate();
     return _state_estimate;

@@ -2,7 +2,7 @@
 #include <QObject>
 #include <QColor>
 #include "opencv2/opencv.hpp"
-#include "ball_kalman_filter.h"
+#include "ball_kalman_filter_2d.h"
 #include "math/types.h"
 #include "time_levels.h"
 #include "camera.h"
@@ -55,7 +55,7 @@ signals:
 
 private:
     QColor const & _colorToFilter;
-    BallKalmanFilter _kalmanFilter;
+    BallKalmanFilter_2d _kalmanFilter;
 
     cv::SimpleBlobDetector::Params _detectorParams;
 
