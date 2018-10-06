@@ -100,6 +100,26 @@ T GetLargest(std::vector<T> const & elements)
     }
     return largestElement;
 }
+template<typename T>
+T GetClosest(std::vector<T> const & elements)
+{
+    T closestElement;
+    if(elements.size() == 1)
+    {
+        closestElement =  elements.at(0);
+    }
+    else if(elements.size() > 1)
+    {
+        for(auto const & element : elements)
+        {
+            if(element.x < closestElement.x)
+            {
+                closestElement = element;
+            }
+        }
+    }
+    return closestElement;
+}
 
 void PrintData(Data const & data);
 
