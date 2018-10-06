@@ -26,7 +26,7 @@ public:
         // 0 1 0 1
         // 0 0 1 0
         // 0 0 0 1
-        _A = Matrix4f::Identity(4,4),
+        _A = Matrix4f::Identity(4,4);
         _A(0,2) = 1;
         _A(1,3) = 1;
         // Q =

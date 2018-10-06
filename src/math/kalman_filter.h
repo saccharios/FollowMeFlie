@@ -19,6 +19,7 @@ class KalmanFilter
 public:
     KalmanFilter () :
         _A(StateMatrix::Zero()),
+        _A_transpose(StateMatrix::Zero()),
         _Q(StateMatrix::Zero()),
         _H(State2MeasMatrix::Zero()),
         _H_transpose(Meas2StateMatrix::Zero()),
@@ -31,6 +32,7 @@ public:
     void SetStateUpdateMatrix(StateMatrix const & A)
     {
         _A = A;
+        _A_transpose = _A.transpose();
     }
     void SetProcessNoiseCovMatrix(StateMatrix const & Q)
     {
@@ -71,7 +73,7 @@ public:
     StateVector Estimate()
     {
         //        textLogger << "_P = "  << _P << "\n";
-        _P =  _A*_P * _A.transpose() + _Q;
+        _P =  _A*_P * _A_transpose + _Q;
 
 //        textLogger << "No measurement! _state_estimation = " << _state_prediction[0] << " "
 //                  << _state_prediction[1] << " "
@@ -99,7 +101,7 @@ public:
 //        textLogger << "_Q = "  << _Q << "\n";
 
         // Kalman gain
-        StateMatrix a_posteriori_P =  _A*_P * _A.transpose() + _Q;
+        StateMatrix a_posteriori_P =  _A*_P * _A_transpose + _Q;
         //textLogger << "a_posteriori_P = "  << a_posteriori_P << "\n";
         MeasMatrix S = _H*a_posteriori_P*_H_transpose + _R;
         Meas2StateMatrix Gain = a_posteriori_P*_H_transpose * (S.inverse()); // Only use for matrices up to 4x4 !
@@ -121,6 +123,7 @@ public:
 
 private:
     StateMatrix _A;
+    StateMatrix _A_transpose;
     StateMatrix _Q;
     State2MeasMatrix _H;
     Meas2StateMatrix _H_transpose;
