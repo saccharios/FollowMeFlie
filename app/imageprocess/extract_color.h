@@ -51,6 +51,7 @@ public slots:
     void ProcessImage(cv::Mat const & img);
     void Initialize(cv::Mat const & img);
     void StartMeasurement() {_kalmanFilter_2d.StartMeasurement(true);}
+    void SetSetPoint(Point3f setPoint) {_setPoint = setPoint;}
 
 signals:
     void EstimateReady(Point3f const &);
@@ -61,7 +62,11 @@ private:
     BallKalmanFilter_3d _kalmanFilter_3d;
 
     cv::SimpleBlobDetector::Params _detectorParams;
+    int fiftyCmInRadius = 18;
+    static constexpr float _fiftyCmInRadius = 18;
+    static constexpr float _factor = _fiftyCmInRadius / 33.88;
 
+    Point3f _setPoint = {0.5f,0.0f,0.0f};
 
     void ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper);
     std::vector<cv::KeyPoint> ExtractKeyPoints(cv::Mat const & img, cv::Mat & imgToShow);

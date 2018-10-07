@@ -338,5 +338,7 @@ void MainWindow::on_pushButton_EnterSetPoint_clicked()
     SetPointDialog setPointDialog(_commander.GetSetPoint());
     QObject::connect(&setPointDialog, SIGNAL(NewSetPoint(Point3f)) ,
                      &_commander, SLOT(SetSetPoint(Point3f)));
+    QObject::connect(&setPointDialog, SIGNAL(NewSetPoint(Point3f)) ,
+                     &_extractColor, SLOT(SetSetPoint(Point3f)));
     setPointDialog.exec();
 }

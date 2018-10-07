@@ -30,23 +30,19 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
 
     DrawEstimate(imgToShow, estimateBallCoordinatesFromCFlie_2d, {255,255,0}); // Cyan
     DrawEstimate(imgToShow, estimateBallCoordinatesFromCFlie_3d, {0,255,255} ); // Yellow
+    DrawEstimate(imgToShow, _setPoint, {255,0,0} ); // Blue
 
     cv::imshow("Thresholded Frame", imgToShow); // Show output image
 }
 
-void ExtractColor::DrawEstimate(cv::Mat & imgToShow, Point3f estimateCrazyFlieCoord, cv::Scalar color)
+void ExtractColor::DrawEstimate(cv::Mat & imgToShow, Point3f pointCrazyFlieCoord, cv::Scalar color)
 {
-
     // Draw the estimate
-    cv::KeyPoint estimate = Camera::ConvertCrazyFlieCoordToCameraCoord(estimateCrazyFlieCoord);
-    int fiftyCmInRadius = 18;
-
-    int radius = estimate.size /33.88* fiftyCmInRadius;
-    cv::circle(imgToShow, estimate.pt, radius, color, 2);
-    // Draw circle in the middle
-    cv::circle(imgToShow, Camera::GetOrigin().pt, fiftyCmInRadius, {255,0,0}, 2); // Blue
-
+    cv::KeyPoint point = Camera::ConvertCrazyFlieCoordToCameraCoord(pointCrazyFlieCoord);
+    int radius = point.size * _factor;
+    cv::circle(imgToShow, point.pt, radius, color, 2);
 }
+
 
 void ExtractColor::ConvertToHSV(cv::Mat const & img, cv::Mat & imgHSV, cv::Scalar & colorLower, cv::Scalar colorUpper)
 {
