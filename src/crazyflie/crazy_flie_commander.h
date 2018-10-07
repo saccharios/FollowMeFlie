@@ -31,6 +31,7 @@ public:
 
     void Update();
     void ResetVelocityController(float z_integral_part = 0, float y_integral_part = 0, float x_integral_part = 0);
+    Point3f GetSetPoint() {return _setPoint;}
 
 public slots:
     void ReceiveEstimate(Point3f const &);

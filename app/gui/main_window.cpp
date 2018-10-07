@@ -122,7 +122,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&_camera, SIGNAL(CameraIsRunning(bool)) ,
                      &_commander, SLOT(SetCameraIsRunning(bool)));
-
 }
 MainWindow::~MainWindow()
 {
@@ -336,6 +335,8 @@ void MainWindow::on_pushButton_TakeMeasurement_clicked()
 
 void MainWindow::on_pushButton_EnterSetPoint_clicked()
 {
-    SetPointDialog setPointDialog;
+    SetPointDialog setPointDialog(_commander.GetSetPoint());
+    QObject::connect(&setPointDialog, SIGNAL(NewSetPoint(Point3f)) ,
+                     &_commander, SLOT(SetSetPoint(Point3f)));
     setPointDialog.exec();
 }

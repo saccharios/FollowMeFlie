@@ -13,13 +13,17 @@ class SetPointDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SetPointDialog(QWidget *parent = nullptr);
+    explicit SetPointDialog(Point3f setPoint, QWidget *parent = nullptr);
     ~SetPointDialog();
+
+signals:
+    void NewSetPoint(Point3f setPoint);
 
 private slots:
     void on_buttonBox_accepted();
 
     void on_buttonBox_rejected();
+
 
 private:
     Ui::SetPointDialog *ui;
