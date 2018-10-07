@@ -65,6 +65,8 @@ struct Point3f
        x(xx),y(yy), z(zz) {}
 };
 
+Point3f operator-(Point3f const & a, Point3f const & b);
+
 
 // (0, 0) is in the middle of the camera view
 // x is to the left

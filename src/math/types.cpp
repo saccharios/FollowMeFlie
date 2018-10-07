@@ -24,3 +24,12 @@ std::ostream & operator << (std::ostream& stream, Data const & data)
     }
     return stream;
 }
+
+Point3f operator-(Point3f const & a, Point3f const & b)
+{
+    Point3f c;
+    c.x = a.x - b.x;
+    c.y = a.y - b.y;
+    c.z = a.z - b.z;
+    return c;
+}

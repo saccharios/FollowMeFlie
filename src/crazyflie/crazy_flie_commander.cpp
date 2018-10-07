@@ -130,8 +130,7 @@ Velocity CrazyFlieCommander::UpdateHoverMode()
 
     Point3f const & currentEstimate = _currentEstimate.read(); // is in meter
     Velocity velocity;
-    Point3f error = currentEstimate;
-    error.x -= 0.5f; // The ball should be 0.5 m away from the crazyflie
+    Point3f error = currentEstimate - _setPoint;
     velocity[0] = error.x;
     velocity[1] = error.y;
    // velocity[2] = error.z + 0.1f;

@@ -35,6 +35,7 @@ public:
 public slots:
     void ReceiveEstimate(Point3f const &);
     void SetCameraIsRunning(bool const &);
+    void SetSetPoint(Point3f setPoint) {_setPoint = setPoint;}
 
 private:
     Crazyflie & _crazyflie;
@@ -49,6 +50,7 @@ private:
     int _landingTimeTicks;
     Commands commands;
     bool _cameraIsRunning = false;
+    Point3f _setPoint{0.5, 0.0, 0.0};
 
 
     Velocity UpdateHoverMode();
