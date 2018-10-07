@@ -16,14 +16,14 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>160</y>
-     <width>201</width>
-     <height>32</height>
+     <x>130</x>
+     <y>40</y>
+     <width>81</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+    <enum>Qt::Vertical</enum>
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
@@ -34,8 +34,8 @@
     <rect>
      <x>50</x>
      <y>40</y>
-     <width>113</width>
-     <height>22</height>
+     <width>41</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -44,8 +44,8 @@
     <rect>
      <x>50</x>
      <y>80</y>
-     <width>113</width>
-     <height>22</height>
+     <width>41</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -54,8 +54,8 @@
     <rect>
      <x>50</x>
      <y>120</y>
-     <width>113</width>
-     <height>22</height>
+     <width>41</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -109,6 +109,19 @@
    </property>
    <property name="text">
     <string>z:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="valid_label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
   </widget>
  </widget>

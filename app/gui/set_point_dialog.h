@@ -1,6 +1,4 @@
-#ifndef SET_POINT_DIALOG_H
-#define SET_POINT_DIALOG_H
-
+#pragma once
 #include <QDialog>
 #include "math/types.h"
 
@@ -25,9 +23,20 @@ private slots:
     void on_buttonBox_rejected();
 
 
+    void on_setpoint_x_lineEdit_textChanged(const QString &arg1);
+    void on_setpoint_y_lineEdit_textChanged(const QString &arg1);
+    void on_setpoint_z_lineEdit_textChanged(const QString &arg1);
+
 private:
     Ui::SetPointDialog *ui;
     Point3f _setPoint = {};
-};
+    bool _isValid = false;
 
-#endif // SET_POINT_DIALOG_H
+    float ReadX();
+    float ReadY();
+    float ReadZ();
+    void Validate();
+    void SetValidText(bool isValid);
+    void EnableOKButton(bool enable);
+
+};
