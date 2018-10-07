@@ -24,7 +24,8 @@ SOURCES +=  main.cpp \
     opencv_utils.cpp \
     imageprocess/ball_kalman_filter_2d.cpp \
     imageprocess/ball_kalman_filter_3d.cpp \
-    imageprocess/coordinate_conversions.cpp
+    imageprocess/coordinate_conversions.cpp \
+    gui/set_point_dialog.cpp
 
 HEADERS  += \
     qt_util.h \
@@ -39,10 +40,12 @@ HEADERS  += \
     imageprocess/extract_color.h \
     time_levels.h \
     imageprocess/ball_kalman_filter_2d.h \
-    imageprocess/ball_kalman_filter_3d.h
+    imageprocess/ball_kalman_filter_3d.h \
+    gui/set_point_dialog.h
 
 FORMS    += \
-    gui/main_window.ui
+    gui/main_window.ui \
+    gui/set_point_dialog.ui
 
 LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 

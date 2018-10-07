@@ -15,6 +15,8 @@
 #include "time_levels.h"
 #include "math/types.h"
 #include "text_logger.h"
+#include "set_point_dialog.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _radioDongle(),
@@ -331,3 +333,9 @@ void MainWindow::on_pushButton_TakeMeasurement_clicked()
 }
 
 
+
+void MainWindow::on_pushButton_EnterSetPoint_clicked()
+{
+    SetPointDialog setPointDialog;
+    setPointDialog.exec();
+}
