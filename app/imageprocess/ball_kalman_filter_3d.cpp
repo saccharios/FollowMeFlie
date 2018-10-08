@@ -3,7 +3,7 @@
 #include "camera.h"
 #include <opencv2\opencv.hpp>
 #include "math/types.h"
-Point3f BallKalmanFilter_3d::Update(std::vector<Point3f> const & crazyFliePoints)
+BallKalmanFilter_3d::Vector6f BallKalmanFilter_3d::Update(std::vector<Point3f> const & crazyFliePoints)
 {
 //    textLogger << "Update Kalman Filter\n";
     //    std::cout << "Num of midPoints = " << midPoints.size() << std::endl;
@@ -27,7 +27,6 @@ Point3f BallKalmanFilter_3d::Update(std::vector<Point3f> const & crazyFliePoints
 
 //    textLogger << "Best measurement,  x = " << validMeasurement.pt.x << " y = " << validMeasurement.pt.y << "\n";
     // Update the kalman filter
-    Point3f output = validMeasurement;
     BallKalmanFilter_3d::Vector6f estimate;
     if(isValid)
     {
@@ -50,10 +49,7 @@ Point3f BallKalmanFilter_3d::Update(std::vector<Point3f> const & crazyFliePoints
     //            << " vy = " << estimate[2]
     //            << " vz = " << estimate[3] << std::endl;
 
-    output.x = estimate[0];
-    output.y = estimate[1];
-    output.z = estimate[2];
-    return output;
+    return estimate;
 }
 
 bool BallKalmanFilter_3d::GetBestFit(std::vector<Point3f> const & crazyFliePoints, cv::Point3f prediction, Point3f & bestFit)

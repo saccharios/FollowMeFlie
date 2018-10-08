@@ -9,12 +9,12 @@ using namespace Eigen;
 
 class BallKalmanFilter_3d
 {
+public:
     static constexpr unsigned int num_states = 6;
     static constexpr unsigned int num_measurements = 3;
     using Vector6f = Matrix<float,num_states,1>;
     using Matrix6f = Matrix<float,num_states,num_states>;
     // State is defined as (x, y, z, vx, vy, vz)
-public:
     BallKalmanFilter_3d(float meas_noise, float process_noise_1, float process_noise_2):
         _A(),
         _Q(),
@@ -77,7 +77,7 @@ public:
 
 
     void Initialize(Point3f input) {_kalmanFilter.Initialize(Vector3f{input.x, input.y, input.z});}
-    Point3f Update(std::vector<Point3f> const & crazyFliePoints);
+    BallKalmanFilter_3d::Vector6f Update(std::vector<Point3f> const & crazyFliePoints);
 private:
     Matrix6f _A;
     Matrix6f _Q;

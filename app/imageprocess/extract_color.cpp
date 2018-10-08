@@ -40,6 +40,10 @@ void ExtractColor::DrawEstimate(cv::Mat & imgToShow, Point3f pointCrazyFlieCoord
     // Draw the estimate
     cv::KeyPoint point = Camera::ConvertCrazyFlieCoordToCameraCoord(pointCrazyFlieCoord);
     int radius = point.size * _factor;
+    if(radius <= 1)
+    {
+        radius = 1;
+    }
     cv::circle(imgToShow, point.pt, radius, color, 2);
 }
 
@@ -172,9 +176,20 @@ Point3f ExtractColor::ProcessWithKalman3d(std::vector<cv::KeyPoint> const & camP
 {
     std::vector<Point3f> crazyFliePointMeasurements = Camera::ConvertCameraToCrazyFlieCoord(camPoints);
 
-    Point3f estimateBallCoordinatesFromCFlie = _kalmanFilter_3d.Update(crazyFliePointMeasurements);
-    //    std::cout << "estimateBallCoordinatesFromCFlie: x (m) = " << estimateBallCoordinatesFromCFlie.x
-    //              << " y (m) = " << estimateBallCoordinatesFromCFlie.y
-    //              << " z (m) = " << estimateBallCoordinatesFromCFlie.z << "\n";
-    return estimateBallCoordinatesFromCFlie;
+    BallKalmanFilter_3d::Vector6f estimate = _kalmanFilter_3d.Update(crazyFliePointMeasurements);
+
+
+//    std::cout << "estimate: x (m) = " << estimate[0]
+//              << " y (m) = " << estimate[1]
+//              << " z (m) = " << estimate[2]
+//              << " vx (m/s) = " << estimate[3]
+//              << " vy (m/s) = " << estimate[4]
+//              << " vz (m/s) = " << estimate[5]
+//              << "\n";
+    Point3f output;
+    output.x = estimate[0];
+    output.y = estimate[1];
+    output.z = estimate[2];
+
+    return output;
 }
