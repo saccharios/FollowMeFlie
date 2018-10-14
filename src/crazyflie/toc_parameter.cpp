@@ -7,8 +7,10 @@
 
 bool TocParameter::ReadAll()
 {
-    // Send Read request for all parameters, one by oen (from 0 to _itemCount - 1)
-    if(_lastReadParameter < static_cast<int8_t>(_itemCount) - 1)
+    // Send Read request for all parameters, one by one (from 0 to _itemCount - 1)
+    //textLogger << (_lastReadParameter < static_cast<int8_t>(_itemCount) - 1) << "\n";
+
+    if(static_cast<int16_t>(_lastReadParameter) < static_cast<int16_t>(_itemCount) - 1)
     {
         ReadElement(_lastReadParameter + 1);
     }
@@ -267,5 +269,5 @@ void TocParameter::Reset()
     _itemCount =0 ;
     _elements.clear();
     _shared_impl.Reset();
-    _lastReadParameter = -1;
+    _lastReadParameter = 0;
 }

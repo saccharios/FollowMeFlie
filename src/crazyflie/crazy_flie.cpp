@@ -27,6 +27,7 @@ Crazyflie::~Crazyflie()
 // Runs on 10ms.
 void Crazyflie::Update()
 {
+   // std::cout << "Connection state = " << static_cast<int>(_state) << std::endl;
     switch(_state)
     {
     case State::ZERO:
