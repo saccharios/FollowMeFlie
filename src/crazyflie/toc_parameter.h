@@ -39,158 +39,235 @@ public:
         selftestPassed = 4,
         taskDump = 86,
     };
+
+
+    enum class commander : uint8_t
+    {
+        enHighLevel = 5,
+    };
+
     enum class flightmode : uint8_t
     {
-        althold = 5,
-        poshold = 6,
-        posSet = 7,
-        yawMode = 8,
-        yawRst = 9,
-        stabModeRoll = 10,
-        stabModePitch = 11,
-        stabModeYaw = 12,
+        althold = 6,
+        poshold = 7,
+        posSet = 8,
+        yawMode = 9,
+        yawRst = 10,
+        stabModeRoll = 11,
+        stabModePitch = 12,
+        stabModeYaw = 13,
     };
     enum class cmdrCPPM : uint8_t
     {
-        rateRoll = 13,
-        ratePitch = 14,
-        rateYaw = 15,
-        angRoll = 16,
-        angPitch = 17,
+        rateRoll = 14,
+        ratePitch = 15,
+        rateYaw = 16,
+        angRoll = 17,
+        angPitch = 18,
     };
     enum class locSrv : uint8_t
     {
-        enRangeStreamFP32 = 18,
+        enRangeStreamFP32 = 19,
     };
     enum class pid_rate : uint8_t
     {
-        roll_kp = 19,
-        roll_ki = 20,
-        roll_kd = 21,
-        pitch_kp = 22,
-        pitch_ki = 23,
-        pitch_kd = 24,
-        yaw_kp = 25,
-        yaw_ki = 26,
-        yaw_kd = 27,
+        roll_kp = 20,
+        roll_ki = 21,
+        roll_kd = 22,
+        pitch_kp = 23,
+        pitch_ki = 24,
+        pitch_kd = 25,
+        yaw_kp = 26,
+        yaw_ki = 27,
+        yaw_kd = 28,
     };
     enum class pid_attitude : uint8_t
     {
-        roll_kp = 28,
-        roll_ki = 29,
-        roll_kd = 30,
-        pitch_kp = 31,
-        pitch_ki = 32,
-        pitch_kd = 33,
-        yaw_kp = 34,
-        yaw_ki = 35,
-        yaw_kd = 36,
+        roll_kp = 29,
+        roll_ki = 30,
+        roll_kd = 31,
+        pitch_kp = 32,
+        pitch_ki = 33,
+        pitch_kd = 34,
+        yaw_kp = 35,
+        yaw_ki = 36,
+        yaw_kd = 37,
     };
     enum class sensorfusion6 : uint8_t
     {
-        kp = 37,
-        ki = 38,
-        baseZacc = 39,
+        kp = 38,
+        ki = 39,
+        baseZacc = 40,
     };
-    enum class posEst : uint8_t
+
+
+    enum class stabilizer : uint8_t
     {
-        estAlphaAsl = 40,
-        estAlphaZr = 41,
-        velFactor = 42,
-        velZAlpha = 43,
-        vAccDeadband= 44,
+        estimator = 41,
+        controller = 42,
+    };
+
+    enum class health : uint8_t
+    {
+        startPropTest = 43,
+    };
+
+    enum class posEstAlt : uint8_t
+    {
+        estAlphaAsl = 44,
+        estAlphaZr = 45,
+        velFactor = 46,
+        velZAlpha = 47,
+        vAccDeadband= 48,
     };
     enum class velCtlPid : uint8_t
     {
-        vxKp = 45,
-        vxKi = 46,
-        vxKd = 47,
-        vyKp = 48,
-        vyKi = 49,
-        vyKd = 50,
-        vzKp = 51,
-        vzKi = 52,
-        vzKd = 53,
+        vxKp = 49,
+        vxKi = 50,
+        vxKd = 51,
+        vyKp = 52,
+        vyKi = 53,
+        vyKd = 54,
+        vzKp = 55,
+        vzKi = 56,
+        vzKd = 57,
     };
     enum class posCtlPid : uint8_t
     {
-        xKp = 54,
-        xKi = 55,
-        xKd = 56,
-        yKp = 57,
-        yKi = 58,
-        yKd = 59,
-        zKp = 60,
-        zKi = 61,
-        zKd = 62,
-        thrustBase = 63,
-        thrustMin = 64,
-        rpLimit = 65,
-        xyVelMax = 66,
-        zVelMax = 67,
+        xKp = 58,
+        xKi = 59,
+        xKd = 60,
+        yKp = 61,
+        yKi = 62,
+        yKd = 63,
+        zKp = 64,
+        zKi = 65,
+        zKd = 66,
+        thrustBase = 67,
+        thrustMin = 68,
+        rpLimit = 69,
+        xyVelMax = 70,
+        zVelMax = 71,
     };
     enum class controller : uint8_t
     {
-        tiltComp = 68
+        tiltComp = 72
     };
+
+    enum class ctrlMel : uint8_t
+    {
+        kp_xy = 73,
+        kd_xy = 74,
+        ki_xy = 75,
+        i_range_xy = 76,
+        kp_z = 77,
+        kd_z = 78,
+        ki_z = 79,
+        i_range_z = 80,
+        mass = 81,
+        massThrust = 82,
+        kR_xy = 83,
+        kR_z = 84,
+        kw_xy = 85,
+        kw_z = 86,
+        ki_m_xy = 87,
+        ki_m_z = 88,
+        kd_omega_rp = 89,
+        i_range_m_xy = 90,
+        i_range_m_z = 91,
+    };
+
     enum class motorPowerSet : uint8_t
     {
-        enable = 69,
-        m1 = 70,
-        m2 = 71,
-        m3 = 72,
-        m4 = 73,
+        enable = 92,
+        m1 = 93,
+        m2 = 94,
+        m3 = 95,
+        m4 = 96,
     };
     enum class firmware : uint8_t
     {
-        revision0 = 74,
-        revision1 = 75,
-        modified = 76,
+        revision0 = 97,
+        revision1 = 98,
+        modified = 99,
     };
     enum class imu_tests : uint8_t
     {
-        MPU6500 = 77,
-        HMC5883L = 78,
-        MS5611 = 79,
+        MPU6500 = 100,
+        HMC5883L = 101,
+        MS5611 = 102,
     };
     enum class imu_sensors : uint8_t
     {
-        HMC5883L = 80,
-        MS5611 = 81,
+        HMC5883L = 103,
+        MS5611 = 104,
     };
     enum class sound : uint8_t
     {
-        effect = 82,
-        neffect = 83,
-        freq = 84,
-        ratio = 85,
+        effect = 105,
+        neffect = 106,
+        freq = 107,
+        ratio = 108,
     };
     enum class kalman : uint8_t
     {
-        resetEstimation = 87,
-        quadIsFlying = 88,
-        pNacc_xy = 89,
-        pNacc_z = 90,
-        pNVel = 91,
-        pNPos = 92,
-        pNatt = 93,
-        pNSkew = 94,
-        mNBaro = 95,
-        mNGyro_rollpitch = 96,
-        mNGyro_yaq = 97
+        resetEstimation = 110,
+        quadIsFlying = 111,
+        pNacc_xy = 112,
+        pNacc_z = 113,
+        pNVel = 114,
+        pNPos = 115,
+        pNatt = 116,
+        pNSkew = 117,
+        mNBaro = 118,
+        mNGyro_rollpitch = 119,
+        mNGyro_yaq = 120,
+        initialX = 121,
+        initialY = 122,
+        initialZ = 123,
     };
     enum class ring : uint8_t
     {
-        effect = 98,
-        neffect = 99,
-        solidRed = 100,
-        solidGreen = 101,
-        solidBlue = 102,
-        headlightEnable = 103,
-        glowstep = 104,
-        emptyCharge = 105,
-        fullCharge = 106,
+        effect = 126,
+        neffect = 127,
+        solidRed = 128,
+        solidGreen = 129,
+        solidBlue = 130,
+        headlightEnable = 131,
+        glowstep = 132,
+        emptyCharge = 133,
+        fullCharge = 134,
+        fadeColor = 135,
+        fadetime = 136,
     };
+    enum class deck : uint8_t
+    {
+        bcBuzzer = 137,
+        bcGTGPS = 138,
+        bcCPPM = 139,
+        bcUSD = 140,
+        bcZRanger = 141,
+        bcZRagner2 = 142,
+        bcDWM1000 = 144,
+        bcFlow = 148,
+        bcFlow2 = 149,
+        bcOA = 150,
+        bcMultiranger = 151,
+    };
+    enum class loco : uint8_t
+    {
+        mode = 143,
+    };
+    enum class tdoa3 : uint8_t
+    {
+        logld = 145,
+        logOthrld = 146,
+    };
+    enum class motion : uint8_t
+    {
+        disable = 147,
+    };
+
 
     TocParameter(RadioDongle & radioDongle) :
         _radioDongle(radioDongle),
