@@ -124,12 +124,18 @@ public:
     TocParameter & GetParameterTOC() {return _parameters;}
 
     void ResetCrazyflieKalmanFilter(bool enable);
+    void SendActualPosition(Point3f position_act);
 
     bool IsGoneCrazy() const;
+    void EnableTestMode(bool ena) {_testModeEnabled = ena;}
+    bool IsTestModeEnabled()  {return _testModeEnabled;}
+
 signals:
     void ConnectionTimeout();
     void NotConnecting();
 
+public slots:
+    void ReceiveEstimate(Point3f const &);
 private:
     RadioDongle & _radioDongle;
 
@@ -156,7 +162,7 @@ private:
     Negative_Edge_Detector _leaveConnectingState;
 
     SensorValues _sensorValues;
-
+    bool _testModeEnabled = false;
 
     void SetVelocityWorldRef(Velocity velocity);
     void SendVelocityRef(Velocity velocity);
@@ -175,7 +181,6 @@ private:
     }
 
     void SendSetpoint(SetPoint setPoint); // Available but not used
-    void SendActualPosition(Point3f position_act); // Available but not used
     void SendReferencePosition(Point3f position_ref); // Available but not used
 };
 

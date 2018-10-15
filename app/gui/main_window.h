@@ -55,6 +55,8 @@ private slots:
 
     void on_pushButton_EnterSetPoint_clicked();
 
+    void on_pushButton_enableTestMode_clicked();
+
 private:
     RadioDongle _radioDongle;
     Crazyflie _crazyFlie;

@@ -72,6 +72,7 @@ TocLog::TocLog(RadioDongle & radioDongle) :
             "posCtl.targetVX",
             "posCtl.targetVY",
             "posCtl.targetVZ",
+            "kalman.stateX",
     };
 
     _loggingBlocks.at(5).name = "block_5";
@@ -93,7 +94,7 @@ TocLog::TocLog(RadioDongle & radioDongle) :
 //            "kalman.inFlight",
 //            "kalman.stateX",
 //            "kalman.stateY",
-//            "kalman.stateZ",
+            "kalman.stateZ",
 //            "kalman.statePX",
 //            "kalman.statePY",
 //            "kalman.statePZ",
@@ -109,6 +110,7 @@ TocLog::TocLog(RadioDongle & radioDongle) :
     _loggingBlocks.at(6).name = "block_6";
     _loggingBlocks.at(6).elements_to_add =
     {
+            "kalman.stateY",
 //            "pid_rate.yaw_outP",
 //            "pid_rate.yaw_outI",
 //            "pid_rate.yaw_outD",

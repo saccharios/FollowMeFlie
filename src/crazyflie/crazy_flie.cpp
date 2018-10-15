@@ -207,7 +207,10 @@ void Crazyflie::SendSetpoint(SetPoint setPoint)
     data.insert(data.end(), thrustVect.begin(), thrustVect.end());
 
     CRTPPacket  packet(Commander::id, Commander::Setpoint::id, std::move(data));
-    _radioDongle.RegisterPacketToSend(std::move(packet));
+    if(!_testModeEnabled)
+    {
+        _radioDongle.RegisterPacketToSend(std::move(packet));
+    }
 }
 
 void Crazyflie::Stop()
@@ -236,12 +239,16 @@ void  Crazyflie::SendVelocityRef(Velocity velocity)
     CreatePayload(data, data_points);
 
     CRTPPacket  packet(CommanderGeneric::id, CommanderGeneric::Channel::id, std::move(data));
-    _radioDongle.RegisterPacketToSend(std::move(packet));
+
+    if(!_testModeEnabled)
+    {
+        _radioDongle.RegisterPacketToSend(std::move(packet));
+    }
 }
 
 void  Crazyflie::SendActualPosition(Point3f position_act)
 {
-    textLogger << "Sending position act, x = " << position_act.x << " y = " << position_act.y << " z = " << position_act.z << "\n";
+    // textLogger << "Sending position act, x = " << position_act.x << " y = " << position_act.y << " z = " << position_act.z << "\n";
     // x in meter in world frame.
     // y in meter in world frame.
     // z in meter in world frame.
@@ -250,8 +257,8 @@ void  Crazyflie::SendActualPosition(Point3f position_act)
     std::array<float,3> data_points{position_act.x, position_act.y, position_act.z};
     CreatePayload(data, data_points);
 
-    CRTPPacket  packet2(Localization::id, Localization::External_Position::id, std::move(data));
-    _radioDongle.RegisterPacketToSend(std::move(packet2));
+    CRTPPacket packet(Localization::id, Localization::External_Position::id, std::move(data));
+    _radioDongle.RegisterPacketToSend(std::move(packet));
 }
 
 void  Crazyflie::SendReferencePosition(Point3f position_ref)
@@ -422,4 +429,8 @@ bool Crazyflie::IsGoneCrazy() const
 {
     auto const & sensorValues = GetSensorValues();
     return std::abs(sensorValues.stabilizer.roll)> 60 || std::abs(sensorValues.stabilizer.pitch) > 60;
+}
+void Crazyflie::ReceiveEstimate(Point3f const & estimate)
+{
+    SendActualPosition(estimate);
 }

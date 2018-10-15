@@ -119,8 +119,6 @@ public:
         return _state_estimation;
     }
 
-
-
 private:
     StateMatrix _A;
     StateMatrix _A_transpose;

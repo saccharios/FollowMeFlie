@@ -96,6 +96,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)),
                      &_commander, SLOT(ReceiveEstimate(Point3f const &)));
 
+    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)),
+                     &_crazyFlie, SLOT(ReceiveEstimate(Point3f const &)));
+
     QObject::connect(this, SIGNAL(StartMeasurement()),
                      &_extractColor, SLOT(StartMeasurement()));
 
@@ -341,4 +344,9 @@ void MainWindow::on_pushButton_EnterSetPoint_clicked()
     QObject::connect(&setPointDialog, SIGNAL(NewSetPoint(Point3f)) ,
                      &_extractColor, SLOT(SetSetPoint(Point3f)));
     setPointDialog.exec();
+}
+
+void MainWindow::on_pushButton_enableTestMode_clicked()
+{
+    _crazyFlie.EnableTestMode(!_crazyFlie.IsTestModeEnabled());
 }

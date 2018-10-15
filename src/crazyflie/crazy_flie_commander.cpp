@@ -6,7 +6,7 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _crazyflie(crazyflie),
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper, gain_derivative ):
-    _pid_ZVelocity (samplingTime, 2.0f,   1.0f, 1.0f, 0.00f, -0.5f, 1.0f, 0.01f), // in meter
+    _pid_ZVelocity (samplingTime, 2.0f,   1.0f, 1.0f, 0.00f, -0.5f, 1.0f, 0.005f), // in meter
     _currentEstimate(),
     _takeOffTimeTicks(static_cast<int>(std::round(0.7f/samplingTime))),
     _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
@@ -22,6 +22,7 @@ void CrazyFlieCommander::Update()
     {
     case FlightState::Off:
     {
+
         if(commands.enableHover)
         {
             _flightState = FlightState::WaitCameraOn;
@@ -37,6 +38,7 @@ void CrazyFlieCommander::Update()
         }
         else if(_cameraIsRunning)
         {
+            _crazyflie.ResetCrazyflieKalmanFilter(false);
             ResetVelocityController();
             _takeOffCntr = 0;
             _flightState = FlightState::TakeOff;
@@ -113,9 +115,9 @@ void CrazyFlieCommander::Update()
     }
 }
 // called when new estimate is ready
-void CrazyFlieCommander::ReceiveEstimate(Point3f const & distance)
+void CrazyFlieCommander::ReceiveEstimate(Point3f const & estimate)
 {
-    _currentEstimate.write() = distance;
+    _currentEstimate.write() = estimate;
     _currentEstimate.swap();
 }
 
@@ -127,13 +129,12 @@ void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_
 }
 Velocity CrazyFlieCommander::UpdateHoverMode()
 {
-
+//    _crazyflie.SendActualPosition(_currentEstimate.read());
     Point3f const & currentEstimate = _currentEstimate.read(); // is in meter
     Velocity velocity;
     Point3f error = currentEstimate - _setPoint;
     velocity[0] = error.x;
     velocity[1] = error.y;
-   // velocity[2] = error.z + 0.1f;
     velocity[2] = _pid_ZVelocity.Update(error.z);
     //std::cout << "Distance error, x = " <<  error.x << " y = " << error.y << " z = "<< error.z << "\n";
 //    textLogger << " Velocity z output = " << velocity[2]<< "\n";
