@@ -124,6 +124,7 @@ public:
     TocParameter & GetParameterTOC() {return _parameters;}
 
     void ResetCrazyflieKalmanFilter(bool enable);
+    void InitKalmanFilter(Point3f position);
     void SendActualPosition(Point3f position_act);
 
     bool IsGoneCrazy() const;

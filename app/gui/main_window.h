@@ -57,6 +57,8 @@ private slots:
 
     void on_pushButton_enableTestMode_clicked();
 
+    void on_pushButton_disableTestMode_clicked();
+
 private:
     RadioDongle _radioDongle;
     Crazyflie _crazyFlie;

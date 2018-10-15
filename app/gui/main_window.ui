@@ -296,6 +296,19 @@
      <string>EnableTestMode</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_disableTestMode">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>190</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>DisableTestMode</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

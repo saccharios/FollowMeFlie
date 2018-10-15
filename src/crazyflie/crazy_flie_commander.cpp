@@ -1,6 +1,7 @@
 #include "crazyflie/crazy_flie_commander.h"
 #include "math/constants.h"
 #include "math/types.h"
+#include "math/functions.h"
 
 CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime) :
     _crazyflie(crazyflie),
@@ -39,6 +40,8 @@ void CrazyFlieCommander::Update()
         else if(_cameraIsRunning)
         {
             _crazyflie.ResetCrazyflieKalmanFilter(false);
+            _crazyflie.InitKalmanFilter(_currentEstimate.read());
+
             ResetVelocityController();
             _takeOffCntr = 0;
             _flightState = FlightState::TakeOff;
@@ -65,6 +68,8 @@ void CrazyFlieCommander::Update()
             velocity[2] = 0.5f*(_takeOffCntr/_takeOffTimeTicks) + 0.1f;
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
+
+            _crazyflie.SendActualPosition(ConvertToPosition(_currentEstimate.read()));
             ++_takeOffCntr;
             if( _takeOffCntr == _takeOffTimeTicks)
             {
@@ -129,7 +134,7 @@ void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_
 }
 Velocity CrazyFlieCommander::UpdateHoverMode()
 {
-//    _crazyflie.SendActualPosition(_currentEstimate.read());
+    _crazyflie.SendActualPosition(ConvertToPosition(_currentEstimate.read()));
     Point3f const & currentEstimate = _currentEstimate.read(); // is in meter
     Velocity velocity;
     Point3f error = currentEstimate - _setPoint;

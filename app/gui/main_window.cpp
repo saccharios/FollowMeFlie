@@ -348,5 +348,10 @@ void MainWindow::on_pushButton_EnterSetPoint_clicked()
 
 void MainWindow::on_pushButton_enableTestMode_clicked()
 {
-    _crazyFlie.EnableTestMode(!_crazyFlie.IsTestModeEnabled());
+    _crazyFlie.EnableTestMode(true);
+}
+
+void MainWindow::on_pushButton_disableTestMode_clicked()
+{
+    _crazyFlie.EnableTestMode(false);
 }

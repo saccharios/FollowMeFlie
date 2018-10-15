@@ -424,6 +424,12 @@ void Crazyflie::ResetCrazyflieKalmanFilter(bool enable)
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::resetEstimation), 1);
     }
 }
+void Crazyflie::InitKalmanFilter(Point3f position)
+{
+    _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::initialX), position.x);
+    _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::initialY), position.y);
+    _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::initialZ), position.z);
+}
 
 bool Crazyflie::IsGoneCrazy() const
 {

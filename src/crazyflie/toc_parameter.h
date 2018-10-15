@@ -281,7 +281,7 @@ public:
     bool Setup() {return _shared_impl.Setup();}
     bool ReadAll();
 
-    bool WriteValue(TOCElement & element, float value);
+    void WriteParameterFast(uint8_t id, float value);
 
     std::vector<TOCElement> const & GetElements() const {return _elements; }
 
@@ -320,5 +320,6 @@ private:
     void ReadData(Data const & data, uint8_t parameterIdPosition, uint8_t valuePosition);
     void ReadElement(uint8_t elementId);
     void AddToRequestWritingParamteter(uint8_t id, float value);
+    bool WriteValue(TOCElement & element, float value);
 
 };

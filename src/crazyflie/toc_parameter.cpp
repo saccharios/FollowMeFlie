@@ -124,6 +124,12 @@ bool TocParameter::WriteValue( TOCElement & element, float float_value)
 }
 
 
+void TocParameter::WriteParameterFast(uint8_t id, float value)
+{
+    bool isValid = false;
+    TOCElement & element = STLUtils::ElementForID(_elements, id, isValid);
+    WriteValue(element, value);
+}
 
 void TocParameter::AddToRequestWritingParamteter(uint8_t id, float value)
 {

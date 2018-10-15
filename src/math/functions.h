@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <cmath>
 #include "constants.h"
+#include "types.h"
 template<typename T>
 T WrapAround(T value, T min, T max)
 {
@@ -40,5 +41,6 @@ T Limit(T input, T min, T max)
     }
 }
 
+Point3f ConvertToPosition( Point3f error);
 
 
