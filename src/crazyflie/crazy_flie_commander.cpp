@@ -8,7 +8,7 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     _samplingTime(samplingTime),
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper, gain_derivative ):
     _pid_ZVelocity (samplingTime, 2.0f,   1.0f, 1.0f, 0.00f, -0.5f, 1.0f, 0.005f), // in meter
-    _currentEstimate(),
+    _currentBallEstimate(),
     _takeOffTimeTicks(static_cast<int>(std::round(0.7f/samplingTime))),
     _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
 {}
@@ -27,7 +27,6 @@ void CrazyFlieCommander::Update()
         if(commands.enableHover)
         {
             _flightState = FlightState::WaitCameraOn;
-            _crazyflie.ResetCrazyflieKalmanFilter(true);
         }
         break;
     }
@@ -39,9 +38,23 @@ void CrazyFlieCommander::Update()
         }
         else if(_cameraIsRunning)
         {
-            _crazyflie.ResetCrazyflieKalmanFilter(false);
-            _crazyflie.InitKalmanFilter(_currentEstimate.read());
+            _takeOffCntr = 0;
+            _crazyflie.InitKalmanFilter(ConvertToPosition(_currentBallEstimate.read()));
+            _crazyflie.SetKalmanIsFlying(true);
+            _flightState = FlightState::ResetKalman;
+        }
+        break;
+    }
+    case FlightState::ResetKalman:
+    {
+        ++_takeOffCntr;
 
+        if(_takeOffCntr < 10)
+        {
+            _crazyflie.ResetCrazyflieKalmanFilter(true);
+        }
+        else
+        {
             ResetVelocityController();
             _takeOffCntr = 0;
             _flightState = FlightState::TakeOff;
@@ -69,7 +82,7 @@ void CrazyFlieCommander::Update()
             _crazyflie.SetVelocityCrazyFlieRef(velocity);
             _crazyflie.SetSendingVelocityRef(true);
 
-            _crazyflie.SendActualPosition(ConvertToPosition(_currentEstimate.read()));
+            _crazyflie.SendActualPosition(ConvertToPosition(_currentBallEstimate.read()));
             ++_takeOffCntr;
             if( _takeOffCntr == _takeOffTimeTicks)
             {
@@ -120,10 +133,10 @@ void CrazyFlieCommander::Update()
     }
 }
 // called when new estimate is ready
-void CrazyFlieCommander::ReceiveEstimate(Point3f const & estimate)
+void CrazyFlieCommander::ReceiveBallEstimate(Point3f const & ballEstimate)
 {
-    _currentEstimate.write() = estimate;
-    _currentEstimate.swap();
+    _currentBallEstimate.write() = ballEstimate;
+    _currentBallEstimate.swap();
 }
 
 void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_integral_part, float x_integral_part)
@@ -134,8 +147,8 @@ void CrazyFlieCommander::ResetVelocityController(float z_integral_part, float y_
 }
 Velocity CrazyFlieCommander::UpdateHoverMode()
 {
-    _crazyflie.SendActualPosition(ConvertToPosition(_currentEstimate.read()));
-    Point3f const & currentEstimate = _currentEstimate.read(); // is in meter
+    _crazyflie.SendActualPosition(ConvertToPosition(_currentBallEstimate.read()));
+    Point3f const & currentEstimate = _currentBallEstimate.read(); // is in meter
     Velocity velocity;
     Point3f error = currentEstimate - _setPoint;
     velocity[0] = error.x;

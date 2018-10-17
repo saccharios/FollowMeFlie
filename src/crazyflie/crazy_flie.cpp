@@ -2,6 +2,7 @@
 #include <chrono>
 #include "math/constants.h"
 #include "math/types.h"
+#include "math/functions.h"
 #include "protocol.h"
 #include "constants.h"
 Crazyflie::Crazyflie(RadioDongle & radioDongle) :
@@ -124,6 +125,7 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::controller::tiltComp), 1);// default 0
 
         _state = State::NORMAL_OPERATION;
+        break;
     }
     case State::NORMAL_OPERATION:
     {
@@ -159,14 +161,7 @@ void Crazyflie::Update()
             _state = State::DISCONNECT;
         }
 
-
-        // Log velocity ref and crazyflie target v ref
-//        textLogger << _logger.Value("posCtl.targetVZ") << ", "
-//                   << _logger.Value("posCtl.VZp") << ", "
-//                   << _logger.Value("posCtl.VZi") << ", "
-//                   << _logger.Value("posCtl.VZd") << ", "
-//                   << _velocity[2]<< ", \n";
-
+        _logger.LogKalmanPosition();
 
         if(_disconnect)
         {
@@ -436,7 +431,18 @@ bool Crazyflie::IsGoneCrazy() const
     auto const & sensorValues = GetSensorValues();
     return std::abs(sensorValues.stabilizer.roll)> 60 || std::abs(sensorValues.stabilizer.pitch) > 60;
 }
-void Crazyflie::ReceiveEstimate(Point3f const & estimate)
+void Crazyflie::ReceiveBallEstimate(Point3f const & ballEstimate)
 {
-    SendActualPosition(estimate);
+    SendActualPosition(ConvertToPosition(ballEstimate));
+}
+void Crazyflie::SetKalmanIsFlying(bool enable)
+{
+    if(enable)
+    {
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::quadIsFlying), 1);
+    }
+    else
+    {
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::kalman::quadIsFlying), 0);
+    }
 }

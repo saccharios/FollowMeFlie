@@ -636,3 +636,14 @@ void TocLog::Reset()
         block.Reset();
     }
 }
+void TocLog::LogKalmanPosition()
+{
+    bool found;
+    auto & result = STLUtils::ElementForName(_tocElements, "kalman.stateX", found);
+    _shared_impl.Log(result.id);
+    auto & result1 = STLUtils::ElementForName(_tocElements, "kalman.stateY", found);
+    _shared_impl.Log(result1.id);
+    auto & result2 = STLUtils::ElementForName(_tocElements, "kalman.stateZ", found);
+    _shared_impl.Log(result2.id);
+
+}

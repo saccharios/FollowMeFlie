@@ -277,3 +277,4 @@ void TocParameter::Reset()
     _shared_impl.Reset();
     _lastReadParameter = 0;
 }
+

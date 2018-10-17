@@ -125,6 +125,7 @@ public:
 
     void ResetCrazyflieKalmanFilter(bool enable);
     void InitKalmanFilter(Point3f position);
+    void SetKalmanIsFlying(bool enable);
     void SendActualPosition(Point3f position_act);
 
     bool IsGoneCrazy() const;
@@ -136,7 +137,7 @@ signals:
     void NotConnecting();
 
 public slots:
-    void ReceiveEstimate(Point3f const &);
+    void ReceiveBallEstimate(Point3f const &);
 private:
     RadioDongle & _radioDongle;
 

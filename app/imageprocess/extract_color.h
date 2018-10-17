@@ -54,7 +54,7 @@ public slots:
     void SetSetPoint(Point3f setPoint) {_setPoint = setPoint;}
 
 signals:
-    void EstimateReady(Point3f const &);
+    void BallEstimateReady(Point3f const &);
 
 private:
     QColor const & _colorToFilter;

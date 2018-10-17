@@ -63,7 +63,7 @@ public:
 
     void LogAll() {_shared_impl.LogAll();}
     void Log(uint8_t index) {_shared_impl.Log(index);}
-
+    void LogKalmanPosition();
     void Reset();
 public slots:
     void ReceivePacket(CRTPPacket packet);

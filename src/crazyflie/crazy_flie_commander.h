@@ -15,9 +15,10 @@ public:
     {
         Off = 0,
         WaitCameraOn = 1,
-        TakeOff = 2,
-        Follow = 3,
-        Landing = 4,
+        ResetKalman = 2,
+        TakeOff = 3,
+        Follow = 4,
+        Landing = 5,
     };
 
     struct Commands
@@ -33,8 +34,9 @@ public:
     void ResetVelocityController(float z_integral_part = 0, float y_integral_part = 0, float x_integral_part = 0);
     Point3f GetSetPoint() {return _setPoint;}
 
+
 public slots:
-    void ReceiveEstimate(Point3f const &);
+    void ReceiveBallEstimate(Point3f const &);
     void SetCameraIsRunning(bool const &);
     void SetSetPoint(Point3f setPoint) {_setPoint = setPoint;}
 
@@ -43,7 +45,7 @@ private:
     float _samplingTime;
 
     PID_Controller _pid_ZVelocity;
-    Double_Buffer<Point3f> _currentEstimate;
+    Double_Buffer<Point3f> _currentBallEstimate;
     FlightState _flightState = FlightState::Off;
     int _takeOffCntr = 0;
     int _takeOffTimeTicks;

@@ -93,11 +93,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&_camera, SIGNAL(ImgReadyForInitialization(cv::Mat const &)),
                      &_extractColor, SLOT(Initialize(cv::Mat const &)));
 
-    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)),
-                     &_commander, SLOT(ReceiveEstimate(Point3f const &)));
+    QObject::connect(&_extractColor, SIGNAL(BallEstimateReady(Point3f const &)),
+                     &_commander, SLOT(ReceiveBallEstimate(Point3f const &)));
 
-    QObject::connect(&_extractColor, SIGNAL(EstimateReady(Point3f const &)),
-                     &_crazyFlie, SLOT(ReceiveEstimate(Point3f const &)));
+    QObject::connect(&_extractColor, SIGNAL(BallEstimateReady(Point3f const &)),
+                     &_crazyFlie, SLOT(ReceiveBallEstimate(Point3f const &)));
 
     QObject::connect(this, SIGNAL(StartMeasurement()),
                      &_extractColor, SLOT(StartMeasurement()));

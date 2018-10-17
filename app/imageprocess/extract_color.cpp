@@ -26,7 +26,7 @@ void ExtractColor::ProcessImage(cv::Mat const & img)
     Point3f estimateBallCoordinatesFromCFlie_2d = ProcessWithKalman2d(camPoints);
     Point3f estimateBallCoordinatesFromCFlie_3d = ProcessWithKalman3d(camPoints);
 
-    emit EstimateReady(estimateBallCoordinatesFromCFlie_2d);
+    emit BallEstimateReady(estimateBallCoordinatesFromCFlie_2d);
 
     DrawEstimate(imgToShow, estimateBallCoordinatesFromCFlie_2d, {255,255,0}); // Cyan
     DrawEstimate(imgToShow, estimateBallCoordinatesFromCFlie_3d, {0,255,255} ); // Yellow
