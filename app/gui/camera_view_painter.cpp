@@ -93,16 +93,15 @@ void CameraViewPainter::PaintVerticalLine(QPainter & painter, float roll, float 
     QPointF text_offset{0,2};
     // draw to the right
     float x = WrapAround(yaw, 0.0f, distance_between_lines);
-    x = distance_between_lines - x;
     while(x < _x_max)
     {
         QPoint p1 = World2CameraCoord(qt_utils::rotate(QPointF{x,-length}, -roll_r),this, _x_max, _y_max);
         QPoint p2 = World2CameraCoord(qt_utils::rotate(QPointF{x, length}, -roll_r),this, _x_max, _y_max);
         painter.drawLine(QLine(p1,p2));
         QPoint p3 = World2CameraCoord(qt_utils::rotate(QPointF{x, 0} + text_offset,-roll_r),this, _x_max, _y_max);
-        float num = WrapAround(x+yaw,-180.0f, 180.0f);
+        float num = WrapAround(yaw-x,-180.0f, 180.0f);
         // Wrapping may not return exactly zero:
-        if( std::abs(num) < 0.0005)
+        if( std::abs(num) < 0.00005)
         {
             num = 0.0;
         }
@@ -111,14 +110,20 @@ void CameraViewPainter::PaintVerticalLine(QPainter & painter, float roll, float 
     }
     // draw to the left
     x = WrapAround(yaw, 0.0f, distance_between_lines);
-    x =  - x;
+    x = x - distance_between_lines;
     while(x > -_x_max)
     {
         QPoint p1 = World2CameraCoord(qt_utils::rotate(QPointF{x, -length}, -roll_r),this, _x_max, _y_max);
         QPoint p2 = World2CameraCoord(qt_utils::rotate(QPointF{x, length}, -roll_r),this, _x_max, _y_max);
         painter.drawLine(QLine(p1,p2));
         QPoint p3 = World2CameraCoord(qt_utils::rotate(QPointF{x, 0} + text_offset,-roll_r),this, _x_max, _y_max);
-        painter.drawText(p3,QString::number(WrapAround(x+yaw,-180.0f, 180.0f)));
+        float num = WrapAround(yaw-x,-180.0f, 180.0f);
+        // Wrapping may not return exactly zero:
+        if( std::abs(num) < 0.00005)
+        {
+            num = 0.0;
+        }
+        painter.drawText(p3,QString::number(num));
         x -= distance_between_lines;
     }
     // Line in the middle
