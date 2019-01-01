@@ -1,6 +1,6 @@
 #pragma once
-#include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
-#include "E:\Code\lib\eigen-3.3.4\Eigen/LU"
+#include </usr/include/eigen3/Eigen/Core>
+#include </usr/include/eigen3/Eigen/LU>
 #include "text_logger.h"
 #include "math/types.h"
 using namespace Eigen;

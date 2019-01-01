@@ -1,5 +1,5 @@
 #pragma once
-#include "E:\Code\lib\libusb-1.0.21\include\libusb-1.0\libusb.h"
+#include <libusb-1.0/libusb.h>
 #include <unistd.h>
 #include "crtp_packet.h"
 #include <QObject>

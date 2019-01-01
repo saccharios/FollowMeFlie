@@ -1,7 +1,7 @@
 #include "ball_kalman_filter_2d.h"
 #include "opencv_utils.h"
 #include "camera.h"
-#include <opencv2\opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include "math/types.h"
 MidPoint BallKalmanFilter_2d::Update(std::vector<MidPoint> const & midPoints)
 {

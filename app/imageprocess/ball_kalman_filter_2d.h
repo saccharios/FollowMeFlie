@@ -1,5 +1,5 @@
 #pragma once
-#include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
+#include </usr/include/eigen3/Eigen/Core>
 
 #include "math/types.h"
 #include "math/kalman_filter.h"

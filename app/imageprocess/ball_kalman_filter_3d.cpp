@@ -1,7 +1,7 @@
 #include "ball_kalman_filter_3d.h"
 #include "opencv_utils.h"
 #include "camera.h"
-#include <opencv2\opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include "math/types.h"
 BallKalmanFilter_3d::Vector6f BallKalmanFilter_3d::Update(std::vector<Point3f> const & crazyFliePoints)
 {

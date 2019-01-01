@@ -54,20 +54,24 @@ DEPENDPATH += $$PWD/../build/src/lib
 
 # Include opencv 3.2.0
 
-INCLUDEPATH += $${opencv_path}/install/include
-LIBS += $${opencv_path}/bin/libopencv_calib3d320.dll
-LIBS += $${opencv_path}/bin/libopencv_core320.dll
-LIBS += $${opencv_path}/bin/libopencv_features2d320.dll
-LIBS += $${opencv_path}/bin/libopencv_flann320.dll
-LIBS += $${opencv_path}/bin/libopencv_highgui320.dll
-LIBS += $${opencv_path}/bin/libopencv_imgcodecs320.dll
-LIBS += $${opencv_path}/bin/libopencv_imgproc320.dll
-LIBS += $${opencv_path}/bin/libopencv_ml320.dll
-LIBS += $${opencv_path}/bin/libopencv_objdetect320.dll
-LIBS += $${opencv_path}/bin/libopencv_photo320.dll
-LIBS += $${opencv_path}/bin/libopencv_shape320.dll
-LIBS += $${opencv_path}/bin/libopencv_stitching320.dll
-LIBS += $${opencv_path}/bin/libopencv_superres320.dll
-LIBS += $${opencv_path}/bin/libopencv_video320.dll
-LIBS += $${opencv_path}/bin/libopencv_videoio320.dll
-LIBS += $${opencv_path}/bin/libopencv_videostab320.dll
+INCLUDEPATH += $${opencv_path}/include
+
+opencv_lib_path = /usr/local/lib
+#LIBS += `pkg-config opencv --libs`
+
+#LIBS += -L$${opencv_lib_path} \
+#        -lopencv_calib3d \
+#        -lopencv_core \
+#        -lopencv_dnn \
+#        -lopencv_features2d \
+#        -lopencv_flann \
+#        -lopencv_gapi \
+#        -lopencv_highgui \
+#        -lopencv_imgcodecs \
+#        -lopencv_imgproc \
+#        -lopencv_ml \
+#        -lopencv_objdetect \
+#        -lopencv_photo \
+#        -lopencv_stitching \
+#        -lopencv_video \
+#        -lopencv_videoio

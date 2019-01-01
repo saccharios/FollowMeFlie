@@ -4,7 +4,7 @@
 #include <QTableView>
 #include <QScrollBar>
 #include <QHeaderView>
-
+#include <cmath>
 namespace qt_utils
 {
 

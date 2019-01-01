@@ -1,5 +1,5 @@
 #pragma once
-#include "QOBJECT"
+#include <QObject>
 #include "math/pid_controller.h"
 #include "crazyflie/crazy_flie.h"
 #include "math/types.h"

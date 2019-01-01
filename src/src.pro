@@ -59,12 +59,12 @@ SOURCES += \
 
 
 # Include library libusb-1.0.21
-INCLUDEPATH += $${libubs_path}/include/libusb-1.0
-INCLUDEPATH += $${libubs_path}/include/$$PWD/
-LIBS += -L$${libubs_path}/MinGW32/static -llibusb-1.0
+#INCLUDEPATH += $${libubs_path}/include/libusb-1.0
+#INCLUDEPATH += $${libubs_path}/include/$$PWD/
+#LIBS += -L$${libubs_path}/MinGW32/static -llibusb-1.0
 
 
-DEPENDPATH += $${libubs_path}/MinGW32/static
+#DEPENDPATH += $${libubs_path}/MinGW32/static
 
 # Include Eigen library
 INCLUDEPATH += $${eigen_lib_path}

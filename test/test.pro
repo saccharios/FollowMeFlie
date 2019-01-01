@@ -33,11 +33,16 @@ HEADERS  += \
      $$PWD/../app/imageprocess/camera.h
 
 # Include Google Test
-INCLUDEPATH += $${goolgetest_path}/googletest-release-1.7.0/include \
-    $${goolgetest_path}/googletest-release-1.7.0 \
-    $${goolgetest_path}/gtestbuild-1.7.0
-SOURCES += $${goolgetest_path}/googletest-release-1.7.0/src/gtest-all.cc
-LIBS += -lgtest -L$${goolgetest_path}/gtestbuild-1.7.0
+#INCLUDEPATH += $${goolgetest_path}/googletest-release-1.7.0/include \
+#    $${goolgetest_path}/googletest-release-1.7.0 \
+#    $${goolgetest_path}/gtestbuild-1.7.0
+#SOURCES += $${goolgetest_path}/googletest-release-1.7.0/src/gtest-all.cc
+#LIBS += -lgtest -L$${goolgetest_path}/gtestbuild-1.7.0
+INCLUDEPATH += $${goolgetest_path}/include \
+DEPENDPATH += $${goolgetest_path}/include \
+LIBS += -L$${goolgetest_path} -lgtest  \
+        -L$${goolgetest_path} -lgtest_main
+
 
 
 # Include code to test
@@ -49,20 +54,20 @@ DEPENDPATH += $$PWD/../build/app
 
 # Include opencv 3.2.0
 
-INCLUDEPATH += $${opencv_path}/install/include
-LIBS += $${opencv_path}/bin/libopencv_calib3d320.dll
-LIBS += $${opencv_path}/bin/libopencv_core320.dll
-LIBS += $${opencv_path}/bin/libopencv_features2d320.dll
-LIBS += $${opencv_path}/bin/libopencv_flann320.dll
-LIBS += $${opencv_path}/bin/libopencv_highgui320.dll
-LIBS += $${opencv_path}/bin/libopencv_imgcodecs320.dll
-LIBS += $${opencv_path}/bin/libopencv_imgproc320.dll
-LIBS += $${opencv_path}/bin/libopencv_ml320.dll
-LIBS += $${opencv_path}/bin/libopencv_objdetect320.dll
-LIBS += $${opencv_path}/bin/libopencv_photo320.dll
-LIBS += $${opencv_path}/bin/libopencv_shape320.dll
-LIBS += $${opencv_path}/bin/libopencv_stitching320.dll
-LIBS += $${opencv_path}/bin/libopencv_superres320.dll
-LIBS += $${opencv_path}/bin/libopencv_video320.dll
-LIBS += $${opencv_path}/bin/libopencv_videoio320.dll
-LIBS += $${opencv_path}/bin/libopencv_videostab320.dll
+INCLUDEPATH += $${opencv_path}/include
+#LIBS += $${opencv_path}/bin/libopencv_calib3d320.dll
+#LIBS += $${opencv_path}/bin/libopencv_core320.dll
+#LIBS += $${opencv_path}/bin/libopencv_features2d320.dll
+#LIBS += $${opencv_path}/bin/libopencv_flann320.dll
+#LIBS += $${opencv_path}/bin/libopencv_highgui320.dll
+#LIBS += $${opencv_path}/bin/libopencv_imgcodecs320.dll
+#LIBS += $${opencv_path}/bin/libopencv_imgproc320.dll
+#LIBS += $${opencv_path}/bin/libopencv_ml320.dll
+#LIBS += $${opencv_path}/bin/libopencv_objdetect320.dll
+#LIBS += $${opencv_path}/bin/libopencv_photo320.dll
+#LIBS += $${opencv_path}/bin/libopencv_shape320.dll
+#LIBS += $${opencv_path}/bin/libopencv_stitching320.dll
+#LIBS += $${opencv_path}/bin/libopencv_superres320.dll
+#LIBS += $${opencv_path}/bin/libopencv_video320.dll
+#LIBS += $${opencv_path}/bin/libopencv_videoio320.dll
+#LIBS += $${opencv_path}/bin/libopencv_videostab320.dll

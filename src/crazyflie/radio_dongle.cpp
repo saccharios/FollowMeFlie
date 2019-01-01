@@ -1,7 +1,7 @@
 #include "radio_dongle.h"
 #include <chrono>
-#undef _GLIBCXX_HAS_GTHREADS
-#include "../../../mingw_std_threads/mingw.thread.h"
+//#undef _GLIBCXX_HAS_GTHREADS
+//#include "../../../mingw_std_threads/mingw.thread.h"
 #include "math/types.h"
 #include "crazyflie/protocol.h"
 #include "text_logger.h"
@@ -216,6 +216,7 @@ bool RadioDongle::WriteData(uint8_t * data, int length)
     {
     case 0:
         textLogger << "Writing data failed partially\n";
+        break;
     case LIBUSB_ERROR_TIMEOUT:
         textLogger << "USB timeout" << "\n";
         break;

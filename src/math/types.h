@@ -1,5 +1,5 @@
 #pragma once
-#include "E:\Code\lib\eigen-3.3.4\Eigen/Core"
+#include </usr/include/eigen3/Eigen/Core>
 //#include "crazyflie/crtp_packet.h"
 #include <vector>
 #include <memory>
