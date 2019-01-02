@@ -62,8 +62,6 @@ public:
     uint8_t GetPort() const;
     uint8_t GetChannel() const;
 
-    // TODO SF Move PrintData and Data to math/types.h
-    static void PrintData(Data const & data);
     void Print() const;
 
 private:

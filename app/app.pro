@@ -57,7 +57,7 @@ DEPENDPATH += $$PWD/../build/src/lib
 INCLUDEPATH += $${opencv_path}/include
 
 opencv_lib_path = /usr/local/lib
-#LIBS += `pkg-config opencv --libs`
+LIBS += `pkg-config opencv --libs`
 
 #LIBS += -L$${opencv_lib_path} \
 #        -lopencv_calib3d \
