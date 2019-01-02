@@ -1,6 +1,7 @@
 #include "set_point_dialog.h"
 #include "ui_set_point_dialog.h"
 #include <QPushButton>
+#include <QIntValidator>
 
 SetPointDialog::SetPointDialog(Point3f setPoint, QWidget *parent) :
     QDialog(parent),

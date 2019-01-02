@@ -52,10 +52,14 @@ LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
 INCLUDEPATH += $$PWD/../build/src/lib
 DEPENDPATH += $$PWD/../build/src/lib
 
-# Include opencv 3.2.0
+#INCLUDEPATH += $${opencv_path}/include
 
+#opencv_lib_path = /usr/local/lib
+#LIBS += `pkg-config opencv --libs`
+
+
+# Include opencv
 INCLUDEPATH += $${opencv_path}/include
-
 opencv_lib_path = /usr/local/lib
 LIBS += `pkg-config opencv --libs`
 

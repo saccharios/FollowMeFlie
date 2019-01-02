@@ -49,7 +49,7 @@ INCLUDEPATH += $$PWD/../build/app
 DEPENDPATH += $$PWD/../build/app
 
 
-# Include opencv 3.2.0
+# Include opencv
 INCLUDEPATH += $${opencv_path}/include
 opencv_lib_path = /usr/local/lib
 LIBS += `pkg-config opencv --libs`
