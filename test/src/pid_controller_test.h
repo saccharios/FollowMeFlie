@@ -11,8 +11,8 @@ private:
 
 TEST_F(PID_Controller_Test, P_Gain)
 {
-    float sampling_time = 0.001;
-    float gain_proportional =0.5f;
+    float sampling_time = 0.001f;
+    float gain_proportional = 0.5f;
     float time_constant_inverse = 0.0f;
     float gain_correction = 1.0;
     float feed_fwd = 0.1f;
