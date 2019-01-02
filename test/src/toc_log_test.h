@@ -16,8 +16,8 @@ private:
     std::vector<CRTPPacket> _packets;
      int _port = 5; // Log Port
      int _channel = 2; // Data channel
-     float num1 = 1.6756;
-     float num2 = 73.6756;
+     float num1 = 1.6756f;
+     float num2 = 73.6756f;
      uint8_t int1 = 17;
      uint8_t int2 = 39;
      uint8_t blockID1 = 2;

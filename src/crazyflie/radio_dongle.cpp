@@ -5,6 +5,7 @@
 #include "math/types.h"
 #include "crazyflie/protocol.h"
 #include "text_logger.h"
+#include <libusb-1.0/libusb.h>
 
 RadioDongle::RadioDongle() :
     _radioSettings(RadioSettings::_0802M),

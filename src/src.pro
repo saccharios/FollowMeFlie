@@ -55,16 +55,8 @@ SOURCES += \
     math/pid_controller.cpp \
     math/functions.cpp
 
-
-
-
-# Include library libusb-1.0.21
-#INCLUDEPATH += $${libubs_path}/include/libusb-1.0
-#INCLUDEPATH += $${libubs_path}/include/$$PWD/
-#LIBS += -L$${libubs_path}/MinGW32/static -llibusb-1.0
-
-
-#DEPENDPATH += $${libubs_path}/MinGW32/static
+# Include library libusb-1.0
+LIBS += -lusb-1.0
 
 # Include Eigen library
 INCLUDEPATH += $${eigen_lib_path}
