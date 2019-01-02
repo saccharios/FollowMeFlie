@@ -1,9 +1,7 @@
 include(../defaults.pri)
+
 TEMPLATE = app
-# Use C++ 14
 CONFIG += c++14
-#CONFIG += console
-#CONFIG -= qt
 
 INCLUDEPATH += $$PWD/../test/src
 INCLUDEPATH += $$PWD/../src
@@ -41,13 +39,6 @@ LIBS += -L$${goolgetest_path} \
 
 # Include code to test
 LIBS += -L$$OUT_PWD/../src/lib/ -lFollowMeFlie
-
-
-INCLUDEPATH += $$PWD/../build/src/lib
-DEPENDPATH += $$PWD/../build/src/lib
-INCLUDEPATH += $$PWD/../build/app
-DEPENDPATH += $$PWD/../build/app
-
 
 # Include opencv
 INCLUDEPATH += $${opencv_path}/include
