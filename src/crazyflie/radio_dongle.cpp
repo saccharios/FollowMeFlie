@@ -103,7 +103,7 @@ bool RadioDongle::OpenUSBDongle()
         }
         else
         {
-             textLogger << "Error! No dongle found.\n";
+             std::cout << "Error! No dongle found. ERR "<< error <<std::endl;
         }
 
         for(auto & device : devices)
@@ -161,7 +161,7 @@ void RadioDongle::StartRadio()
         textLogger << "Got device version " << _deviceVersion << "\n";
         if(_deviceVersion < 0.3)
         {
-            textLogger << "Device version too low. Device is not supported.\n";
+            std::cout << "Device version too low. Device is not supported.\n";
             return;
         }
 
