@@ -16,7 +16,7 @@ public:
         _gain_proportional(gain_proportional),
         _time_constant_inverse(time_constant_inverse),
         _gain_correction(gain_correction),
-        _feed_fwd(feed_fwd),
+        _feed_fwd_stat(feed_fwd),
         _limit_lower(limit_lower),
         _limit_upper(limit_upper),
         _integral_part(0),
@@ -24,7 +24,7 @@ public:
     {}
 
     float Update(float error);
-    float Update(float error, float feed_fwd);
+    float Update(float error, float feed_fwd_dyn);
 
     void Reset(float integral_part = 0);
 
@@ -34,7 +34,7 @@ private:
     float _gain_proportional;
     float _time_constant_inverse;
     float _gain_correction;
-    float _feed_fwd;
+    float _feed_fwd_stat;
     float _limit_lower;
     float _limit_upper;
 

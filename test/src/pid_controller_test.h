@@ -14,7 +14,7 @@ TEST_F(PID_Controller_Test, P_Gain)
     float sampling_time = 0.001f;
     float gain_proportional = 0.5f;
     float time_constant_inverse = 0.0f;
-    float gain_correction = 1.0;
+    float gain_correction = 0.0;
     float feed_fwd = 0.1f;
     float limit_lower = -1.0;
     float limit_upper = 1.0;
@@ -31,10 +31,10 @@ TEST_F(PID_Controller_Test, P_Gain)
 
     // Step input
     float input = 1;
-    for(unsigned int i = 0; i < 100; ++i)
+    for(unsigned int i = 0; i < 10; ++i)
     {
         float output = pid_controller.Update(input);
-        EXPECT_FLOAT_EQ(output, input*gain_proportional + feed_fwd);
+        EXPECT_FLOAT_EQ(input*gain_proportional + feed_fwd, output) << "at i = " << i;
     }
 }
 
