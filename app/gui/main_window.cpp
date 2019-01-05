@@ -16,6 +16,7 @@
 #include "math/types.h"
 #include "text_logger.h"
 #include "set_point_dialog.h"
+#include "crazyflie/crazy_flie_commander.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
