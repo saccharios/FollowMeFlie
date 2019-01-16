@@ -16,8 +16,8 @@ public:
 
     ExtractColor(QColor const & color) :
         _colorToFilter(color),
-        _kalmanFilter_2d(0.5, 0.05, 0.0),
-        _kalmanFilter_3d(0.5, 0.05, 0.0),
+        _kalmanFilter_2d(1, 0.05, 0.1), // meas_noise, process_noise_1, process_noise_2
+        _kalmanFilter_3d(0.5, 0.05, 0.0), // meas_noise, process_noise_1, process_noise_2
         _detectorParams()
     {
 

@@ -9,7 +9,7 @@ CrazyFlieCommander::CrazyFlieCommander(Crazyflie & crazyflie, float samplingTime
     //(sampling_time,   gain_proportional, time_constant_inverse, gain_correction,  feed_fwd, limit_lower,limit_upper, gain_derivative ):
     _pid_ZVelocity (samplingTime, 2.0f,   1.0f, 1.0f, 0.00f, -0.5f, 1.0f, 0.005f), // in meter
     _currentBallEstimate(),
-    _takeOffTimeTicks(static_cast<int>(std::round(0.7f/samplingTime))),
+    _takeOffTimeTicks(static_cast<int>(std::round(0.5f/samplingTime))),
     _landingTimeTicks(static_cast<int>(std::round(2.0f/samplingTime)))
 {}
 

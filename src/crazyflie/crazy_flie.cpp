@@ -111,8 +111,8 @@ void Crazyflie::Update()
     case State::SET_PARAMETERS:
     {
         // Set Parameters that take into account the increased weight due to the camera
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 44000); //40000
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 25000); //23000
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustBase), 46000); //40000
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::posCtlPid::thrustMin), 30000); //23000
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKp), 8); // default 25
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKi), 0.1f);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vxKd), 6);// default 0
@@ -120,9 +120,12 @@ void Crazyflie::Update()
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKi), 0.1f);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vyKd), 6);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKp), 10.0f);// default 25
-        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 0.1f);// default 1
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKi), 0.5f);// default 1
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::velCtlPid::vzKd), 2.0f);// default 0
         _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::controller::tiltComp), 1);// default 0
+
+
+        _parameters.WriteParameter(static_cast<uint8_t>(TocParameter::ctrlMel::mass), 0.006f);
 
         _state = State::NORMAL_OPERATION;
         break;
