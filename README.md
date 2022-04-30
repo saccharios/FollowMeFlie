@@ -8,3 +8,5 @@ Check out this [video](https://youtu.be/gP_Cj_Js5NY) of the CrazyFlie and the cl
 
 Check under "Projects" on what I am currently working on.
 
+# Note
+I've stopped working on this project a long time ago. 
